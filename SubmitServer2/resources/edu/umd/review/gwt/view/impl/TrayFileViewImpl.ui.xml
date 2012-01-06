@@ -1,0 +1,8 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <g:HTMLPanel ui:field="outer" styleName="tray-file-view">
+    <g:Anchor ui:field="link" styleName="link" addStyleNames="link-block" />
+    <g:FlowPanel ui:field="panel" />
+  </g:HTMLPanel>
+</ui:UiBinder>

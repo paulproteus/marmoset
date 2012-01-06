@@ -1,0 +1,21 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:style>
+    .file-name {
+      font-size: 120%;
+      font-weight: bold;
+      margin-left: 1em;
+    }
+
+    .file-box {
+      margin-bottom: 2em;
+      border: 1px solid silver;
+    }
+  </ui:style>
+  <g:HTMLPanel styleName="{style.file-box}">
+    <g:Label ui:field="fileLabel" styleName="{style.file-name}" />
+    <pre>
+      <g:FlexTable ui:field="codeGrid" styleName="code-grid code" cellSpacing="0" cellPadding="0" />
+    </pre>
+  </g:HTMLPanel>
+</ui:UiBinder>

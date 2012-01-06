@@ -1,0 +1,77 @@
+
+#  Marmoset: a student project snapshot, submission, testing and code review
+#  system developed by the Univ. of Maryland, College Park
+#
+#  Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+#  by William Pugh. See http://marmoset.cs.umd.edu/
+#
+#  Copyright 2005 - 2011, Univ. of Maryland
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy of
+#  the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations under
+#  the License.
+
+# A template configuration file for the BuildServer
+# This contains substitution tags for ant
+
+# see sample.properties for explanations of what the config
+# parameters mean
+
+# Configuration stuff.
+java.home=@JAVA_HOME@
+findbugs.home=@FIND_BUGS_HOME@
+build.server.home=@BUILD_SERVER_HOME@
+build.server.root=@BUILD_SERVER_ROOT@
+#pmd.home=@PMD_HOME@
+hostname=@HOSTNAME@
+
+semester=@SEMESTER@
+supported.courses=@COURSES@
+
+#
+# Name of an unprivileged account that the main account
+# running the buildServer can 'sudo' to without a password
+# to execute untrusted student code in a more secure environment.
+#
+unprivileged.account=@UNPRIVILEGED_ACCOUNT@
+
+# Java static analysis tools: comma-separated list of names of
+# classes implementing the ISubmissionInspectionStep interface.
+# If no package is given explicitly, the "edu.umd.cs.buildServer"
+# package is assumed.
+#tools.java=FindBugsRunner,PMDRunner,CodeFeaturesRunner
+tools.java=FindBugsRunner
+
+# How to contact the SubmitServer, and authenticate
+# as the BuildServer.
+submit.server.protocol=https
+submit.server.host=@SERVER_HOST@
+submit.server.port=@PORT@
+submit.server.password=@PASSWORD@
+
+# Paths to SubmitServer servlets used by the BuildServer.
+submit.server.requestproject.path=/submitServer/buildServer/RequestSubmission
+submit.server.getprojectjar.path=/submitServer/buildServer/GetProjectJarfile
+submit.server.reporttestresults.path=/submitServer/buildServer/ReportTestOutcomes
+submit.server.handlebuildserverlogmessage.path=/submitServer/buildServer/HandleBuildServerLogMessage
+
+# Directories.  These must all be distinct.
+build.directory=${build.server.home}/build
+test.files.directory=${build.server.home}/testfiles
+jar.cache.directory=${build.server.home}/jarcache
+log.directory=${build.server.home}/log
+#log.directory=console
+
+# Debug properties.
+debug.verbose=true
+debug.donotloop=false
+#debug.donotloop=true
+debug.java.security=false

@@ -1,0 +1,1445 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY BuildServer "<application>BuildServer</application>">
+<!ENTITY nbsp "&#160;">
+]>
+ 
+<book lang="en" id="buildserver-manual">
+ 
+<bookinfo>
+<title>Marmoset BuildServer Manual</title>
+
+<authorgroup>
+	<author>
+		<firstname>David</firstname>
+		<surname>Hovemeyer</surname>
+	</author>
+	<author>
+		<firstname>Jaime</firstname>
+		<surname>Spacco</surname>
+	</author>
+	<author>
+		<firstname>Nat</firstname>
+		<surname>Ayewah</surname>
+	</author>	
+</authorgroup>
+
+<copyright>
+	<year>2005</year>
+	<year>2006</year>
+	<holder>University of Maryland</holder>
+</copyright>
+
+<legalnotice>
+<!--
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike License.
+To view a copy of this license, visit
+<ulink url="http://creativecommons.org/licenses/by-nc-sa/1.0/">http://creativecommons.org/licenses/by-nc-sa/1.0/</ulink>
+or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+-->
+All Rights Reserved
+</legalnotice>
+
+</bookinfo>
+
+<!--
+	**************************************************************************
+	Introduction
+	**************************************************************************
+-->
+ 
+<chapter id="introduction">
+	<title>Introduction</title>
+
+	<para>
+	This document explains how to use the BuildServer component of Marmoset.
+	The BuildServer automatically builds and tests student project submissions,
+	and reports the test results back to the SubmitServer database.
+	</para>
+
+	<para>
+	The goals of this document are to specify how to set up and run a
+	BuildServer instance, and how to develop course projects that can
+	be automatically built and tested by the BuildServer.
+	</para>
+
+</chapter>
+
+<chapter id="instructorquickstart">
+	<title>Quick Start Guide for Instructors</title>
+
+	<para>
+	This chapter explains how you can quickly develop a course
+	project that can be used with the Marmoset BuildServer.
+	</para>
+
+	<para>
+	The best way to get started developing a project for use with
+	Marmoset is to download one of the example projects, and then
+	modify it.  You can find the sample projects using the
+	following links:
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				<ulink url="https://submit.cs.umd.edu/docs/instructor/JavaProject/">Sample Java Project</ulink>
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>
+				<ulink url="https://submit.cs.umd.edu/docs/instructor/CProject/">Sample C Project</ulink>
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<para>
+	<xref linkend="debuggingprojects"/>
+	explains how to run the BuildServer from the command line
+	for debugging purposes.  This is very useful for developing and
+	debugging your project and canonical solution,
+	and also for debugging particular student submissions that
+	don't behave as expected when built and tested by the
+	BuildServer in production.
+	</para>
+</chapter>
+
+<chapter id="installing">
+	<title>Installing the BuildServer</title>
+	<para>
+	This chapter describes how to download and install the
+	BuildServer software.  You might want to do this because you
+	want to run one of more BuildServer daemon processes
+	(<xref linkend="daemon"/>), or you might want to run
+	the BuildServer in debugging mode on your development
+	machine in order to test projects (<xref linkend="debuggingprojects"/>).
+	</para>
+
+	<sect1 id="install_prerequisites">
+		<title>Prerequisites</title>
+
+		<para>
+		To install and run the BuildServer, you need the following:
+		</para>
+
+		<itemizedlist>
+			<listitem><para>JDK 1.5 (a.k.a. 5.0) or later (<ulink url="http://java.sun.com/j2se/">Download Java</ulink>)</para></listitem>
+			<listitem><para>Ant 1.6 or later (<ulink url="http://ant.apache.org/">Download Ant</ulink>)</para></listitem>
+			<listitem><para>Perl 5 or later (<ulink url="http://www.perl.org/">Download Perl</ulink>)</para></listitem>
+          <listitem>
+            <para>
+              JavaMail 1.3 API (versions later than 1.3 have not been tested)
+              (<ulink url="http://java.sun.com/products/javamail/javamail-1_3.html">
+              Download JavaMail 1.3</ulink>)
+            </para>
+          </listitem>
+		</itemizedlist>
+		
+		<para>
+			You also need an existing Submit Server installation and database. If you are 
+			installing this at your university, you need to complete the Submit Server 
+			installation at least through Chapter 4 of the Submit Server installation manual.
+		</para>
+
+        <para>
+          Certain third-party libraries that are essential to the function of the
+          BuildServer are not included in the BuildServer distribution.  As such,
+          you will have to download them yourself and place the downloaded libraries
+          in the correct directories <emphasis>before</emphasis> compiling and running
+          the BuildServer.
+        </para>
+
+        <para>
+          You will need the libraries from the JavaMail API
+          Implementation version 1.3, which can be downloaded from
+          <ulink
+          url="http://java.sun.com/products/javamail/javamail-1_3.html">
+          http://java.sun.com/products/javamail/javamail-1_3.html
+          </ulink>.  Unpack the JavaMail 1.3 zip archive, and place
+          the ".jar" files in the "lib" directory of the BuildServer
+          distribution.  If the directory containing the BuildServer
+          distribution is "BuildServer," this directory would then be
+          "BuildServer/lib".
+        </para>
+
+        <para>
+          To build the BuildServer from source, you will also need a
+          copy of Clover code coverage analysis library from
+          Atlassian.  The BuildServer uses Clover version 1, which you
+          can find in the Clover release archive at <ulink
+          url="http://www.atlassian.com/software/clover/ArchiveCloverDownloads.jspa">this
+          link</ulink>.  You should use, for example, "Clover for Ant"
+          version 1.x.y (for some version numbers x and y); copy
+          clover.jar from the Clover package into the lib directory in
+          the BuildServer source distribution before building the
+          BuildServer source code.  If you decide to use Clover when
+          running the BuildServer, you will need to obtain a license
+          for Clover from Atlassian.  Using the BuildServer without a
+          licensed copy of Clover has not been tested and is not
+          necessarily supported: running the BuildServer without the
+          Clover library and a valid license key may cause unexpected
+          behavior.  If the directory containing the BuildServer
+          distribution is "BuildServer," the Clover library should be
+          placed in "BuildServer/lib".
+        </para>
+
+	</sect1>
+
+	<sect1 id="install_steps">
+		<title>Installation Steps</title>
+
+		<orderedlist numeration="arabic">
+			<listitem>
+				<para>
+				Create a fresh directory. I will refer to this directory as
+				'buildserver' in this chapter but you may name the directory
+				anything you'd like.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				  Unpack your distribution into this directory;
+				  you'll need the following components:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>BuildServer</para>
+					</listitem>
+					<listitem>
+						<para>SubmitServerModelClasses</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+				Change directory into the 'BuildServer' directory.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				Run <literal>ant</literal>.  The code should compile with no
+				errors.  (You may see warnings about deprecated code; they
+				are normal.  The ant bujild script
+				expects SubmitServerModelClasses to be
+				next to tbe BuildServer, and will find
+				and compile it as appropriate).
+				</para>
+			</listitem>
+			<listitem>
+			  <para>
+			    Run the <literal>batch-install</literal>
+			    from inside the BuildServer directory.
+			    Here is a sample call to this script:
+			  </para>
+			  <para>
+			    <literal>./batch-install -h oursubmitserver.ourschool.edu -c CSE101,"CSE 202" 
+			    -s "Spring 2006" 4</literal>
+			  </para>
+			  
+			  <para>
+			    The full usage of this script is:
+			  </para>
+
+			  <literallayout>
+			  <literal>
+Usage: ./batch-install 
+		 [ -b &lt;buildServerWorkDir&gt; ] 
+			Where to put BuildServer work directories and logfiles; defaults to the current directory (i.e. BuildServer)
+		 [ -f &lt;findbugsDir&gt; ] 
+			If empty then FindBugs won't be used
+		 [ -p &lt;port&gt; ] 
+			Defaults to 8443
+		 [ -u &lt;unprivilegedAccount&gt; ] 
+			Default is to use the same account running the BuildServer (less secure but perfectly functional)
+		 -w &lt;password&gt; 
+			REQUIRED: MUST match buildserver.password in your submit server's web.xml config file
+		 -h &lt;serverHost&gt; 
+			REQUIRED: The hostname of the SubmitServer to connect to
+		 -c &lt;course1,...,courseN&gt; 
+			REQUIRED: Comma-separated list of courses this BuildServer supports
+		 -s &lt;semester&gt; 
+			REQUIRED: The semester for which this BuildServer can build submissions
+ 		 &lt;numBuildServers&gt; 
+			REQUIRED: The number of BuildServers to create 
+<!-- 
+Usage: ./batch-install 
+		 [ -b &lt;buildServerWorkDir&gt; (where to put the bs1 directories and logfiles) ]
+		 [ -f &lt;findbugsDir&gt; ]
+		 [ -p &lt;port&gt; ]
+		 [ -u &lt;unprivilegedAccount&gt; ]
+		 -w &lt;password&gt;
+		 -h &lt;serverHost&gt;
+		 -c &lt;course1,...,courseN&gt;
+		 -s &lt;semester&gt;
+ 		 &lt;numBuildServers&gt;
+-->
+			</literal>
+			</literallayout>
+
+
+
+				<table id="buildserver-install-script">
+					<title>Test properties</title>
+					<tgroup cols="3" align="left">
+					<thead>
+					<row>
+						<entry>Parameter</entry>
+						<entry>Required?</entry>
+						<entry>Default</entry>
+						<entry>Meaning</entry>
+					</row>
+					</thead>
+					<tbody>	
+					<row>
+						<entry>-b [buildServerWorkDir]</entry>
+						<entry>no</entry>
+						<entry>
+						The current directory (the batch-install script must be run from
+						the BuildServer directory).
+						</entry>
+						<entry>Where to put the work directories for the BuildServers
+						this script	creates.  The work directories are where the 
+						BuildServer stores downloaded submissions and test-setups,
+						and stores its logfiles.  These directories will
+						typically be named something like bs2.&lt;hostname&gt;
+						</entry>
+					</row>
+
+
+					<row>
+						<entry>-f [FindBugsDir]</entry>
+						<entry>no</entry>
+						<entry>don't use FindBugs </entry>
+						<entry>
+						If a FindBugs installation is specified, then this BuildServer 
+						will run FindBugs on all Java-based submissions, and report the
+						results back to the SubmitServer (which will display them to
+						students and instructors). If no FindBugs
+						installation is specified, then this BuildServer will not use
+						FindBugs.
+						</entry>
+					</row>
+					
+					<row>
+						<entry>-u [unprivilegedAccount]</entry>
+						<entry>no</entry>
+						<entry>don't use an unprivileged account</entry>
+						<entry>
+						If an unprivileged account is specified, the BuildServer will 
+						'su' to this account before executing student code for
+						Makefile-based projects.  (Note that this implies that
+						the account running the BuildServer can 'su' to the unprivileged
+						account with no password.)
+						This provides additional security in that student-written code
+						will not be able to delete anything from the file system.
+						If no unprivileged account is specified, then student-written
+						code will run under the same account that is running the 
+						BuildServer.  This is somewhat less secure, but perfectly
+						functional.
+						</entry>
+					</row>
+
+					<row>
+						<entry>port</entry>
+						<entry>no</entry>
+						<entry>8443</entry>
+						<entry>
+						The port on the server where the SubmitServer is running.
+						</entry>
+					</row>
+
+					<row>
+						<entry>-w [password]</entry>
+						<entry>yes</entry>
+						<entry>N/A</entry>
+						<entry>
+						This is the password that the build server will use to connect to the
+						submit server.  It <emphasis>must be identical</emphasis> to the
+						"buildserver.password" context param value in the web.xml configuration file
+						on your submit server.  Please see the submit server documentation for more
+						information.
+						</entry>
+					</row>
+
+					<row>
+						<entry>-h [submitserverHost]</entry>
+						<entry>yes</entry>
+						<entry>N/A</entry>
+						<entry>
+						The hostname of the SubmitServer for BuildServers to
+						connect to.
+						</entry>
+					</row>
+
+					<row>
+						<entry>-c &lt;course1,...,courseN&gt;</entry>
+						<entry>yes</entry>
+						<entry>N/A</entry>
+						<entry>
+						A comma-separated list of the courses that this BuildServer
+						can compile and test.  For example:
+						<literallayout>
+						-c CMSC131,CMSC132,CMSC433
+						</literallayout>
+						</entry>
+					</row>
+
+					<row>
+						<entry>-s [semester]</entry>
+						<entry>yes</entry>
+						<entry>N/A</entry>
+						<entry>
+						The semester for which this BuildServer can build and test
+						submissions.  For example:
+						<literallayout>
+						-s "Spring 2006"
+						</literallayout>
+						</entry>
+					</row>
+
+					<row>
+						<entry>num_build_servers</entry>
+						<entry>yes</entry>
+						<entry>N/A</entry>
+						<entry>
+						The number of BuildServers to create.  BuildServers 
+						will be put into &lt;buildServerWorkDir&gt;, and will be named:
+						<literallayout>
+						bs1.&lt;hostname&gt; ... bsN.&lt;hostname&gt;
+						</literallayout>
+						</entry>
+					</row>
+<!--
+					<row>
+						<entry></entry>
+						<entry></entry>
+						<entry></entry>
+						<entry></entry>
+					</row>
+-->
+
+					</tbody>
+					</tgroup>
+				</table>
+
+<!--
+				<para>
+				Run the <literal>install</literal> script from inside the BuildServer directory.
+				The usage of this script is:
+				<literal>
+				<literallayout>
+Usage: ./install 
+		 [ -r &lt;runDir&gt; ]
+		 [ -m &lt;pmdDir&gt; ]
+		 [ -b &lt;buildServerHome&gt;]
+		 [ -f &lt;findbugsDir&gt; ]
+		 [ -p &lt;port&gt; ]
+		 [ -h &lt;serverHost&gt; ]
+		 [ -w &lt;buildserver.password from web.xml&gt; ]
+		 [ -i ] (installs and also builds buildServer)
+ 		 [ -g ] (starts building submissions immediately)
+		 [ -c &lt;course1,...,courseN&gt; ]
+		 [ -s &lt;semester&gt; ]
+ 		 install 
+				</literallayout>
+				</literal>
+				</para>
+				<table id="buildserver-install-script">
+					<title>Test properties</title>
+					<tgroup cols="3" align="left">
+					<thead>
+					<row>
+						<entry>Parameter</entry>
+						<entry>Required?</entry>
+						<entry>Default</entry>
+						<entry>Meaning</entry>
+					</row>
+					</thead>
+					<tbody>	
+					<row>
+						<entry>[-r runDir]</entry>
+						<entry>no</entry>
+						<entry>n/a</entry>
+						<entry>Name of the directory (to be created if it doesn't exist)
+						where the buildServer will store its files. The value of "runDir" 
+						is concatenated to the host name of the machine the script is running
+						on to form the name of the directory.</entry>
+					</row>
+					<row>
+						<entry>[-b buildServerHome]</entry>
+						<entry>no</entry>
+						<entry>The current directory (the install script is usually run from
+						inside the BuildServer directory).</entry>
+						<entry>The home directory of the BuildServer, containing the classfiles
+						for the BuildServer and any other necessary jarfiles.  This directory
+						needs to be in the format created by ant using the build.xml file
+						inside the 
+						</entry>
+					</row>
+
+					<row>
+						<entry></entry>
+						<entry></entry>
+						<entry></entry>
+						<entry></entry>
+					</row>
+
+					</tbody>
+					</tgroup>
+				</table>
+
+				<para>Typical usage:</para>
+				<para>     <literal>./install -r bs1 install</literal></para>
+				<para>which creates the directory <literal>bs1.foo.cs.umd.edu</literal>
+				      (where the hostname is foo.cs.umd.edu) and copies some files into it.
+				</para>
+
+-->
+
+
+			</listitem>
+		</orderedlist>
+	</sect1>
+</chapter>
+
+<chapter id="daemon">
+	<title>Running a BuildServer</title>
+	<para>
+	This chapter describes how to run a BuildServer.
+	It assumes you have installed the BuildServer software as described in
+	<xref linkend="installing"/>.
+	</para>
+
+	<note>
+		<para>
+		The build servers connect securely to the Submit Server to get submissions to build.
+		In order to this, the unsigned security certificate associated with the submit server
+		needs to be installed in the JVM that will run the build server. See Section 2.4.3 
+		"Configuring SSL" of the Submit Server installation manual for more details. (If you 
+		are running the build server on the same host as the submit server, and you have already 
+		installed the certificate during the Submit Server installation process, then you can
+		ignore this note.) 
+		</para>
+	</note>
+
+	<sect1 id="daemon_about">
+		<title>About running a BuildServer</title>
+		
+		<para>
+			A build server is usually run as a daemon process running in the background. It 
+			probes the associated SubmitServer to see if any submissions need to be built -- if
+			this is the case, it downloads and builds these submissions. A Build Server can 
+			also be started from the command line to download and build a submission from the
+			submit server, or to build a submission that is available offline.
+			Starting the Build Server from the command line is often useful for debugging the
+			Build Server behavior, because this arrangement prints out all its output to stdout.
+		</para>
+				<para>
+		To run the build server as a daemon process, a cron job is set up to periodically
+		check that the server is still running. This ensures that if the server crashes,
+		it is restarted. However, this feature can be bothersome if an administrator wants
+		to kill the build server since it will be restarted within 5 minutes unless the cron
+		script is changed. For maximum flexibility, the Build Server distribution includes a 
+		"cron-set" script that influences the behavior of the cron job.
+				</para>
+	</sect1>
+
+	<sect1 id="daemon_on">
+		<title>To run the BuildServer daemons</title>
+
+		<orderedlist>
+			<listitem>
+				<para>
+		Enable cron processes using the "cron-set" script. From the BuildServer directory, run:
+				</para>
+				<para>
+		<literal>scripts/cron-set -c CRONTAB.sh on</literal>
+				</para>
+				<para>
+		This command modifies the CRONTAB.sh script to ensure that it periodically checks 
+		to ensure that the build servers are running.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+   		Run <literal>./CRONTAB.sh</literal>. This starts the build servers created during
+   		the installation process.
+				</para>
+			</listitem>
+		</orderedlist>
+	</sect1>
+	
+	<sect1 id="daemon_off">
+		<title>To stop the BuildServer daemons</title>
+
+		<orderedlist>
+			<listitem>
+				<para>
+		Disable cron processes using the "cron-set" script. From the BuildServer directory, run:
+				</para>
+				<para>
+		<literal>scripts/cron-set -c CRONTAB.sh off</literal>
+				</para>
+				<para>
+		This command modifies the CRONTAB.sh script to ensure that it does NOT restart
+		the build server.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+   		Run <literal>./killall</literal>. This stops all the build servers created during
+   		the installation process.
+				</para>
+			</listitem>
+		</orderedlist>
+	</sect1>
+	
+	<sect1 id="command_line">
+		<title>To run the BuildServer from the command line</title>
+
+		<orderedlist>
+			<listitem>
+				<para>
+			Running the build server from the command line is often useful for debugging purposes.
+			To run a single build server from the command line, first change directory (cd) into
+			the build server directory that corresponds to the build server you wish to run.
+			e.g. <literal>cd bs1.ourserver.ourschool.edu</literal>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				Use the runBuildServer script which has the following usage:
+				</para>
+				<para>
+		<literal>Usage: ./runBuildServer &lt;config file&gt; [ once ]</literal>
+				</para>
+				<para>
+		The config file is the "config.properties" file in the current directory. Adding the literal
+		<literal>once</literal> to the command instructs the build server to shut down after it has 
+		downloaded and built a single submission from the Submit Server.
+				</para>
+			</listitem>
+		</orderedlist>
+		
+		<warning>The build server working directories (bs1.*, bs2.* etc) are used to store
+				submission and test-setup information retrieved from the submit server, and
+				other temporary information needed during the testing process. Therefore, you
+				should not execute a build server that is in the process of testing a 
+				submission because this will interfere with the active testing process. 
+				Usually, the <literal>runBuildServer</literal> script is used when no build servers are active 
+				(i.e. all were shut down with the <literal>killall</literal> script) or in
+				a seperate build server installation.
+		</warning>
+	</sect1>
+		
+	<sect1 id="buildserver_offline">
+		<title>To run the BuildServer Offline</title>
+
+				<para>
+			It is also possible to run a build server offline on a particular submission. To 
+			do this, you will need a copy of the submission to be tested, and the associated
+			test-setup. (Both can be downloaded from the Submit Server. 
+			See <xref linkend="projects"/> for more info about these two files.)
+				</para>
+				
+		<orderedlist>
+			<listitem>
+				<para>
+			Set the BUILDSERVER_ROOT environment variable to point to the 'BuildServer/'
+			directory (i.e. the main directory that contains the 'scripts', 'bin' and build.xml)
+				</para>
+				<para>
+			e.g. <literal>setenv BUILDSERVER_ROOT $HOME/buildServer/BuildServer</literal>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+			Create a new directory that will be used temporarily for the offline testing. You 
+			can create this directory anywhere except in any of the existing build server 
+			working directories (i.e. the ones named bs1.*, bs2.* etc.). Using any of these
+			directories may create a conflict with any existing (and running) build servers.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+			Copy the zip files representing the submission to be tested, and its associated
+			test-setup into the new directory. Both can be downloaded from the Submit Server. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				The testSubmission.sh script in the 'BuildServer/scripts' directory
+				will dynamically create a build server, run it once on the two zip files, 
+				and then shut it down. Example Usage: 
+				</para>
+				<para>
+		<literal>$BUILDSERVER_ROOT/scripts/testSubmission.sh submission.zip test-setup.zip</literal>
+				</para>
+				<para>
+		You may want to add testSubmission.sh to your path if this is a task you perform often.
+				</para>
+			</listitem>
+		</orderedlist>
+	</sect1>
+	
+</chapter>
+
+<chapter id="projects">
+	<title>Overview of Automatic Building and Testing</title>
+
+	<para>
+	This section provides an overview of how the BuildServer builds
+	and tests student submissions.  The process of building and testing
+	one submission requires two files: a <emphasis>submission zipfile</emphasis>
+	and a <emphasis>test setup jarfile</emphasis>.  Both of these are
+	simply files in the <ulink url="http://www.info-zip.org/">Zip</ulink>
+	format.
+	</para>
+
+	<sect1 id="submissionzipfile">
+	<title>The Submission Zipfile</title>
+
+	<para>
+	Student submissions are stored in zip files, referred to as
+	<emphasis>submission zipfiles</emphasis>.
+	They contain the source code files for the student's project.
+	They may also other files: for example, test cases provided
+	to the students, the student's own test cases, image or data files,
+	etc.
+	</para>
+
+	</sect1>
+
+	<sect1 id="projectjarfile">
+	<title>The Test Setup Jarfile</title>
+
+	<para>
+	All of the information
+	about how to build and test submissions for a particular
+	course project is contained in the
+	<emphasis>test setup jarfile</emphasis>.  The test setup jarfile
+	is a zip or jar file containing several elements:
+	</para>
+
+	<variablelist>
+		<varlistentry>
+			<term>The test.properties file</term>
+			<listitem>
+				<para>
+				This is a Java properties file defining metadata about
+				how to build and test a submission for the particular project.
+				This file must be in the root directory of the
+				test setup jarfile.
+				</para>
+
+				<para>
+				A detailed description of the test.properties file may be
+				found in <xref linkend="testproperties"/>.
+				</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>Test cases and supporting source or object files</term>
+			<listitem>
+				<para>
+				The test setup jarfile contains source and/or object files needed
+				to compile and test the student source code.
+				</para>
+				<para>
+				For Java projects, only .class files should be provided
+				in the test setup jarfile.  The test setup jarfile is provided on the
+				compile-time and runtime classpath for building/executing
+				the student's code.  For testing student code,
+				<ulink url="http://junit.org/">JUnit</ulink> test cases
+				should be provided.  More information is in
+				<xref linkend="javaprojects"/>.
+				</para>
+				<para>
+				For C projects, either C source files or object files may
+				be provided.  The individual test cases must be standalone
+				executables linked against the student's modules.
+				More information is in <xref linkend="cprojects"/>.
+				</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>Files needed by test cases at runtime</term>
+			<listitem>
+				<para>
+				If the test cases require files when they are executed, the files
+				should be stored in the test setup jarfile.  These files will
+				be extracted into the <emphasis>testfiles directory</emphasis>,
+				and will be available to the tests at testing time.
+				</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>The security.policy file (optional, Java-only)</term>
+			<listitem>
+				<para>
+				For Java projects, a security policy file may be provided,
+				specifying what privileges are granted to student code.
+				It is important to prevent untrusted student code from
+				forging test outcomes, sending secret test information over
+				the network, etc.  This file, if present, must be located
+				in the root directory of the test setup jarfile.
+				</para>
+				<para>
+				If no security policy file is specified,
+				a restrictive default security policy is used.
+				</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>Makefile (C-only)</term>
+			<listitem>
+				<para>
+				Test setup jarfiles for C projects must include a Makefile capable
+				of compiling the executables that will serve as the test cases.
+				The Makefile must be in the root directory of the test setup jarfile.
+				</para>
+			</listitem>
+		</varlistentry>
+	</variablelist>
+
+	<para>
+	<xref linkend="javaprojects"/> and <xref linkend="cprojects"/>
+	cover the specifics of what needs to be in the test setup jarfile for
+	Java projects and C projects.
+	</para>
+
+	</sect1>
+
+	<sect1 id="directories">
+	<title>Directories</title>
+
+	<para>
+	Two directories are used by the BuildServer at runtime.
+	The <emphasis>build directory</emphasis> is where the student submission
+	is extracted.  The <emphasis>test files directory</emphasis> is where
+	the test setup jarfile is extracted.
+	</para>
+
+	<para>
+	The idea behind keeping these two directories separate is that it
+	prevents commingling of student and instructor files.  However, for
+	C projects, a single directory is used as both the
+	build directory and the test files directory.
+	</para>
+
+	</sect1>
+
+	<sect1 id="steps">
+	<title>Building and Testing Steps</title>
+
+	<para>
+	The following steps are used when building and testing a student submission.
+	</para>
+
+	<orderedlist numeration="arabic">
+		<listitem>
+			<para>
+			The submission zipfile is extracted into the build directory.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			The test setup jarfile is extracted into the test files directory.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			The submission is built: either by issuing a command to build all
+			of the source files in the submission (for Java projects)
+			or by invoking a make command (for C projects).
+			If the build fails, the compiler error messages are recorded
+			and a failed build test outcome is recorded.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			The public, release, secret and student tests specified in the test setup jarfile's
+			test.properties file are executed and test outcomes recorded.
+			</para>
+		</listitem>
+	</orderedlist>
+
+	</sect1>
+</chapter>
+
+<chapter id="supported-languages">
+<title>The mechanism for testing C projects is flexible enough to work for almost any language</title>
+	<para>
+	The buildServer supports
+	two categories of programming languages:  Java projects (which use a security manager and JUnit)
+	and C or C-like projects (which use the <literal>make</literal> utility to create executable
+	files which are then run run by the BuildServer.
+	</para>
+	<para>
+	The mechanism used for C projects is flexible enough that we've used it for Ruby and 
+	OCaml projects as well.  Other langauges, such as C++ or Python, will also work 
+	using the same mechanism.
+	</para>
+	<para>
+	Thus when we write "C project", keep in mind that this mechanism is extremely flexible
+	and is not certainly not limited to projects written in the C language.
+	</para>
+</chapter>
+
+<!-- 
+<chapter id="submitting">
+	<title>Support for automated submissions</title>
+	<para> There are two mechanisms that automatically create 
+	zip archives of student source files and upload these to the SubmitServer:
+	The "submit" button available through the CourseProjectManager Eclipse plugin, 
+	and the command-line submission tool.
+	</para>
+	<para>
+	Both of these mechanisms require a <xref link="dot-submit-file">.submit file</xref>
+	be place inside the student project.
+	</para>
+	<sect1 id="dot-submit-file">
+		<title>The .submit file</title>
+		<para>
+		Projects should contain a .submit file inside the project root directory
+		</para>
+	</sect1>
+</chapter>
+-->
+
+<chapter id="testproperties">
+	<title>Test Properties</title>
+
+	<para>
+	This chapter describes how to define a test.properties file
+	for a project.  As noted in <xref linkend="projects"/>,
+	this file must be placed in the root directory of the
+	test setup jarfile.
+	</para>
+
+	<para>
+	The format of the test properties file is described in the Java API
+	documentation for the load() and store() methods of the
+	<ulink url="http://java.sun.com/j2se/1.5.0/docs/api/java/util/Properties.html"
+	>java.util.Properties class</ulink>.
+	</para>
+	
+	<table id="testpropertiestable">
+		<title>Test properties</title>
+		<tgroup cols="4" align="left">
+			<thead>
+				<row>
+					<entry>Property Name</entry>
+					<entry>Value</entry>
+					<entry>Language</entry>
+					<entry>Meaning</entry>
+				</row>
+			</thead>
+			<tbody>		
+				<row>
+					<entry>build.language</entry>
+					<entry>"c","java","ruby", or "ocaml"</entry>
+					<entry>Any</entry>
+					<entry>Specifies the source language of the project.
+					Case is ignored, so "Java", "java", and "JAVA" are all equivalent.
+					Currently C, Java, Ruby and OCaml projects are supported.  If this property is not
+					specified, it defaults to "Java".</entry>
+				</row>
+				<row>
+					<entry>build.sourceVersion</entry>
+					<entry>"1.5", "1.6", etc.</entry>
+					<entry>Java</entry>
+					<entry>Specifies the value of the "-source" command line option
+					used when invoking <command>javac</command>.
+					If not specified, defaults to "1.6".</entry>
+				</row>
+				<row>
+					<entry>build.make.command</entry>
+					<entry>Path of make command</entry>
+					<entry>C</entry>
+					<entry>Specifies the full path of the make command used to
+					build student submissions.  If not specified, defaults to
+					"/usr/bin/make".  Instructors should not need to set this property
+					unless they are administering their own buildserver.
+					</entry>
+				</row>
+				<row>
+					<entry>build.make.file</entry>
+					<entry>Filename of makefile</entry>
+					<entry>C</entry>
+					<entry>Specifies the filename of the makefile.
+					If not specified, the makefile is left implicit, meaning that
+					the make utility will decide which one to use.
+					If this property is specified, it will be passed as
+					part of the "-f" option to the make command.</entry>
+				</row>
+				<row>
+					<entry>test.class.{public,release,secret,student}</entry>
+					<entry>Name of JUnit TestCase class (Java),
+						or comma-separated list of test executables (C)</entry>
+					<entry>Java or C</entry>
+					<entry>For Java projects, specifies the full classname of a JUnit TestCase class which
+					performs the public, release, secret or student tests.
+					For C/Ruby/OCaml projects, specifies the names of the executables which
+					represent the public, release, or secret tests.
+					Note that C projects do not support student-written tests that
+					are executed by the BuildServer, as this would be insecure and complicated.
+					This property must NOT be left blank; i.e. if a project
+					has no secret tests, then this property must be omitted.
+					</entry>
+				</row>
+				<row>
+					<entry>test.timeout.testCase</entry>
+					<entry>Timeout in seconds</entry>
+					<entry>Java</entry>
+					<entry>Specifies the amount of time a single test method is allowed
+					to execute before considering the test failed.
+					If not specified, defaults to 30 seconds.</entry>
+				</row>
+				<row>
+					<entry>test.timeout.process</entry>
+					<entry>DEPRECATED:  This field is ignored (Used to be Timeout in seconds)</entry>
+					<entry>Java or C</entry>
+					<entry>deprecated
+					<!-- 
+					Specifies the maximum number of seconds a test process
+					is allowed to run before considering all of the tests performed
+					by that process failed.  For Java, the public, release, and secret
+					tests are each performed in a separate process.  For C, each
+					test case is performed in a separate process.  The default is
+					60 seconds.  (For Java projects, you will probably want to
+					increase this.)
+					-->
+					</entry>
+				</row>
+				<row>
+					<entry>test.output.maxBytes</entry>
+					<entry>Number of bytes</entry>
+					<entry>Java or C</entry>
+					<entry>Specifies the maximum number of bytes of output that will
+					be captured from a test process.  If not specified,
+					defaults to 1 MB.</entry>
+				</row>
+				<row>
+					<entry>test.runInInstructorDir</entry>
+					<entry>true or false</entry>
+					<entry>Java</entry>
+					<entry>If true, test processes are run in the directory containing
+					the extracted test setup jarfile (the <emphasis>test files directory</emphasis>
+					containing instructor-provided files),
+					rather than the <emphasis>build directory</emphasis>
+					(containing student submission files).
+					The default is to run in the build directory.</entry>
+				</row>
+				
+				<row>
+					<entry>test.performCodeCoverage</entry>
+					<entry>true or false</entry>
+					<entry>Java</entry>
+					<entry>Should the buildServer try to perform code coverage?
+					The BuildServer can have Clover, a code-coverage tools, installed into it which
+					can collect code coverage results for each test case.  This is especially 
+					useful when combined with student-written tests because you can download
+					the code-coverage stats from the server and use them for grading purposes to
+					support test-driven development for students.  Note that it is possible for
+					students to submit a zip archive through the web interface in a format
+					such that it can be built and tested but the code coverage tool will not
+					work properly.
+					</entry>
+				</row>
+<!--
+				<row>
+					<entry></entry>
+					<entry></entry>
+					<entry></entry>
+					<entry></entry>
+				</row>
+-->
+			</tbody>
+		</tgroup>
+	</table>
+</chapter>
+
+<chapter id="javaprojects">
+	<title>Creating Java Projects</title>
+	<para>
+	This chapter describes how to create a Java project
+	that will work with the BuildServer.
+	</para>
+
+	<sect1 id="jrefsolution">
+		<title>Create the project and canonical solution</title>
+
+		<para>
+		Start by creating the project and canonical solution.
+		You can use any Java development environment: for example,
+		<ulink url="http://www.eclipse.org/">Eclipse</ulink>.
+		</para>
+
+		<para>
+		A good way to get started is to use the sample Java project
+		available from your instructor homepage on the SubmitServer,
+		as described in <xref linkend="instructorquickstart"/>.
+		</para>
+	</sect1>
+
+	<sect1 id="junittests">
+		<title>Create JUnit tests</title>
+		<para>
+		As you are developing the canonical solution, you can start
+		writing <ulink url="http://junit.org/">JUnit</ulink> tests
+		for the project.  Marmoset supports three kinds of tests:
+		<emphasis>public</emphasis>, <emphasis>release</emphasis>,
+		and <emphasis>secret</emphasis>.  Each kind of test is embodied by
+		a class which extends <literal>junit.framework.TestCase</literal>.
+		A test class may contain any number of test methods: each such
+		method is considered a single test case.
+		</para>
+
+		<para>
+		Note that test classes are optional: you may provide or omit
+		public, release, and secret tests in any combination.
+		</para>
+
+		<para>
+		Your canonical solution should pass all of the test cases.
+		</para>
+	</sect1>
+
+	<sect1 id="jtestproperties">
+		<title>Create the test.properties file</title>
+
+		<para>
+		You should define whichever combination of the
+		"test.class.public", "test.class.release",
+		"test.class.secret", "test.class.student" properties are needed to
+		define which classes represent your JUnit test cases.
+		</para>
+
+<!-- 
+		<para>
+		You may want to increase the value of the "test.timeout.process"
+		property so it is long enough to allow a test process
+		to complete even if several of the individual test methods
+		in the test class time out.  Timing out of individual test
+		methods is controlled by the "test.timeout.testCase" property.
+		</para>
+-->
+	</sect1>
+
+	<sect1 id="jsecuritypolicy">
+		<title>Create the security.policy file (optional)</title>
+
+		<para>
+		The default security.policy file in the sample project should
+		be adequate for most Java projects.  Note that Clover, the code coverage tool
+		used by the BuildServer, needs permission to create and write a special file in /tmp
+		and permission to create shutdownHooks.  Both of these permissions are granted in the
+		sample file.  You may want to
+		selectively grant privileges to student code for certain kinds of
+		tests: for example, writing files.
+		</para>
+	</sect1>
+
+	<sect1 id="jpackaging">
+		<title>Package the test setup jarfile and canonical solution zipfile</title>
+
+		<para>
+		The test setup jarfile should contain the following items:
+		</para>
+
+		<orderedlist numeration="arabic">
+			<listitem>
+				<para>
+				Any classes required to build and execute a student submission.
+				These should placed in the test setup jarfile according to the usual
+				Java conventions for packages.  For example, if the class
+				<literal>edu.umd.cs.Foobar</literal> is needed by submissions, the test setup jarfile
+				should contain a file <filename>edu/umd/cs/Foobar.class</filename>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				JUnit TestCase classes for the public, release, secret, and/or student tests.
+				These should also follow the usual Java package conventions.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				The test.properties file, and optionally a security.policy file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				Any data files needed by the student submissions or test cases
+				at runtime.
+				</para>
+			</listitem>
+		</orderedlist>
+
+		<warning>
+			<para>
+				The test setup jarfile should <emphasis>never</emphasis> contain any classes
+				from the canonical solution (i.e., any classes that the student
+				is supposed to write), because they will take precedence over
+				the student classes at runtime.  Leaving them in basically means that
+				the test results will be for the canonical solution, and not
+				the student's work.
+			</para>
+		</warning>
+
+		<para>
+		The canonical solution zipfile represents what students are expected
+		to implement, and should pass all of the project tests.
+		The zipfile should contain the source files
+		corresponding to classes that are meant to be implemented by the
+		student.  The source files do not need to be in any particular
+		directory structure, although using normal Java conventions
+		is recommended.  If the an Eclipse
+		".project" file is present, that is used as the base directory for the project,
+		and no files outside that directory will be extracted.
+		If an Eclipse ".classpath" file is present, it will be used to
+		find source directories in the project, and no source files
+		outside those directories will be compiled.
+		</para>
+	</sect1>
+
+</chapter>
+
+<chapter id="cprojects">
+	<title>Creating C Projects</title>
+
+	<warning>
+		<para>
+		BuildServer support for C projects is somewhat experimental.
+		</para>
+	</warning>
+
+	<para>
+	Creating a C project to work with the BuildServer is very similar
+	to creating a Java project.  (See <xref linkend="javaprojects"/>.)
+	</para>
+
+	<para>
+	You will probably want to start by getting the sample C project from
+	your instructor homepage on the SubmitServer, and then
+	modifying it: see <xref linkend="instructorquickstart"/>.
+	</para>
+
+	<sect1 id="cdirectories">
+		<title>C projects use a single directory for building and testing</title>
+
+		<para>
+		One important difference between Java projects and C projects
+		is that for C projects, the BuildServer extracts the student submission
+		and test setup jarfile into the <emphasis>same directory</emphasis>.
+		Essentially, the build directory and test files directory are
+		the same.  The student files are extracted first, and the
+		instructor files (from the test setup jarfile) are extracted last.
+		That way, student files cannot overwrite instructor files.
+		</para>
+	</sect1>
+
+	<sect1 id="crefsolution">
+		<title>Create test setup jarfile and canonical solution</title>
+
+		<para>
+		You should decide what files will be provided to students,
+		and which files they will be expected to implement.
+		You should also write a Makefile which can compile the student
+		code modules, provided code modules, and link them into
+		test executables.
+		</para>
+	</sect1>
+
+	<sect1 id="ctestproperties">
+		<title>Creating the test properties file</title>
+
+		<para>
+		You can probably use the test.properties from the sample
+		C project.  You may want to specify a particular make command,
+		makefile name, or test process timeout value.
+		</para>
+	</sect1>
+
+	<sect1 id="cpackaging">
+		<title>Package the test setup jarfile and canonical solution zipfile</title>
+
+		<para>
+		Because the student files and instructor files are extracted into
+		the same directory, you need to make a clear division between
+		files the students are expected to provide, and files the
+		instructor will provide.  Instructor files (in the test setup jarfile)
+		will overwrite identically-named files in student submissions.
+		</para>
+
+		<para>
+		As with Java projects, the test setup jarfile should contain
+		the test.properties file.  It should also contain a Makefile,
+		any source or object files needed for student code to compile
+		or link against, and source or object code needed to compile
+		and link test executables.
+		</para>
+		
+		<para>
+		Note that in Java, it is impossible to create a file with
+		Unix executable permissions set.
+		Therefore, when the BuildServer extracts files,
+		it cannot make them executable.
+		Thus, your Makefile will need to change the permission on any files that 
+		need to be invoked, either later in the Makefile or in test cases.
+		If your Makefile or
+		test executables need to invoke shell scripts, perl scripts, and the
+		like, then the Makefile will first need to change the permissions
+		to make these files executable.  
+		<!-- 
+		Alternatively, you can
+		explicitly invoke the interpreter
+		executable, passing the name of the script as an argument.
+		-->
+		</para>
+	</sect1>
+
+	<sect1 id="csecurity">
+		<title>Security considerations for C projects</title>
+
+		<para>
+		Student code is untrusted, and could do lots of
+		nasty things.  For example:
+		</para>
+
+		<orderedlist>
+			<listitem>
+				<para>
+				Killing the BuildServer process.
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+				Reading secret instructor files, or overwriting them.
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+				Opening network connections, creating fork() bombs, etc.
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+		There is no satisfactory way to prevent this at present.
+		</para>
+		<para>
+		Student code cannot, however, access anything that's not physically on the
+		BuildServer machine, such as the database containing grades and other people's submissions, or
+		the submitServer that runs the web application front-end.
+		Thus if students write malicious code, we'll have logs on the last message received from
+		that BuildServer as well as a copy of the malicious submission itself.  So it's very likely
+		that we'll figure it out if someone is causing problems in this way.
+		</para>
+	</sect1>
+</chapter>
+
+<chapter id="debuggingprojects">
+	<title>Debugging Projects</title>
+
+	<para>
+	Because building and running unknown software is a complex process,
+	it is often difficult to predict exactly what will happen
+	when submissions are built and tested by the build server.
+	Therefore, you will often need to use the BuildServer to test
+	a project submission and test setup in isolation.  For example:
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>You might want to make sure that your canonical solution passes
+			all of the tests, and that the tests work as expected.</para>
+		</listitem>
+
+		<listitem>
+			<para>The BuildServer might have problems building or testing
+			a particular student submission.</para>
+		</listitem>
+	</itemizedlist>
+
+	<para>
+	The BuildServer supports a debugging mode where a single
+	submission and test setup are built and tested from the command line.
+	</para>
+
+	<note>
+		<para>
+		The debugging mode has only been tested on Unix systems.
+		If you really want to use it on Windows, send an email
+		to <email>jspacco@cs.umd.edu</email>.
+		</para>
+	</note>
+
+	<para>
+	You can use the BuildServer in debugging mode as follows:
+	</para>
+
+	<orderedlist>
+		<listitem>
+			<para>Download and compile the BuildServer as described in
+			<xref linkend="installing"/>.</para>
+			<para> Alternatively, if you have access to the BuildServer machine
+			being used to test your class, log into that machine.
+			</para>
+		</listitem>
+
+		<listitem>
+			<para>Set the <literal>BUILDSERVER_ROOT</literal> environment
+			variable to the full path of the directory where you installed the BuildServer.
+			I.e., the <filename>BuildServer</filename> directory.</para>
+		</listitem>
+
+		<listitem>
+			<para>Add the <filename>scripts</filename> subdirectory of
+			<replaceable>$BUILDSERVER_ROOT</replaceable> to your PATH.</para>
+		</listitem>
+
+		<listitem>
+			<para>Invoke the following command:</para>
+
+			<screen>
+			<prompt>$ </prompt><command>testSubmission.sh <replaceable>submission.zip</replaceable> <replaceable>testsetup.jar</replaceable></command>
+			</screen>
+
+			<para>Replace <replaceable>submission.zip</replaceable> with the submission you
+			want to test, and <replaceable>testsetup.jar</replaceable> with the
+			appropriate test setup jar file.</para>
+
+			<para>
+			Detailed logging messages about the building/testing process will be
+			printed to stdout, and the test outcomes will be saved in a file
+			called <filename>alltests.out</filename>, located in a temporary
+			directory created by the BuildServer.  You will see a message printed
+			showing the full path to this file.  You can use the
+			<filename>dumpTestOutcomes.sh</filename> script to summarize the contents
+			of this file.
+			</para>
+		</listitem>
+	</orderedlist>
+
+</chapter>
+
+<chapter id="troubleshooting">
+	<title>Troubleshooting</title>
+
+	<para>
+	Not written yet.
+	</para>
+</chapter>
+
+</book>
+
+<!-- vim:set ts=3: -->

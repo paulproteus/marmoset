@@ -1,0 +1,11 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <g:FlowPanel>
+    <g:Anchor ui:field="editLink" styleName="link">Edit</g:Anchor>
+    <g:Anchor ui:field="discardLink" styleName="link">Discard</g:Anchor>
+
+    <g:Anchor ui:field="saveLink" styleName="link">Save</g:Anchor>
+    <g:Anchor ui:field="cancelLink" styleName="link">Cancel</g:Anchor>
+  </g:FlowPanel>
+</ui:UiBinder>

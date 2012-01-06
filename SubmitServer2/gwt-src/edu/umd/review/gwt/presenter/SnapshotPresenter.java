@@ -1,0 +1,110 @@
+package edu.umd.review.gwt.presenter;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.shared.ResettableEventBus;
+import com.google.gwt.user.client.Timer;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.event.shared.EventBus;
+
+import edu.umd.review.gwt.PresenterFactory;
+import edu.umd.review.gwt.event.HotkeyHandler;
+import edu.umd.review.gwt.event.SessionExpiryEvent;
+import edu.umd.review.gwt.rpc.dto.FileDto;
+import edu.umd.review.gwt.view.FileView;
+import edu.umd.review.gwt.view.SnapshotView;
+
+/**
+ * Handles the presentation of a single snapshot.
+ *
+ * @author rwsims@umd.edu (Ryan W Sims)
+ *
+ */
+public class SnapshotPresenter extends AbstractPresenter implements SnapshotView.Presenter,
+    SessionExpiryEvent.Handler {
+  private static final Logger logger = Logger.getLogger(SnapshotPresenter.class.getName());
+  private static final int millisPerMinute = 60000;
+  private static final int timeoutMinutes = 5;
+
+  private final SnapshotView view;
+  private final Collection<FileDto> files;
+  private final ResettableEventBus eventBus;
+  private final PresenterFactory presenterFactory;
+  private final HotkeyHandler hotkey;
+  private final Map<String, FileView> fileViews = Maps.newTreeMap();
+  private final Map<String, FileView.Presenter> filePresenters = Maps.newTreeMap();
+  private final Timer heartbeat;
+
+  private int idleMinutes;
+
+  @Inject
+  SnapshotPresenter(@Assisted SnapshotView view, EventBus eventBus,
+      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<FileDto> files) {
+    this.view = view;
+    this.files = files;
+    this.presenterFactory = presenterFactory;
+    this.hotkey = hotkey;
+    this.eventBus = new ResettableEventBus(eventBus);
+    heartbeat = new Timer() {
+      @Override
+      public void run() {
+        idleMinutes += 1;
+        if (idleMinutes > timeoutMinutes) {
+          SnapshotPresenter.this.eventBus.fireEvent(new SessionExpiryEvent());
+        }
+      }
+    };
+  }
+
+  @Override
+  public void start() {
+    view.reset();
+    view.setPresenter(this);
+    view.addKeyPressHandler(hotkey);
+    eventBus.addHandler(SessionExpiryEvent.getType(), this);
+    for (FileDto file : files) {
+      FileView fileView = view.addFileView(null);
+      fileViews.put(file.getPath(), fileView);
+      FileView.Presenter filePresenter = presenterFactory.makeFilePresenter(fileView, file);
+      filePresenter.start();
+      filePresenters.put(file.getPath(), filePresenter);
+    }
+    heartbeat.scheduleRepeating(millisPerMinute);
+    view.addMouseMoveHandler(new MouseMoveHandler() {
+      @Override
+      public void onMouseMove(MouseMoveEvent event) {
+        resetIdle();
+      }
+    });
+    // TODO(rwsims): Adding a keypress handler here to reset the idle time seems to a) not work and
+    // b) screw up the hotkey handling. This requires investigation.
+  }
+
+  @Override
+  public void finish() {
+    Iterator<FileView.Presenter> iter = filePresenters.values().iterator();
+    while (iter.hasNext()) {
+      FileView.Presenter p = iter.next();
+      iter.remove();
+      p.finish();
+    }
+    eventBus.removeHandlers();
+  }
+
+  private void resetIdle() {
+    idleMinutes = 0;
+  }
+
+  @Override
+  public void onSessionExpiry(SessionExpiryEvent event) {
+    logger.info("Session expiry, reloading window.");
+    view.expireSession();
+  }
+}

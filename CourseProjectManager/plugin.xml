@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+
+	<!-- The AutoSync nature marks projects as wanting CVS operations to run automatically. -->   
+
+	<!-- Property page to configure the AutoCVS nature for projects. -->	
+	
+	<!-- Object contribution to submit the project for project popup menu. -->
+
+	
+	<!-- We register a view to log AutoCVS actions and diagnostics. -->
+	<extension
+       point="org.eclipse.ui.views">
+		<view
+			id="edu.umd.cs.eclipse.courseProjectManager.logView"
+			name="Course Project Manager log"
+			class="edu.umd.cs.eclipse.courseProjectManager.AutoCVSLogView">
+		</view>
+   </extension>
+   
+   <extension
+		point="org.eclipse.ui.propertyPages">
+		<page
+			id="edu.umd.cs.eclipse.courseProjectManager.autocvsproperty"
+			objectClass="org.eclipse.core.resources.IProject"
+			adaptable="true"
+			class="edu.umd.cs.eclipse.courseProjectManager.AutoCVSPropertyPage"
+			name="Course Project Management">
+			<!-- This property can only be set for CVS-managed projects. -->
+			<filter
+				name="projectPersistentProperty"
+				value="org.eclipse.team.core.repository=org.eclipse.team.cvs.core.cvsnature">
+			</filter>
+		</page>
+	</extension>
+	<extension
+		point="org.eclipse.ui.popupMenus">
+	<!-- Object contribution for the "Turnin Project!" option on the popup menu. -->
+  		<objectContribution
+        	objectClass="org.eclipse.core.resources.IProject"
+        	id="edu.umd.cs.eclipse.courseProjectManager.submitProject"
+        	adaptable="true">
+        	<filter
+				name="nature"
+				value="edu.umd.cs.eclipse.courseProjectManager.autoCVSNature"/>
+     		<action
+	           enablesFor="1"
+    	       label="Submit Project"
+        	   class="edu.umd.cs.eclipse.courseProjectManager.TurninProjectAction"
+	           id="edu.umd.cs.eclipse.courseProjectManager.submitProjectAction"/>
+	  	</objectContribution>
+	</extension>
+		<!-- The AutoCVS nature marks projects as wanting to be automatically managed by the plugin. -->   
+<!--
+	<extension
+		point="org.eclipse.core.resources.natures"
+		id="edu.umd.cs.courseProjectManager.autoCVSNature"
+		name="Manage as course project">
+		<runtime>
+			<run class="edu.umd.cs.courseProjectManager.AutoCVSNature"/>
+		</runtime>
+	</extension>
+	-->
+
+	<!-- The AutoSync nature marks projects as wanting CVS operations to run automatically. -->   
+	<extension
+		point="org.eclipse.core.resources.natures"
+		id="autoSyncNature"
+		name="Auto Sync via CVS">
+		<runtime>
+			<run class="edu.umd.cs.eclipse.courseProjectManager.AutoSyncNature"/>
+		</runtime>
+  <requires-nature id="edu.umd.cs.eclipse.courseProjectManager.autoCVSNature"/>
+	</extension>
+ <extension
+       id="autoCVSNature"
+       name="autocvspluginextensionpoint"
+       point="org.eclipse.core.resources.natures">
+    <runtime>
+       <run class="edu.umd.cs.eclipse.courseProjectManager.AutoCVSNature"/>
+    </runtime>
+ </extension>
+ <extension
+       id="autoRunLogNature"
+       point="org.eclipse.core.resources.natures">
+    <runtime>
+       <run class="edu.umd.cs.eclipse.courseProjectManager.AutoRunLogNature"/>
+    </runtime>
+ </extension>
+ <extension
+       point="org.eclipse.ui.startup">
+ </extension>
+</plugin>

@@ -1,0 +1,5 @@
+To compile the SubmitServer code base, you must download the Java 2
+Enterprise Edition (J2EE) SDK.  Only J2EE version 1.4 has been tested;
+versions later than 1.4 may not work or could produce unexpected
+behavior.  You can download the J2EE v1.4 SDK from
+<http://java.sun.com/javaee/downloads/previous_j2ee/>.

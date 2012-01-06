@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0.4//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.4/distro-source/core/src/gwt-module.dtd">
+<module rename-to="codereview">
+  <!-- Style & Resources -->
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name='com.google.gwt.user.theme.standard.Standard' />
+  <inherits name="com.google.gwt.resources.Resources" />
+  <source path="gwt">
+    <exclude name="**/TestUtils.java" />
+    <exclude name="**/*JavaTest.java" />
+  </source>
+  <source path="common" />
+  <entry-point class="edu.umd.review.gwt.CodeReview" />
+  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
+  <inherits name="com.google.common.base.Base" />
+  <inherits name="com.google.common.collect.Collect" />
+  <inherits name="com.google.gwt.inject.Inject" />
+  <inherits name='net.customware.gwt.dispatch.Dispatch' />
+  <inherits name='com.google.gwt.activity.Activity' />
+
+  <!-- Logging configuration. -->
+  <inherits name="com.google.gwt.logging.Logging"/>
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
+  <set-configuration-property name="UiBinder.useSafeHtmlTemplates" value="true" />
+</module>

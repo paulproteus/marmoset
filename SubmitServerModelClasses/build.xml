@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<project name="modelClasses" default="jar">
+	<description>
+		Classes that model rows of the database.  Much of this code can be replaced with
+			Hibernate.  Project also contains random utility stuff that can be shared
+			with other projects.  Someday I should refactor this stuff into separate 
+			projects.
+
+			The edu.umd.cs.marmoset.utilities package could be its own project
+			since these are generic utilities.  However, since these utilities
+			are currently used only by the BuildServer and SubmitServer classes,
+			they are in the project with the modelClasses.
+	</description>
+	
+	<property name="jarfile" value="modelClasses.jar"/>
+	<property name="output.dir" value="bin"/>
+	<property name="classes.dir" value="bin"/>
+	<property name="unpacked.dir" value="unpackedLibraries"/>	
+	
+	<path id="modelClasses.classpath">
+		<pathelement location="lib/dbunit.jar"/>
+		<pathelement location="lib/dom4j-full.jar"/>
+		<pathelement location="lib/mail.jar"/>
+		<pathelement location="lib/smtp.jar"/>
+		<pathelement location="lib/mailapi.jar"/>
+		<pathelement location="lib/jsr305.jar"/>
+		<pathelement location="lib/pop3.jar"/>
+		<pathelement location="lib/log4j.jar"/>
+		<pathelement location="lib/commons-httpclient.jar"/>
+		<pathelement location="lib/junit.jar"/>
+		<pathelement location="lib/mysql-connector-java.jar"/>
+		<pathelement location="lib/commons-io.jar"/>
+	</path>
+
+	<target name="init" depends="">
+		<mkdir dir="${output.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<target name="jar" depends="classes">
+		<jar destfile="${output.dir}/${jarfile}">
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<!-- Comment out the next line to stop from unjarring the libraries on every rebuild -->
+	<property name="${unjar.libs}" value="true"/>
+	<target name="unjar" if="${unjar.libs}">
+		<mkdir dir="${unpacked.dir}"/>
+		<unjar dest="${unpacked.dir}/">
+		    <fileset dir=".">
+		        <include name="lib/*.jar"/>
+		    	<exclude name="lib/modelClasses.jar"/>
+		    </fileset>
+		</unjar>
+	</target>
+
+	<target name="daemon" depends="classes,unjar">
+		<jar destfile="${output.dir}/daemon.jar">
+			<manifest>
+				<attribute name="Main-class" value="edu.umd.cs.marmoset.utilities.UptimeDaemon"/>
+			</manifest>
+			<fileset dir="${unpacked.dir}">
+				<include name="**/*.class"/>
+			</fileset>
+			<fileset dir="${classes.dir}">
+				<include name="edu/umd/cs/marmoset/utilities/*.class"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="classes" depends="init">
+		<javac
+			srcdir="src"
+			destdir="${classes.dir}"
+			source="1.5"
+			target="1.5"
+			includeantruntime="false"
+			debug="on">
+			<classpath refid="modelClasses.classpath"/>
+		</javac>
+         <copy todir="${classes.dir}"  overwrite="true">
+            <fileset dir="src">
+	   <include name="**/*.txt"/>
+            </fileset>
+	</copy>
+   
+	</target>
+	
+	<!--
+	Copies only the utilities classes without dependencies on external libraries
+	to wherever output.dir is pointing
+	-->
+	<target name="utils" depends="classes">
+		<echo message="${output.dir}"/>
+		<jar file="${output.dir}/utils.jar">
+			<fileset dir="${classes.dir}">
+				<include name="**/JProcess*class"/>
+				<include name="**/TextFileReader*class"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="test">
+		<echo message="user.dir: ${user.dir}"/>		
+	</target>
+	
+	<target name="clean">
+		<delete>
+			<fileset dir="${classes.dir}">
+			    <include name="**/*.class"/>
+				<include name="${jarfile}"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="client">
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.CheckUptime"/>
+		<property name="jarfile" value="${dist}/client.jar"/>
+		<antcall target="uptimeJarfile"/>
+	</target>
+
+	<target name="uptimeJarfile" depends="classes">
+		
+		<jar destfile="${jarfile}" compress="false">
+<!--
+			<fileset dir="unpackedLibraries"/>
+-->
+			<fileset dir="bin" includes="edu/umd/cs/submitServer/utilities/*.class" excludes="**/JavaMail.class"/>
+			<manifest >
+			    <attribute name="Main-class" value="${manifest.class}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<!--
+	Utilities
+	-->
+	
+	<target name="unpackedLibraries">
+		<unjar dest="unpackedLibraries/">
+		    <fileset dir=".">
+		        <include name="lib/mysql-connector-java.jar"/>
+	    		<include name="lib/commons-io.jar"/>
+		    </fileset>
+		</unjar>
+	</target>
+	
+	<target name="utilJarFile" depends="unjar">
+		<jar destfile="${output.dir}/${jarfileName}" update="true">
+			<manifest>
+				<attribute name="Main-class" value="${manifest.class}"/>
+			</manifest>
+			<fileset dir="${unpacked.dir}">
+				<include name="**/*.class"/>
+			</fileset>
+			<fileset dir="${classes.dir}">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>		
+	</target>
+
+	<target name="comment-stripper" depends="classes">
+		<property name="jarfileName" value="stripper.jar"/>
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.CommentStripper"/>
+		<antcall target="utilJarFile"/>
+	</target>
+
+	<target name="direct-upload-snapshot" depends="classes">
+		<property name="jarfileName" value="upload-snapshot.jar"/>
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.DirectSnapshotUpload"/>
+		<antcall target="utilJarFile"/>
+	</target>
+	<target name="direct-upload-submission" depends="classes">
+		<property name="jarfileName" value="upload-submission.jar"/>
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.DirectSubmissionUpload"/>
+		<antcall target="utilJarFile"/>
+	</target>
+	
+	<target name="compute-deltas" depends="classes">
+		<property name="jarfileName" value="compute-deltas.jar"/>
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.ComputeDeltas"/>
+		<antcall target="utilJarFile"/>
+	</target>
+	<target name="eval-findbugs" depends="classes">
+		<property name="jarfileName" value="eval-findbugs.jar"/>
+		<property name="manifest.class" value="edu.umd.cs.marmoset.utilities.EvaluateFindBugsAccuracyUsingMarmosetDataset"/>
+		<antcall target="utilJarFile"/>
+	</target>
+</project>

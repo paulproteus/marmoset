@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<!--
+  * Marmoset: a student project snapshot, submission, testing and code review
+ * system developed by the Univ. of Maryland, College Park
+ * 
+ * Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+ * by William Pugh. See http://marmoset.cs.umd.edu/
+ * 
+ * Copyright 2005 - 2011, Univ. of Maryland
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+-->
+
+<project name="project" default="jar">
+	<description>
+		The BuildServer automatically builds submissions
+		stored in the SubmitServer.
+	</description>
+	
+	<property file="local.properties"/>
+	<property file="build.properties"/>
+	<property name="output.dir" value="bin"/>
+  <!-- 
+  Assume findbugs is rooted one slot above the BuildServer unless
+  explicitly over-ridden
+  -->
+  <property name="findbugs.dir" value=""/>
+	<property environment="env"/>
+
+	<target name="init" depends="">
+		<mkdir dir="${output.dir}"/>
+	</target>
+	
+	<path id="buildserver.classpath">
+		<pathelement location="lib/clover.jar"/>
+		<pathelement location="lib/jsr305.jar"/>
+		<pathelement location="lib/commons-httpclient.jar"/>
+		<pathelement location="lib/commons-lang-2.4.jar"/>
+		<pathelement location="lib/commons-logging.jar"/>
+		<pathelement location="lib/commons-io.jar"/>
+		<pathelement location="lib/junit.jar"/>
+		<pathelement location="lib/dom4j.jar"/>
+		<pathelement location="lib/log4j.jar"/>
+		<pathelement location="lib/findbugs.jar"/>
+		<pathelement location="lib/bcel.jar"/>
+		<pathelement location="lib/modelClasses.jar"/>
+	</path>
+
+	<target name="modelClasses" depends="init">
+		<!--
+		Effectively builds the modelClasses jarfile in the lib directory for this project.
+		Calls over to the antfile for the model classes (separate eclipse project) 
+		but passes an output.dir to the "lib" directory in THIS project.
+		-->
+		<ant
+			antfile="${modelClasses}/build.xml"
+			inheritall="false"
+			>
+			<property name="output.dir" value="${user.dir}/lib"/>
+		</ant>
+	</target>
+
+  <target name="findbugs" depends="init">
+    <ant antfile="build.xml" dir="${findbugs.dir}" inheritAll="false"/>
+  </target>
+	
+	<target name="classes" depends="modelClasses">
+		<javac
+			srcdir="src"
+			destdir="bin"
+			includeantruntime="false"
+			debug="on">
+			<classpath refid="buildserver.classpath"/>
+		</javac>
+		<copy todir="bin">
+			<fileset dir="src">
+				<include name="**/*.policy"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="jar" depends="classes">
+		<jar destfile="buildserver.jar"
+  			manifest="etc/MANIFEST.MF">
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+				<include name="**/*.policy"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="doc">
+		<exec executable="xsltproc" os="${os}">
+			<arg line="-o doc/ doc/manual.xsl doc/manual.xml"/>
+		</exec>
+		<!--
+		<copy dir="doc/manual">
+			<fileset dir="doc/manual">
+				<include name="*png"/>
+			</fileset>
+		</copy>
+		-->
+	</target>
+
+	<target name="clean">
+		<delete file="buildserver.jar"/>
+		<delete>
+			<fileset dir="bin">
+			    <include name="**/*.class"/>
+			    <include name="lib/modelClasses.jar"/>
+		 	</fileset>
+		</delete>
+	</target>
+	
+	<target name="test">
+		<echo message="javahome: ${java.home}"/>
+		<echoproperties/>
+	</target>
+
+	<property name="run.dir" value="run"/>
+	<property name="scripts.dir" value="scripts"/>
+	<property name="runBuildServer" value="runBuildServer"/>
+	<property name="findbugs.version" value="findbugs-0.8.6-dev"/>
+  <property name="build.server.home" value="${user.dir}"/>
+
+  <!--
+  A "full install" also calls the jar task.
+  -->
+  <target name="full.install" depends="jar, install"/>
+
+  <!-- 
+  run.dir should incorporate not only the name of the run directory
+  but also the hostname.  This is not well documented.
+  -->
+  <target name="install">
+    <property name="path.to.run" value="${build.server.home}/${run.dir}"/>
+    <mkdir dir="${path.to.run}"/>
+    <copy tofile="${path.to.run}/config.properties"
+      file="${scripts.dir}/cluster.template"
+      overwrite="yes">
+      <filterset>
+	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
+	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
+	<filter token="BUILD_SERVER_HOME" value="${path.to.run}"/>
+	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
+	<filter token="SERVER_HOST" value="${server.host}"/>
+	<filter token="PMD_HOME" value="${pmd.dir}"/>
+	<filter token="HOSTNAME" value="${run.dir}"/>
+	<filter token="COURSES" value="${courses}"/>
+	<filter token="SEMESTER" value="${semester}"/>
+	<filter token="PORT" value="${port}"/>
+	<filter token="PASSWORD" value="${password}"/>
+	<filter token="UNPRIVILEGED_ACCOUNT" value="${unprivileged.account}"/>
+      </filterset>
+    </copy>
+    <copy todir="${path.to.run}" file="${scripts.dir}/${runBuildServer}"/>
+    <copy todir="${path.to.run}" file="${scripts.dir}/checkDaemon.sh"/>
+  </target>
+  
+  <target name="parameters.print">
+    <echo message="java.home: ${java.home}"/>
+    <echo message="JAVA_HOME: ${env.JAVA_HOME}"/>
+    <echo message="run.dir: ${run.dir}"/>
+    <echo message="semester = ${semester}"/>
+    <echo message="courses = ${courses}"/>
+  </target>
+	
+  <target name="cluster.install" depends="jar">
+    <mkdir dir="${hostname}"/>
+    <copy tofile="${hostname}/config.properties"
+      file="${scripts.dir}/cluster.template">
+      <filterset>
+	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
+	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
+	<filter token="BUILD_SERVER_HOME" value="${user.dir}/${hostname}"/>
+	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
+	<filter token="HOSTNAME" value="${hostname}"/>
+      </filterset>
+    </copy>
+    <copy todir="${hostname}" file="${scripts.dir}/${runBuildServer}" />
+  </target>
+
+  <target name="normal.install" depends="jar">
+    <!--
+    <property name="run.hostname"
+    value="run.${hostname}"/>
+    -->
+    <mkdir dir="${run.dir}"/>
+    <copy tofile="${run.dir}/config.properties"
+      file="${scripts.dir}/cluster.template">
+      <filterset>
+	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
+	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
+	<filter token="BUILD_SERVER_HOME" value="${user.dir}/${run.dir}"/>
+	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
+	<filter token="HOSTNAME" value="${run.dir}.${hostname}"/>
+      </filterset>
+    </copy>
+    <copy todir="${run.dir}" file="${scripts.dir}/${runBuildServer}" />
+  </target>
+  
+</project>

@@ -1,0 +1,43 @@
+<project name="CommandLineSubmission" default="all">
+	
+	<target name="all" depends="jarFile"/>
+	
+	<path id="base.classpath">
+			<pathelement path="${classpath}"/>
+			<pathelement location="lib/commons-logging.jar"/>
+			<pathelement location="lib/commons-httpclient.jar"/>
+	</path>	
+
+	<!-- Using ant to produce Java-1.6 compatible classfiles -->
+	<target name="classes">
+		<javac
+			classpathref="base.classpath"
+			source="1.6"
+			target="1.6"
+			destdir="bin"
+			srcdir="src"
+			includeantruntime="false"
+		/>
+	</target>
+	
+	<target name="jarFile" depends="classes">
+		<jar destfile="submit.jar" compress="false">
+			<fileset dir="bin" includes="**/*.class"/>
+			<zipfileset src="lib/commons-logging.jar"/>
+			<zipfileset src="lib/commons-httpclient.jar"/>
+			<manifest >
+			    <attribute name="Main-class" value="edu.umd.cs.submit.CommandLineSubmit"/>
+			  </manifest>
+		</jar>
+	</target>
+	
+	<!--
+		Delete generated files.
+	-->
+	<target name="clean">
+		<delete>
+			<fileset dir="bin" includes="**/*.class"/>
+		</delete>
+	</target>
+	
+</project>

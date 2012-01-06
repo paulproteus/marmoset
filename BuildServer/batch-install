@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+
+#  Marmoset: a student project snapshot, submission, testing and code review
+#  system developed by the Univ. of Maryland, College Park
+#
+#  Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+#  by William Pugh. See http://marmoset.cs.umd.edu/
+#
+#  Copyright 2005 - 2011, Univ. of Maryland
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy of
+#  the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations under
+#  the License.
+
+#
+# NOTE: This script must be run from inside the BuildServer directory!
+#
+# - Creates a CRONTAB.sh script in the work directory
+# - Invokes 'install' ant target with appropriate parameters for
+#   initializing the run directory
+
+use strict qw(refs vars);
+use Getopt::Std;
+
+my %opts=();
+
+getopts("b:f:h:c:s:p:u:w:",\%opts);
+
+#
+# The number of BuildServers to create.  
+# If you create N BuildServers, they will be named:
+# bs1.<hostname> ... bsN.<hostname>
+#
+my ($numBuildServers)=@ARGV;
+#print "num: $numBuildServers\n";
+
+if (scalar @ARGV != 1 or $numBuildServers !~ /\d+/)
+{
+    print qq{Usage: $0 
+		 [ -b <buildServerWorkDir> ]
+			Where to put BuildServer work directories and logfiles; defaults to the current directory (i.e. BuildServer)
+		 [ -f <findbugsDir> ]
+			If empty then FindBugs won\'t be used
+		 [ -p <port> ]
+			Defaults to 8443
+		 [ -u <unprivilegedAccount> ]
+			Default is to use the same account running the BuildServer (less secure but perfectly functional)
+		 -w <password>
+			REQUIRED: MUST match buildserver.password in your submit server's web.xml config file
+		 -h <serverHost>
+			REQUIRED: The hostname of the SubmitServer to connect to
+		 -c <course1,...,courseN>
+			REQUIRED: Comma-separated list of courses this BuildServer supports
+		 -s <semester>
+			REQUIRED: The semester for which this BuildServer can build submissions
+ 		 <numBuildServers>
+			REQUIRED: The number of BuildServers to create \n
+		    };
+    exit 1;
+}
+
+#
+# batch-install script needs to be run from inside the BuildServer directory
+# so that it can find all of the BuildServer classfiles.
+#
+my $pwd = `pwd`;
+$pwd =~ s/\s+//;
+my $buildServerHome = "$pwd";
+
+#
+# The BuildServerWorkDir is where each buildServer will store its work files
+# (i.e. where it will download, compile and execute submissions).
+# This script will create buildServers named:
+# bs1.<hostname> thru bsN.<hostname>
+#
+# Defaults to the buildServerHome
+#
+my $buildServerWorkDir = $buildServerHome;
+$buildServerWorkDir = $opts{'b'} if $opts{'b'};
+
+#
+# REQUIRED
+# The hostname of the SubmitServer to connect to.
+#
+my $serverHost = "";
+if ($opts{'h'})
+{
+    $serverHost = "-Dserver.host=$opts{'h'}";
+}
+
+#
+# REQUIRED
+# The password the build server will use when connecting
+# to the submit server.  This *must* be the same as the
+# buildserver.password context param value in the web.xml
+# configuration file on your submit server
+#
+my $password = "";
+if ($opts{'w'}) {
+	$password=$opts{'w'};
+}
+
+
+#
+# The port to connect to on the server
+# (i.e. https://submit.cs.umd.edu:8443/)
+#
+# Defaults to 8443
+#
+my $port = "8443";
+if ($opts{'p'}) {
+	$port=$opts{'p'};
+}
+
+
+#
+# Unprivileged account
+#
+# This is optional; if you don't specify an unprivileged account
+# then student code will be run under the account running the BuildServer,
+# which is less secure.
+#
+# NOTE: This feature has not been tested very thoroughly, and requires
+# that your makefile (for makefile-based projects) make all files executable.
+# You probably shouldn't use this feature.
+#
+my $unprivilegedAccount=$opts{'u'};
+
+#
+# REQUIRED
+# A comma-separated list of the courses this BuildServer can build, for example:
+# -c CMSC131,CMSC132,CMSC433
+#
+my $courses = "";
+if ($opts{'c'})
+{
+    $courses = "-Dcourses=\"$opts{'c'}\"";
+}
+
+#
+# REQUIRED
+# The semester for which this BuildServer will build submissions, for example:
+# -s "Spring 2006"
+#
+my $semester = "";
+if ($opts{'s'})
+{
+    $semester = "-Dsemester=\"$opts{'s'}\"";
+}
+
+#
+# directory containing a FindBugs installation
+# If specified, then this BuildServer will run FindBugs on all Java-based submissions.
+# If not specified, then this BuildServer will not use FindBugs.
+#
+my $findbugsDir = "";
+if ($opts{'f'})
+{
+	$findbugsDir = "-Dfindbugs.dir=$opts{'f'}";
+}
+
+#
+# The hostname will be used to name the buildServerWorkDir, for example:
+# bs1.<hostname>
+#
+my $hostname = `hostname`;
+$hostname =~ s/\n//;
+
+#
+# Create the CRONTAB.sh script
+# CRONTAB.sh is a shell script that will be put into the buildServerWorkDir,
+# and when run will start all the BuildServers created by this batch-install script.
+#
+my $crontab = "$buildServerWorkDir/CRONTAB.sh";
+open CRONTAB, ">$crontab";
+#
+# Create <numBuildServers> BuildServers
+#
+for (my $ii=1; $ii<=$numBuildServers; $ii++) {
+    my $runDir="bs${ii}.$hostname";
+    # ant creates the run directory, copies the property-file template
+    # with substitutions, and also copies a couple scripts 
+    my $command =
+	"ant -Dunprivileged.account=$unprivilegedAccount " .
+	"-Dbuild.server.home=$buildServerWorkDir -Dhostname=$hostname " .
+	"-Drun.dir=$runDir $findbugsDir $semester $courses " .
+	"-Dport=$port -Dpassword=$password $serverHost install";
+    print "$command\n";
+    print `$command`;
+
+#
+# Change the permissions on the runBuildServer and checkDaemon.sh scripts
+# Remove permissions for everyone else on the work directory
+#
+    print `chmod +x $buildServerWorkDir/$runDir/runBuildServer`;
+    print `chmod +x $buildServerWorkDir/$runDir/checkDaemon.sh`;
+    print `chmod o-rwx $buildServerWorkDir/$runDir`;
+
+    # Checks to see if the build server is running; if not, it invokes a
+    # fresh instance via runBuildServer script
+    print CRONTAB "#cd $buildServerWorkDir/$runDir ; ./checkDaemon.sh config.properties\n";
+}
+
+#
+# The UptimeDaemon is a small Java program that listens on port 9999, and responds to
+# connections with the results of a call to 'uptime'.  This lets the SubmitServer query
+# each BuildServer host for its status.
+#
+my $uptimeOutputDir="$buildServerWorkDir/uptimeDaemon";
+`mkdir $uptimeOutputDir` if (! -d $uptimeOutputDir);
+my $classpath =
+	"$buildServerHome/bin:" .
+	"$buildServerHome/lib/modelClasses.jar:" .
+	"$buildServerHome/lib/findbugs.jar:" .
+	"$buildServerHome/lib/commons-io.jar:" .
+	"$buildServerHome/lib/commons-httpclient.jar:" .
+	"$buildServerHome/lib/commons-logging.jar:" .
+	"$buildServerHome/lib/junit.jar:" .
+	"$buildServerHome/lib/jaxen.jar:" .
+	"$buildServerHome/lib/bcel.jar:" .
+	"$buildServerHome/lib/log4j.jar:" .
+	"$buildServerHome/lib/mailapi.jar:" .
+	"$buildServerHome/lib/mail.jar:" .
+	"$buildServerHome/lib/smtp.jar:" .
+	"$buildServerHome/lib/imap.jar:" .
+	"$buildServerHome/lib/pop3.jar:" .
+	"$buildServerHome/lib/dom4j.jar";
+# NOTE:  this is disabled (commented out) by default
+print CRONTAB "#java -cp $classpath edu.umd.cs.marmoset.utilities.UptimeDaemon $uptimeOutputDir > /dev/null 2> /dev/null &";
+
+#
+# Make the meta-crontab script executable
+#
+close CRONTAB;
+`chmod +x $crontab`;

@@ -1,0 +1,7 @@
+To run the BuildServer code base, you must download the JavaMail API
+Implementation, version 1.3, and copy all of the "*.jar" files
+contained in the zip archive to this directory.  Only JavaMail version
+1.3 has been tested; versions later than 1.3 may not work or could
+produce unexpected behavior.  You can download the JavaMail API
+Implementation version 1.3 from
+<http://java.sun.com/products/javamail/javamail-1_3.html>.

@@ -1,0 +1,487 @@
+body {
+	color: black;
+	background: white;
+	margin: 1em;
+}
+h1 {
+	font-size: 1.5em;
+	font-weight: bold;
+	font-family: verdana, arial, helvetica, sans-serif;
+	margin-bottom: 2px;
+}
+h2 {
+	font-size: 1.25em;
+	font-weight: bold;
+	font-family: arial, helvetica, sans-serif;
+		margin-bottom: 2px;
+}
+h3 {
+	font-size: 1.125em;
+	font-weight: bold;
+	font-family: arial, helvetica, sans-serif;
+		margin-bottom: 2px;
+		color: #993300;
+}
+a:link {
+	color: #cc0000;
+}
+
+a:visited {
+	color: #aa0000;
+}
+
+div.header {
+	background: #ffcc33;
+	padding: 0px 4px 5px 5em;
+	margin: 0 5em 0 0em;
+	color: black;
+	/*border: 3px solid black;*/
+}
+
+div#headerImage {
+	float: left;
+	margin-top:8px;
+	margin-right:4em;
+}
+div#headerTitle {
+	font: bold 200% "new century schoolbook", times, serif;
+	padding: 10px 0 0 0;
+	color:#CC0000;
+}
+div#headerContact {
+	padding: 5px 0 9px 0;
+	font-family: arial, helvetica, sans-serif;
+	font-size: smaller;
+}
+
+div.breadcrumb {
+	clear:both;
+	background: #cc0000;
+	padding: 5px 5px 5px 5em;
+	margin: 0 5em 2em 0em;
+	color: white;
+}
+
+div.breadcrumb  p {
+	font-size: 80%;
+	font-weight: bold;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-variant: small-caps;
+	padding: 0;
+	margin: 0;
+}
+
+div.breadcrumb  p #breadcrumbUserID {
+	font-variant: normal;
+	color:#FFFF00;
+}
+
+div.breadcrumb a:link {
+	color: white;
+	text-decoration: none;
+}
+
+div.breadcrumb a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+div.breadcrumb a:hover {
+	color: white;
+	text-decoration: underline;
+}
+
+div.logout {
+	float: right;
+	width: 4em;
+	padding: 0.5em;
+	margin: -1.4em 1em -1em 0.5em;
+	border: 0;
+	background: black;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	font-family: verdana, arial, helvetica, sans-serif;
+}
+
+div.logout a:link {
+	color: white;
+	text-decoration: none;
+}
+
+div.logout a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+div.logout a:hover {
+	color: white;
+	text-decoration: underline;
+}
+
+div.footer {
+	border-top: 1px solid black;
+	text-align: left;
+	padding: 5px;
+	margin: 2em 3em 0;
+}
+
+table {
+	border-style: ridge;
+	border-width: 6px;
+	border-collapse: collapse;
+}
+
+th {
+	vertical-align: bottom;
+	padding: 4px;
+	border: 1px solid black;
+	margin: 0px;
+	background: #ffcc33;
+}
+
+td {
+	text-align: center;
+	vertical-align: top;
+	padding: 4px;
+	border: 1px solid black;
+	margin: 0px;
+}
+
+td.description {
+	text-align: left;
+}
+
+td.left {
+	text-align: left;
+}
+td.right {
+	text-align: right;
+}
+
+th.description {
+	text-align: left;
+}
+
+th.number {
+	text-align: right;
+}
+td.number {
+	text-align: right;
+}
+table  {
+	margin: 0.5em 2em;
+}
+
+col.right {
+	border-right: 7px solid black;
+}
+
+form { padding: 0; margin: 0; }
+
+table.stacktrace td {
+	padding-left: 5em;
+}
+
+table.form td {
+	padding: 0.25em;
+	text-align: left;
+	vertical-align: top;
+}
+
+table.form td.label {
+	font-weight: bold;
+	text-align: right;
+	background: #fff9e5;
+	padding-left: 3em;
+	padding-right: 0.5em;
+	}
+
+
+table.form tr.submit td {
+	background: #ffcc33;
+	text-align: center;
+}
+
+tr.r0 {
+	background: #fff3cc;
+}
+
+tr.r1 {
+	background: white;
+}
+tr.ir0 {
+    opacity:0.75;
+	background: #eee3d0;
+}
+
+tr.ir1 {
+    opacity:0.75;
+	background: #dddddd;
+}
+tr.highlight {
+	background: #00ffaf;
+}
+td.passed {
+	BACKGROUND: #5fbf5f;
+}
+td.failed {
+	BACKGROUND: #9f3f3f;
+}
+td.error {
+	BACKGROUND: #CC0000;
+}
+td.huh {
+	BACKGROUND: #ffcc33;
+}
+td.missing_component {
+	BACKGROUND: #3b63f8;
+}
+td.timeout {
+	BACKGROUND: #ff00ff;
+}
+td.not_implemented {
+	BACKGROUND: #FFFFFF;
+}
+td.could_not_run {
+	BACKGROUND: #808080;
+}
+td.warning {
+	BACKGROUND: #0000df;
+}
+
+/* Styles for source code display */
+table.codetable {
+	border-style: none;
+	border-width: 0px;
+	border-collapse: collapse;
+	margin: 0px;
+}
+table.codetable td {
+	text-align: left;
+	vertical-align: baseline;
+	padding: 0px;
+	border: none;
+	margin: 0px;
+	white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Menlo', 'DejaVu Sans Mono', 'Consolas', 'Ubuntu Mono', monospace;
+}
+table.codetable td.codecoveredcount {
+	text-align: right;
+	background: #abcabd;
+	padding: 0px 2px;
+
+}
+table.codetable td.codeuncoveredcount {
+	text-align: right;
+	background: #f0c8c8;
+	padding: 0px 2px;
+
+}
+table.codetable td.codeunchanged {
+	opacity:0.5;
+	background: #f0f0f0;
+	padding: 0px 2px;
+	
+}
+table.codetable td.codeelided {
+    opacity:0.5;
+    background: #FFE0E0;
+    padding: 0px 2px;
+   
+}
+table.codetable td.codeuncovered {
+	background: #f0c8c8;
+	padding: 0px 2px;
+}
+table.codetable td.linenumber {
+	text-align: right;
+	background: #ffffff;
+	padding: 0px 15px;
+	width: 4em;
+}
+.codehighlight {
+	background: #fff3cc;
+}
+.codekeyword {
+	color: green;
+	font-weight: bold;
+}
+.codestring {
+	color: fuchsia;
+}
+.codeliteral {
+	color: fuchsia;
+}
+.codecomment {
+	color: blue;
+	font-style: italic;
+}
+.statusmessage {
+	border:1px solid #cedff2;
+	background-color:#f5faff;
+	color:#003399;
+	padding:7px;
+	font-family: arial, helvetica, sans-serif;
+}
+.statusmessageNegative {
+	border:1px solid #ffbbbb;
+	background-color:#ffeee1;
+	color:#FF3300;
+	padding:7px;
+	font-family: arial, helvetica, sans-serif;
+}
+
+
+.notemessage {
+	/*border:1px solid #ddcef2;
+	background-color:#faf5ff;
+	color:#993399;
+	padding:10px;*/
+}
+/* Section Title is the div around the title for each section.
+ * The contents of this div are:
+ * 		.sectionTitle h1 ==> The actual title
+ *		.sectionTitle p  ==> Description and Deadline texts
+ *		.sectionTitle .sectionDescription ==> The description of the section (in a p tag)
+ *		.sectionTitle .projectDeadline ==> (optional) The deadline for a project (in a p tag)
+ * Template:
+ *
+
+<div class="sectionTitle">
+	<h1>[Title]</h1>
+
+	<p class="sectionDescription">[A Description]</p>
+</div>
+
+	<p class="projectDeadline"><b>Deadline:</b>&nbsp;
+		<span><fmt:formatDate value="${project.ontime}"
+							  pattern="E',' dd MMM 'at' hh:mm a" /></span>
+		<c:if test="${project.ontime != project.late}">
+			&nbsp;(Late:
+			<span><fmt:formatDate value="${project.late}"
+								  pattern="E',' dd MMM 'at' hh:mm a" /></span>)
+		</c:if>
+	</p>
+
+ *
+ */
+.sectionTitle {
+	/*border-left:3em solid #FFEE99;*/
+	/*border-style:solid;
+	border-color:#FFEE99;
+	border-width: 0 0 0 3em;*/
+	padding: 0.5em 1em 0.5em 2em;
+	background:#FFF8DC;
+	margin: 2em 5em 0 0em;
+}
+.sectionTitle h1 {
+	margin:0;
+	padding-bottom:3px;
+	border-bottom:1px solid #CC0033;
+	color:#990000;
+	font-family: arial, helvetica, sans-serif;
+}
+.sectionTitle h1 a:link {
+	color: #CC0000;
+	text-decoration: none;
+}
+.sectionTitle h1 a:visited {
+	color: #CC0000;
+	text-decoration: none;
+}
+.sectionTitle h1 a:hover {
+	color: #FFCC33;
+	text-decoration: none;
+}
+.sectionTitle p {
+	margin:0.25em 0.25em 0.25em 0em;
+}
+.sectionTitle .sectionDescription {
+	font-family: arial, helvetica, sans-serif;
+	font-style: italic;
+	color:#CC3300;
+}
+.sectionTitle .projectDeadline {
+	color:#CC3300;
+}
+.sectionTitle .projectDeadline span {
+	color:#000000;
+	font-weight: bold;
+}
+.projectMenu {
+	border-left:3em solid #FFEE99;
+	background:#FFEE99;
+	padding: 0.25em 0.25em 0.25em 2em;
+	font-family: arial, helvetica, sans-serif;
+	margin: 0 5em 2em 0em;
+	color:#CC3300;
+}
+
+.projectMenu a:link {
+	color: #CC3300;
+	text-decoration: none;
+}
+
+.projectMenu a:visited {
+	color: #CC3300;
+	text-decoration: none;
+}
+
+.projectMenu a:hover {
+	color: #aa0000;
+	text-decoration: underline;
+}
+
+div.projectvitalstats table {
+	border: 1px solid #CC3300;
+	font-family:Arial;
+	color:#CC9900;
+}
+div.projectvitalstats td {
+	border: 1px solid #CC3300;
+}
+div.projectvitalstats .statproperty {
+	color:#CC3300;
+}
+
+div.screennotes {
+	font-family: arial, tahoma, sans-serif;
+	margin:10px;
+	padding:10px;
+	border: 1px solid #FFCC99;
+	background:#FFFFCC;
+}
+
+div.screennotes h4 {
+	margin:0px;
+	font-size: large;
+	color :#AA9988;
+}
+
+.alertmessage {
+	padding: 0.5em 1em 0.5em 2em;
+	background:#FFF8DC;
+	margin: 2em 5em 2em 0;
+	font-family: arial, helvetica, sans-serif;
+	color:#CC3300;
+	line-height: 1.5em;
+}
+
+.experimental {
+	color:green;
+}
+
+.errorMessage {
+	color:red;
+}
+
+acronym { cursor : help; }
+
+.crSection {
+	font-family: Arial;
+	text-align: left;
+	color: #CC3300;
+	padding-left: 20px;
+}

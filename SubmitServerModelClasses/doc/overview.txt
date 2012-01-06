@@ -1,0 +1,30 @@
+NOTE: schema.sql has been moved to dbScripts
+
+This project contains the SubmitServer model classes.  These classes model
+rows of the database and are all valid JavaBeans.
+
+When adding a field to one of the Model Classes, you must do three things:
+
+1) Add the filed to ATTRIBUTES_LIST array in the proper place.  This list is ordered according
+	to the order of the columns in the database and must match the column name exactly.
+
+2) Add a private field to the class using camelCase (the database fields use underscores)
+
+3) You need to modify at least the update(), insert() and fetchValues() methods to take 
+	into account the new fields.  Some classes have generic populatePreparedStatement()
+	methods that handle both cases in a fairly general way.  Some of the classes have 
+	actual insert() and update() methods that need to be changed by hand.  All classes
+	need to have their fetchValues() method updated.
+
+
+In addition, there are a couple of Utility classes in this package:
+
+Queries: static methods that represent queries that return rows from multiple tables 
+of the database and therefore could not be assigned to a particular class.
+
+StatementAndResultSet: utility class that contains a PreparedStatement and the ResultSet
+produced by executing the statement.  The close() method will close both of these items.
+
+Formats: Contains formatting information for dates.
+
+Debug: Basically a wrapper for logging that will eventually be replaced by commons-logging.

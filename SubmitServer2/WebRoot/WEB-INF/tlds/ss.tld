@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+
+  <description>Marmoset submitserver tags</description>
+  <display-name>submitserver</display-name>
+  <tlib-version>1.0</tlib-version>
+  <short-name>ss</short-name>
+  <uri>http://www.cs.umd.edu/marmoset/ss</uri>
+
+  <tag-file>
+    <name>studentPicture</name>
+    <path>/WEB-INF/tags/studentPicture.tag</path>
+  </tag-file>
+  <tag-file>
+        <name>selectCodeCoverage</name>
+        <path>/WEB-INF/tags/selectCodeCoverage.tag</path>
+    </tag-file>
+
+  <tag-file>
+    <name>studentEmail</name>
+    <path>/WEB-INF/tags/studentEmail.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>head</name>
+    <path>/WEB-INF/tags/head.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>headContent</name>
+    <path>/WEB-INF/tags/headContent.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>header</name>
+    <path>/WEB-INF/tags/header.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>codeReviews</name>
+    <path>/WEB-INF/tags/codeReviews.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>footer</name>
+    <path>/WEB-INF/tags/footer.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>breadCrumb</name>
+    <path>/WEB-INF/tags/breadCrumb.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>instructorBreadCrumb</name>
+    <path>/WEB-INF/tags/instructorBreadCrumb.tag</path>
+  </tag-file>
+
+
+  <tag-file>
+    <name>loginBreadCrumb</name>
+    <path>/WEB-INF/tags/loginBreadCrumb.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>loginTitle</name>
+    <path>/WEB-INF/tags/loginTitle.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>missingIdOrPasswordMessage</name>
+    <path>/WEB-INF/tags/missingIdOrPasswordMessage.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>noSuchIdMessage</name>
+    <path>/WEB-INF/tags/noSuchIdMessage.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>noSuchStudentInDBMessage</name>
+    <path>/WEB-INF/tags/noSuchStudentInDBMessage.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>authenticationFailedMessage</name>
+    <path>/WEB-INF/tags/authenticationFailedMessage.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>authenticationFailedMessageGeneric</name>
+    <path>/WEB-INF/tags/authenticationFailedMessageGeneric.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>loginForm</name>
+    <path>/WEB-INF/tags/loginForm.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>loginName</name>
+    <path>/WEB-INF/tags/loginName.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>campusUID</name>
+    <path>/WEB-INF/tags/campusUID.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>registerStudentsFileFormat</name>
+    <path>/WEB-INF/tags/registerStudentsFileFormat.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>imageUrl</name>
+    <path>/WEB-INF/tags/imageUrl.tag</path>
+  </tag-file>
+
+  <tag-file>
+    <name>script</name>
+    <path>/WEB-INF/tags/script.tag</path>
+  </tag-file>
+
+  <!--
+    Project Tags
+  -->
+  <tag-file>
+    <name>inconsistentBackgroundRetestDescription</name>
+    <path>/WEB-INF/tags/projectTags/inconsistentBackgroundRetestDescription.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>projectTestResultsTable</name>
+    <path>/WEB-INF/tags/projectTags/projectTestResultsTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>projectMenu</name>
+    <path>/WEB-INF/tags/projectTags/projectMenu.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>projectTitle</name>
+    <path>/WEB-INF/tags/projectTags/projectTitle.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>projectLegend</name>
+    <path>/WEB-INF/tags/projectTags/projectLegend.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>studentsWithoutSubmissionsTable</name>
+    <path>/WEB-INF/tags/projectTags/studentsWithoutSubmissionsTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>submissionDetails</name>
+    <path>/WEB-INF/tags/projectTags/submissionDetails.tag</path>
+  </tag-file>
+
+  <!--
+  Table tags
+  -->
+  <tag-file>
+    <name>studentWrittenTestOutcomesTable</name>
+    <path>/WEB-INF/tags/tableTags/studentWrittenTestOutcomesTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>uncoveredMethodsTable</name>
+    <path>/WEB-INF/tags/tableTags/uncoveredMethodsTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>allOutcomesTable</name>
+    <path>/WEB-INF/tags/tableTags/allOutcomesTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>pmdOutcomesTable</name>
+    <path>/WEB-INF/tags/tableTags/pmdOutcomesTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>findBugsTable</name>
+    <path>/WEB-INF/tags/tableTags/findBugsTable.tag</path>
+  </tag-file>
+  <tag-file>
+    <name>sourceFilesTable</name>
+    <path>/WEB-INF/tags/tableTags/sourceFilesTable.tag</path>
+  </tag-file>
+  <!--
+  Functions
+  -->
+
+  <function>
+    <description>
+      Determines if all details about a submission should be available because
+      the deadline has expired
+    </description>
+    <name>showPostDeadlineDetails</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus</function-class>
+    <function-signature>boolean showPostDeadlineDetails(
+      edu.umd.cs.marmoset.modelClasses.Project,
+                 edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus)
+      </function-signature>
+    <example>
+      ${ss:showPostDeadlineDetails(project, studentSubmitStatus)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Gives the default view link for an instructor's view of a submission
+    </description>
+    <name>instructorSubmissionViewLink</name>
+    <function-class>edu.umd.cs.submitServer.Links</function-class>
+    <function-signature>java.lang.String defaultInstructorView(edu.umd.cs.marmoset.modelClasses.Project, edu.umd.cs.marmoset.modelClasses.Submission)</function-signature>
+    <example>
+      ${ss:instructorSubmissionViewLink(project, submission)}
+    </example>
+  </function>
+
+
+  <function>
+    <description>
+      Gives the default view link for a strudent's view of a submission
+    </description>
+    <name>submissionViewLink</name>
+    <function-class>edu.umd.cs.submitServer.Links</function-class>
+    <function-signature>java.lang.String defaultStudentView(edu.umd.cs.marmoset.modelClasses.Project, edu.umd.cs.marmoset.modelClasses.Submission)</function-signature>
+    <example>
+      ${ss:submissionViewLink(project, submission)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate &lt;col&gt; tags for a given number of columns, then generate one for each
+      using the col.right class to present a
+      darker right border to separate the different test types.
+    </description>
+    <name>formattedColumnHeaders</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+    <function-signature>java.lang.String formattedColumnHeaders(int, edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection)</function-signature>
+    <example>
+      ${ss:formattedColumnHeaders(10, canonicalTestResults)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate html table formatted version of test outcomes
+    </description>
+    <name>formattedTestHeaderTop</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+    <function-signature>java.lang.String formattedTestHeaderTop(edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection, boolean)</function-signature>
+    <example>
+      Name: ${ss:formattedTestHeaderTop(canonicalTestResults, instructorView)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate html table formatted version of test outcomes
+    </description>
+    <name>formattedTestHeader</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+    <function-signature>java.lang.String formattedTestHeader(edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection, boolean)</function-signature>
+    <example>
+      Name: ${ss:formatTestHeader(canonicalTestResults, instructorView)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate html table formatted version of test outcomes
+    </description>
+    <name>formattedTestResults</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+    <function-signature>java.lang.String formattedTestResults(edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection,edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection)</function-signature>
+    <example>
+      Name: ${ss:formatTestResults(canonicalTestResults,testResults)}
+    </example>
+  </function>
+
+    <function>
+    <description>
+      Generate html table formatted version of test outcomes for a student
+    </description>
+    <name>formattedStudentTestResults</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+    <function-signature>java.lang.String formattedTestResults(edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection,edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection, boolean)</function-signature>
+    <example>
+      Name: ${formattedStudentTestResults(canonicalTestResults,testResults, releaseTested)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate font-hightlighted source code in HTML
+    </description>
+    <name>displaySourceCode</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>java.lang.String displaySourceCode(java.sql.Connection,edu.umd.cs.marmoset.modelClasses.Submission,java.lang.String,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.Integer,edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults)</function-signature>
+    <example>
+      Name: ${ss:displaySourceCode(connection, submission, sourceFileName, startHighlight, numToHighlight, numContext, tabWidth, codeCoverageResults)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate source code in HTML for all files in submission
+    </description>
+    <name>displayAllSourceFiles</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>java.lang.String displayAllSourceFiles(java.sql.Connection,edu.umd.cs.marmoset.modelClasses.Submission,edu.umd.cs.marmoset.modelClasses.Project,java.lang.Integer,edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults)</function-signature>
+    <example>
+      Name: ${ss:displayAllSourceFiles(connection, submission, project, tabWidth, codeCoverageResults)}
+    </example>
+  </function>
+  <function>
+    <description>
+      Count changed sources files in submission
+    </description>
+    <name>numberChangedLines</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>int getNumberChangedLines(java.sql.Connection,edu.umd.cs.marmoset.modelClasses.Submission,edu.umd.cs.marmoset.modelClasses.Project)</function-signature>
+    <example>
+      Name: ${ss:numberChangedLines(connection, submission, project)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Generate baseline code for project
+    </description>
+    <name>displayBaselineSource</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>java.lang.String displayBaselineSource(java.sql.Connection, edu.umd.cs.marmoset.modelClasses.Project, java.lang.Integer)</function-signature>
+    <example>
+      Name: ${ss:displayBaselineSource(connection, project, tabWidth)}
+    </example>
+  </function>
+
+
+
+  <function>
+    <description>
+      Generate code review for all files in submission
+    </description>
+    <name>displayCodeReview</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>java.lang.String displayCodeReview(java.sql.Connection,edu.umd.cs.marmoset.modelClasses.Submission, edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment,  edu.umd.cs.marmoset.modelClasses.Project, java.lang.String)</function-signature>
+    <example>
+      Name: ${ss:displayCodeReview(connection, submission, codeReviewAssignment, project, link)}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Head javascript for displaying source files
+    </description>
+    <name>displayAllSourceFilesHead</name>
+    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
+    <function-signature>java.lang.String headJavascript()</function-signature>
+    <example>
+      Name: ${ss:displayAllSourceFilesHead()}
+    </example>
+  </function>
+
+  <function>
+    <description>
+      Count the number of submissions remaining for retest for a given projectPK
+    </description>
+    <name>numForRetest</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.Queries</function-class>
+    <function-signature>int countNumSubmissionsForRetest(java.lang.String, java.sql.Connection)</function-signature>
+    <example>
+      Name: ${ss:numForRetest(projectPK, connection)}
+    </example>
+  </function>
+
+    <function>
+    <description>
+        Rubric evaluations for reviewer
+    </description>
+    <name>evaluationsForReviewer</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.RubricEvaluation</function-class>
+    <function-signature>Collection lookupByReviewer(
+      edu.umd.cs.marmoset.modelClasses.CodeReviewer, java.sql.Connection )</function-signature>
+    <example>
+      Name: ${ss:evaluationsForReviewer(reviewer, connection)}
+    </example>
+  </function>
+
+
+    <function>
+    <description>
+        Rubrics for assignment
+    </description>
+    <name>ss:rubricsForAssignment</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.Rubric</function-class>
+    <function-signature>Collection lookupByAssignment(
+      edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment, java.sql.Connection )</function-signature>
+    <example>
+      Name: ${ss:ss:rubricsForAssignment(assignment, connection)}
+    </example>
+  </function>
+
+    <function>
+    <description>
+      Count the number of submissions that need to be tested for a given projectPK
+    </description>
+    <name>numToTest</name>
+    <function-class>edu.umd.cs.marmoset.modelClasses.Queries</function-class>
+    <function-signature>int countNumSubmissionsToTest(java.lang.String, java.sql.Connection)</function-signature>
+    <example>
+      Name: ${ss:numToTest(projectPK, connection)}
+    </example>
+  </function>
+
+  <function>
+  <description>
+    Figure out if a radio button should be checked
+  </description>
+  <name>checked</name>
+  <function-class>edu.umd.cs.submitServer.SubmitServerUtilities</function-class>
+  <function-signature>java.lang.String checked(java.lang.Object, java.lang.Object)</function-signature>
+  <example>
+    Name: ${ss:checked(s1, s2)}
+  </example>
+  </function>
+    <function>
+  <description>
+    Figure out if a radio button should be checked
+  </description>
+  <name>checkedOrNull</name>
+  <function-class>edu.umd.cs.submitServer.SubmitServerUtilities</function-class>
+  <function-signature>java.lang.String checkedOrNull(java.lang.String, java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:checkedOrNull(s1, s2)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+    Figure out if a radio button should be checked
+  </description>
+  <name>isChecked</name>
+  <function-class>edu.umd.cs.submitServer.SubmitServerUtilities</function-class>
+  <function-signature>java.lang.String checked(boolean)</function-signature>
+  <example>
+    Name: ${ss:isChecked(b)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+    Figure out if an option of a select pull-down menu should be the default selected one
+  </description>
+  <name>selected</name>
+  <function-class>edu.umd.cs.submitServer.SubmitServerUtilities</function-class>
+  <function-signature>java.lang.String selected(java.lang.Object, java.lang.Object)</function-signature>
+  <example>
+    Name: ${ss:selected(s1, s2)}
+  </example>
+  </function>
+    <function>
+
+  <description>
+    Figure out if an option of a select pull-down menu should be the default selected one
+  </description>
+  <name>selectedOrNull</name>
+  <function-class>edu.umd.cs.submitServer.SubmitServerUtilities</function-class>
+  <function-signature>java.lang.String selectedOrNull(java.lang.String, java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:selectedOrNull(s1, s2)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+    Check if the coverage of a given release test that failed due to a run-time
+  exception has public/student tests that cover the source of the exception
+    or range lines before it.
+  </description>
+  <name>isApproximatelyCovered</name>
+  <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection</function-class>
+  <function-signature>boolean isApproximatelyCovered(edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection, edu.umd.cs.marmoset.modelClasses.TestOutcome)</function-signature>
+  <example>
+    Name: ${ss:isApproximatelyCovered(collection, outcome)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+  Generate a link to view exception location related to a test outcome
+  </description>
+  <name>exceptionLocation</name>
+  <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcome</function-class>
+  <function-signature>String getExceptionLocation(edu.umd.cs.marmoset.modelClasses.TestOutcome, java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:exceptionLocation(testOutcome, viewSourceLink)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+  Generate a link to view the source code related to a test outcome
+  </description>
+  <name>hotlink</name>
+  <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcome</function-class>
+  <function-signature>String getHotlink(edu.umd.cs.marmoset.modelClasses.TestOutcome, java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:hotlink(testOutcome, viewSourceLink)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+    Generate a string that is a random password
+  </description>
+  <name>nextRandomPassword</name>
+  <function-class>edu.umd.cs.marmoset.utilities.MarmosetUtilities</function-class>
+  <function-signature>java.lang.String nextRandomPassword(void)</function-signature>
+  <example>
+    Name: ${ss:nextRandomPassword()}
+  </example>
+  </function>
+
+  <function>
+  <description>
+    Escape HTML elements and removing CR and LF characters from a string.
+    This is handy for scrubbing data that will eventually be written into
+    an HTML document or sent in an HTTP response so that it can't trigger
+    a cross-site or response-splitting vulnerability.
+  </description>
+  <name>scrub</name>
+  <function-class>edu.umd.cs.marmoset.utilities.XSSScrubber</function-class>
+  <function-signature>java.lang.String scrubbedStr(java.lang.CharSequence)</function-signature>
+  <example>
+    Name: ${ss:scrub(strToScrub)}
+  </example>
+  </function>
+
+
+  <function>
+  <description>
+  URLEncode
+  </description>
+  <name>urlEncode</name>
+  <function-class>java.net.URLEncoder</function-class>
+  <function-signature>java.lang.String encode(java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:urlEncode(strToScrub)}
+  </example>
+  </function>
+
+  <function>
+  <description>
+  URLDecode
+  </description>
+  <name>urlDecode</name>
+  <function-class>java.net.URLDecoder</function-class>
+  <function-signature>java.lang.String decode(java.lang.String)</function-signature>
+  <example>
+    Name: ${ss:urlDecode(strToScrub)}
+  </example>
+  </function>
+
+
+
+</taglib>

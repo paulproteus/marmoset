@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<ruleset name="Marmoset - Use of Language Features">
+
+	<rule name="MarmosetLoopContainsBreak"
+		message="Method has a loop containing a break statement"
+		class="net.sourceforge.pmd.rules.XPathRule">
+		<description>
+		Method has a loop containing a break statement.
+		</description>
+		<properties>
+			<property name="xpath">
+				<value>
+				<![CDATA[
+//MethodDeclaration[count(.//DoStatement//BreakStatement|.//WhileStatement//BreakStatement|.//ForStatement//BreakStatement)>0]
+				]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+	
+	<rule name="MarmosetMultipleReturnStatements"
+		message="Method contains multiple return statements"
+		class="net.sourceforge.pmd.rules.XPathRule">
+		<description>
+		Method contains multiple return statements
+		</description>
+		<properties>
+			<property name="xpath">
+				<value>
+				<![CDATA[
+//MethodDeclaration[count(.//ReturnStatement) > 1]
+				]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+	
+	<rule name="MarmosetNestedIfStatement"
+		message="Method contains a nested if statement"
+		class="net.sourceforge.pmd.rules.XPathRule">
+		<description>
+		Method contains a nested if statement
+		</description>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+//MethodDeclaration
+[
+  .//IfStatement/Statement/Block/BlockStatement/Statement/IfStatement |
+  .//IfStatement/Statement/IfStatement
+]
+					]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule name="MarmosetLabeledLoop"
+		message="Method contains a loop with a label"
+		class="net.sourceforge.pmd.rules.XPathRule">
+		<description>
+			Method contains a loop with a label
+		</description>
+		<properties>
+			<property name="xpath">
+				<value>
+				<![CDATA[
+//MethodDeclaration[count(.//LabeledStatement//WhileStatement|.//LabeledStatement//ForStatement|.//LabeledStatement//DoStatement) > 0]
+				]]>
+				</value>
+			</property>
+		</properties>
+	</rule>
+
+</ruleset>
+
+<!-- vim:set ts=4: -->

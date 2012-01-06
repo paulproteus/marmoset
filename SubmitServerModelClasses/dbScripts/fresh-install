@@ -1,0 +1,168 @@
+#!/bin/bash
+
+#  Marmoset: a student project snapshot, submission, testing and code review
+#  system developed by the Univ. of Maryland, College Park
+#
+#  Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+#  by William Pugh. See http://marmoset.cs.umd.edu/
+#
+#  Copyright 2005 - 2011, Univ. of Maryland
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy of
+#  the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations under
+#  the License.
+
+function usage() {
+    echo "Usage: $0 <password> <database data directory>  [ -p <port> ] [ -d <database> ]"
+    exit
+}
+
+if [ "$MYSQL_HOME" = "" ]; then
+    echo "Please set MYSQL_HOME to point to your MySQL installation"
+    exit
+fi
+
+if [ $# -lt 2 ]; then
+    usage
+fi
+
+#
+# Password for the root account
+#
+if [ "$1" == "" ]; then
+    usage;
+    exit
+fi
+PASSWORD=$1
+shift
+#echo "password: $PASSWORD"
+
+#
+# Directory where we're putting the actual server
+# Hard-code this if you have a well-defined place you always put the DB
+#
+if [ "$1" == "" ]; then
+    usage;
+    exit
+fi
+DIR=$1
+shift
+#echo "DIR: $DIR"
+
+port=3306
+database=submitserver
+while [ $# -gt 0 ]
+do
+  case $1 in
+      -h | -help | --help )
+	  usage
+	  exit;;
+      -p )
+	  shift
+	  port=$1
+	  shift;;
+      -d )
+	  shift
+	  database=$1
+	  shift;;
+  esac
+done
+
+
+DATESTRING=`date "+%F-%H-%M-%S"`
+
+#
+# Shutdown and/or move away old database
+#
+if [ -d $DIR ]; then
+#     echo "There is already a directory at $DIR; I can't install over it!"
+#     exit
+    # try to shutdown the database if it looks like there's one already running
+    if [ -f $DIR/submitserver.pid ]; then
+	echo "database already running; trying to stop it"
+	stop-innodb $DIR
+# TODO: try to kill any remaining mysql processes
+#	skill mysql
+    fi
+    # move away existing directory 
+    echo "moving existing $DIR directory to $DIR.$DATESTRING"
+    mv $DIR $DIR.$DATESTRING
+fi
+
+#
+# Create necessary directory structure for new DB
+#
+mkdir $DIR
+mkdir $DIR/$database
+mkdir $DIR/innodb.logs
+
+#
+# Create new database
+#
+$MYSQL_HOME/bin/mysql_install_db \
+    --basedir=$MYSQL_HOME \
+    --datadir=$DIR \
+    --innodb_data_home_dir=$DIR/$database \
+    --innodb_log_group_home_dir=$DIR/innodb.logs \
+    --socket=$DIR/submitserver.sock \
+    --pid-file=$DIR/submitserver.pid \
+    --log-slow-queries=$DIR/slow_queries.log
+
+#
+# Start new database using my own start-innodb script
+#
+start-innodb -p $port -d $database $DIR 
+
+#
+# Move away old .my.cnf mysql config file, if it exists
+#
+MY_CNF=$HOME/.my.cnf
+if [ -f $MY_CNF ]; then
+    echo "moving $MY_CNF to $MY_CNF.$DATESTRING"
+    mv $MY_CNF $MY_CNF.$DATESTRING
+fi
+
+#
+# Sleep for 10 seconds to give MySQL server a chance to start up
+#
+echo "Starting Database. Please wait..."
+sleep 10
+echo "25%"
+sleep 10
+echo "50%"
+sleep 10
+echo "75%"
+sleep 10
+echo "100%"
+
+#
+# Reset root password
+#
+echo
+echo "$MYSQL_HOME/bin/mysqladmin --socket=$DIR/submitserver.sock -u root password $PASSWORD"
+echo
+$MYSQL_HOME/bin/mysqladmin --socket=$DIR/submitserver.sock -u root password $PASSWORD
+
+#
+# Create new .my.cnf file
+#
+echo "[mysql]" >> $MY_CNF
+echo "user=root" >> $MY_CNF
+echo "socket=$DIR/submitserver.sock" >> $MY_CNF
+echo "password=$PASSWORD" >> $MY_CNF
+echo "database=$database" >> $MY_CNF
+echo "" >> $MY_CNF
+echo "[mysqladmin]" >> $MY_CNF
+echo "user=root" >> $MY_CNF
+echo "socket=$DIR/submitserver.sock" >> $MY_CNF
+echo "password=$PASSWORD" >> $MY_CNF
+
+chmod og-rwx $MY_CNF

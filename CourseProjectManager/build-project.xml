@@ -1,0 +1,84 @@
+<!--
+	Ant build script for the Course Project Manager plugin.
+
+-->
+
+<project name="courseProjectManager" default="dist">
+
+	<property file="build.properties" />
+
+<!-- 
+	The local.properties properties file contains the location of eclipsePlugin.dir 
+
+	This value is likely to be different for each checkout of the plugin,
+	so the local.properties file is not managed by cvs
+	
+-->
+	<property file="local.properties" />
+
+
+	<property name="src.dir" value="src"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="tools.dir" value="tools"/>
+	<!-- the binaries/classes, built by eclipse. -->
+	<property name="bin.dir" value="bin" />
+
+	 <path id="plugin.classpath">
+	<fileset dir="${lib.dir}">
+	  <include name="*.jar"/>
+	  </fileset>
+	<fileset dir="${eclipsePlugin.dir}">
+	  <include name="org.eclipse*.jar"/>
+	  </fileset>
+	    </path>
+
+
+
+	<target name="init">
+		<mkdir dir="${bin.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+	</target>
+
+	<target name="clean" description="Clean up temporary files">
+		<delete includeemptydirs="true">
+			<fileset dir="${dist.dir}" />
+			<fileset dir="${bin.dir}" />
+		</delete>
+	</target>
+
+	<target name="classes" depends="init" description="Compile java source files">
+        <mkdir dir="${bin.dir}"/>
+        <!-- Compile Java source files. -->
+        <javac srcdir="${src.dir}"
+		  destdir="${bin.dir}"
+                source="1.5"
+                target="1.5"
+                debug="on">
+            <classpath refid="plugin.classpath"/>
+        </javac>
+	</target>
+
+
+	
+	<target name="dist" depends="classes" description="Build a plugin distributable">
+
+		<jar destfile="${dist.dir}/autocvs.jar">
+				<fileset dir="${bin.dir}" />
+				<fileset dir="${src.dir}" >
+				  <include name="**/*.properties"/>
+			  </fileset>
+		</jar>
+		<copy todir="${dist.dir}/lib">
+			<fileset dir="${lib.dir}">
+			  <include name="*.jar"/>
+			  </fileset>
+		</copy>
+		<copy todir="${dist.dir}">
+			<fileset file="plugin.xml" />
+		</copy>
+		<copy todir="${dist.dir}/META-INF">
+			<fileset dir="META-INF"/>
+		</copy>
+	</target>
+</project>

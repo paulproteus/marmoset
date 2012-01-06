@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/SubmitServerModelClasses"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="junit"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="gwt-src"/>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v7.0"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guice-servlet-3.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-fileupload.jar" sourcepath="/export/home/jspacco/software/commons-fileupload/src"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-logging.jar" sourcepath="/export/home/jspacco/software/commons-logging-1.0.4"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/standard.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-log.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-io.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dom4j-full.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/mysql-connector-java-5.1.13-bin.jar"/>
+	<classpathentry kind="lib" path="lib/annotations.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/ffident.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/cos.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jmimemagic-0.1.0.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/tar.jar"/>
+	<classpathentry kind="lib" path="lib/jsr305.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/gwt-dispatch-1.2.0.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guava-10.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guava-gwt-10.0.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/openid4java-0.9.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/gin-1.5-post-gwt-2.2.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/gwt-dnd-3.1.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/SubmitServerModelClasses/lib/mail.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/log4j.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>

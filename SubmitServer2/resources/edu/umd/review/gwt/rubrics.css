@@ -1,0 +1,17 @@
+.rubricPanelDraft {
+  border: 2px solid red;
+  margin-bottom: 4px;
+}
+
+.rubricPanelDead {
+  text-decoration: line-through;
+  font-style: italic;
+  color: #444;
+  border: 1px solid black;
+  margin-bottom: 4px;
+}
+
+.rubricPanelLive {
+  border: 1px solid black;
+  margin-bottom: 4px;
+}

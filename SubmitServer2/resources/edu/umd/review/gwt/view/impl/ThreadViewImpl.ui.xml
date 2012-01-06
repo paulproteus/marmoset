@@ -1,0 +1,30 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:view="urn:import:edu.umd.review.gwt.view.impl">
+  <ui:with type="edu.umd.review.gwt.CodeReviewResources" field="res" />
+  <ui:style>
+    .ack-label {
+      margin-bottom: 2px;
+      text-align: center;
+      font-size: 90%;
+      background-color: #afa;
+    }
+
+    .waitingLabel {
+    text-align: center;
+    width: 100%;
+    padding: 1em 0;
+  }
+  </ui:style>
+  <g:FlowPanel styleName="thread-box" addStyleNames="comment-text">
+    <g:Label ui:field="needAckLabel" styleName="{style.ack-label}" visible="false">Please respond</g:Label>
+    <g:SimplePanel ui:field="rubricPanel" visible="false"/>
+    <g:FlowPanel ui:field="commentPanel" />
+    <g:Label ui:field="waitingLabel" styleName="{style.waitingLabel}">creating new draft...</g:Label>
+    <view:DraftViewImpl ui:field="draftView" addStyleNames="draft-view comment-text" />
+    <g:FlowPanel ui:field="buttonPanel">
+      <g:Anchor ui:field="replyLink" addStyleNames="link">Reply</g:Anchor>
+      <g:Anchor ui:field="ackLink" addStyleNames="link" enabled="false" visible="false">Acknowledge</g:Anchor>
+    </g:FlowPanel>
+  </g:FlowPanel>
+</ui:UiBinder>

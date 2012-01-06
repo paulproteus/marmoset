@@ -1,0 +1,10 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:with type="edu.umd.review.gwt.CodeReviewResources" field="res" />
+  <g:FocusPanel ui:field="outer" styleName="tray-thread-view" addStyleNames="comment-text">
+    <g:FlowPanel ui:field="inner">
+      <g:HTML ui:field="description" />
+      <g:FlowPanel ui:field="rubricPanel" />
+    </g:FlowPanel>
+  </g:FocusPanel>
+</ui:UiBinder>

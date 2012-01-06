@@ -1,0 +1,158 @@
+#! /usr/bin/perl -w
+
+#  Marmoset: a student project snapshot, submission, testing and code review
+#  system developed by the Univ. of Maryland, College Park
+#
+#  Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+#  by William Pugh. See http://marmoset.cs.umd.edu/
+#
+#  Copyright 2005 - 2011, Univ. of Maryland
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy of
+#  the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations under
+#  the License.
+
+# Run a BuildServer instance.
+# All configuration information is read from
+# the BuildServer configuration properties file.
+
+use strict qw(refs vars);
+use FileHandle;
+
+my $ID = '[A-Za-z_.]';
+
+if (scalar(@ARGV) < 1 or scalar(@ARGV) > 3) {
+	print STDERR "Usage: runBuildServer.pl <config file> [ once ] \n";
+	print STDERR "Setting 'once' is equivalent to setting 'debug.donotloop=true' and 'log.directory=console'\n";
+	print STDERR "in the config.properties file, without actually having to edit the file.\n";
+	exit 1;
+}
+
+my $configFile = shift @ARGV;
+my $once = "";
+$once = shift @ARGV if (scalar @ARGV > 0);
+print "Reading [$configFile]\n";
+my %configProps = ();
+Read_Props($configFile);
+
+my $javaHome = Get_Required_Property('java.home');
+my $findBugsHome = Get_Required_Property('findbugs.home');
+my $buildServerRoot = Get_Required_Property('build.server.root');
+my $buildServerHome = Get_Required_Property('build.server.home');
+my $supportedCourses = Get_Required_Property('supported.courses');
+my $pid = $$;
+
+# Make sure we are running in ${build.server.home}
+my $cwd = `pwd`;
+chomp $cwd;
+if (Get_Canonical_Path($cwd) ne Get_Canonical_Path($buildServerHome)) {
+	die "Current directory $cwd does not match build server home $buildServerHome\n";
+}
+
+# Create the pidfile
+Create_PID_File();
+
+# Make sure java.home/bin and findbugs.home/bin
+# are on the executable PATH.
+my $oldPath = $ENV{'PATH'};
+$ENV{'PATH'} = "$javaHome/bin:$findBugsHome/bin:$oldPath";
+
+# Start build server.
+my $buildServerClasspath =
+	"$buildServerRoot/bin/buildserver.jar:" .
+	"$buildServerRoot/lib/modelClasses.jar:" .
+	"$buildServerRoot/lib/findbugs.jar:" .
+	"$buildServerRoot/lib/clover.jar:" .
+	"$buildServerRoot/lib/commons-io.jar:" .
+	"$buildServerRoot/lib/commons-httpclient.jar:" .
+	"$buildServerRoot/lib/commons-logging.jar:" .
+	"$buildServerRoot/lib/junit.jar:" .
+	"$buildServerRoot/lib/jaxen.jar:" .
+	"$buildServerRoot/lib/bcel.jar:" .
+	"$buildServerRoot/lib/log4j.jar:" .
+	"$buildServerRoot/lib/dom4j.jar";
+
+exec("java",
+	"-Dcom.sun.management.jmxremote",
+	"-Xmx64m",
+	"-classpath",
+	$buildServerClasspath,
+	"edu.umd.cs.buildServer.BuildServer",
+	$configFile,
+        $once)
+	|| die "Couldn't exec build server: $!\n";
+
+sub Read_Props {
+	my ($configFile) = @_;
+	my %props = ();
+
+	# Read properties file
+	my $fh = new FileHandle("<$configFile");
+	(defined $fh) || die "Couldn't open $configFile: $!";
+	while (<$fh>) {
+		if (/^\s*($ID+)\s*=\s*(.*)\s*$/) {
+			$props{$1} = $2;
+		}
+	}
+	$fh->close();
+
+	# Do ant-style substitutions
+	foreach my $key (keys %props) {
+		my $value = $props{$key};
+		$value =~ s/\$\{($ID+)\}/Get_Replacement($1, \%props)/ge;
+		#print "$key=$value\n";
+
+		$configProps{$key} = $value;
+	}
+}
+
+sub Get_Canonical_Path {
+	my ($dir) = @_;
+	my $canonicalDir = `cd '$dir' && /bin/pwd 2> /dev/null`;
+	return $canonicalDir;
+}
+
+sub Get_Replacement {
+	my ($key, $hashref) = @_;
+	if (exists $hashref->{$key}) {
+		return $hashref->{$key};
+	} else {
+		return "";
+	}
+}
+
+sub Get_Required_Property {
+	my ($key) = @_;
+	die "Missing configuration property $key\n" if (!exists $configProps{$key});
+	return $configProps{$key};
+}
+
+sub Create_PID_File {
+	my $pidfile = "$buildServerHome/buildserver.pid";
+	if (-f $pidfile) {
+		my $pid = `cat $pidfile`;
+		chomp $pid;
+#		print "pid: $pid\n";
+		if (-r "/proc/$pid") {
+			die "Build server already running with pid $pid --" .
+				"PLEASE CHECK YOUR CRONTAB to make sure another build server is not started soon\n";
+		}
+	}
+
+#	die "Build server *not* running with pid $pid\n";
+
+	my $pid_fh= new FileHandle(">$pidfile");
+	(defined $pid_fh) || die "Couldn't create pid file $pidfile: $!\n";
+	print $pid_fh $pid, "\n";
+	$pid_fh->close();
+}
+
+# vim:ts=4

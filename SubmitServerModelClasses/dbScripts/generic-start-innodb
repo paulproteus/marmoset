@@ -1,0 +1,143 @@
+#!/bin/bash
+
+#  Marmoset: a student project snapshot, submission, testing and code review
+#  system developed by the Univ. of Maryland, College Park
+#
+#  Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
+#  by William Pugh. See http://marmoset.cs.umd.edu/
+#
+#  Copyright 2005 - 2011, Univ. of Maryland
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#  use this file except in compliance with the License. You may obtain a copy of
+#  the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations under
+#  the License.
+
+
+function usage() {
+    echo "Usage: $0
+	[ -h ] 
+	[ -p <port> ] 
+	[ -l ]
+	<database root directory> "
+    exit 1
+}
+
+if [ "$MYSQL_HOME" = "" ]; then
+    echo "Please set MYSQL_HOME to point to your MySQL installation"
+    exit
+fi
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+case $1 in
+    -h | -help | --help )
+	usage
+	exit 1
+	;;
+esac
+
+
+#
+# Assume default MYSQL port
+#
+PORT=3306
+while [ $# -gt 1 ]
+do
+  case $1 in
+      -h | -help | --help )
+	  usage
+	  exit 1
+	  ;;
+      -p )
+	  shift
+	  PORT=$1
+	  shift;;
+      -l )
+	  shift
+	  echo
+	  echo "Careful with this option: You are logging everything!"
+	  echo "This will kill your performance and should only be used"
+	  echo "for debugging purposes"
+	  echo
+	  LOG=--log=sql.log
+	  ;;
+  esac
+done
+
+#
+# Read database and DB-server directory
+#
+DIR=$1
+
+echo "STARTING DATABASE $database FROM DATA DIR $DIR ON PORT $PORT"
+
+
+DATE=`date "+%F-%H-%M-%S"`
+
+#
+# TODO: This must be exactly the same between this file and fresh-install
+#
+DATA_HOME=$DIR/data
+
+INNODB_LOGS=$DIR/innodb-logs
+BIN_LOGS=$DIR/bin-logs
+LOGS=$DIR/logs
+
+SOCKET=$DIR/db.sock
+PID_FILE=$DIR/db.pid
+SLOW_QUERIES=$LOGS/slow-queries.txt
+ERRLOG=$LOGS/error-log.txt
+
+#
+# Save old log-files
+#
+if [ -f $SLOW_QUERIES ]; then
+    mv $SLOW_QUERIES $SLOW_QUERIES.$DATE
+fi
+if [ -f $ERRLOG ]; then
+    mv $ERRLOG $ERRLOG.$DATE
+fi
+
+#
+# TODO: I don't really know why I set a lot of these parameters to the values they have
+#
+
+mysqld_safe \
+--no-defaults \
+--basedir=$MYSQL_HOME \
+--ledir=$MYSQL_HOME/bin \
+--innodb_data_home_dir=$DATA_HOME \
+--innodb_data_file_path=database.innodb:10M:autoextend \
+--innodb_log_group_home_dir=$INNODB_LOGS \
+--innodb_buffer_pool_size=700M \
+--innodb_log_file_size=150M \
+--innodb_log_buffer_size=8MB \
+--innodb_additional_mem_pool_size=50M \
+--innodb_log_files_in_group=3 \
+--innodb_file_io_threads=4 \
+\
+--max_connections=50 \
+--thread_concurrency=5 \
+--max_allowed_packet=16M \
+\
+--port=$PORT \
+--socket=$SOCKET \
+--pid-file=$PID_FILE \
+--datadir=$DATA_HOME \
+\
+--log-error=$ERRLOG \
+--log-slow-queries=$SLOW_QUERIES \
+--long_query_time=3 $LOG \
+--log-bin=$BIN_LOGS/binlog \
+&

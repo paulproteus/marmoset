@@ -1,0 +1,22 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:style>
+    .content {
+      margin-right: 1em;
+      margin-top: 1em;
+    }
+
+    .outer {
+      height: 100%;
+    }
+  </ui:style>
+  <g:ScrollPanel styleName="{style.outer}">
+    <g:FlowPanel styleName="{style.content}">
+      <g:FlowPanel ui:field="mainPanel"></g:FlowPanel>
+      <g:HorizontalPanel>
+        <g:Button ui:field="publishButton">Publish</g:Button>
+        <g:Button ui:field="cancelButton">Cancel</g:Button>
+      </g:HorizontalPanel>
+    </g:FlowPanel>
+  </g:ScrollPanel>
+</ui:UiBinder>

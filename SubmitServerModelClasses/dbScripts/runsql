@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <script.sql>"
+    exit 1
+fi
+
+$MYSQL_HOME/bin/mysql -e "source $1"

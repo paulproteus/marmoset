@@ -1,0 +1,35 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:edu.umd.review.gwt.widget">
+  <ui:style>
+    .score-box {
+      display: block;
+      border: 2px solid silver;
+      padding: 2px;
+    }
+
+    .edit-box {
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      border: 2px solid silver;
+      padding: 2px;
+      width: 40em;
+    }
+
+    .rubric-widget {
+      display: inline;
+      margin-right: .5em;
+    }
+  </ui:style>
+  <g:FlowPanel ui:field="rubricPanel">
+      <g:Label ui:field="titleLabel" />
+      <g:FlowPanel>
+        <g:TextBox ui:field="scoreBox"
+          styleName="{style.score-box} {style.rubric-widget}" addStyleNames="comment-text" />
+        <g:TextBox ui:field="explanationBox"
+          styleName="{style.edit-box} {style.rubric-widget}" addStyleNames="comment-text" />
+      </g:FlowPanel>
+      <w:RubricEvaluationControl ui:field="control" />
+  </g:FlowPanel>
+</ui:UiBinder>

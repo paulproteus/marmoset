@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<dataset>
+  <courses
+  	semester='Spring 2005'
+  	courseName='CMSC132'
+  	section='1'
+  	description='A course'
+  	url='http://www.cs.umd.edu/'/>
+
+</dataset>

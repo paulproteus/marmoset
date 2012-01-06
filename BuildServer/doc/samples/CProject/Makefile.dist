@@ -1,0 +1,22 @@
+# The distribution Makefile.
+# Packages up the reference solution and the
+# project jarfile.
+
+SUBMISSION_FILES = add.c add.h
+TESTJAR_FILES = Makefile test1.c test2.c test.properties
+
+dist : ref_solution.zip test_setup.zip
+
+# Create a reference solution.
+# This should be submitted from the canonical account
+# for the project.
+ref_solution.zip : $(SUBMISSION_FILES)
+	zip -9r $@ $(SUBMISSION_FILES)
+
+# Create the test setup jarfile.
+# (This can actually be a zipfile.)
+test_setup.zip : $(TESTJAR_FILES)
+	zip -9r $@ $(TESTJAR_FILES)
+
+clean :
+	rm -f *.zip

@@ -1,0 +1,11 @@
+The jdbc2_0-stdextx is offered as a free download at
+<http://java.sun.com/products/jdbc/download.html>, but a license is
+not explicitly specified on that page, nor is one set out in any of
+the documentation associated with this package.  For further
+information on jdbc2_0-stdext, we recommend you visit the web page at
+the link above.
+
+The license for a version (3.0) of this software that followed the one
+distributed with this package is available at
+<http://java.sun.com/products/jdbc/jdbc-3_0-fr-spec-license.html>, but
+may not apply to this library.
