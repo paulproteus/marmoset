@@ -89,9 +89,22 @@
 		<c:out value="${course.courseName}"/><c:if test="${not empty course.section}"><c:out value="${course.section}"/></c:if>:
 		<c:out value="${course.description}"/> </a>
 	</c:forEach>
+    
 	<c:if test="${student.canImportCourses}">
+    <c:choose>
+    <c:when test="${grades.server}">
 	<c:url var="importCourseLink" value="/view/import/importCourse.jsp"/>
 	<li><a href="${importCourseLink}">Import course from grade server</a>
+    </li>
+    </c:when>
+    <c:otherwise>
+    <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp"/>
+    <li><a href="${createCourseLink}">Create course</a>
+    </li>
+    </c:otherwise>
+    </c:choose>
+    <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp"/>
+     <li><a href="${buildServerConfigLink}">Generate buildserver config file</a>
 	</c:if>
 </ul>
 </c:otherwise>

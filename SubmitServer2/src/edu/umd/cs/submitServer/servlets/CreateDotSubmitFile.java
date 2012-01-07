@@ -56,18 +56,25 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
 		Project project = (Project) request.getAttribute("project");
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
-		out.println("projectNumber=" + project.getProjectNumber());
-		String section = course.getSection();
-		if (section != null && !section.isEmpty())
-		    out.println("section=" + section);
-		out.println("courseName=" + course.getCourseName());
-		out.println("semester=" + course.getSemester());
-		out.println("submitURL=" + request.getScheme() + "://"
+		print(out, "courseName", course.getCourseName());
+		print(out, "courseKey" , course.getSubmitKey());
+        
+		print(out, "section", course.getSection());
+		print(out, "semester" ,course.getSemester());
+        print(out, "projectNumber",  project.getProjectNumber());
+		print(out, "projectNumber", project.getProjectNumber());
+        
+		print(out, "submitURL", request.getScheme() + "://"
 				+ request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath() + ECLIPSE_SUBMIT_PATH);
 
 		out.flush();
 		out.close();
+	}
+	
+	private void print(PrintWriter out, String key, String value) {
+	    if (value == null || value.length() == 0) return;
+	    out.println(key+"="+value);
 	}
 
 }

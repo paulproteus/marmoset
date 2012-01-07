@@ -851,6 +851,15 @@
 		<url-pattern>/action/ImportCourse</url-pattern>
 	</filter-mapping>
 
+    <servlet>
+        <servlet-name>CreateBuildserverConfigFile</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.CreateBuildserverConfigFile </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateBuildserverConfigFile</servlet-name>
+        <url-pattern>/action/instructor/CreateBuildserverConfigFile</url-pattern>
+    </servlet-mapping>
+    
 	<servlet>
 		<servlet-name>CourseRSS</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.CourseRSS </servlet-class>
@@ -917,6 +926,10 @@
 	<servlet>
 		<servlet-name>SubmitProjectViaEclipse</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.SubmitProjectViaEclipse </servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>BuildserverWelcome</servlet-name>
+		<servlet-class> edu.umd.cs.submitServer.servlets.BuildserverWelcome </servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>RequestSubmission</servlet-name>
@@ -1213,6 +1226,10 @@
 	<servlet-mapping>
 		<servlet-name>SubmitProjectViaEclipse</servlet-name>
 		<url-pattern>/eclipse/SubmitProjectViaEclipse</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>BuildserverWelcome</servlet-name>
+		<url-pattern>/buildServer/Welcome</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RequestSubmission</servlet-name>

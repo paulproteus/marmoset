@@ -261,4 +261,10 @@ public class BuildServerTestHarness extends BuildServer {
 	public int getNumServerLoopIterations() {
 		return numServerLoopIterations;
 	}
+
+    @Override
+    protected void doWelcome() throws MissingConfigurationPropertyException, IOException {
+        // TODO Auto-generated method stub
+        
+    }
 }

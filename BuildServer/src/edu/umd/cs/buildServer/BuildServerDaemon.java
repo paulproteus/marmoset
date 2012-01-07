@@ -126,7 +126,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		getConfig().setProperty(CLOVER_DB, cloverDBPath);
 	}
 
-	
+	private String getWelcomeURL(){
+        return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_WELCOME_PATH);
+    }
+
 
 	private String getRequestProjectURL(){
 		return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_REQUESTPROJECT_PATH);
@@ -195,6 +198,32 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		return header.getValue();
 	}
 
+    protected void doWelcome() throws MissingConfigurationPropertyException, IOException {
+        System.out.println("Connecting to submit server");
+        String url = getWelcomeURL();
+        MultipartPostMethod method = new MultipartPostMethod(url);
+
+       
+        method.addParameter("hostname", getBuildServerConfiguration().getHostname());
+        String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
+        method.addParameter("courses", supportedCourses);
+        method.addParameter("load", SystemInfo.getSystemLoad());
+
+        BuildServer.printURI(getLog(), method);
+
+        int responseCode = client.executeMethod(method);
+        System.out.println(method.getResponseBodyAsString());
+        if (responseCode != HttpStatus.SC_OK) {
+
+            getLog().error("HTTP server returned non-OK response: " + responseCode + ": " + method.getStatusText());
+            getLog().error(" for URI: " + method.getURI());
+
+            getLog().error("Full error message: " + method.getStatusText());
+            throw new IOException(method.getStatusText());
+        }
+    }
+    
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -343,6 +372,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 				getTestSetupURL());
 		method.addParameter("testSetupPK", projectSubmission.getTestSetupPK());
 		method.addParameter("projectJarfilePK", projectSubmission.getTestSetupPK());
+		String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
+        method.addParameter("courses", supportedCourses);
+        
 		BuildServer.printURI(getLog(), method);
 
 		try {
@@ -496,6 +528,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		method.addParameter("testMachine", hostname);
 		method.addParameter("hostname", hostname);
 		method.addParameter("load", SystemInfo.getSystemLoad());
+		String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
+        method.addParameter("courses", supportedCourses);
+        
 
 		
 		// CodeMetrics

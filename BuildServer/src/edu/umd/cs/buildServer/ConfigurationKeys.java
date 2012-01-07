@@ -44,6 +44,9 @@ public interface ConfigurationKeys {
 	
 	/** URL path to the RequestProject servlet on the submit server. */
 	public static final String SUBMIT_SERVER_REQUESTPROJECT_PATH = "/buildServer/RequestSubmission";
+	
+	/** URL path to the RequestProject servlet on the submit server. */
+    public static final String SUBMIT_SERVER_WELCOME_PATH = "/buildServer/Welcome";
 
 	/** URL path to the GetProjectJar servlet on the submit server. */
 	public static final String SUBMIT_SERVER_GETTESTSETUP_PATH = "/buildServer/GetTestSetup";

@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 
@@ -102,6 +104,18 @@ public class Course {
 	 */
 	public String getCourseName() {
 		return courseName;
+	}
+	public String getFullName() {
+	    StringBuilder b = new StringBuilder(courseName);
+	    if (section != null && section.length() > 0) {
+	        b.append("-");
+	        b.append(section);
+	    }
+	    if (semester != null && semester.length() > 0) {
+            b.append(", ");
+            b.append(semester);
+        }
+	    return b.toString();
 	}
 	public String getBuildserverKey() {
 	    return buildserverKey;
@@ -420,20 +434,11 @@ public class Course {
     throws SQLException
     {
         String k[] = keys.split("[ ,]");
-        String query =
-            " SELECT course_pk  FROM courses WHERE ";
-        for(int i = 0; i < k.length; i++) {
-            if (i > 0)
-                query += " OR ";
-            query += " buildserver_key = ? ";
-        }
+        
+        PreparedStatement stmt = queryByBuildserverKey(conn, "course_pk", k);
         ArrayList<Integer> result = new ArrayList<Integer>();
-        PreparedStatement stmt = null;
+
         try {
-            stmt=conn.prepareStatement(query);
-            for(int i = 0; i < k.length; i++) {
-                stmt.setString(i+1, k[i]);
-            }
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 result.add(rs.getInt(1));
@@ -443,7 +448,45 @@ public class Course {
             Queries.closeStatement(stmt);
         }
     }
-    
+
+
+    public static PreparedStatement queryByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
+        PreparedStatement stmt = null;
+        String query = " SELECT " + attributes + "  FROM courses WHERE ";
+        for (int i = 0; i < k.length; i++) {
+            if (i > 0)
+                query += " OR ";
+            query += " buildserver_key = ? ";
+        }
+
+        stmt = conn.prepareStatement(query);
+        for (int i = 0; i < k.length; i++) {
+            stmt.setString(i + 1, k[i]);
+        }
+
+        return stmt;
+    }
+
+    public static Map<String, Course> lookupAllByBuildserverKey(Connection conn, String keys) throws SQLException {
+        String k[] = keys.split("[ ,]");
+        PreparedStatement stmt = queryByBuildserverKey(conn, ATTRIBUTES,  k);
+
+        Map<String, Course> result = new TreeMap<String, Course>();
+
+        for(String kk : k)
+            result.put(kk, null);
+        
+        try {
+
+            for (Course c : getAllFromPreparedStatement(stmt)) {
+                result.put(c.getBuildserverKey(), c);
+            }
+            return result;
+        } finally {
+            Queries.closeStatement(stmt);
+        }
+    }
+
     public static List<Course> lookupAll(Connection conn)
     throws SQLException
     {
