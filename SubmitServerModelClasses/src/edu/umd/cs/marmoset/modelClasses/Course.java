@@ -198,7 +198,7 @@ public class Course {
 	    buildserverKey = generateRandomKey();
 	    if (submitKey != null)
 	        throw new IllegalStateException();
-	    buildserverKey = generateRandomKey();
+	    submitKey = generateRandomKey();
 	      
 	    String insert = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
 
