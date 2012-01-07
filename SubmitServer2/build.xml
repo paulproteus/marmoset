@@ -333,7 +333,8 @@
       <jvmarg value="-Xmx256M"/>
       <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
       <arg value="-war"/> <arg value="WebRoot"/> <arg value="-strict" />
-      <arg value="-localWorkers"/> <arg value="6"/> 
+      <arg value="-localWorkers"/> <arg value="${gwt.threads}"/> 
+      <arg value="-logLevel"/> <arg value="${gwt.loglevel}" />
       <arg value="edu.umd.review.CodeReview"/>
     </java>
   </target>
