@@ -103,7 +103,7 @@ public class AuthenticationFilter extends SubmitServerFilter {
 
 		checkReferer(request);
 		if (session == null || session.isNew() || userSession == null) {
-			String login = String.format("%s/%s/",
+			String login = String.format("%s/authenticate/%s/",
 			                             request.getContextPath(),
 			                             System.getProperty("authentication.type", "openid"));
 
