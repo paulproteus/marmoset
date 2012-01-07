@@ -18,19 +18,6 @@
         <param-value>true</param-value>
     </context-param>
 
-
-
-	
-  
-  <!--
-  Set authentication.type to specify which type of authentication to use. Defaults to openid.
-  Unauthenticated users will be redirected to /authenticate/${authentication.type}/ to authenticate.
-  -->
-  <context-param>
-    <param-name>authentication.type</param-name>
-    <param-value>openid</param-value>
-  </context-param>
-
 	<context-param>
 		<param-name>fileupload.maxsize</param-name>
 		<param-value>15728640</param-value>
