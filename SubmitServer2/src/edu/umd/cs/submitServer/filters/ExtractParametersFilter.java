@@ -433,8 +433,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				}
 			}
 
-
-
 			student = Student.lookupByStudentPK(studentPK, conn);
 			request.setAttribute(STUDENT, student);
 			if (coursePK != null) {

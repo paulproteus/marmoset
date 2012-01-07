@@ -277,6 +277,8 @@ public abstract class BuildServer implements ConfigurationKeys {
 		String supportedCourseList = getBuildServerConfiguration().getSupportedCourses();
 		getLog().debug(
 				"Executing server loop; can build " + supportedCourseList);
+		
+		doWelcome();
 		int overloadCount = 0;
 		while (continueServerLoop()) {
 
@@ -623,6 +625,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		cleanUpDirectory(getBuildServerConfiguration().getTestFilesDirectory());
 	}
 
+	protected abstract void doWelcome() throws MissingConfigurationPropertyException, IOException;
 	/**
 	 * Get a ProjectSubmission object representing the submission to be built
 	 * and tested.

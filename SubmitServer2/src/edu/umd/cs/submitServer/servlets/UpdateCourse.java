@@ -42,27 +42,8 @@ import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.UserSession;
 
-/**
- * @author jspacco
- *
- */
 public class UpdateCourse extends SubmitServerServlet {
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -73,6 +54,7 @@ public class UpdateCourse extends SubmitServerServlet {
 		Course course = (Course) request.getAttribute("course");
 		RequestParser parser = new RequestParser(request,
 				getSubmitServerServletLog(), strictParameterChecking());
+		String section  = parser.getOptionalCheckedParameter("section");
 		String description = parser.getOptionalCheckedParameter("description");
 		String url =  parser.getOptionalCheckedParameter("url");
 		boolean download = parser.getCheckbox("download");
@@ -84,6 +66,8 @@ public class UpdateCourse extends SubmitServerServlet {
 				course.setDescription(description);
 			if (url != null)
 				course.setUrl(url);
+			if (section != null)
+			    course.setSection(section);
 			course.setAllowsBaselineDownload(download);
 			
 			// insert the course

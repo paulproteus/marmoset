@@ -29,6 +29,9 @@ public class InitializeWebProperties implements ServletContextListener {
 			for (Object o : p.keySet()) {
 				ctx.setInitParameter((String) o, (String) p.get(o));
 			}
+			if (ctx.getInitParameter("grades.server.jdbc.url") != null)
+			    ctx.setInitParameter("grades.server", "true");
+			
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
