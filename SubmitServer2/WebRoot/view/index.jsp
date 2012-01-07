@@ -45,12 +45,6 @@
 <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
 	type="text/javascript"></script>
-<style>
-#content { padding: 0px 5%; padding-top: 1em;}
-#content h2 { margin-top: 0px;}
-#enrolled-list { width: 47%; float: left;}
-#open-list {width: 47%; margin-left: 50%;}
-</style>
 </head>
 <body>
 <ss:header />
@@ -62,7 +56,7 @@
 </div>
 
 <c:set var="statusMap" value="${userSession.instructorStatus}"/>
-<div id="content">
+
 <div id="enrolled-list">
 <h2>Courses Enrolled</h2>
 <c:choose>
@@ -111,10 +105,29 @@
 </c:choose>
 </div>
 
+<c:if test="${not empty pendingRequests}">
+<div id="pending-list">
+<h2>Pending requests</h2>
+<table>
+<tr>
+	<th>Course Name</th>
+	<th>Course Description</th>
+</tr>
+<c:forEach var="course" items="${pendingRequests}">
+<tr>
+	<td><c:out value="${course.courseName}" /></td>
+	<td><c:out value="${course.description}" /></td>
+	<!-- TODO(rwsims): Allow students to cancel registration requests? -->
+</tr>
+</table>
+</div>
+</c:if>
+
 <c:if test="${not empty openCourses}">
 <div id="open-list">
 <h2>Open Courses</h2>
-<form>
+<c:url var="registrationAction" value="/action/RequestRegistration" />
+<form method="POST" action="${registrationAction}">
 <table id="open-course-table">
 	<tr>
 		<th><input type="checkbox" id="toggle-all"/></th>
@@ -136,8 +149,6 @@
 </form>
 </div>
 </c:if>
-
-</div> <!-- content div -->
 
 <ss:footer />
 

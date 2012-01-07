@@ -124,6 +124,10 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	private boolean strictParameterChecking = true;
 
 	private SubmitServerDatabaseProperties submitServerDatabaseProperties;
+	
+	protected SubmitServerDatabaseProperties getDatabaseProps() {
+		return submitServerDatabaseProperties;
+	}
 
 	/*
 	 * (non-Javadoc)
