@@ -282,7 +282,7 @@
 
 
 
-
+    <!-- ExtractParametersFilter -->
 	<filter>
 		<filter-name>ExtractParametersFilter</filter-name>
 		<filter-class> edu.umd.cs.submitServer.filters.ExtractParametersFilter </filter-class>
@@ -818,6 +818,15 @@
 		<filter-name>AllInstructorsForCourseFilter</filter-name>
 		<url-pattern>/view/instructor/course.jsp</url-pattern>
 	</filter-mapping>
+  
+    <filter>
+      <filter-name>OpenCourseFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.OpenCourseFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>OpenCourseFilter</filter-name>
+      <url-pattern>/view/index.jsp</url-pattern>
+    </filter-mapping>
 
 
 	<filter>

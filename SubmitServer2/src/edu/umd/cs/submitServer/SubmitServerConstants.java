@@ -104,6 +104,8 @@ public interface SubmitServerConstants {
 	public static final String TEST_OUTCOMES_MAP = "testOutcomesMap";
 	public static final String INSTRUCTOR_CAPABILITY = "instructorCapability";
 	public static final String COURSE_LIST = "courseList";
+	/** All current courses that a student is not yet registered for. */
+	public static final String OPEN_COURSES = "openCourses";
 	public static final String COURSE_MAP = "courseMap";
 	public static final String PROJECT_MAP = "projectMap";
 

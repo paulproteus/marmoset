@@ -137,11 +137,11 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			request.setAttribute(USER, user);
 
 			List<Course> courseList;
-			if (user.isSuperUser())
+			if (user.isSuperUser()) {
 				courseList = Course.lookupAll(conn);
-			else
-				courseList = Course.lookupAllByStudentPK(
-						userSession.getStudentPK(), conn);
+			} else {
+				courseList = Course.lookupAllByStudentPK(userSession.getStudentPK(), conn);
+			}
 			request.setAttribute(SubmitServerConstants.COURSE_LIST, courseList);
 			if (courseList.size() == 1) {
 				request.setAttribute("singleCourse", Boolean.TRUE);
