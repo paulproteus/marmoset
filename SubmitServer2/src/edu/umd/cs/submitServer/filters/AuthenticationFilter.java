@@ -35,6 +35,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -91,7 +93,18 @@ public class AuthenticationFilter extends SubmitServerFilter {
 
 		}
 	}
-
+	
+	private String authType;
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		ServletContext ctx = filterConfig.getServletContext();
+		authType = ctx.getInitParameter("authentication.type");
+		if (authType == null) {
+			authType = "openid";
+		}
+	}
+	
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -105,7 +118,7 @@ public class AuthenticationFilter extends SubmitServerFilter {
 		if (session == null || session.isNew() || userSession == null) {
 			String login = String.format("%s/authenticate/%s/",
 			                             request.getContextPath(),
-			                             System.getProperty("authentication.type", "openid"));
+			                             authType);
 
 			// if the request is "get", save the target for a later
 			// re-direct
