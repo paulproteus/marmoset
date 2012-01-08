@@ -98,6 +98,7 @@ public class AuthenticationFilter extends SubmitServerFilter {
 	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+	    super.init(filterConfig);
 		ServletContext ctx = filterConfig.getServletContext();
 		authType = ctx.getInitParameter("authentication.type");
 		if (authType == null) {

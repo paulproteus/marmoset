@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.marmoset.utilities.Charsets;
 
 /**
  * Complete registration of a new OpenID identifier. This servlet handles the form post from
@@ -59,6 +60,15 @@ public class RegisterOpenId extends SubmitServerServlet {
 		} finally {
 			releaseConnection(conn);
 		}
-		resp.sendRedirect(req.getParameter("target"));
+		  // check to see if user tried to view a page before logging in
+        String target = req.getParameter("target");
+
+        if (target != null && !target.equals("")) {
+            target = Charsets.decodeURL(target);
+            resp.sendRedirect(target);
+            return;
+        }
+
+		
 	}
 }

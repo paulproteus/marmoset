@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -48,132 +49,130 @@ import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
 
 /**
  * @author jspacco
- *
+ * 
  *         Base class for all filters in the SubmitServer. Provides utility
  *         methods for getting and releasing database connections, and
  *         establishes a general logger for all filters.
- *
+ * 
  */
-public abstract class SubmitServerFilter implements Filter,
-		SubmitServerConstants {
-	private Logger authenticationLog;
+public abstract class SubmitServerFilter implements Filter, SubmitServerConstants {
+    private Logger authenticationLog;
 
-	protected Logger getAuthenticationLog() {
-		if (authenticationLog == null) {
-			authenticationLog = Logger.getLogger(AUTHENTICATION_LOG);
-		}
-		return authenticationLog;
-	}
+    protected Logger getAuthenticationLog() {
+        if (authenticationLog == null) {
+            authenticationLog = Logger.getLogger(AUTHENTICATION_LOG);
+        }
+        return authenticationLog;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.servlet.Filter#destroy()
-	 */
-	@Override
-	public void destroy() {
-		// Not sure what needs to be done in here...
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.servlet.Filter#destroy()
+     */
+    @Override
+    public void destroy() {
+        // Not sure what needs to be done in here...
+    }
 
-	protected SubmitServerDatabaseProperties submitServerDatabaseProperties;
+    protected SubmitServerDatabaseProperties submitServerDatabaseProperties;
 
-	protected ServletContext servletContext;
-	private static Logger submitServerFilterLog = Logger.getLogger(SubmitServerFilter.class);
+    protected ServletContext servletContext;
+    private static Logger submitServerFilterLog = Logger.getLogger(SubmitServerFilter.class);
 
-	static protected Logger getSubmitServerFilterLog() {
-		return submitServerFilterLog;
-	}
+    static protected Logger getSubmitServerFilterLog() {
+        return submitServerFilterLog;
+    }
 
-	/**
-	 * If true, all parameter parsers should throw an exception when a regex
-	 * filter fails to match a parameter value. Otherwise we just output an
-	 * error to the log and return a scrubbed version of the value.
-	 *
-	 * @return true if parsers should enforce strict paramter checking
-	 */
-	public boolean strictParameterChecking() {
-		return strictParameterChecking;
-	}
+    /**
+     * If true, all parameter parsers should throw an exception when a regex
+     * filter fails to match a parameter value. Otherwise we just output an
+     * error to the log and return a scrubbed version of the value.
+     * 
+     * @return true if parsers should enforce strict paramter checking
+     */
+    public boolean strictParameterChecking() {
+        return strictParameterChecking;
+    }
 
-	private boolean strictParameterChecking = true;
+    private boolean strictParameterChecking = true;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-	 */
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		servletContext = filterConfig.getServletContext();
-		if ("true".equals(servletContext.getInitParameter("DEBUG"))) {
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("Initializing " + this.getClass().getSimpleName());
+        servletContext = filterConfig.getServletContext();
+        if ("true".equals(servletContext.getInitParameter("DEBUG"))) {
             submitServerFilterLog.setLevel(Level.DEBUG);
         }
 
+        submitServerDatabaseProperties = new SubmitServerDatabaseProperties(servletContext);
+        System.out.println("Initialized " + this.getClass().getSimpleName());
+        
+        getSubmitServerFilterLog().debug("Initializing logger for " + getClass());
 
-			submitServerDatabaseProperties = new SubmitServerDatabaseProperties(
-					servletContext);
+        strictParameterChecking = "true".equalsIgnoreCase(servletContext.getInitParameter("strict.parameter.checking"));
+    }
 
-		getSubmitServerFilterLog().debug(
-				"Initializing logger for " + getClass());
+    /**
+     * Gets a connection to the database.
+     * 
+     * @return a connection to the database.
+     * @throws SQLException
+     */
+    protected Connection getConnection() throws SQLException {
+        if (submitServerDatabaseProperties == null)
+            throw new UnsupportedOperationException("No submitServerDatabaseProperties");
+        
+        return submitServerDatabaseProperties.getConnection();
+    }
 
-		strictParameterChecking = "true".equalsIgnoreCase(servletContext
-				.getInitParameter("strict.parameter.checking"));
-	}
+    /**
+     * Releases a database connection. Swallows (or handles) any SQLExceptions
+     * that happen since there's nothing the web application can do if a
+     * database connection cannot be closed.
+     * 
+     * @param conn
+     *            the connection to release
+     */
+    protected void releaseConnection(Connection conn) {
+        if (submitServerDatabaseProperties == null)
+            throw new UnsupportedOperationException("No submitServerDatabaseProperties");
+       
+        try {
+            submitServerDatabaseProperties.releaseConnection(conn);
+        } catch (SQLException e) {
+            getSubmitServerFilterLog().warn(e.getMessage(), e);
+        }
+    }
 
-	/**
-	 * Gets a connection to the database.
-	 *
-	 * @return a connection to the database.
-	 * @throws SQLException
-	 */
-	protected Connection getConnection() throws SQLException {
-		return submitServerDatabaseProperties.getConnection();
-	}
+    protected void handleSQLException(SQLException e) {
+        // log SQLException
+        getSubmitServerFilterLog().info(e.getMessage(), e);
+    }
 
-	/**
-	 * Releases a database connection. Swallows (or handles) any SQLExceptions
-	 * that happen since there's nothing the web application can do if a
-	 * database connection cannot be closed.
-	 *
-	 * @param conn
-	 *            the connection to release
-	 */
-	protected void releaseConnection(Connection conn) {
-		try {
-			submitServerDatabaseProperties.releaseConnection(conn);
-		} catch (SQLException e) {
-			getSubmitServerFilterLog().warn(e.getMessage(), e);
-		}
-	}
+    private static Map<String, ChosenSubmissionPolicy> bestSubmissionPolicyMap = new HashMap<String, ChosenSubmissionPolicy>();
 
-	protected void handleSQLException(SQLException e) {
-		// log SQLException
-		getSubmitServerFilterLog().info(e.getMessage(), e);
-	}
-
-	private static Map<String, ChosenSubmissionPolicy> bestSubmissionPolicyMap = new HashMap<String, ChosenSubmissionPolicy>();
-
-	/**
-	 * Returns an instance of the BestSubmissionPolicy class with the given
-	 * className. Returns an instance of DefaultBestSubmissionPolicy if
-	 * className is null.
-	 *
-	 * @param className
-	 *            The name of the BestSubmissionPolicy subclass to return.
-	 * @return An instance of a subclass of BestSubmissionPolicy.
-	 * @throws ServletException
-	 *             If anything goes wrong the exception will be wrapped with a
-	 *             ServletException, which will be thrown.
-	 */
-	public static ChosenSubmissionPolicy getBestSubmissionPolicy(String className)
-			throws ServletException {
-		if (className == null)
-			className = DEFAULT_BEST_SUBMISSION_POLICY;
-		if (bestSubmissionPolicyMap.containsKey(className))
-			return bestSubmissionPolicyMap.get(className);
-		ChosenSubmissionPolicy bestSubmissionPolicy = (ChosenSubmissionPolicy) SubmitServerUtilities
-				.createNewInstance(className);
-		bestSubmissionPolicyMap.put(className, bestSubmissionPolicy);
-		return bestSubmissionPolicy;
-	}
+    /**
+     * Returns an instance of the BestSubmissionPolicy class with the given
+     * className. Returns an instance of DefaultBestSubmissionPolicy if
+     * className is null.
+     * 
+     * @param className
+     *            The name of the BestSubmissionPolicy subclass to return.
+     * @return An instance of a subclass of BestSubmissionPolicy.
+     * @throws ServletException
+     *             If anything goes wrong the exception will be wrapped with a
+     *             ServletException, which will be thrown.
+     */
+    public static ChosenSubmissionPolicy getBestSubmissionPolicy(String className) throws ServletException {
+        if (className == null)
+            className = DEFAULT_BEST_SUBMISSION_POLICY;
+        if (bestSubmissionPolicyMap.containsKey(className))
+            return bestSubmissionPolicyMap.get(className);
+        ChosenSubmissionPolicy bestSubmissionPolicy = (ChosenSubmissionPolicy) SubmitServerUtilities.createNewInstance(className);
+        bestSubmissionPolicyMap.put(className, bestSubmissionPolicy);
+        return bestSubmissionPolicy;
+    }
 }

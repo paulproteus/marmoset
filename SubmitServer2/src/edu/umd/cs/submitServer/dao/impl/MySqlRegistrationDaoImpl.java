@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
@@ -18,8 +20,8 @@ import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
 
 public class MySqlRegistrationDaoImpl implements RegistrationDao {
-	private final Student student;
-	private final SubmitServerDatabaseProperties props;
+	private final @Nonnull Student student;
+	private final @Nonnull SubmitServerDatabaseProperties props;
 	
 	private enum RequestStatus {
 		PENDING,
@@ -29,7 +31,11 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	}
 	
 	public MySqlRegistrationDaoImpl(Student student, SubmitServerDatabaseProperties props) {
-		this.student = student;
+	    if (student == null)
+            throw new NullPointerException();
+        this.student = student;
+		if (props == null)
+		    throw new NullPointerException();
 		this.props = props;
 	}
 	
@@ -101,7 +107,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  	ResultSet rs = stmt.executeQuery();
 	  	List<Student> students = Lists.newArrayList();
 	  	while (rs.next()) {
-	  		int studentPK = rs.getInt(1);
+	  		@Student.PK int studentPK = Student.asPK(rs.getInt(1));
 	  		students.add(Student.lookupByStudentPK(studentPK, conn));
 	  	}
 	  	return students;
