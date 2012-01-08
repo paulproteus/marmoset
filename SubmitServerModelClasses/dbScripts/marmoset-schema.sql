@@ -1,13 +1,20 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.9.2
+-- version 3.4.5deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 06, 2012 at 10:54 AM
--- Server version: 5.5.9
--- PHP Version: 5.3.6
+-- Generation Time: Jan 08, 2012 at 12:45 PM
+-- Server version: 5.1.58
+-- PHP Version: 5.3.6-13ubuntu3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `submitserver`
@@ -19,7 +26,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Table structure for table `background_data`
 --
 
-CREATE TABLE `background_data` (
+CREATE TABLE IF NOT EXISTS `background_data` (
   `student_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `gender` enum('female','male','na') DEFAULT NULL,
   `ethnic_racial_association` enum('yes','na') DEFAULT NULL,
@@ -46,7 +53,7 @@ CREATE TABLE `background_data` (
 -- Table structure for table `buildservers`
 --
 
-CREATE TABLE `buildservers` (
+CREATE TABLE IF NOT EXISTS `buildservers` (
   `buildserver_pk` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `remote_host` varchar(200) COLLATE utf8_bin NOT NULL,
@@ -55,11 +62,9 @@ CREATE TABLE `buildservers` (
   `last_job` datetime DEFAULT NULL,
   `last_success` datetime DEFAULT NULL,
   `system_load` varchar(250) COLLATE utf8_bin NOT NULL,
-  `last_built_submission_pk` int(11) NOT NULL DEFAULT '0',
-  `last_testrun_pk` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -67,7 +72,7 @@ CREATE TABLE `buildservers` (
 -- Table structure for table `code_metrics`
 --
 
-CREATE TABLE `code_metrics` (
+CREATE TABLE IF NOT EXISTS `code_metrics` (
   `test_run_pk` mediumint(6) unsigned NOT NULL DEFAULT '0',
   `checksum_sourcefiles` varchar(32) NOT NULL DEFAULT '',
   `checksum_classfiles` varchar(32) NOT NULL DEFAULT '',
@@ -81,7 +86,7 @@ CREATE TABLE `code_metrics` (
 -- Table structure for table `code_reviewer`
 --
 
-CREATE TABLE `code_reviewer` (
+CREATE TABLE IF NOT EXISTS `code_reviewer` (
   `code_reviewer_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_review_assignment_pk` int(11) NOT NULL,
   `submission_pk` int(11) NOT NULL,
@@ -96,7 +101,7 @@ CREATE TABLE `code_reviewer` (
   KEY `code_review_pk` (`student_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`),
   KEY `submission_pk` (`submission_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Assignment of a reviewer to a code review';
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Assignment of a reviewer to a code review' AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
@@ -104,7 +109,7 @@ CREATE TABLE `code_reviewer` (
 -- Table structure for table `code_review_assignment`
 --
 
-CREATE TABLE `code_review_assignment` (
+CREATE TABLE IF NOT EXISTS `code_review_assignment` (
   `code_review_assignment_pk` int(11) NOT NULL AUTO_INCREMENT,
   `description` text NOT NULL,
   `project_pk` int(11) NOT NULL,
@@ -113,7 +118,7 @@ CREATE TABLE `code_review_assignment` (
   `anonymous` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`code_review_assignment_pk`),
   KEY `project_pk` (`project_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -121,7 +126,7 @@ CREATE TABLE `code_review_assignment` (
 -- Table structure for table `code_review_comment`
 --
 
-CREATE TABLE `code_review_comment` (
+CREATE TABLE IF NOT EXISTS `code_review_comment` (
   `code_review_comment_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_reviewer_pk` int(11) NOT NULL,
   `comment` mediumtext NOT NULL,
@@ -132,7 +137,7 @@ CREATE TABLE `code_review_comment` (
   PRIMARY KEY (`code_review_comment_pk`),
   KEY `code_reviewer_pk` (`code_reviewer_pk`),
   KEY `code_review_thread_pk` (`code_review_thread_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -140,18 +145,18 @@ CREATE TABLE `code_review_comment` (
 -- Table structure for table `code_review_thread`
 --
 
-CREATE TABLE `code_review_thread` (
+CREATE TABLE IF NOT EXISTS `code_review_thread` (
   `code_review_thread_pk` int(11) NOT NULL AUTO_INCREMENT,
   `file` varchar(120) NOT NULL,
   `line` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
   `created_by` int(11) NOT NULL,
   `submission_pk` int(11) NOT NULL,
-  `rubric_evaluation_pk` int(11) NOT NULL DEFAULT '0',
+  `rubric_evaluation_pk` int(11) NOT NULL,
   PRIMARY KEY (`code_review_thread_pk`),
   KEY `submission_pk` (`submission_pk`),
   KEY `rubric_evaluation_pk` (`rubric_evaluation_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -159,7 +164,7 @@ CREATE TABLE `code_review_thread` (
 -- Table structure for table `courses`
 --
 
-CREATE TABLE `courses` (
+CREATE TABLE IF NOT EXISTS `courses` (
   `course_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `semester` varchar(15) NOT NULL DEFAULT '',
   `coursename` varchar(20) DEFAULT NULL,
@@ -168,12 +173,12 @@ CREATE TABLE `courses` (
   `url` varchar(100) DEFAULT NULL,
   `course_ids` varchar(50) DEFAULT NULL,
   `allows_baseline_download` tinyint(1) NOT NULL DEFAULT '1',
-  `buildserver_key` varchar(40) NOT NULL,
   `submit_key` varchar(40) NOT NULL,
+  `buildserver_key` varchar(40) NOT NULL,
   PRIMARY KEY (`course_pk`),
-  UNIQUE KEY `buildserver_key` (`buildserver_key`),
-  UNIQUE KEY `submit_key` (`submit_key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  UNIQUE KEY `submit_key` (`submit_key`),
+  UNIQUE KEY `buildserver_key` (`buildserver_key`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -181,7 +186,7 @@ CREATE TABLE `courses` (
 -- Table structure for table `eclipse_launch_events`
 --
 
-CREATE TABLE `eclipse_launch_events` (
+CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
   `eclipse_launch_event_pk` mediumint(10) unsigned NOT NULL AUTO_INCREMENT,
   `student_registration_pk` mediumint(10) unsigned NOT NULL DEFAULT '0',
   `project_number` varchar(20) NOT NULL DEFAULT '',
@@ -193,7 +198,7 @@ CREATE TABLE `eclipse_launch_events` (
   PRIMARY KEY (`eclipse_launch_event_pk`),
   KEY `project_pk` (`project_pk`),
   KEY `student_registration_pk` (`student_registration_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -201,7 +206,7 @@ CREATE TABLE `eclipse_launch_events` (
 -- Table structure for table `errors`
 --
 
-CREATE TABLE `errors` (
+CREATE TABLE IF NOT EXISTS `errors` (
   `error_pk` int(11) NOT NULL AUTO_INCREMENT,
   `when` datetime NOT NULL,
   `user_pk` int(11) DEFAULT NULL,
@@ -226,7 +231,7 @@ CREATE TABLE `errors` (
   KEY `course_pk` (`course_pk`),
   KEY `project_pk` (`project_pk`),
   KEY `submission_pk` (`submission_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=279 ;
 
 -- --------------------------------------------------------
 
@@ -234,7 +239,7 @@ CREATE TABLE `errors` (
 -- Table structure for table `log_entries`
 --
 
-CREATE TABLE `log_entries` (
+CREATE TABLE IF NOT EXISTS `log_entries` (
   `log_pk` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `course_pk` int(10) unsigned NOT NULL,
   `student_pk` int(10) unsigned DEFAULT NULL,
@@ -246,7 +251,7 @@ CREATE TABLE `log_entries` (
   PRIMARY KEY (`log_pk`),
   KEY `course_pk` (`course_pk`),
   KEY `student_pk` (`student_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -254,12 +259,11 @@ CREATE TABLE `log_entries` (
 -- Table structure for table `projects`
 --
 
-CREATE TABLE `projects` (
+CREATE TABLE IF NOT EXISTS `projects` (
   `project_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `hidden` tinyint(1) NOT NULL DEFAULT '0',
   `course_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `test_setup_pk` int(20) unsigned NOT NULL DEFAULT '0',
-  `diff_against` int(11) NOT NULL DEFAULT '0',
   `project_number` varchar(30) NOT NULL DEFAULT '0',
   `ontime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `late` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -281,9 +285,26 @@ CREATE TABLE `projects` (
   `stack_trace_policy` enum('test_name_only','restricted_exception_location','exception_location','full_stack_trace') DEFAULT 'test_name_only',
   `num_release_tests_revealed` smallint(6) NOT NULL DEFAULT '2',
   `archive_pk` mediumint(8) unsigned DEFAULT NULL,
+  `diff_against` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`project_pk`),
   KEY `course_pk` (`course_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `registration_requests`
+--
+
+CREATE TABLE IF NOT EXISTS `registration_requests` (
+  `student_pk` int(11) NOT NULL,
+  `course_pk` int(11) NOT NULL,
+  `timestamp` bigint(20) NOT NULL,
+  `status` enum('PENDING','APPROVED','DENIED') COLLATE utf8_bin NOT NULL,
+  UNIQUE KEY `student_pk` (`student_pk`),
+  UNIQUE KEY `course_pk` (`course_pk`),
+  UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -291,16 +312,16 @@ CREATE TABLE `projects` (
 -- Table structure for table `rubrics`
 --
 
-CREATE TABLE `rubrics` (
+CREATE TABLE IF NOT EXISTS `rubrics` (
   `rubric_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_review_assignment_pk` int(11) NOT NULL,
   `name` varchar(80) COLLATE utf8_bin NOT NULL,
   `description` text COLLATE utf8_bin NOT NULL,
   `presentation` varchar(40) COLLATE utf8_bin NOT NULL,
-  `data` text COLLATE utf8_bin,
+  `data` varchar(120) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`rubric_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -308,7 +329,7 @@ CREATE TABLE `rubrics` (
 -- Table structure for table `rubric_evaluations`
 --
 
-CREATE TABLE `rubric_evaluations` (
+CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
   `rubric_evaluation_pk` int(11) NOT NULL AUTO_INCREMENT,
   `rubric_pk` int(11) NOT NULL,
   `code_reviewer_pk` int(11) NOT NULL,
@@ -321,7 +342,7 @@ CREATE TABLE `rubric_evaluations` (
   PRIMARY KEY (`rubric_evaluation_pk`),
   KEY `rubric_pk` (`rubric_pk`,`code_reviewer_pk`,`code_review_thread_pk`),
   KEY `status` (`status`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -329,7 +350,7 @@ CREATE TABLE `rubric_evaluations` (
 -- Table structure for table `students`
 --
 
-CREATE TABLE `students` (
+CREATE TABLE IF NOT EXISTS `students` (
   `student_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `login_name` varchar(50) NOT NULL DEFAULT '',
   `campus_uid` varchar(40) NOT NULL DEFAULT '',
@@ -338,14 +359,14 @@ CREATE TABLE `students` (
   `email` varchar(100) DEFAULT NULL,
   `superuser` tinyint(1) NOT NULL DEFAULT '0',
   `given_consent` enum('yes','no','under 18','pending') NOT NULL DEFAULT 'pending',
-  `account_type` enum('normal','demo','team','admin','pseudo') NOT NULL DEFAULT 'normal',
+  `account_type` enum('normal','demo','team','admin','pseudo','foobar') NOT NULL DEFAULT 'normal',
   `password` varchar(50) DEFAULT NULL,
   `has_picture` tinyint(1) NOT NULL DEFAULT '0',
   `can_import_courses` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`student_pk`),
   UNIQUE KEY `login_name` (`login_name`),
   KEY `campus_uid` (`campus_uid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -353,7 +374,7 @@ CREATE TABLE `students` (
 -- Table structure for table `student_pictures`
 --
 
-CREATE TABLE `student_pictures` (
+CREATE TABLE IF NOT EXISTS `student_pictures` (
   `student_pk` int(11) NOT NULL,
   `type` varchar(50) NOT NULL,
   `image` blob NOT NULL,
@@ -366,7 +387,7 @@ CREATE TABLE `student_pictures` (
 -- Table structure for table `student_registration`
 --
 
-CREATE TABLE `student_registration` (
+CREATE TABLE IF NOT EXISTS `student_registration` (
   `student_registration_pk` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `course_pk` int(5) unsigned NOT NULL DEFAULT '0',
   `student_pk` int(5) unsigned NOT NULL DEFAULT '0',
@@ -383,7 +404,7 @@ CREATE TABLE `student_registration` (
   KEY `student_pk` (`student_pk`),
   KEY `course_pk` (`course_pk`),
   KEY `cvs_account` (`class_account`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -391,7 +412,7 @@ CREATE TABLE `student_registration` (
 -- Table structure for table `student_submit_status`
 --
 
-CREATE TABLE `student_submit_status` (
+CREATE TABLE IF NOT EXISTS `student_submit_status` (
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `student_registration_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `partner_sr_pk` int(11) DEFAULT NULL,
@@ -411,7 +432,7 @@ CREATE TABLE `student_submit_status` (
 -- Table structure for table `submissions`
 --
 
-CREATE TABLE `submissions` (
+CREATE TABLE IF NOT EXISTS `submissions` (
   `submission_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `student_registration_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
@@ -443,7 +464,7 @@ CREATE TABLE `submissions` (
   KEY `build_status` (`build_status`),
   KEY `submission_timestamp` (`submission_timestamp`),
   KEY `current_test_run_pk` (`current_test_run_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
 
 -- --------------------------------------------------------
 
@@ -451,13 +472,26 @@ CREATE TABLE `submissions` (
 -- Table structure for table `submission_archives`
 --
 
-CREATE TABLE `submission_archives` (
+CREATE TABLE IF NOT EXISTS `submission_archives` (
   `archive_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `archive` mediumblob NOT NULL,
   `checksum` varchar(32) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `test`
+--
+
+CREATE TABLE IF NOT EXISTS `test` (
+  `pk` int(11) NOT NULL AUTO_INCREMENT,
+  `size` int(11) NOT NULL,
+  `result` text COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`pk`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=139 ;
 
 -- --------------------------------------------------------
 
@@ -465,7 +499,7 @@ CREATE TABLE `submission_archives` (
 -- Table structure for table `test_outcomes`
 --
 
-CREATE TABLE `test_outcomes` (
+CREATE TABLE IF NOT EXISTS `test_outcomes` (
   `test_run_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `test_type` enum('build','public','release','secret','findbugs','pmd','student','uncovered_method') NOT NULL DEFAULT 'build',
   `test_number` int(20) unsigned NOT NULL DEFAULT '0',
@@ -491,7 +525,7 @@ CREATE TABLE `test_outcomes` (
 -- Table structure for table `test_runs`
 --
 
-CREATE TABLE `test_runs` (
+CREATE TABLE IF NOT EXISTS `test_runs` (
   `test_run_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `test_setup_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `submission_pk` int(20) unsigned NOT NULL DEFAULT '0',
@@ -508,7 +542,7 @@ CREATE TABLE `test_runs` (
   PRIMARY KEY (`test_run_pk`),
   KEY `test_runs_ibfk_1` (`submission_pk`),
   KEY `checksum_classfiles` (`checksum_classfiles`(4))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
 
 -- --------------------------------------------------------
 
@@ -516,7 +550,7 @@ CREATE TABLE `test_runs` (
 -- Table structure for table `test_setups`
 --
 
-CREATE TABLE `test_setups` (
+CREATE TABLE IF NOT EXISTS `test_setups` (
   `test_setup_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `jarfile_status` enum('new','pending','tested','active','inactive','failed','broken') NOT NULL DEFAULT 'new',
@@ -531,7 +565,7 @@ CREATE TABLE `test_setups` (
   `num_secret_tests` smallint(3) NOT NULL DEFAULT '0',
   `archive_pk` int(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`test_setup_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -539,10 +573,14 @@ CREATE TABLE `test_setups` (
 -- Table structure for table `test_setup_archives`
 --
 
-CREATE TABLE `test_setup_archives` (
+CREATE TABLE IF NOT EXISTS `test_setup_archives` (
   `archive_pk` int(20) NOT NULL AUTO_INCREMENT,
   `archive` mediumblob NOT NULL,
   `checksum` varchar(32) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
