@@ -262,38 +262,59 @@
 
     </form>
 
-    <h2>Authenticate as...</h2>
+    <h2>User actions</h2>
+
+
+    <c:if test="${! grade.server}">
+        <h3>Allow course creation</h3>
+        <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
+        <p>
+        <form name="AllowCourseCreation" method="post" action="${allowCourseCreationLink}">
+            <select name="studentPK">
+                <c:forEach var="student" items="${allStudents}" varStatus="counter">
+                  <c:if test="${!student.canImportCourses}">
+                    <option value="${student.studentPK}">
+                        <c:out value="${student.fullName}" />
+                    </option>
+                    </c:if>
+                </c:forEach>
+            </select> <input type="submit" value="Allow course creation" />
+        </form>
+    </c:if>
+
+    <h3>Authenticate as</h3>
     <p>This allows you to log in as any other user, and allow you to view the submit server as that user would. Once
         you have authenticated as another user, you will have to log out and log in as yourself in order to perform
         actions as yourself.</p>
 
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>directory name</th>
-            <th>Authenticate</th>
+    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
 
+    <p>
+    <form name="AuthenticateAs" method="post" action="${authenticateAsLink}">
+        <select name="studentPK">
             <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                <c:url var="loginLink" value="/authenticate/PerformLogin" />
-
-                <tr class="r${counter.index % 2}">
-                    <td class="description"><c:url var="studentLink" value="/view/instructor/student.jsp">
-                            <c:param name="studentPK" value="${student.studentPK}" />
-                        </c:url> <a href="${studentLink}"><c:out value="${student.lastname}" />, <c:out
-                                value="${student.firstname}" /></a></td>
-                    <td class="description"><c:out value="${student.loginName}" /></td>
-                    <td>
-                        <form name="PerformLogin" method="post" action="${loginLink}">
-                            <input type="hidden" name="loginName" value="${student.loginName}" /> <input type="submit"
-                                value="as" />
-                        </form>
-                    </td>
-
-                </tr>
-
+                <option value="${student.studentPK}">
+                    <c:out value="${student.fullName}" />
+                </option>
             </c:forEach>
-        </tr>
-    </table>
+        </select> <input type="submit" value="Authenticate as" />
+    </form>
+
+    <c:url var="makeSuperuserLink" value="/action/admin/MakeSuperuser" />
+
+    <h3>Create superuser account</h3>
+    <p>
+    <form name="MakeSuperuser" method="post" action="${makeSuperuserLink}">
+        <select name="studentPK">
+            <c:forEach var="student" items="${allStudents}" varStatus="counter">
+                <c:if test="${student.canImportCourses}">
+                    <option value="${student.studentPK}">
+                        <c:out value="${student.fullName}" />
+                    </option>
+                </c:if>
+            </c:forEach>
+        </select> <input type="submit" value="Make superuser account for" />
+    </form>
 
     <ss:footer />
 </body>
