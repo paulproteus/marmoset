@@ -846,6 +846,14 @@
 		<filter-name>CheckAuthenticationTypeFilter</filter-name>
 		<url-pattern>/authenticate/*</url-pattern>
 	</filter-mapping>
+    <filter>
+      <filter-name>SkipAuthenticationParameterFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.SkipAuthenticationParameterFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>SkipAuthenticationParameterFilter</filter-name>
+      <url-pattern>/authenticate/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
         <servlet-name>CreateBuildserverConfigFile</servlet-name>
