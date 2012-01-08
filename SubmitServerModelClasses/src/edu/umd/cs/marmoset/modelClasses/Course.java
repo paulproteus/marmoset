@@ -280,6 +280,31 @@ public class Course {
 		setSubmitKey(resultSet.getString(startingFrom++));
 		return startingFrom;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("Course %s", getDescription());
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	  if (!(obj instanceof Course)) {
+	  	return false;
+	  }
+	  Course that = (Course) obj;
+	  if (this.coursePK == null || that.coursePK == null) {
+	  	return this.courseName.equals(that.courseName);
+	  }
+	  return this.coursePK.equals(that.coursePK);
+	}
+	
+	@Override
+	public int hashCode() {
+	  int hash = 71;
+	  hash += 31 * (coursePK == null ? 0 : coursePK);
+	  hash += 31 * courseName.hashCode();
+	  return hash;
+	}
 
 	/**
 	 * Finds a cousre in the database based in the name of the course.

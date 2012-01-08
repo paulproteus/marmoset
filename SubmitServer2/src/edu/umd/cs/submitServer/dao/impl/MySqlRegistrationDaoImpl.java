@@ -31,12 +31,8 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	}
 	
 	public MySqlRegistrationDaoImpl(Student student, SubmitServerDatabaseProperties props) {
-	    if (student == null)
-            throw new NullPointerException();
-        this.student = student;
-		if (props == null)
-		    throw new NullPointerException();
-		this.props = props;
+		this.student = Preconditions.checkNotNull(student);
+		this.props = Preconditions.checkNotNull(props);
 	}
 	
 	@Override
@@ -52,7 +48,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  try {
 	    conn = props.getConnection();
 	    exists = conn.prepareStatement("SELECT * from registration_requests " +
-	    			"WHERE coursePK = ? AND studentPK = ?");
+	    			"WHERE course_pk = ? AND student_pk = ?");
 	    Queries.setStatement(exists, coursePK, student.getStudentPK());
 	    ResultSet rs = exists.executeQuery();
 	    if (rs.next()) {

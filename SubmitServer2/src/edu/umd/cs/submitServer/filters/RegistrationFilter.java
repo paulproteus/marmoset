@@ -42,8 +42,12 @@ public class RegistrationFilter extends SubmitServerFilter {
 		Connection conn = null;
 		try {
 			conn = getConnection();
+			List<Course> pendingRequests = dao.getPendingRequests();
+			request.setAttribute("pendingRequests", pendingRequests);
+			
 			List<Course> openCourses = Course.lookupAll(conn);
 			openCourses.removeAll(registeredCourses);
+			openCourses.removeAll(pendingRequests);
 			request.setAttribute(SubmitServerConstants.OPEN_COURSES, openCourses);
 			chain.doFilter(request, response);
 		} catch (SQLException e) {

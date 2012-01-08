@@ -17,7 +17,7 @@ public class Charsets {
 	
 	public static String encodeURL(String s) {
 		try {
-			return sanityCheck(URLEncoder.encode(sanityCheck(s), "UTF-8");
+			return sanityCheck(URLEncoder.encode(sanityCheck(s), "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError("UTF-8 should always be available");
 		}
@@ -25,7 +25,7 @@ public class Charsets {
 	
 	public static String decodeURL(String s) {
 		try {
-			return sanityCheck(URLDecoder.decode(sanityCheck(s), "UTF-8");
+			return sanityCheck(URLDecoder.decode(sanityCheck(s), "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError("UTF-8 should always be available");
 		}
