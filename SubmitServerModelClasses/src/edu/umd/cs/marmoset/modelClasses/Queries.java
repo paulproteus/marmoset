@@ -611,6 +611,8 @@ public final class Queries {
 				p.setString(col, (String) o);
 			else if (o instanceof Integer)
 				p.setInt(col, (Integer) o);
+			else if (o instanceof Long)
+				p.setLong(col, (Long) o);
 			else if (o instanceof Enum<?>)
 				p.setString(col, ((Enum<?>) o).name());
 			else if (o instanceof Timestamp)

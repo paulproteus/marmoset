@@ -10,10 +10,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
+import edu.umd.cs.submitServer.UserSession;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
 import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
 
@@ -28,17 +30,21 @@ public class RegistrationFilter extends SubmitServerFilter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
-		Student student = (Student) ((HttpServletRequest) request).getSession()
-		                                                          .getAttribute(SubmitServerConstants.STUDENT);
-		RegistrationDao dao = new MySqlRegistrationDaoImpl(student, submitServerDatabaseProperties);
-		request.setAttribute("pendingRequests", dao.getPendingRequests());
+		HttpSession session = ((HttpServletRequest) request).getSession();
+		UserSession userSession = (UserSession) session.getAttribute(SubmitServerConstants.USER_SESSION);
 		
 		List<Course> registeredCourses = (List<Course>) request.getAttribute(SubmitServerConstants.COURSE_LIST);
 		Connection conn = null;
 		try {
 			conn = getConnection();
+			Student student = Student.getByStudentPK(userSession.getStudentPK(), conn);
+			RegistrationDao dao = new MySqlRegistrationDaoImpl(student, submitServerDatabaseProperties);
+			List<Course> pendingRequests = dao.getPendingRequests();
+			request.setAttribute("pendingRequests", pendingRequests);
+			
 			List<Course> openCourses = Course.lookupAll(conn);
 			openCourses.removeAll(registeredCourses);
+			openCourses.removeAll(pendingRequests);
 			request.setAttribute(SubmitServerConstants.OPEN_COURSES, openCourses);
 			chain.doFilter(request, response);
 		} catch (SQLException e) {
