@@ -1,9 +1,6 @@
 package edu.umd.cs.submitServer.filters;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,30 +10,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.common.base.Preconditions;
+
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
 import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
 
-/**
- * Filter to get a list of all courses available for registration and any pending registration requests.
- * 
- * @author rwsims
- *
- */
-public class RegistrationFilter extends SubmitServerFilter {
+public class CourseRegistrationsFilter extends SubmitServerFilter {
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
-	    HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) resp;
-        HttpSession session = request.getSession();
+		
 		Student user = (Student) request.getAttribute(SubmitServerConstants.USER);
+		Course course = (Course) Preconditions.checkNotNull(request.getAttribute(SubmitServerConstants.COURSE));
+		
 		RegistrationDao dao = new MySqlRegistrationDaoImpl(user, submitServerDatabaseProperties);
-		request.setAttribute("pendingRequests", dao.getPendingRequests());
-		request.setAttribute(SubmitServerConstants.OPEN_COURSES, dao.getOpenCourses());
+		request.setAttribute("pendingRegistrations", dao.getPendingRegistrations(course.getCoursePK()));
+		
 		chain.doFilter(request, response);
 	}
 }

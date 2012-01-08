@@ -30,7 +30,12 @@
 
 <!DOCTYPE HTML>
 <html>
-<ss:head title="Instructor view of course ${course.courseName}" />
+<head>
+<ss:headContent title="Instructor view of course ${course.courseName}" />
+<style>
+tr.reject {background: #f33}
+</style>
+</head>
 <body>
     <ss:header />
     <ss:instructorBreadCrumb />
@@ -192,8 +197,39 @@
         </table>
     </div>
 
+	<c:if test="${not empty pendingRegistrations}">
+	<h3>
+		<a id="requests" name="requests">Registration Requests</a>
+	</h3>
+	<c:url var="updateRegistrations" value="/action/instructor/UpdatePendingRegistrations" />
+	<form action="${updateRegistrations}" method="POST">
+	<input type="hidden" value="${course.coursePK}" name="course" />
+	<table id="pending-table">
+		<tr>
+			<th>Name</th>
+			<th>Action</th>
+		</tr>
+		<c:forEach var="student" items="${pendingRegistrations}">
+		<tr>
+			<td><c:out value="${student.lastname}" />, <c:out value="${student.firstname}" /></td>
+			<td>
+				<c:set var="radioName" value="request-pk-${student.studentPK}" />
+				<input type="radio" name="${radioName}" value="accept" id="accept-${radioName}"/>
+				<label for="accept-${radioName}">accept</label>
+				&nbsp;&nbsp;
+				<input type="radio" name="${radioName}" value="reject" id="reject-${radioName}"/>
+				<label for="reject-${radioName}">reject</label>
+			</td>
+		</tr>
+		</c:forEach>
+	</table>
+	<button id="set-all-accept-button">Set all to "accept"</button>
+	<button id="clear-all-button">Clear all</button>
+	<input type="submit" value="Submit" />
+	</form>
+	</c:if>
 
-    <h2>
+	<h2>
         <a id="staff">Staff</a>
     </h2>
     <table>
@@ -382,8 +418,39 @@
             </c:forEach>
         </table>
     </c:if>
-
-
+    
     <ss:footer />
+	<script
+		src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
+		type="text/javascript"></script>
+	<script type="text/javascript">
+    window.$marmoset = {
+    	acceptRadios: $("#pending-table").find('input[type="radio"][value="accept"]'),
+    	allRadios: $("#pending-table").find('input[type="radio"]'),
+    	allRows: $("#pending-table tr")
+    };
+    
+    $("#set-all-accept-button").click(function(event) {
+    	$marmoset.acceptRadios.attr('checked', true);
+    	$marmoset.allRows.removeClass("reject");
+    	event.preventDefault();
+    });
+    
+    $("#clear-all-button").click(function(event) {
+    	$marmoset.allRadios.attr('checked', false);
+    	$marmoset.allRows.removeClass("reject");
+    	event.preventDefault();
+    });
+    
+    $marmoset.allRadios.change(function(event) {
+    	var $target = $(event.target);
+    	$parents = $target.parents("tr");
+    	if ($target.val() == 'reject') {
+    		$parents.addClass('reject');
+    	} else {
+    		$parents.removeClass('reject');
+    	}
+    });
+    </script>
 </body>
 </html>

@@ -1326,8 +1326,14 @@
 		<url-pattern>/data/instructor/PrintRubricsForDatabase</url-pattern>
 	</servlet-mapping>
 
-
-
+    <servlet>
+      <servlet-name>UpdatePendingRegistrations</servlet-name>
+      <servlet-class>edu.umd.cs.submitServer.servlets.UpdatePendingRegistrations</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>UpdatePendingRegistrations</servlet-name>
+      <url-pattern>/action/instructor/UpdatePendingRegistrations</url-pattern>
+    </servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>PrintGradesForDatabase</servlet-name>
@@ -1582,6 +1588,15 @@
     <filter-mapping>
         <filter-name>CourseStatusFilter</filter-name>
         <url-pattern>/view/instructor/course.jsp</url-pattern>
+    </filter-mapping>
+    
+    <filter>
+      <filter-name>CourseRegistrationsFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.CourseRegistrationsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>CourseRegistrationsFilter</filter-name>
+      <url-pattern>/view/instructor/course.jsp</url-pattern>
     </filter-mapping>
 
     <filter>

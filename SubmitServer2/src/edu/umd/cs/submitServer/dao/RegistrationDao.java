@@ -27,6 +27,10 @@ public interface RegistrationDao {
 	 */
 	public List<Student> getPendingRegistrations(int coursePK); 
 	
+
+	/** Returns a list of all courses a student may register for. */
+	public List<Course> getOpenCourses();
+	
 	/** Returns a list of all courses the dao's Student has pending registrations for. */
 	public List<Course> getPendingRequests();
 	
