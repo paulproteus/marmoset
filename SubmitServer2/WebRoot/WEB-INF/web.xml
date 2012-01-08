@@ -807,11 +807,11 @@
 	</filter-mapping>
   
     <filter>
-      <filter-name>OpenCourseFilter</filter-name>
-      <filter-class>edu.umd.cs.submitServer.filters.OpenCourseFilter</filter-class>
+      <filter-name>RegistrationFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.RegistrationFilter</filter-class>
     </filter>
     <filter-mapping>
-      <filter-name>OpenCourseFilter</filter-name>
+      <filter-name>RegistrationFilter</filter-name>
       <url-pattern>/view/index.jsp</url-pattern>
     </filter-mapping>
 
@@ -854,6 +854,16 @@
     <servlet-mapping>
         <servlet-name>CreateBuildserverConfigFile</servlet-name>
         <url-pattern>/action/instructor/CreateBuildserverConfigFile</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Registration -->
+    <servlet>
+    	<servlet-name>RequestRegistration</servlet-name>
+    	<servlet-class>edu.umd.cs.submitServer.servlets.RequestRegistration</servlet-class>
+    </servlet>
+    <servlet-mapping>
+    	<servlet-name>RequestRegistration</servlet-name>
+    	<url-pattern>/action/RequestRegistration</url-pattern>
     </servlet-mapping>
     
 	<servlet>
@@ -1522,7 +1532,7 @@
         <servlet-name>StudentAccountForInstructor</servlet-name>
         <url-pattern>/action/instructor/StudentAccountForInstructor</url-pattern>
     </servlet-mapping>
-
+    
 	<filter>
 		<filter-name>MyCodeReviewsFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.MyCodeReviewsFilter</filter-class>
