@@ -50,9 +50,9 @@ public class CreateBuildserverConfigFile extends SubmitServerServlet {
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
 
-        out.printf("Buildservr config file");
-        out.printf("Generated for %s%n", user.getFullname());
-        out.printf("At  %tc%n", new Date());
+        out.printf("# Buildservr config file%n");
+        out.printf("# Generated for %s%n", user.getFullname());
+        out.printf("# At %tc%n", new Date());
         out.println();
         print(out, "submitURL",
                 request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath()
@@ -86,7 +86,6 @@ public class CreateBuildserverConfigFile extends SubmitServerServlet {
             releaseConnection(conn);
 
         }
-        out.println();
         print(out, "supportedCourses", b.toString());
 
         out.close();

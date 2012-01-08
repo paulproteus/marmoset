@@ -883,6 +883,14 @@
 		<servlet-class> edu.umd.cs.submitServer.servlets.CourseCalendar </servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>AllowCourseCreation</servlet-name>
+		<servlet-class> edu.umd.cs.submitServer.servlets.AllowCourseCreation </servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>AuthenticateAs</servlet-name>
+		<servlet-class> edu.umd.cs.submitServer.servlets.AuthenticateAs </servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>PerformLogin</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.PerformLogin </servlet-class>
 	</servlet>
@@ -1166,6 +1174,14 @@
         <url-pattern>/view/admin/TestingGround</url-pattern>
     </servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>AllowCourseCreation</servlet-name>
+		<url-pattern>/action/admin/AllowCourseCreation</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AuthenticateAs</servlet-name>
+		<url-pattern>/action/AuthenticateAs</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>PerformLogin</servlet-name>
 		<url-pattern>/authenticate/ldap/PerformLogin</url-pattern>

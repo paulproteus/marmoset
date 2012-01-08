@@ -258,16 +258,15 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 								conn);
 				request.setAttribute("canonicalAccount", canonicalAccount);
 
-				if (!studentSpecifiedByInstructor && !user.isSuperUser()) {
-					// make sure the student is registered for the course that
-					// owns this project
+				if (!studentSpecifiedByInstructor 
+				        && !student.getCampusUID().equals(user.getCampusUID())
+				        && !user.isSuperUser()) {
 					StudentRegistration reg = StudentRegistration
 							.lookupByStudentPKAndCoursePK(studentPK, coursePK,
 									conn);
 					if (reg == null) {
 						throw new ServletException(
-								"You are not registered for the class "
-										+ "to which this project belongs");
+								"You cannot view information about this person");
 					}
 				}
 

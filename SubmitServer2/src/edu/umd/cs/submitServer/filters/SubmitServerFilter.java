@@ -101,7 +101,6 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
     @OverridingMethodsMustInvokeSuper
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("Initializing " + this.getClass().getSimpleName());
         servletContext = filterConfig.getServletContext();
         if ("true".equals(servletContext.getInitParameter("DEBUG"))) {
             submitServerFilterLog.setLevel(Level.DEBUG);

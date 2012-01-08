@@ -54,10 +54,7 @@ import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.TeamAuthenticationService;
 import edu.umd.cs.submitServer.UserSession;
 
-/**
- * @author jspacco
- *
- */
+
 public class PerformLogin extends SubmitServerServlet {
 
 
