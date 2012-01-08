@@ -55,7 +55,15 @@
     </fieldset>
   </form>
   <!-- /Simple OpenID Selector -->
-  
+  <c:if test="${skipAuthentication}">
+  	<c:url var="verifyOpenId" value="/authenticate/openid/verify" />
+  	<h2>Skip authentication</h2>
+  	<form action="${verifyOpenId}" method="GET">
+  		<input type="hidden" name="target" value="${target}" />
+  		<input type="text" name="uid" placeholder="Enter a fake OpenID identity" />
+  		<input type="submit" />
+  	</form>
+  </c:if>
     <ss:footer/>
 </body>
 </html>

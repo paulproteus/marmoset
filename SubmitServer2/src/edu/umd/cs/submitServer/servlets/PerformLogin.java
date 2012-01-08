@@ -184,7 +184,18 @@ public class PerformLogin extends SubmitServerServlet {
 		// we don't care if they've consented or not, just that they've returned
 		// a form
 		userSession.setGivenConsent(student.getGivenConsent());
+		
+		if (!student.getLoginName().endsWith("-admin") && !student.getLoginName().endsWith("-student")) {
+			Student superuser = Student.lookupByLoginName(student.getLoginName() + "-admin", conn);
+			if (superuser != null) {
+				userSession.setSuperuserPK(superuser.getStudentPK());
+			}
 
+			Student shadow = Student.lookupByLoginName(student.getLoginName() + "-student", conn);
+			if (shadow != null) {
+				userSession.setShadowAccountPK(shadow.getStudentPK());
+			}
+		}
 
 		if (student.isSuperUser()) {
 			for(Course course : Course.lookupAll(conn))  {

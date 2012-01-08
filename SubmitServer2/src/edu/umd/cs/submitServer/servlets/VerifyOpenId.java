@@ -45,28 +45,14 @@ public class VerifyOpenId extends SubmitServerServlet {
 	@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    ParameterList openIdResp = new ParameterList(req.getParameterMap());
-    DiscoveryInformation discovered = (DiscoveryInformation) req.getSession().getAttribute(SubmitServerConstants.OPENID_DISCOVERED);
-    StringBuffer receivingUrl = req.getRequestURL();
-    String queryString = req.getQueryString();
-    if (!Strings.isNullOrEmpty(queryString)) {
-      receivingUrl.append("?").append(queryString);
-    }
-    VerificationResult verification;
-    try {
-      verification = consumerManager.verify(receivingUrl.toString(), openIdResp, discovered);
-    } catch (MessageException e) {
-      throw new ServletException(e);
-    } catch (DiscoveryException e) {
-      throw new ServletException(e);
-    } catch (AssociationException e) {
-      throw new ServletException(e);
-    }
-
-		Identifier verified = Preconditions.checkNotNull(verification.getVerifiedId(),
-		                                                 "OpenID authentication failed");
-		getSubmitServerServletLog().info("Verified OpenID " + verified.getIdentifier());
-		String uid = hashOpenId(verified.getIdentifier());
+		boolean skipAuthentication = "true".equals(req.getServletContext().getInitParameter("authentication.skip"));
+		String uid;
+		if (!skipAuthentication) {
+			uid = verifyIdentity(req);
+		} else {
+			uid = req.getParameter("uid");
+			Preconditions.checkArgument(!Strings.isNullOrEmpty("uid"));
+		}
 		Connection conn = null;
 		try {
 	    conn = getConnection();
@@ -91,12 +77,36 @@ public class VerifyOpenId extends SubmitServerServlet {
     } finally {
     	releaseConnection(conn);
     }
-		
-		
+  }
+
+	private String verifyIdentity(HttpServletRequest req) throws ServletException {
+	  ParameterList openIdResp = new ParameterList(req.getParameterMap());
+    DiscoveryInformation discovered = (DiscoveryInformation) req.getSession().getAttribute(SubmitServerConstants.OPENID_DISCOVERED);
+    StringBuffer receivingUrl = req.getRequestURL();
+    String queryString = req.getQueryString();
+    if (!Strings.isNullOrEmpty(queryString)) {
+      receivingUrl.append("?").append(queryString);
+    }
+    VerificationResult verification;
+    try {
+      verification = consumerManager.verify(receivingUrl.toString(), openIdResp, discovered);
+    } catch (MessageException e) {
+      throw new ServletException(e);
+    } catch (DiscoveryException e) {
+      throw new ServletException(e);
+    } catch (AssociationException e) {
+      throw new ServletException(e);
+    }
+
+		Identifier verified = Preconditions.checkNotNull(verification.getVerifiedId(),
+		                                                 "OpenID authentication failed");
+		getSubmitServerServletLog().info("Verified OpenID " + verified.getIdentifier());
+		String uid = hashOpenId(verified.getIdentifier());
+	  return uid;
   }
 
 	/**
-	 * SHA-512 hash an OpenID identifier, since OpenID puts no restriction on the length of an
+	 * SHA-1 hash an OpenID identifier, since OpenID puts no restriction on the length of an
 	 * identifier.
 	 */
 	private static String hashOpenId(String identifier) throws ServletException {
