@@ -55,8 +55,9 @@ public class CreateBuildserverConfigFile extends SubmitServerServlet {
         out.printf("# At %tc%n", new Date());
         out.println();
         print(out, "submitURL",
-                request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath()
-                        + ECLIPSE_SUBMIT_PATH);
+                request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
+                + request.getContextPath()
+                        );
 
         out.println();
         StringBuilder b = new StringBuilder();

@@ -39,7 +39,7 @@ package edu.umd.cs.buildServer;
  */
 public interface ConfigurationKeys {
 
-	public static final String SUBMIT_SERVER_URL = "submit.server.url";	
+	public static final String SUBMIT_SERVER_URL = "submitURL";	
 
 	
 	/** URL path to the RequestProject servlet on the submit server. */
@@ -63,7 +63,7 @@ public interface ConfigurationKeys {
 	 * List of PKs of courses we support testing for. Kind of a hack need to
 	 * think of a more general way to do this.
 	 */
-	public static final String SUPPORTED_COURSE_LIST = "supported.courses";
+	public static final String SUPPORTED_COURSE_LIST = "supportedCourses";
 
 
 	/**
