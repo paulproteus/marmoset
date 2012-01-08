@@ -119,6 +119,7 @@
 	<td><c:out value="${course.description}" /></td>
 	<!-- TODO(rwsims): Allow students to cancel registration requests? -->
 </tr>
+</c:forEach>
 </table>
 </div>
 </c:if>
