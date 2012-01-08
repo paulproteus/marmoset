@@ -44,7 +44,7 @@ public class AuthenticateAs extends SubmitServerServlet {
         
         HttpSession session = request.getSession();
 
-       if (user.getCampusUID().equals(student.getCampusUID()) && !user.isSuperUser()) {
+       if (!user.getCampusUID().equals(student.getCampusUID()) && !user.isSuperUser()) {
             response.sendError(403);
             return;
         }

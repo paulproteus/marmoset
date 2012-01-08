@@ -274,7 +274,7 @@
                 <c:forEach var="student" items="${allStudents}" varStatus="counter">
                   <c:if test="${!student.canImportCourses}">
                     <option value="${student.studentPK}">
-                        <c:out value="${student.fullName}" />
+                        <c:out value="${student.fullname}" />
                     </option>
                     </c:if>
                 </c:forEach>
@@ -294,7 +294,7 @@
         <select name="studentPK">
             <c:forEach var="student" items="${allStudents}" varStatus="counter">
                 <option value="${student.studentPK}">
-                    <c:out value="${student.fullName}" />
+                    <c:out value="${student.fullname}" />
                 </option>
             </c:forEach>
         </select> <input type="submit" value="Authenticate as" />
@@ -309,7 +309,7 @@
             <c:forEach var="student" items="${allStudents}" varStatus="counter">
                 <c:if test="${student.canImportCourses}">
                     <option value="${student.studentPK}">
-                        <c:out value="${student.fullName}" />
+                        <c:out value="${student.fullname}" />
                     </option>
                 </c:if>
             </c:forEach>

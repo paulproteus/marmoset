@@ -59,7 +59,7 @@
             </c:forEach>
         </select>
         <p>
-            <input type="submit" value="Create Code Review">
+            <input type="submit" value="Create Buildserver config file">
         </p>
     </form>
 

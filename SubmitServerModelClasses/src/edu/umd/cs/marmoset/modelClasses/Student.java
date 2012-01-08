@@ -225,7 +225,7 @@ public class Student  implements Comparable<Student> {
   public String getFullname() {
     if (FAKE_NAMES)
       return FakeNames.getFullname(studentPK);
-    return firstname + " " + lastname;
+    return firstname + " " + lastname + " (" +loginName +")";
   }
   /**
    * @return Returns the studentPK.
