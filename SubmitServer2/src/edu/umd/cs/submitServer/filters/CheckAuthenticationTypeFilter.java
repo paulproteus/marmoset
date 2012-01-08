@@ -35,7 +35,7 @@ public class CheckAuthenticationTypeFilter implements Filter {
 		if (authType == null) {
 			authType = "openid";
 		}
-		safeUrl = Pattern.compile("^/authenticate/[a-zA-Z0-9](.jsp)?");
+		safeUrl = Pattern.compile("^/authenticate/[a-zA-Z0-9]+(.jsp)?");
 	  guardedUrl = Pattern.compile("^/authenticate/([a-zA-Z0-9]+)/.*");
   }
 	
