@@ -33,6 +33,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
@@ -49,6 +53,10 @@ public class UserSession {
 	private boolean backgroundDataComplete = false;
 	private String givenConsent;
 	private Integer onlyCoursePK;
+	
+	/* These are only set if the user actually has these identities. */
+	private @Student.PK Integer superuserPK = null;
+	private @Student.PK Integer shadowAccountPK = null;
 
 	public void addInstructorCapability(Integer coursePK) {
 		instructorCapabilitySet.add(coursePK);
@@ -146,5 +154,21 @@ public class UserSession {
 
     public void setOnlyCoursePK(Integer onlyCoursePK) {
         this.onlyCoursePK = onlyCoursePK;
+    }
+    
+    public void setSuperuserPK(@Nonnull Integer superuserPK) {
+	    this.superuserPK = superuserPK;
+    }
+    
+    public void setShadowAccountPK(@NonNull Integer shadowAccountPK) {
+	    this.shadowAccountPK = shadowAccountPK;
+    }
+    
+    public @Nullable Integer getShadowAccountPK() {
+	    return shadowAccountPK;
+    }
+    
+    public @Nullable Integer getSuperuserPK() {
+	    return superuserPK;
     }
 }

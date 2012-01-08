@@ -1530,6 +1530,15 @@
 		<servlet-name>InitializeDatabase</servlet-name>
 		<url-pattern>/authenticate/InitializeDatabase</url-pattern>
 	</servlet-mapping>
+  
+    <servlet>
+      <servlet-name>BecomePersona</servlet-name>
+      <servlet-class>edu.umd.cs.submitServer.servlets.BecomePersona</servlet-class> 
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>BecomePersona</servlet-name>
+      <url-pattern>/action/become</url-pattern>
+    </servlet-mapping>
 
 
     <servlet>

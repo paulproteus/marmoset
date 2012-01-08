@@ -56,7 +56,12 @@
 </div>
 
 <c:set var="statusMap" value="${userSession.instructorStatus}"/>
-
+<c:if test="${not empty userSession.superuserPK}">
+<c:url var="personaUrl" value="/action/become">
+	<c:param name="persona">admin</c:param>
+</c:url>
+<a href="${personaUrl}">become superuser</a>
+</c:if>
 <div id="enrolled-list">
 <h2>Courses Enrolled</h2>
 <c:choose>
@@ -136,10 +141,12 @@
 		<th>Description</th>
 	</tr>
 	<c:forEach var="course" items="${openCourses}">
+	<tr>
 		<c:set var="checkboxName" value="course-pk-${course.coursePK}" />
 		<td><input type="checkbox" name="${checkboxName}" id="${checkboxName}-box"/></td>
 		<td><label for="${checkboxName}-box"><c:out value="${course.courseName}" /></label></td>
 		<td><c:out value="${course.description}" /></td>
+		</tr>
 	</c:forEach>
 	<tr>
 		<td colspan="3">
