@@ -39,8 +39,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
+import edu.umd.cs.submitServer.StudentForUpload;
 import edu.umd.cs.submitServer.UserSession;
 
 /**
@@ -49,21 +52,6 @@ import edu.umd.cs.submitServer.UserSession;
  */
 public class CreateCourse extends SubmitServerServlet {
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -72,24 +60,28 @@ public class CreateCourse extends SubmitServerServlet {
 				.getAttribute(USER_SESSION);
 
 		Connection conn = null;
+		Student user = (Student) request.getAttribute(USER);
+		if (!user.getCanImportCourses()) {
+		    response.setStatus(403, "You don't have the permission to create courses");
+		    return;
+		}
 		try {
 			conn = getConnection();
+	        
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerServletLog(), strictParameterChecking());
 			Course course = parser.getCourse();
 
 			// insert the course
 			course.insert(conn);
+			if (!user.isSuperUser()) {
+			    StudentForUpload.registerStudent(course,
+	                    user, user.getLoginName(), StudentRegistration.MODIFY_CAPABILITY, conn);
+			}
 
 			userSession.addInstructorActionCapability(course.getCoursePK());
 			userSession.addInstructorCapability(course.getCoursePK());
 
-			// TODO redirect to the login page with the URL of the new course
-			// encoded as the target
-			// or reset the user's session
-			// otherwise this redirect doesn't work because the user's session
-			// doesn't reflect
-			// instructor access to the new course
 			String redirectUrl = request.getContextPath()
 					+ "/view/instructor/course.jsp?coursePK="
 					+ course.getCoursePK();

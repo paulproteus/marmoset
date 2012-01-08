@@ -1150,7 +1150,7 @@
 
 	<servlet-mapping>
 		<servlet-name>PerformLogin</servlet-name>
-		<url-pattern>/authenticate/PerformLogin</url-pattern>
+		<url-pattern>/authenticate/ldap/PerformLogin</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CourseRSS</servlet-name>

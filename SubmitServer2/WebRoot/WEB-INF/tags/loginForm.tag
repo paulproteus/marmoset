@@ -2,7 +2,7 @@
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 
-    <c:url var="loginLink" value="/authenticate/PerformLogin"/>
+    <c:url var="loginLink" value="/authenticate/ldap/PerformLogin"/>
 	<form name="PerformLogin" method="post" action="${loginLink}" >
 		<c:if test="${not empty param.target}">
 	    <input type="hidden" name="target" value="${ss:urlEncode(param.target)}">

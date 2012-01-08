@@ -294,11 +294,12 @@
                     <td class="label">Course Name:</td>
                     <td class="input"><c:out value="${course.courseName}" /></td>
                 </tr>
+                <c:if test="${course.section}">
                  <tr>
                     <td class="label">Section:</td>
                     <td class="input"><c:out value="${course.section}" /></td>
                 </tr>
-              
+                </c:if>
                 <tr>
                     <td class="label">Description:</td>
                     <td class="input"><input type="text" name="description" size="60" value="${currentDescription}"
