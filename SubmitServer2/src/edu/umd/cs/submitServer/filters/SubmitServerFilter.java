@@ -107,7 +107,6 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
         }
 
         submitServerDatabaseProperties = new SubmitServerDatabaseProperties(servletContext);
-        System.out.println("Initialized " + this.getClass().getSimpleName());
         
         getSubmitServerFilterLog().debug("Initializing logger for " + getClass());
 
