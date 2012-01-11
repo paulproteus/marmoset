@@ -258,6 +258,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 								conn);
 				request.setAttribute("canonicalAccount", canonicalAccount);
 
+				student = Student.lookupByStudentPK(studentPK, conn);
+				request.setAttribute(STUDENT, student);
 				if (!studentSpecifiedByInstructor 
 				        && !student.getCampusUID().equals(user.getCampusUID())
 				        && !user.isSuperUser()) {
@@ -432,8 +434,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				}
 			}
 
-			student = Student.lookupByStudentPK(studentPK, conn);
-			request.setAttribute(STUDENT, student);
 			if (coursePK != null) {
 				// Get Course and all of its projects
 				course = Course.lookupByCoursePK(coursePK, conn);

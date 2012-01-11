@@ -165,7 +165,7 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
         Integer rubricCount = parser.getOptionalInteger("rubric-count");
         if (rubricCount != null)
             for(int i = 1; i <= rubricCount; i++) {
-                String base = "rubric"+i+"-";
+                String base = String.format("rubric-%d-", i);
                 String name = request.getParameter(base+"name");
                 String presentation = request.getParameter(base+"presentation");
                 String rubricDescription = request.getParameter(base+"description");

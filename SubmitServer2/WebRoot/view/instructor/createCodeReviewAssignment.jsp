@@ -36,7 +36,7 @@
 	href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css"
 	rel="stylesheet" type="text/css" />
 <script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
 	type="text/javascript"></script>
 <script
 	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"
@@ -191,110 +191,82 @@
 					<th>description</th>
 				</tr>
 			</thead>
-			<tbody id="rubric-table">
+			<tbody  id="rubric-table">
 			</tbody>
-
 		</table>
 		</div>
 	</form>
-	
-	
-	<div id="templates0" style="display: none">
-		<table>
-			<tbody id="templates">
-				<tr id="numeric">
-					
-					<th>Numeric</th>
-					<td><input type="hidden" name="presentation" value="NUMERIC" />
-					<input type="text" name="name" size="20" placeholder="Name of rubric item"/>
-                    </td>
-					<td>min: <input type="text" name="min" placeholder="min"  size="4">
-					max: <input type="text" name="max" placeholder="max"  size="4">
-					default: <input type="text" name="default" placeholder="default"  size="4">
-					</td>
-					<td> <input type="text"  name="description" size="50" placeholder="a longer description of this rubric item"/>
-					</td>
-				</tr>
-				<tr id="dropdown">
-					
-					<th>Dropdown</th>
-					<td><input type="hidden" name="presentation" value="DROPDOWN" />
-					<input type="text" name="name" size="20"  placeholder="Name of rubric item"/>
-                    </td>
-					<td><input type="text" name="value" required="required"
-						placeholder="name:value pairs (e.g., bad:0, ok:5, good:7)" size="50" />
-					</td>
-					       <td> <input type="text"  name="description" size="50" placeholder="a longer description of this rubric item"/>
-                    </td>
-				</tr>
-				<tr id="checkbox">
-					<th>Checkbox</th>
-					<td><input type="hidden" name="presentation" value="CHECKBOX" />
-                    <input type="text" name="name" size="20" placeholder="Name of rubric item"/>
-					</td>
-					<td><input type="checkbox" value="ignore" onclick="return false;"  >
-					<input type="text" name="false" title="value if not checked" size="4" value="0" required="required">
-					&nbsp;
-					<input type="checkbox" value="ignore"   onclick="return false;"  CHECKED >
-                    <input type="text" name="true" title="value if checked"  size="4" required="required">
-                    </td>
-					       <td> <input type="text"  name="description" size="50" placeholder="a longer description of this rubric item"/>
-                    </td>
-				</tr>
-			</tbody>
-		</table>
+	<ss:script file="jsrender.js" />
+	<script id="rubricTemplate" type="text/x-jquery-tmpl">
+            <tr id="rubric-{{=count}}">
+                <th>{{=header}}</th>
+                <td>
+                    <input type="hidden" name="{{=prefix}}-presentation" value="{{=presentation}}" />
+                    <input type="text" name="{{=prefix}}-name" size="20" placeholder="Name of rubric item"/>
+                </td>
+                <td>
+                    {{=editWidgets!}}
+                </td>
+                <td>
+                    <input type="text" name="{{=prefix}}-description" size="50" placeholder="a longer description of this rubric item"/>
+                </td>
+            </tr>
+        </script>
+
+	<script id="dropdownTemplate" type="text/x-jquery-tmpl">
+            <input type="hidden" name="{{=prefix}}-value" id="{{=prefix}}-hidden"/>
+            <select id="{{=prefix}}-select"></select>
+            <button id="{{=prefix}}-edit-button">edit dropdown</button>
+        </script>
+	<script id="numericTemplate" type="text/x-jquery-tmpl">
+            <label for="{{=prefix}}-min-input">min:</label>
+            <input type="text" name="{{=prefix}}-min" id="{{=prefix}}-min-input" placeholder="min"  size="4">
+
+            <label for="{{=prefix}}-max-input">max:</label>
+            <input type="text" name="{{=prefix}}-max" id="{{=prefix}}-max-input" placeholder="max"  size="4">
+
+            <label for="{{=prefix}}-default-input">default:</label>
+            <input type="text" name="{{=prefix}}-default" id="{{=prefix}}-default-input" placeholder="default"  size="4">
+        </script>
+	<script id="checkboxTemplate" type="text/x-jquery-tmpl">
+            <input type="checkbox" value="ignore" onclick="return false;"  >
+            <input type="text" name="{{=prefix}}-false" title="value if not checked" size="4" value="0" required="required">
+            &nbsp;
+            <input type="checkbox" value="ignore"   onclick="return false;"  CHECKED >
+            <input type="text" name="{{=prefix}}-true" title="value if checked"  size="4" required="required">
+        </script>
+
+	<div id="edit-dialog" style="display: none">
+		<select id="edit-dialog-dropdown-select"></select>
+		<div>
+			<input type="text" id="edit-dialog-value-input" />
+			<input type="number" id="edit-dialog-score-input" min="-1000" max="1000" />
+		</div>
+		<div>
+			<span id="edit-dialog-controls">
+				<button id="edit-dialog-add">add</button>
+				<button id="edit-dialog-delete">delete</button>
+				<button id="edit-dialog-clear-all">clear all</button>
+			</span>
+		</div>
 	</div>
+
+	<ss:script file="rubrics.js" />
 	<script type="text/javascript">
-		function getRubricCount() {
-			return parseInt($("#rubric-count").val());
-		}
-
-		function setRubricCount(count) {
-			$("#rubric-count").val(count);
-		}
-
-		function getTemplateByName(name) {
-			return $("#templates #" + name).clone();
-		}
-
-		function fixNamesInTemplate(template, name) {
-			$("[name]", template).each(function(idx, obj) {
-				obj = $(obj);
-				obj.attr("name", name + "-" + obj.attr("name"));
-			});
-			template.attr("id", name);
-		}
-
-		function appendTemplateByName(templateName) {
-			count = getRubricCount();
-			count += 1;
-			setRubricCount(count);
-			template = getTemplateByName(templateName);
-			fixNamesInTemplate(template, "rubric" + count);
-			$("#rubric-table").append(template);
-		}
-
-		$("#add-dropdown-button").click(function() {
-			document.getElementById("rubricTable").style.display = "block";
-			appendTemplateByName("dropdown");
-			return false;
+		var dropdownEditor = new marmoset.DropdownEditor("#edit-dialog");
+		var manager = new marmoset.RubricManager("#rubric-table",
+				dropdownEditor);
+		manager.setAddDropdownButton("#add-dropdown-button");
+		manager.setAddNumericButton("#add-numeric-button");
+		manager.setAddCheckboxButton("#add-checkbox-button");
+		$(manager).one('change', function(event) {
+			$("#rubricTable").show();
 		});
-
-		$("#add-numeric-button").click(function() {
-			document.getElementById("rubricTable").style.display = "block";
-			appendTemplateByName("numeric");
-			return false;
-		});
-
-		$("#add-checkbox-button").click(function() {
-			document.getElementById("rubricTable").style.display = "block";
-			appendTemplateByName("checkbox");
-			return false;
+		$(manager).change(function(event) {
+			$("#rubric-count").val(manager.rubricCount);
 		});
 	</script>
 
-
 	<ss:footer />
-
 </body>
 </html>
