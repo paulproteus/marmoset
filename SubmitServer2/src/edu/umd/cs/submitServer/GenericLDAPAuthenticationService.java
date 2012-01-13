@@ -62,14 +62,6 @@ public class GenericLDAPAuthenticationService implements IAuthenticationService 
         String skipLDAP = context.getInitParameter(SubmitServerConstants.LDAP_SSL_OFF);
         boolean skipSSL = "true".equalsIgnoreCase(skipLDAP);
         useSSL = !skipSSL;
-
-        // set cacerts path and password for secure connection
-        if (useSSL) {
-            String keyStore = context.getInitParameter(SubmitServerConstants.AUTHENTICATION_KEYSTORE_PATH);
-            String keyPass = context.getInitParameter(SubmitServerConstants.AUTHENTICATION_KEYSTORE_PASSWORD);
-            useSSL(keyStore, keyPass);
-        }
-
         ldapURL = context.getInitParameter(SubmitServerConstants.LDAP_URL);
         authMechanism = context.getInitParameter(SubmitServerConstants.LDAP_AUTH_MECHANISM);
         principleFormat = context.getInitParameter(SubmitServerConstants.LDAP_PRINCIPAL_FORMAT);
@@ -135,11 +127,6 @@ public class GenericLDAPAuthenticationService implements IAuthenticationService 
         return true;
     }
 
-    private void useSSL(String cacertsFile, String cacertsPassword) {
-        if (cacertsFile != null)
-            System.setProperty("javax.net.ssl.trustStore", cacertsFile);
-        if (cacertsPassword != null)
-            System.setProperty("javax.net.ssl.trustStorePassword", cacertsPassword);
-    }
+  
 
 }

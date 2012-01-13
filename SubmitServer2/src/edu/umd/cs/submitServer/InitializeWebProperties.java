@@ -31,7 +31,11 @@ public class InitializeWebProperties implements ServletContextListener {
 			}
 			if (ctx.getInitParameter("grades.server.jdbc.url") != null)
 			    ctx.setInitParameter("grades.server", "true");
-			
+
+			String keyStore = ctx.getInitParameter(SubmitServerConstants.AUTHENTICATION_KEYSTORE_PATH);
+			String keyPass = ctx.getInitParameter(SubmitServerConstants.AUTHENTICATION_KEYSTORE_PASSWORD);
+			useSSL(keyStore, keyPass);
+	 
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -39,5 +43,12 @@ public class InitializeWebProperties implements ServletContextListener {
 		}
 
 	}
+	
+	  public void useSSL(String cacertsFile, String cacertsPassword) {
+	        if (cacertsFile != null)
+	            System.setProperty("javax.net.ssl.trustStore", cacertsFile);
+	        if (cacertsPassword != null)
+	            System.setProperty("javax.net.ssl.trustStorePassword", cacertsPassword);
+	    }
 
 }
