@@ -303,7 +303,7 @@ public class Student  implements Comparable<Student> {
     this.hasPicture = hasPicture;
   }
   public boolean getCanImportCourses() {
-    return canImportCourses;
+    return canImportCourses || isSuperUser();
   }
   public void setCanImportCourses(boolean canImportCourses) {
     this.canImportCourses = canImportCourses;
