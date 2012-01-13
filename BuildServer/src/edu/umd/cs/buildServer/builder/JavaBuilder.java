@@ -47,8 +47,6 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.dom4j.DocumentException;
 
-import com.cenqua.clover.CloverInstr;
-
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ConfigurationKeys;
@@ -248,7 +246,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 				coverageMarkupCmd += cliArgs[ii] + " ";
 			}
 			getLog().trace("Clover instrumentation args: " + coverageMarkupCmd);
-			int result = CloverInstr.mainImpl(cliArgs);
+			int result = Clover.cloverInstrMainImpl(cliArgs);
 			if (result != 0) {
 				throw new BuilderException(
 						"Clover was unable to instrument the source code in "
@@ -413,7 +411,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		return getJarFile(TestRunner.class);
 	}
 	public static File getCloverJar() {
-		return getJarFile(com.cenqua.clover.CloverInstr.class);
+		return Clover.getCloverJar();
 	}
 
 	public static File getLog4jJar() {

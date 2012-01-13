@@ -26,15 +26,11 @@
  */
 package edu.umd.cs.buildServer.util;
 
-import static edu.umd.cs.buildServer.ConfigurationKeys.HOSTNAME;
 import static edu.umd.cs.buildServer.ConfigurationKeys.SUBMIT_SERVER_HANDLEBUILDSERVERLOGMESSAGE_PATH;
-import static edu.umd.cs.buildServer.ConfigurationKeys.SUPPORTED_COURSE_LIST;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -46,7 +42,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import edu.umd.cs.buildServer.BuildServerConfiguration;
-import edu.umd.cs.buildServer.Configuration;
 import edu.umd.cs.buildServer.MissingConfigurationPropertyException;
 
 /**

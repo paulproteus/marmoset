@@ -42,7 +42,6 @@
 	</target>
 	
 	<path id="buildserver.classpath">
-		<pathelement location="lib/clover.jar"/>
 		<pathelement location="lib/jsr305.jar"/>
 		<pathelement location="lib/commons-httpclient.jar"/>
 		<pathelement location="lib/commons-lang-2.4.jar"/>

@@ -37,12 +37,10 @@ import java.util.Set;
 
 import org.apache.bcel.classfile.ClassFormatException;
 
-import com.cenqua.clover.reporters.xml.XMLReporter;
-import com.cenqua.clover.util.CloverUtils;
-
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.MissingConfigurationPropertyException;
 import edu.umd.cs.buildServer.ProjectSubmission;
+import edu.umd.cs.buildServer.builder.Clover;
 import edu.umd.cs.buildServer.builder.DirectoryFinder;
 import edu.umd.cs.buildServer.builder.JavaBuilder;
 import edu.umd.cs.buildServer.util.BuildServerUtilities;
@@ -298,7 +296,7 @@ public class JavaTester extends Tester {
 	 */
 	private void runCloverClean() {
 		try {
-			CloverUtils.scrubCoverageData(getProjectSubmission().getConfig().getConfig()
+			Clover.cloverUtilsScrubCoverageData(getProjectSubmission().getConfig().getConfig()
 					.getRequiredProperty(CLOVER_DB), false);
 		} catch (MissingConfigurationPropertyException e) {
 			e.printStackTrace();
@@ -492,7 +490,7 @@ public class JavaTester extends Tester {
 				cloverReportArgs.append(cliArgs[ii] + " ");
 			}
 			getLog().debug("Args for clover report: " + cloverReportArgs);
-			int result = XMLReporter.runReport(cliArgs);
+			int result = Clover.xmlReporterRunReport(cliArgs);
 			if (result != 0) {
 				getLog().error("Unable to generate Clover XML report");
 			}
