@@ -11,6 +11,11 @@
   <short-name>ss</short-name>
   <uri>http://www.cs.umd.edu/marmoset/ss</uri>
 
+<tag-file>
+    <name>createCourseForm</name>
+    <path>/WEB-INF/tags/createCourseForm.tag</path>
+  </tag-file>
+
   <tag-file>
     <name>studentPicture</name>
     <path>/WEB-INF/tags/studentPicture.tag</path>
