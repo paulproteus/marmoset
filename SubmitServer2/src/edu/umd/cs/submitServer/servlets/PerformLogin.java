@@ -76,7 +76,7 @@ public class PerformLogin extends SubmitServerServlet {
 			session.invalidate();
 		}
 		boolean skipAuthentication = "true".equals(this.getServletContext()
-				.getInitParameter(SKIP_LDAP));
+				.getInitParameter(SKIP_AUTHENTICATION));
 
 		session = request.getSession(true);
 		String campusUID = parser.getOptionalCheckedParameter("loginName");

@@ -63,6 +63,11 @@
   		<input type="text" name="uid" placeholder="Enter a fake OpenID identity" />
   		<input type="submit" />
   	</form>
+    <form action="${verifyOpenId}" method="GET">
+        <input type="hidden" name="target" value="${target}" />
+        <input type="text" name="login_name" placeholder="Enter existing username" />
+        <input type="submit" />
+    </form>
   </c:if>
     <ss:footer/>
 </body>

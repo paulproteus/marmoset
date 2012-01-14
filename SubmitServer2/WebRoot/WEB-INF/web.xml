@@ -1200,7 +1200,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CreateCourse</servlet-name>
-		<url-pattern>/action/admin/CreateCourse</url-pattern>
+		<url-pattern>/action/CreateCourse</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Fixup</servlet-name>

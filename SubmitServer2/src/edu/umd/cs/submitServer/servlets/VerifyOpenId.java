@@ -47,16 +47,25 @@ public class VerifyOpenId extends SubmitServerServlet {
       throws ServletException, IOException {
 		boolean skipAuthentication = "true".equals(req.getServletContext().getInitParameter("authentication.skip"));
 		String uid;
+		String loginName = null;
 		if (!skipAuthentication) {
 			uid = verifyIdentity(req);
 		} else {
 			uid = req.getParameter("uid");
-			Preconditions.checkArgument(!Strings.isNullOrEmpty("uid"));
+			loginName = req.getParameter("login_name");
+			boolean ok = !Strings.isNullOrEmpty(uid)
+			        || !Strings.isNullOrEmpty(loginName);
+            Preconditions.checkArgument(ok);
 		}
 		Connection conn = null;
 		try {
 	    conn = getConnection();
-	    Student student = Student.lookupByCampusUID(uid, conn);
+	    Student student;
+	    if (uid != null) 
+	        student = Student.lookupByCampusUID(uid, conn);
+	    else 
+	        student = Student.lookupByLoginName(loginName, conn);
+	    
 	    String targetUrl = req.getParameter("marmoset.target");
 	    if (Strings.isNullOrEmpty(targetUrl)) {
 	    	targetUrl = Util.urlEncode(req.getContextPath() + "/view/index.jsp");
