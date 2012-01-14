@@ -47,7 +47,7 @@
 	name="projectPK" value="${project.projectPK}">
 <p>Comment:<br>
 <textarea cols="40" rows="8" name="comment"></textarea>
-<p>Jarfile: <input type="file" name="file" size=40>
+<p>Zip/Jar file: <input type="file" name="file" size=40>
 <p><input type="submit" value="Upload Project Jarfile">
 </form>
 
