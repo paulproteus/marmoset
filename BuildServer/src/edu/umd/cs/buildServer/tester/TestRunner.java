@@ -34,6 +34,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.JUnit4TestAdapter;
@@ -452,6 +454,10 @@ public class TestRunner extends BaseTestRunner {
 	}
 
 	public static void main(String[] args) {
+	    Properties p = System.getProperties();
+	    for(Map.Entry<?,?> e : p.entrySet()) {
+	        System.out.println(e);
+	    }
 		int startTestNumber = -1;
 
 		int argCount = 0;

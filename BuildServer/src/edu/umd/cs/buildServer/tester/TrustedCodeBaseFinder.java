@@ -79,6 +79,12 @@ final class TrustedCodeBaseFinder {
 	 *            the classpath entry
 	 */
 	private void inspectEntry(String entry) {
+	    try {
+	    File f = new File(entry);
+	    entry = f.getCanonicalPath();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 		if (entry.endsWith(File.separator + "junit.jar")) {
 			// JUnit
 			if (!hasJUnit)

@@ -169,8 +169,9 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	public TestOutcome executeTests()
 	// throws InternalBuildServerException//, IOException
 	{
+	    try {
 		String buildServerTestFilesDir = getDirectoryFinder()
-				.getTestFilesDirectory().getAbsolutePath() + File.separator;
+				.getTestFilesDirectory().getCanonicalPath() + File.separator;
 
 		// Build arguments to java process
 		List<String> javaArgs = new LinkedList<String>();
@@ -206,10 +207,10 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 
 		// Specify filename of project jar file
 		javaArgs.add("-Dbuildserver.test.jar.file="
-				+ getProjectSubmission().getTestSetup().getAbsolutePath() + "");
+				+ getProjectSubmission().getTestSetup().getCanonicalPath());
 		// Specify the path of the build directory
 		javaArgs.add("-Dbuildserver.build.dir="
-				+ getDirectoryFinder().getBuildDirectory().getAbsolutePath());
+				+ getDirectoryFinder().getBuildDirectory().getCanonicalPath());
 		// Add trusted code bases
 		for (Iterator<TrustedCodeBase> i = getTrustedCodeBaseFinder()
 				.getCollection().iterator(); i.hasNext();) {
@@ -230,7 +231,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			javaArgs.add("-Djava.security.manager");
 			javaArgs.add("-Djava.security.policy=file:"
 					+ new File(getDirectoryFinder().getTestFilesDirectory(),
-							"security.policy").getAbsolutePath());
+							"security.policy").getCanonicalPath());
 		}
 		// XXX TestRunner
 		javaArgs.add(TestRunner.class.getName());
@@ -269,12 +270,19 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 
 		// Execute the test!
 		int exitCode;
-		// XXX What is this timing? This assumes we're timing the entire
-		// process, which
-		// we're clearly not doing from here
 		Alarm alarm = tester.getTestProcessAlarm();
 		CombinedStreamMonitor monitor = null;
 
+		System.out.println("java args: ");
+		for(String s : javaArgs)
+		    System.out.println("  " + s);
+		System.out.println("java env: ");
+        
+		if (environment != null) {
+		for(String e : environment)
+		    System.out.println("  " + e);
+		}
+		
 		Process testRunner = null;
 		boolean isRunning = false;
 		try {
@@ -402,6 +410,10 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 						+ " bytes of output");
 
 		return readTestOutcomeFromFile();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("Unexpected IO Exception", e);
+	    }
 	}
 
 	private String getFullTestName() {
