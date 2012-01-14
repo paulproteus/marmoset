@@ -62,8 +62,7 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
 		print(out, "section", course.getSection());
 		print(out, "semester" ,course.getSemester());
         print(out, "projectNumber",  project.getProjectNumber());
-		print(out, "projectNumber", project.getProjectNumber());
-        
+		 
 		print(out, "submitURL", request.getScheme() + "://"
 				+ request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath() + ECLIPSE_SUBMIT_PATH);
