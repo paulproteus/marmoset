@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.apache.log4j.Logger;
@@ -673,6 +674,13 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         return testMap.get(name);
     }
 
+    
+    public @CheckForNull TestOutcome getTest(String type, String number) {
+        for(TestOutcome t : testOutcomes)
+            if (type.equals(t.getTestType()) && number.equals(t.getTestNumber()))
+                return t;
+        return null;
+    }
     public Map<String,TestOutcome> getTestMap() {
         return testMap;
     }

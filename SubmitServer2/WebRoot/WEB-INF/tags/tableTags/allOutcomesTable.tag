@@ -4,7 +4,7 @@
 
 <h2>Test results</h2>
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewSourceLink" value="/view/"/>
 
 <table class="testResults">
 	<c:set var="numDisplayed" value="${numDisplayed + 1}" />
@@ -48,16 +48,6 @@
 			<c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
 			<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
-<!--
-				<c:choose>
-					<c:when test="${testProperties.language=='java' or testProperties.language=='Java'}">
-						<c:out value="${ss:hotlink(test, viewSourceLink)}" />
-					</c:when>
-					<c:otherwise>
-						<pre><c:out	value="${test.longTestResult}" /></pre>
-					</c:otherwise>
-				</c:choose>
--->
 			</td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>

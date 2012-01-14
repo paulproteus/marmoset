@@ -35,9 +35,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -634,15 +636,32 @@ public class TestOutcome implements Serializable {
 	    } while (i >= 0);
 	    return count;
 	}
+	
+	private static String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return URLEncoder.encode(s);
+        }
+
+	}
 	public static @HTML String getHotlink(
-			TestOutcome outcome, String viewSourceLink) {
+			TestOutcome outcome, String viewLink) {
+	    String viewSourceLink = viewLink + "/sourceCode.jsp";
 	    String fullResult = outcome.getLongTestResult();
 	    int length = fullResult.length();
 	    
 	    String result =  outcome.getHotlink(viewSourceLink);
 	    if (length > 5000) {
-	        result = String.format("<b>result is %d characters, %d lines long</b><br>%s", 
-	                length, numLines(fullResult),result);
+	        result = String.format(
+	                "<b><a href=\"%s/PrintTestOutcome?testRunPK=%d&testType=%s&testNumber=%s\">full result is %d characters, %d lines long</a></b><br>%s",
+	                viewLink,
+	                outcome.getTestRunPK(),
+	                urlEncode(outcome.getTestType()),
+	                urlEncode(outcome.getTestNumber()),
+	                length, 
+	                numLines(fullResult),
+	                result);
 	    }
 	    return XSSScrubber.asHTML(result);
 	}

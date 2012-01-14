@@ -1169,9 +1169,13 @@
         <servlet-name>TestingGround</servlet-name>
         <servlet-class>edu.umd.cs.submitServer.servlets.TestingGroundServlet</servlet-class>
     </servlet>
+	<servlet>
+        <servlet-name>PrintTestOutcome</servlet-name>
+        <servlet-class>edu.umd.cs.submitServer.servlets.PrintTestOutcome</servlet-class>
+    </servlet>
 	<servlet-mapping>
-        <servlet-name>TestingGround</servlet-name>
-        <url-pattern>/view/admin/TestingGround</url-pattern>
+        <servlet-name>PrintTestOutcome</servlet-name>
+        <url-pattern>/view/PrintTestOutcome</url-pattern>
     </servlet-mapping>
 
 	<servlet-mapping>

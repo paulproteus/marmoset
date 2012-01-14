@@ -110,7 +110,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 
 		request.setAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY,
 				userSession.isSuperUser());
-		request.setAttribute("instructorActionCapability", userSession.isSuperUser());
+		request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, userSession.isSuperUser());
 
 		TestRun testRun = null;
 		TestOutcomeCollection testOutcomeCollection = null;
