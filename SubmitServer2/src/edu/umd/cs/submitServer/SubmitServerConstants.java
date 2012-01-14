@@ -48,7 +48,7 @@ public interface SubmitServerConstants {
 	public static final String LDAP_AUTH_MECHANISM = "authentication.ldap.authentication_mechanism";
 	public static final String LDAP_PRINCIPAL_FORMAT = "authentication.ldap.principal.format";
 	
-	public static final String SKIP_LDAP = "authentication.ldap.skip";
+	public static final String SKIP_AUTHENTICATION = "authentication.skip";
 
 	// Keys used for setting global properties about the submit server's
 	// environment
@@ -103,6 +103,7 @@ public interface SubmitServerConstants {
 	public static final String TEST_RUN_LIST = "testRunList";
 	public static final String TEST_OUTCOMES_MAP = "testOutcomesMap";
 	public static final String INSTRUCTOR_CAPABILITY = "instructorCapability";
+	public static final String INSTRUCTOR_ACTION_CAPABILITY = "instructorActionCapability";
 	public static final String COURSE_LIST = "courseList";
 	/** All current courses that a student is not yet registered for. */
 	public static final String OPEN_COURSES = "openCourses";

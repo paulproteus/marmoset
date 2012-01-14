@@ -442,12 +442,13 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				request.setAttribute(COURSE, course);
 				request.setAttribute(PROJECT_LIST, projectList);
 				request.setAttribute(
-						SubmitServerConstants.INSTRUCTOR_CAPABILITY, Boolean
-								.valueOf(userSession
-										.hasInstructorCapability(coursePK)));
-				request.setAttribute("instructorActionCapability", Boolean
-						.valueOf(userSession
-								.hasInstructorActionCapability(coursePK)));
+						SubmitServerConstants.INSTRUCTOR_CAPABILITY, userSession
+										.hasInstructorCapability(coursePK));
+				request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, userSession
+								.hasInstructorActionCapability(coursePK));
+			} else if (user.getCanImportCourses()) {
+			        request.setAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY, true);
+			        request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, true);
 			}
 
 
