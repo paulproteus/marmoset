@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
 
+import javax.annotation.CheckForNull;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
@@ -354,8 +355,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @throws IOException
 	 *             if the directory couldn't be created
 	 */
-	private void createDirectory(File dir) throws IOException {
-
+	private void createDirectory(@CheckForNull File dir) throws IOException {
+	    if (dir == null)
+	        return;
 	    String dirName = dir.getAbsolutePath();
 		if (dir.exists()) {
 			if (dir.isFile()) {
@@ -417,13 +419,13 @@ public abstract class BuildServer implements ConfigurationKeys {
 			boolean useServletAppender)
 			throws MissingConfigurationPropertyException, IOException {
 
-		String logDir = config.getConfig().getRequiredProperty(LOG_DIRECTORY);
+		@CheckForNull File logDir = config.getLogDirectory();
 		String configResource;
 
-		if (logDir.equals("console")) {
+		if (logDir == null) {
 			configResource = LOG4J_CONSOLE_CONFIG;
 		} else {
-			System.setProperty("buildserver.log.dir", logDir);
+			System.setProperty("buildserver.log.dir", logDir.getAbsolutePath());
 			configResource = LOG4J_FILE_CONFIG;
 		}
 

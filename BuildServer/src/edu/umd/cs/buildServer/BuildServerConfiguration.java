@@ -36,6 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.annotation.CheckForNull;
+
 /**
  * BuildServerConfiguration Contains all information passed to the BuildServer
  * through the config.properties file. Ultimately this class should be created
@@ -71,7 +73,7 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	private File buildDirectory;
 	private File testFilesDirectory;
 	private File jarCacheDirectory;
-	private File logDirectory;
+	private @CheckForNull File logDirectory;
 
 	private boolean debugVerbose = true;
 	private boolean doNotLoop = true;
@@ -113,14 +115,6 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	}
 	public void loadAllProperties(Configuration config)
 			throws MissingConfigurationPropertyException {
-		// Basic configuration information about a buildServer.
-		// XXX Should I create my own directories or require that they be
-		// specified?
-		// The only thing I really need are the logfiles. Those really could go
-		// into
-		// some kind of central place. It would be nice if one big piece of java
-		// code managed
-		// all of its affairs.
 		setJavaHome(config.getStringProperty("java.home", ""));
 		setBuildServerWorkingDir(config.getStringProperty(BUILD_SERVER_HOME, START_DIRECTORY));
 		setBuildServerRoot(getBuildServerRoot());
@@ -314,7 +308,7 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	 * @return Returns the logDirectory.
 	 */
 	@Override
-	public File getLogDirectory() {
+	public @CheckForNull File getLogDirectory() {
 		return logDirectory;
 	}
 
@@ -323,7 +317,10 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	 *            The logDirectory to set.
 	 */
 	public void setLogDirectory(String logDirectory) {
-		this.logDirectory = new File(buildServerHome, logDirectory);
+	    if (logDirectory == null || logDirectory.equals("console"))
+	        this.logDirectory = null;
+	    else
+	        this.logDirectory = new File(buildServerHome, logDirectory);
 	}
 
 	
