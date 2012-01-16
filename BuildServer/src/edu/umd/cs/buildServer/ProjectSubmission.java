@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.CBuilderAndTesterFactory;
+import edu.umd.cs.buildServer.builder.Clover;
 import edu.umd.cs.buildServer.builder.JavaBuilderAndTesterFactory;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
@@ -278,7 +279,8 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	 *
 	 */
 	public boolean isPerformCodeCoverage() {
-		return getTestProperties().isPerformCodeCoverage();
+		return getTestProperties().isPerformCodeCoverage()
+		        &&  Clover.isAvailable();
 	}
 
 	/**

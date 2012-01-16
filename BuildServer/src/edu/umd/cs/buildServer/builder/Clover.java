@@ -9,6 +9,7 @@ public class Clover {
     static Method cloverInstrMainImpl, xmlReporterRunReport, cloverUtilsScrubCoverageData;
 
     static {
+        boolean a = false;
 
         try {
             cloverInstr = Class.forName("com.cenqua.clover.CloverInstr");
@@ -17,13 +18,14 @@ public class Clover {
             cloverUtilsScrubCoverageData = cloverUtils.getDeclaredMethod("scrubCoverageData", String.class, Boolean.TYPE);
             Class<?> xmlReporter = Class.forName("com.cenqua.clover.XMLReporter");
             xmlReporterRunReport = xmlReporter.getDeclaredMethod("runReport", String[].class);
-            available = true;
+            a = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        available = a;
 
     }
-    static boolean available = false;
+    static final boolean available;
 
     public static boolean isAvailable() {
         return available;

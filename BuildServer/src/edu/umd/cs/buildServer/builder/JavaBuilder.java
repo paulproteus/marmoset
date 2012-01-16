@@ -214,7 +214,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		// CODE COVERAGE:
 		// Use the programmic interface to Clover to instrument code for
 		// coverage
-		if (generateCodeCoverage) {
+		if (generateCodeCoverage && Clover.isAvailable()) {
 			// TODO Put this clover database in the student's build directory
 			// TODO Also clean up this file when we're done with it!
 			String cloverDBPath;
