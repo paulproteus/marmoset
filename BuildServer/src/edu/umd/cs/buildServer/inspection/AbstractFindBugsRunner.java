@@ -26,6 +26,7 @@
  */
 package edu.umd.cs.buildServer.inspection;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -78,6 +79,7 @@ public abstract class AbstractFindBugsRunner implements
 		return projectSubmission;
 	}
 
+	static boolean warnedAboutFindBugs = false;
 	/**
 	 * Execute FindBugs.
 	 */
@@ -87,16 +89,32 @@ public abstract class AbstractFindBugsRunner implements
 
 
 		Configuration config = projectSubmission.getConfig().getConfig();
-		String findBugsHome = config.getOptionalProperty("findbugs.home");
+		String findBugsHome = config.getStringProperty("findbugs.home",
+		        projectSubmission.getConfig().getBuildServerRoot() + "/findbugs");
 
-		String findbugsCmd = "findbugs";
-		if (findBugsHome != null) {
-			findbugsCmd = findBugsHome + "/bin/" + findbugsCmd;
-			System.setProperty("findbugs.home", findBugsHome);
-		} else
-			projectSubmission.getLog().warn(
-					"didn't find findbugs.home in config");
+		String findbugsCmd = null;
+		if (findBugsHome != null) {    
+		    File fb = new File(findBugsHome);
+		    File findBugsJar = new File(new File(fb, "lib"), "findbugs.jar");
+		    if (fb.exists() && fb.isDirectory() && fb.canRead() && findBugsJar.canRead() ) {
+		        findbugsCmd = "java";
+		        args.add("-jar");
+		        args.add(findBugsJar.getAbsolutePath());
+		    }
+		} 
+		
+		if (findbugsCmd == null) {
+		    findbugsCmd = "findbugs";
+		    if (!warnedAboutFindBugs) {
+		    projectSubmission.getLog().warn(
+                    "didn't find findbugs; hoping it is on the path");
+		    System.err.println("didn't find findbugs; hoping it is on the path");
+		    }
+		}
+			
 
+		
+		
 		// Build argument list
 		args.add(findbugsCmd);
 		args.add("-textui");
