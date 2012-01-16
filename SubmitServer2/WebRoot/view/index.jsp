@@ -134,36 +134,6 @@
         </div>
     </c:if>
 
-    <c:if test="${student.canImportCourses}">
-        <h2>Administrator actions</h2>
-        <ul>
-            <c:if test="${user.superUser}">
-                <li><a href="admin/">Administrator functions</a></li>
-            </c:if>
-            <c:choose>
-                <c:when test="${grades.server}">
-                    <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
-                    <li><a href="${importCourseLink}">Import course from grade server</a></li>
-                </c:when>
-                <c:otherwise>
-                    <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
-                    <li><a href="${createCourseLink}">Create course</a></li>
-                </c:otherwise>
-            </c:choose>
-            <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
-            <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>
-            <c:if test="${not empty userSession.superuserPK}">
-            <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />     
-               <li><form method="POST" action="${authenticateAsLink}">
-                <input type="hidden" name="studentPK" value="${userSession.superuserPK}"/>
-                <input type="submit" value="Become superuser" />
-                </form>
-           </li>
-            </c:if>
-        </ul>
-    </c:if>
-
-
     <ss:footer />
 
     <script type="text/javascript">

@@ -10,30 +10,9 @@
  <a href="<c:url value='/view/admin/index.jsp'/>">SuperUser</a> |
 </c:if>
 
-<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService' || (user.password != NULL && user.password != '0')}">
-	<c:url var="changePasswordLink" value="/view/changePassword.jsp">
-		<c:param name="studentPK" value="${user.studentPK}"/>
-	</c:url>
-	<a href="${changePasswordLink}">Change Password</a> |
+<c:if test="${user.canImportCourses}">
+ <a href="<c:url value='/view/admin.jsp'/>">Admin</a> |
 </c:if>
-
-
-<c:choose>
-    <c:when test="${true}">
-    <!--  docs out of date, not provided -->
-    </c:when>
-	<c:when test="${user.superUser}">
-		<a href="<c:url value='/docs/MarmosetHelp/'/>" title="Access documentation" target="_blank">Admin's Guide</a> |
-		<a href="<c:url value='/docs/MarmosetHelp/StudentGuide/'/>" title="Access student documentation" target="_blank">Student's Guide</a> |
-	</c:when>
-	<c:when test="${instructorCapability && course == null}">
-		<a href="<c:url value='/docs/MarmosetHelp/submitserver_usersguide.html'/>" title="Access documentation" target="_blank">Instructor's Guide</a> |
-	</c:when>
-	<c:otherwise>
-		<!-- <a href="<c:url value='/docs/MarmosetHelp/StudentGuide.pdf'/>" title="Access documentation" target="_blank">Student's Guide</a> | -->
-		<a href="<c:url value='/docs/MarmosetHelp/StudentGuide/'/>" title="Access documentation" target="_blank">Student's Guide</a> |
-	</c:otherwise>
-</c:choose>
 
 <c:if test="${!singleCourse}">
  <a href="<c:url value='/view/index.jsp'/>"
