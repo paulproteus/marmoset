@@ -39,8 +39,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guice-3.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/gwt-dispatch-1.2.0.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guava-10.0.1.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guava-gwt-10.0.1.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/openid4java-0.9.6.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/gin-1.5-post-gwt-2.2.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/guice-assistedinject-3.0.jar"/>
