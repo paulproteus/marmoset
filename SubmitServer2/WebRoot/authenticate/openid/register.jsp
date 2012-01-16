@@ -48,23 +48,21 @@ form li.required label {font-weight: bold;}
 		</c:set>
 		<input type="hidden" name="target" value="${target}" />
 		<ul>
+                    <li class="required">
+                <label for="firstname-input">Name:</label>
+                <input type="text" name="firstname" id="firstname-input" placeholder="First" class="required" required="required"/>
+                <input type="text" name="lastname" id="lastname-input"  placeholder="Last" class="required" required="required"/>
+            </li>
+        <li class="required">
+                <label for="email-input">Email:</label>
+                <input type="text" name="email" id="email-input"  placeholder="email" class="email required" required="required"/>
+            </li>
+        
 			<li class="required">
 				<label for="login-input">Username:</label>
-				<input type="text" name="login" id="login-input" class="required"/>
+				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required"/>
 			</li>
-			<li class="required">
-				<label for="email-input">Email:</label>
-				<input type="text" name="email" id="email-input" class="email required"/>
-			</li>
-			<li class="required">
-				<label for="firstname-input">First Name:</label>
-				<input type="text" name="firstname" id="firstname-input" class="required"/>
-			</li>
-			<li class="required">
-				<label for="lastname-input">Last Name:</label>
-				<input type="text" name="lastname" id="lastname-input" class="required"/>
-			</li>
-			</ul>
+							</ul>
 		    <input type="submit" value="Register" />
 	</form>
 	<ss:footer />
