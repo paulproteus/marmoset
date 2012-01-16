@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import edu.umd.cs.marmoset.modelClasses.BackgroundData;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
@@ -56,7 +55,6 @@ import edu.umd.cs.submitServer.UserSession;
 
 
 public class PerformLogin extends SubmitServerServlet {
-
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -203,12 +201,7 @@ public class PerformLogin extends SubmitServerServlet {
 			}
 
 		}
-		// set flag for backgroundData in the session
-		BackgroundData backgroundData = BackgroundData.lookupByStudentPK(
-				student.getStudentPK(), conn);
-		if (backgroundData != null)
-			userSession.setBackgroundDataComplete(backgroundData.isComplete());
-
+		
 		for (StudentRegistration registration : collection) {
 			Course course = Course.lookupByStudentRegistrationPK(
 					registration.getStudentRegistrationPK(), conn);

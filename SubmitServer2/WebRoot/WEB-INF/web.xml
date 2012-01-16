@@ -689,14 +689,6 @@
 		<url-pattern>/view/sourceFiles.jsp</url-pattern>
 	</filter-mapping>
 
-	<filter>
-		<filter-name>BackgroundDataFilter</filter-name>
-		<filter-class>edu.umd.cs.submitServer.filters.BackgroundDataFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>BackgroundDataFilter</filter-name>
-		<url-pattern>/view/background.jsp</url-pattern>
-	</filter-mapping>
 
 
 	<filter>
@@ -768,16 +760,6 @@
 	<filter-mapping>
 		<filter-name>AllCoursesFilter</filter-name>
 		<url-pattern>/demo.jsp</url-pattern>
-	</filter-mapping>
-
-	<!--
-		Hack alert:  Because I'm using a response.forward() rather than a redirect
-		I'm adding another filter-mapping to the servlet I forward to.  This is a hack
-		But I don't know any other ways to do it.
-	-->
-	<filter-mapping>
-		<filter-name>AllCoursesFilter</filter-name>
-		<url-pattern>/authenticate/RegisterDemoAccount</url-pattern>
 	</filter-mapping>
 
 
@@ -1053,18 +1035,6 @@
 		<servlet-class>edu.umd.cs.submitServer.servlets.UpdateProject</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>UpdateBackgroundData</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.UpdateBackgroundData</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>RegisterDemoAccount</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterDemoAccount</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>PerformDemoLogin</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.PerformDemoLogin</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>LogEclipseLaunchEvent</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.LogEclipseLaunchEvent</servlet-class>
 	</servlet>
@@ -1124,10 +1094,6 @@
 	<servlet>
 		<servlet-name>SubmitProjectViaBlueJSubmitter</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.SubmitProjectViaBlueJSubmitter</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ChangePassword</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.ChangePassword</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>RegisterInstructor</servlet-name>
@@ -1369,18 +1335,6 @@
 		<url-pattern>/action/instructor/UpdateProject</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>UpdateBackgroundData</servlet-name>
-		<url-pattern>/action/UpdateBackgroundData</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>RegisterDemoAccount</servlet-name>
-		<url-pattern>/authenticate/RegisterDemoAccount</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>PerformDemoLogin</servlet-name>
-		<url-pattern>/authenticate/PerformDemoLogin</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>LogEclipseLaunchEvent</servlet-name>
 		<url-pattern>/eclipse/LogEclipseLaunchEvent</url-pattern>
 	</servlet-mapping>
@@ -1433,10 +1387,6 @@
 	<servlet-mapping>
 		<servlet-name>SubmitProjectViaBlueJSubmitter</servlet-name>
 		<url-pattern>/bluej/SubmitProjectViaBlueJSubmitter</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ChangePassword</servlet-name>
-		<url-pattern>/action/ChangePassword</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RegisterInstructor</servlet-name>
