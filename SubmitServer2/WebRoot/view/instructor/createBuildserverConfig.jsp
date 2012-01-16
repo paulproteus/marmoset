@@ -25,6 +25,14 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<c:if test="${fn:length(instructorCourses) == 1}">
+<jsp:forward page="/action/instructor/CreateBuildserverConfigFile">
+<jsp:param name="buildserverCourse" value="${instructorCourses[0]}"/>
+</jsp:forward>
+</c:if>
+
 <!DOCTYPE HTML>
 <html>
 

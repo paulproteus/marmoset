@@ -505,6 +505,9 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 
 			request.setAttribute("instructorViewOfStudent",
 					Boolean.valueOf(viewOfAnotherStudentsCode));
+			
+			request.setAttribute("instructorCourses",
+			       userSession.isSuperUser() ? courseList :  userSession.getInstructorCourses());
 			if (testRun != null)
 				request.setAttribute(TEST_RUN, testRun);
 			if (testOutcomeCollection != null)

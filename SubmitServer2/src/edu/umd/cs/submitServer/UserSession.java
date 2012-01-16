@@ -28,8 +28,10 @@
  */
 package edu.umd.cs.submitServer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,6 +79,12 @@ public class UserSession {
 			return Collections.emptyMap();
 		return MarmosetUtilities.setAsMap(instructorCapabilitySet);
 	}
+   public List<Integer> getInstructorCourses() {
+	        if (!capabilitiesActivated)
+	            return Collections.emptyList();
+	        return new ArrayList<Integer>(instructorActionCapabilitySet);
+	    }
+
 
 	public boolean hasInstructorCapability(Integer coursePK) {
 		return capabilitiesActivated
@@ -156,11 +164,11 @@ public class UserSession {
         this.onlyCoursePK = onlyCoursePK;
     }
     
-    public void setSuperuserPK(@Nonnull Integer superuserPK) {
+    public void setSuperuserPK(@Nonnull @Student.PK Integer superuserPK) {
 	    this.superuserPK = superuserPK;
     }
     
-    public void setShadowAccountPK(@NonNull Integer shadowAccountPK) {
+    public void setShadowAccountPK(@NonNull @Student.PK Integer shadowAccountPK) {
 	    this.shadowAccountPK = shadowAccountPK;
     }
     
