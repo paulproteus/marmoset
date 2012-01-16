@@ -99,7 +99,7 @@ public class TestResultHistory extends SubmitServerServlet {
 			HashMap<Integer, TestOutcomeCollection> testRuns = new HashMap<Integer, TestOutcomeCollection>();
 
 			Timestamp when[] = new Timestamp[numDays];
-			Map asOf[] = new Map[numDays];
+			Map<?,?> asOf[] = new Map<?,?>[numDays];
 			SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
 			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
 			out.println("<table><tr><th>as of " + timeFormat.format(mostRecent));
