@@ -66,8 +66,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	private String testMethod;
 	private JUnitTestCase testCase;
 	private int nextTestNumber;
-	@Deprecated
-	private boolean doNotReportProcessTimeout;
 	private String[] environment = null;
 
 	/**
@@ -89,7 +87,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		this.testType = testType;
 		this.classPath = classPath;
 		this.nextTestNumber = TestOutcome.FIRST_TEST_NUMBER;
-		this.doNotReportProcessTimeout = false;
 	}
 
 	/**
@@ -121,20 +118,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		this.nextTestNumber = startTestNumber;
 	}
 
-	/**
-	 * @deprecated Specify whether or not process timeout should be ignored. By
-	 *             default, process timeout is <em>not</em> ignored, and results
-	 *             in the entire test class being marked as "could not run". If
-	 *             process timeout is ignored, we will not generate <em>any</em>
-	 *             TestOutcome(s).
-	 *
-	 * @param doNotReportProcessTimeout
-	 *            true if process timeout should be ignored, false if not
-	 */
-	@Deprecated
-	public void setDoNotReportProcessTimeout(boolean doNotReportProcessTimeout) {
-		this.doNotReportProcessTimeout = doNotReportProcessTimeout;
-	}
 
 	public Logger getLog() {
 		return tester.getLog();
@@ -273,15 +256,17 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		Alarm alarm = tester.getTestProcessAlarm();
 		CombinedStreamMonitor monitor = null;
 
-		System.out.println("java args: ");
-		for(String s : javaArgs)
-		    System.out.println("  " + s);
-		System.out.println("java env: ");
-        
-		if (environment != null) {
-		for(String e : environment)
-		    System.out.println("  " + e);
-		}
+            if (false) {
+                System.out.println("java args: ");
+                for (String s : javaArgs)
+                    System.out.println("  " + s);
+                System.out.println("java env: ");
+
+                if (environment != null) {
+                    for (String e : environment)
+                        System.out.println("  " + e);
+                }
+            }
 		
 		Process testRunner = null;
 		boolean isRunning = false;
