@@ -34,6 +34,13 @@
 	title="Submit project ${project.projectNumber} for ${course.courseName} in ${course.semester}" />
 
 <body>
+<script
+  src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
+  type="text/javascript"></script>
+  <c:url var="jsBase" value="/js" />
+  <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
+  
+  
 <ss:header />
 <ss:breadCrumb />
 
@@ -69,10 +76,6 @@ so don't worry if your submission includes them.
 All of the submitted files need to come from the same directory.
 This works only on browsers that support HTML 5, and
  won't work if you need to submit files from different directories.
- <p><em>This is probably won't work for Java projects</em>, since they generally require 
- the files to be submitted within a certain directory structure. Instead, use the <a href="http://www.cs.umd.edu/~pugh/eclipse">
- Course Project Manager plugin for eclipse</a>, the command line submission tool, or create and submit a zip file.
-
 
 <form name="submitform" enctype="multipart/form-data"
 	action="<c:url value="/action/SubmitProjectViaWeb"/>" method="POST"><input type="hidden"
@@ -80,7 +83,7 @@ This works only on browsers that support HTML 5, and
 	name="submitClientTool" value="web" />
 <table class="form">
 <tr><th colspan=2>file(s) for submission</th>
-<tr><td>File(s) to Submit: <td class="input"><input type="file" name="file" size=40 multiple/>
+<tr><td>File(s) to Submit: <td class="input"><input type="file" name="file" class="multi" size=40 multiple/>
 <tr class="submit"><td class="submit" colspan="2"><input type="submit" value="Submit project!">
 </table>
 </form>

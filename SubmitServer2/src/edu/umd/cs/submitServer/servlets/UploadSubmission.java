@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -114,6 +115,7 @@ public class UploadSubmission extends SubmitServerServlet {
 		byte[] zipOutput = null; // zipped version of bytesForUpload
 		boolean fixedZip = false;
 		try {
+
 			if (files.size() > 1) {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				ZipOutputStream zos = new ZipOutputStream(bos);
@@ -176,7 +178,10 @@ public class UploadSubmission extends SubmitServerServlet {
 				// NOTE: I use both MagicMatch and FormatDescription (above)
 				// because MagicMatch was having
 				// some trouble identifying all zips
-				String mime = null;
+			    
+				String mime = URLConnection.getFileNameMap().getContentTypeFor(fileName);
+						    
+				if (mime == null)
 				try {
 					MagicMatch match = Magic
 							.getMagicMatch(bytesForUpload, true);
@@ -244,6 +249,11 @@ public class UploadSubmission extends SubmitServerServlet {
 		try {
 			conn = getConnection();
 			Submission submission = null;
+			Integer baselinePK = project.getArchivePK();
+			if (baselinePK != null && baselinePK.intValue() != 0) {
+			    byte canonicalSubmission [] = project.downloadArchive(conn);
+			    zipOutput = FixZip.adjustZipNames(canonicalSubmission, zipOutput);
+			}
 			int archivePK = Submission.uploadSubmissionArchive(zipOutput, conn);
 			synchronized(UPLOAD_LOCK) {
 				final int NUMBER_OF_ATTEMPTS = 2;
