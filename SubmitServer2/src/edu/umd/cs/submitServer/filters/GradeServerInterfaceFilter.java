@@ -2,6 +2,7 @@ package edu.umd.cs.submitServer.filters;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -18,8 +19,16 @@ public abstract class GradeServerInterfaceFilter extends SubmitServerFilter {
         super.init(filterConfig);
         ServletContext servletContext = filterConfig.getServletContext();
 
-        if (filterConfig.getInitParameter("grades.server") != null)
+        String user = servletContext.getInitParameter("grades.user");
+        if (user != null)
             gradeServerDatabaseProperties = new GradeServerDatabaseProperties(servletContext);
+        else {
+            for( Enumeration<String> e = servletContext.getInitParameterNames();
+                    e.hasMoreElements();) {
+                String s = e.nextElement();
+                System.out.println(s);
+            }
+        }
     }
 
     protected boolean supportsGradeServer() {

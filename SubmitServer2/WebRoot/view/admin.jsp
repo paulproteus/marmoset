@@ -47,10 +47,10 @@
 
         <ul>
             <c:if test="${user.superUser}">
-                <li><a href="admin/">Administrator functions</a></li>
+                <li><a href="admin/">Superuser functions</a></li>
             </c:if>
             <c:choose>
-                <c:when test="${grades.server}">
+                <c:when test="${gradesServer}">
                     <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
                     <li><a href="${importCourseLink}">Import course from grade server</a></li>
                 </c:when>

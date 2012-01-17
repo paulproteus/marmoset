@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
-import edu.umd.cs.submitServer.UserSession;
 
 public class AuthenticateAs extends SubmitServerServlet {
     @Override
