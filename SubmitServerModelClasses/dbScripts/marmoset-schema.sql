@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `buildservers` (
   `system_load` varchar(250) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `code_reviewer` (
   KEY `code_review_pk` (`student_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`),
   KEY `submission_pk` (`submission_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Assignment of a reviewer to a code review' AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Assignment of a reviewer to a code review'  ;
 
 -- --------------------------------------------------------
 
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `code_review_assignment` (
   `anonymous` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`code_review_assignment_pk`),
   KEY `project_pk` (`project_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `code_review_comment` (
   PRIMARY KEY (`code_review_comment_pk`),
   KEY `code_reviewer_pk` (`code_reviewer_pk`),
   KEY `code_review_thread_pk` (`code_review_thread_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `code_review_thread` (
   PRIMARY KEY (`code_review_thread_pk`),
   KEY `submission_pk` (`submission_pk`),
   KEY `rubric_evaluation_pk` (`rubric_evaluation_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `courses` (
   PRIMARY KEY (`course_pk`),
   UNIQUE KEY `submit_key` (`submit_key`),
   UNIQUE KEY `buildserver_key` (`buildserver_key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
   PRIMARY KEY (`eclipse_launch_event_pk`),
   KEY `project_pk` (`project_pk`),
   KEY `student_registration_pk` (`student_registration_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `errors` (
   KEY `course_pk` (`course_pk`),
   KEY `project_pk` (`project_pk`),
   KEY `submission_pk` (`submission_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=279 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
@@ -251,7 +251,7 @@ CREATE TABLE IF NOT EXISTS `log_entries` (
   PRIMARY KEY (`log_pk`),
   KEY `course_pk` (`course_pk`),
   KEY `student_pk` (`student_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -288,7 +288,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `diff_against` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`project_pk`),
   KEY `course_pk` (`course_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `data` varchar(120) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`rubric_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
   PRIMARY KEY (`rubric_evaluation_pk`),
   KEY `rubric_pk` (`rubric_pk`,`code_reviewer_pk`,`code_review_thread_pk`),
   KEY `status` (`status`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
@@ -366,7 +366,7 @@ CREATE TABLE IF NOT EXISTS `students` (
   PRIMARY KEY (`student_pk`),
   UNIQUE KEY `login_name` (`login_name`),
   KEY `campus_uid` (`campus_uid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -404,7 +404,7 @@ CREATE TABLE IF NOT EXISTS `student_registration` (
   KEY `student_pk` (`student_pk`),
   KEY `course_pk` (`course_pk`),
   KEY `cvs_account` (`class_account`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS `submissions` (
   KEY `build_status` (`build_status`),
   KEY `submission_timestamp` (`submission_timestamp`),
   KEY `current_test_run_pk` (`current_test_run_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -478,7 +478,7 @@ CREATE TABLE IF NOT EXISTS `submission_archives` (
   `checksum` varchar(32) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -491,7 +491,7 @@ CREATE TABLE IF NOT EXISTS `test` (
   `size` int(11) NOT NULL,
   `result` text COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=139 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
@@ -542,7 +542,7 @@ CREATE TABLE IF NOT EXISTS `test_runs` (
   PRIMARY KEY (`test_run_pk`),
   KEY `test_runs_ibfk_1` (`submission_pk`),
   KEY `checksum_classfiles` (`checksum_classfiles`(4))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -565,7 +565,7 @@ CREATE TABLE IF NOT EXISTS `test_setups` (
   `num_secret_tests` smallint(3) NOT NULL DEFAULT '0',
   `archive_pk` int(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`test_setup_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 -- --------------------------------------------------------
 
@@ -579,7 +579,7 @@ CREATE TABLE IF NOT EXISTS `test_setup_archives` (
   `checksum` varchar(32) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
