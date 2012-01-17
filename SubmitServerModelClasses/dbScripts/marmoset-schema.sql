@@ -22,30 +22,6 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `background_data`
---
-
-CREATE TABLE IF NOT EXISTS `background_data` (
-  `student_pk` int(20) unsigned NOT NULL DEFAULT '0',
-  `gender` enum('female','male','na') DEFAULT NULL,
-  `ethnic_racial_association` enum('yes','na') DEFAULT NULL,
-  `AmericanIndian` enum('American Indian') DEFAULT NULL,
-  `Asian` enum('Asian') DEFAULT NULL,
-  `Black` enum('Black') DEFAULT NULL,
-  `Caucasian` enum('Caucasian') DEFAULT NULL,
-  `LatinoLatina` enum('Latino/Latina') DEFAULT NULL,
-  `age` enum('18-22','23-29','30+','na') DEFAULT NULL,
-  `high_school_country` varchar(80) DEFAULT NULL,
-  `prior_programming_experience` enum('none','Community College','Other UM System Institution','Other non-UM System Institution','High School AP Course','Other High School Course','na') DEFAULT NULL,
-  `other_institution` varchar(80) DEFAULT NULL,
-  `a_score` int(1) DEFAULT NULL,
-  `ab_score` int(1) DEFAULT NULL,
-  `umcp_placement_exam` enum('none','cmsc131','cmsc132','cmsc212','na') DEFAULT NULL,
-  `umcp_placement_exam_result` enum('passed','marginally passed','failed') DEFAULT NULL,
-  `major` enum('CS','CE','Math','Other','na') DEFAULT NULL,
-  PRIMARY KEY (`student_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -479,19 +455,6 @@ CREATE TABLE IF NOT EXISTS `submission_archives` (
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8  ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `test`
---
-
-CREATE TABLE IF NOT EXISTS `test` (
-  `pk` int(11) NOT NULL AUTO_INCREMENT,
-  `size` int(11) NOT NULL,
-  `result` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
 
 -- --------------------------------------------------------
 
