@@ -39,20 +39,18 @@ public class RegisterOpenId extends SubmitServerServlet {
 			boolean emptyDatabase = !Student.existAny(conn);
 			
 			// Create normal user account.
-			Student student = Student.insertOrUpdateByUID(uid, firstname, lastname, loginName, email, conn);
 			
 			if (emptyDatabase) {
-				// This is the first user to register, so need to add admin account for them.
-				Student admin = new Student();
-				admin.setLastname(student.getLastname());
-				admin.setFirstname(student.getFirstname());
-				admin.setCampusUID(student.getCampusUID());
-				admin.setLoginName(student.getLoginName()+ "-admin");
-				admin.setEmail(student.getEmail());
+			    Student student = makeStudent(uid, firstname, lastname, loginName, email);
+	            student.setCanImportCourses(true);
+	            student.insert(conn);
+				Student admin = makeStudent(uid, firstname, lastname, loginName + "-admin", email);
 				admin.setSuperUser(true);
-				admin = admin.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
+				admin.insert(conn);
 				PerformLogin.setUserSession(req.getSession(), admin, conn);
 			} else {
+			    Student student = Student.insertOrUpdateByUID(uid, firstname, lastname, loginName, email, conn);
+	            
 				PerformLogin.setUserSession(req.getSession(), student, conn);
 			}
 		} catch (SQLException e) {
@@ -71,4 +69,24 @@ public class RegisterOpenId extends SubmitServerServlet {
 
 		
 	}
+
+    /**
+     * @param uid
+     * @param firstname
+     * @param lastname
+     * @param loginName
+     * @param email
+     * @return
+     */
+    public Student makeStudent(String uid, String firstname, String lastname, String loginName, String email) {
+        Student student = new Student();
+        student.setLoginName(loginName);
+        student.setCampusUID(uid);
+        student.setFirstname(firstname);
+        student.setLastname(lastname);
+        if (email != null) {
+          student.setEmail(email);
+        }
+        return student;
+    }
 }

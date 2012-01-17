@@ -334,7 +334,7 @@ public class Student  implements Comparable<Student> {
    * @param conn the connection to the database
    * @throws SQLException if something goes wrong or a duplicate is found
    */
-  private Student insert(Connection conn) throws SQLException {
+  public Student insert(Connection conn) throws SQLException {
     Student student = lookupByCampusUID(getCampusUID(), conn);
 
     if (student != null && student.getLoginName().equals(getLoginName())) {
@@ -843,70 +843,7 @@ public class Student  implements Comparable<Student> {
         return getFromPreparedStatement(stmt);
     }
 
-    /**
-     * Static factory method that creates a student record with account_type='demo' that is
-     * suitable for use with a demo server
-     * @param emailAddress The email address of the demo user.
-     * @param firstname The demo user's firstname.
-     * @param lastname The demo user's lastname.
-     * @param conn The connection to the database.
-     * @return A fresh student record for this account.
-     * @throws SQLException
-     *
-     * TODO check for duplicates!
-     */
-    public static Student createNewDemoAccount(
-            String emailAddress,
-            String firstname,
-            String lastname,
-            Connection conn)
-    throws SQLException
-    {
-        Student student = new Student();
-        // we're overloading campusUID with the email address for demo accounts
-        student.setLoginName(emailAddress);
-        // we're also overloading employeeNum with the password for demo accounts
-        student.setPassword(nextRandomPassword());
-        // Put something random in here; we're going to change this to the autoupdate
-        // value as soon as the insert succeeds
-        student.setCampusUID(nextRandomPassword());
-        student.setFirstname(firstname);
-        student.setLastname(lastname);
-        //student.setAccountType(DEMO_ACCOUNT);
-        student.insert(conn);
-        // Reset the employeeNum so that it matches the studentPK
-        // Demo accounts don't really need an employeeNum.
-        student.setCampusUID(Integer.toString(student.getStudentPK()));
-        student.update(conn);
-        return student;
-    }
-
-    /**
-     * Sets the account_type for this student record to 'demo' for use with a demo server
-     * @param conn The connection to the database.
-     * @throws SQLException
-     */
-    private void makeDemoAccount(Connection conn)
-    throws SQLException
-    {
-        // Make sure that we don't try to change the status of a student record with no
-        // studentPK.  This usually means that we forgot to insert this record into the DB.
-        if (studentPK == null)
-            throw new IllegalStateException("You cannot update a student record with null " +
-                " for a studentPK.  Did you forget to insert this record into the DB?");
-
-        String update =
-            " UPDATE " +TABLE_NAME+
-            " SET account_type = " +DEMO_ACCOUNT+
-            " WHERE student_pk = ? ";
-
-        PreparedStatement stmt=null;
-        try {
-            stmt = conn.prepareStatement(update);
-        } finally {
-            Queries.closeStatement(stmt);
-        }
-    }
+   
 
     // [NAT]
     /**
