@@ -59,6 +59,20 @@
         <c:choose>
             <c:when test="${empty courseList}">
                 <p>Not registered for any courses</p>
+                 <c:if test="${user.canImportCourses}">
+                 <ul>
+            <c:choose>
+                <c:when test="${gradesServer}">
+                    <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
+                    <li><a href="${importCourseLink}">Import course from grade server</a></li>
+                </c:when>
+                <c:otherwise>
+                    <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
+                    <li><a href="${createCourseLink}">Create course</a></li>
+                </c:otherwise>
+            </c:choose>
+            </ul>
+            </c:if>
             </c:when>
             <c:otherwise>
                 <ul>

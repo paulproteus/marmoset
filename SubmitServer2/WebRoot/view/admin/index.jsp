@@ -189,7 +189,6 @@
     </c:if>
 
 
-<p>grades.server: ${gradesServer}
     <h1>Administrative actions</h1>
     <c:if test="${gradesServer}">
         <h2>
@@ -230,8 +229,6 @@
     
     <h2>User actions</h2>
 
-
-    <c:if test="${! grade.server}">
         <h3>Allow course creation</h3>
         <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
         <p>
@@ -246,7 +243,7 @@
                 </c:forEach>
             </select> <input type="submit" value="Allow course creation" />
         </form>
-    </c:if>
+
 
     <h3>Authenticate as</h3>
     <p>This allows you to log in as any other user, and allow you to view the submit server as that user would. Once

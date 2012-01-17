@@ -496,10 +496,15 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			    request.setAttribute("submissionsWithReviews", submissionsWithReviews);
 			}
 
-	
+            if (student == null && studentPK != null) {
+                student = Student.lookupByStudentPK(studentPK, conn);
+                request.setAttribute(STUDENT, student);
+            }
+            
 			if (viewOfAnotherStudentsCode
 					&& !isCodeReviewer
-					&& !userSession.hasInstructorCapability(coursePK)) {
+					&& !userSession.hasInstructorCapability(coursePK)
+					&& !user.getCampusUID().equals(student.getCampusUID())) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 						"Authentication Error");
 				return;
