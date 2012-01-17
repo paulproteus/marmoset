@@ -28,6 +28,7 @@
  */
 package edu.umd.cs.submitServer.servlets;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
 import edu.umd.cs.submitServer.IAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
@@ -250,7 +252,9 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		// Otherwise we *MUST* be able to load the class used for authentication
 		// or we're screwed.
 		String authenticationServiceClassname = getServletContext()
-				.getInitParameter(AUTHENTICATION_SERVICE);
+				.getInitParameter(AUTHENTICATION_LDAP_SERVICE);
+		if (authenticationServiceClassname == null)
+		    authenticationServiceClassname = GenericLDAPAuthenticationService.class.getName();
 		getSubmitServerServletLog()
 				.debug("authenticationServiceClass: "
 						+ authenticationServiceClassname);
@@ -295,4 +299,18 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		+ project.getProjectPK();
 
 	}
+	
+	public static String stripNewlines(String s) {
+        if (s == null)
+            return s;
+        return s.replaceAll("[\r\n]", " ");
+    }
+	public static void printProperty(PrintWriter out, String key, String value) {
+        if (value == null || value.length() == 0) return;
+        out.println(key+"=" + stripNewlines(value));
+    }
+	public static void printComment(PrintWriter out, String comment) {
+        if (comment == null || comment.length() == 0) return;
+        out.println("# " +  stripNewlines(comment));
+    }
 }

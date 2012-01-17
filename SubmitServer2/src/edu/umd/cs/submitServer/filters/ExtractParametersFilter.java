@@ -100,6 +100,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		Integer codeReviewerPK = parser.getIntegerParameter("codeReviewerPK", null);
 		Integer codeReviewAssignmentPK = parser.getIntegerParameter("codeReviewAssignmentPK", null);
 
+		String gradesServer = req.getServletContext().getInitParameter("grades.server");
+        request.setAttribute("gradesServer", gradesServer);  
 		MultipartRequest multipartRequest = (MultipartRequest) request
 				.getAttribute(MULTIPART_REQUEST);
 		if (multipartRequest != null) {

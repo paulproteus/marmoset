@@ -64,21 +64,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         return accessLog;
     }
 
-    /**
-     * The doPost method of the servlet. <br>
-     * 
-     * This method is called when a form has its tag value method equals to
-     * post.
-     * 
-     * @param request
-     *            the request send by the client to the server
-     * @param response
-     *            the response send by the server to the client
-     * @throws ServletException
-     *             if an error occurred
-     * @throws IOException
-     *             if an error occurred
-     */
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         boolean transactionSuccess = false;
@@ -168,20 +154,11 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
             StudentSubmitStatus submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
                     studentRegistration.getStudentRegistrationPK(), conn);
 
-            String classAccount = studentRegistration.getClassAccount();
-            String oneTimePassword = submitStatus.getOneTimePassword();
-
+           
             conn.commit();
             transactionSuccess = true;
 
-            // write out the classAccount/oneTimePassword pair
-            response.setContentType("text/plain");
-            PrintWriter out = response.getWriter();
-            out.println("cvsAccount=" + classAccount);
-            out.println("classAccount=" + classAccount);
-            out.println("oneTimePassword=" + oneTimePassword);
-            out.flush();
-            out.close();
+            generateSubmitUser(response, studentRegistration, project, submitStatus);
 
             getAccessLog().info(
                     "studentPK " + studentRegistration.getStudentPK() + " successful "
@@ -195,6 +172,26 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         } finally {
             rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
         }
+    }
+
+
+    public static void generateSubmitUser(HttpServletResponse response, StudentRegistration studentRegistration,
+            Project project, StudentSubmitStatus submitStatus) throws IOException {
+        String classAccount = studentRegistration.getClassAccount();
+        String oneTimePassword = submitStatus.getOneTimePassword();
+
+        // write out the classAccount/oneTimePassword pair
+        response.setContentType("text/plain");
+        response.setHeader("Content-Disposition", "inline; filename=\".submitUser\"");
+        PrintWriter out = response.getWriter();
+        printProperty(out,"classAccount" , classAccount);
+        printProperty(out, "cvsAccount" , classAccount);
+        printProperty(out,"oneTimePassword" , oneTimePassword);
+        out.println();
+        printComment(out, " for " + studentRegistration.getFullname());
+        printComment(out, " project " + project.getProjectNumber() + " : " + project.getTitle());
+        out.flush();
+        out.close();
     }
 
     boolean skipLDAP;

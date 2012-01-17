@@ -35,35 +35,23 @@ import edu.umd.cs.marmoset.modelClasses.Project;
 
 public class CreateDotSubmitFile extends SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		Course course = (Course) request.getAttribute("course");
 		Project project = (Project) request.getAttribute("project");
 		response.setContentType("text/plain");
-		PrintWriter out = response.getWriter();
-		print(out, "courseName", course.getCourseName());
-		print(out, "courseKey" , course.getSubmitKey());
+		response.setHeader("Content-Disposition", "inline; filename=\".submit\"");
         
-		print(out, "section", course.getSection());
-		print(out, "semester" ,course.getSemester());
-        print(out, "projectNumber",  project.getProjectNumber());
+		PrintWriter out = response.getWriter();
+		printProperty(out, "courseName", course.getCourseName());
+		printProperty(out, "courseKey" , course.getSubmitKey());
+        
+		printProperty(out, "section", course.getSection());
+		printProperty(out, "semester" ,course.getSemester());
+        printProperty(out, "projectNumber",  project.getProjectNumber());
 		 
-		print(out, "submitURL", request.getScheme() + "://"
+		printProperty(out, "submitURL", request.getScheme() + "://"
 				+ request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath() + ECLIPSE_SUBMIT_PATH);
 
@@ -71,9 +59,7 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
 		out.close();
 	}
 	
-	private void print(PrintWriter out, String key, String value) {
-	    if (value == null || value.length() == 0) return;
-	    out.println(key+"="+value);
-	}
+	
+	
 
 }

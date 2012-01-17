@@ -189,8 +189,9 @@
     </c:if>
 
 
+<p>grades.server: ${gradesServer}
     <h1>Administrative actions</h1>
-    <c:if test="${grader.server}">
+    <c:if test="${gradesServer}">
         <h2>
             Synchronize with <a href="http://grades.cs.umd.edu">grades.cs.umd.edu</a>
         </h2>

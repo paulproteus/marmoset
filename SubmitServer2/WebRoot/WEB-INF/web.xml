@@ -1112,6 +1112,11 @@
 		<servlet-class>edu.umd.cs.submitServer.servlets.CreateDotSubmitFile</servlet-class>
 	</servlet>
 	<servlet>
+        <servlet-name>CreateDotSubmitUserFile</servlet-name>
+        <servlet-class>edu.umd.cs.submitServer.servlets.CreateDotSubmitUserFile</servlet-class>
+    </servlet>
+	
+	<servlet>
 		<servlet-name>ExportProject</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.ExportProject</servlet-class>
 	</servlet>
@@ -1404,6 +1409,19 @@
 		<servlet-name>CreateDotSubmitFile</servlet-name>
 		<url-pattern>/data/instructor/CreateDotSubmitFile</url-pattern>
 	</servlet-mapping>
+	   <servlet-mapping>
+        <servlet-name>CreateDotSubmitFile</servlet-name>
+        <url-pattern>/data/GetDotSubmitFile</url-pattern>
+    </servlet-mapping>
+	      <servlet-mapping>
+        <servlet-name>CreateDotSubmitUserFile</servlet-name>
+        <url-pattern>/data/GetDotSubmitUserFile</url-pattern>
+    </servlet-mapping>
+	   <servlet-mapping>
+        <servlet-name>CreateDotSubmitFile</servlet-name>
+        <url-pattern>/data/instructor/CreateDotSubmitFile</url-pattern>
+    </servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>ExportProject</servlet-name>
 		<url-pattern>/data/instructor/ExportProject</url-pattern>

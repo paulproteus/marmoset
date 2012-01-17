@@ -15,7 +15,10 @@
     <name>createCourseForm</name>
     <path>/WEB-INF/tags/createCourseForm.tag</path>
   </tag-file>
-
+<tag-file>
+    <name>releaseTokens</name>
+    <path>/WEB-INF/tags/releaseTokens.tag</path>
+  </tag-file>
   <tag-file>
     <name>studentPicture</name>
     <path>/WEB-INF/tags/studentPicture.tag</path>

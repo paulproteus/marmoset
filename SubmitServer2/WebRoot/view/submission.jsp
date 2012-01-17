@@ -274,19 +274,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 					</c:if>
 				</c:otherwise>
 		</c:choose>
-		<p>You currently have ${releaseInformation.tokensRemaining} release
-		tokens available. <c:if
-			test="${not empty releaseInformation.regenerationSchedule}">
-			<p>Release token(s) will regenerate at:
-			<ul>
-				<c:forEach var="timestamp"
-					items="${releaseInformation.regenerationSchedule}">
-					<li><fmt:formatDate value="${timestamp}"
-						pattern="E',' dd MMM 'at' hh:mm a" /><br>
-				</c:forEach>
-			</ul>
-		</c:if>
-		</p>
+        <ss:releaseTokens/>
 		</c:if>
 		</c:when>
 		<c:otherwise><p>Submission compiled</c:otherwise>

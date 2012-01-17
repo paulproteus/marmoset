@@ -67,8 +67,8 @@
 
 <ss:codeReviews title="Code reviews"/>
 
-<c:if test="${project.tested}">
-		<p>Project is tested</p>
+<c:if test="${!project.tested}">
+		<p>Project is upload only</p>
 		</c:if>
 <h2>Submissions</h2>
 <c:set var="testCols" value="0" />
