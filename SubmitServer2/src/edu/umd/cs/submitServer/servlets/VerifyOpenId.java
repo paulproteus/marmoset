@@ -52,7 +52,7 @@ public class VerifyOpenId extends SubmitServerServlet {
 			uid = req.getParameter("uid");
 			loginName = req.getParameter("login_name");
 		}
-	    if (uid == null) {
+	    if (uid == null && loginName == null) {
 	        uid = verifyIdentity(req);
 	    }
 		Connection conn = null;
