@@ -26,7 +26,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
-<c:if test="${!canImportCourses}">
+<c:if test="${!user.canImportCourses}">
       <c:redirect url="/view/index.jsp"/>
 </c:if>
 
