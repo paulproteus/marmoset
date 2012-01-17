@@ -46,15 +46,15 @@ public class VerifyOpenId extends SubmitServerServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 		boolean skipAuthentication = "true".equals(req.getServletContext().getInitParameter("authentication.skip"));
-		String uid = verifyIdentity(req);
+		String uid = null;
 		String loginName = null;
-		if (uid == null && skipAuthentication) {
+		if (skipAuthentication) {
 			uid = req.getParameter("uid");
 			loginName = req.getParameter("login_name");
-			boolean ok = !Strings.isNullOrEmpty(uid)
-			        || !Strings.isNullOrEmpty(loginName);
-            Preconditions.checkArgument(ok);
 		}
+	    if (uid == null) {
+	        uid = verifyIdentity(req);
+	    }
 		Connection conn = null;
 		try {
 	    conn = getConnection();
@@ -89,8 +89,6 @@ public class VerifyOpenId extends SubmitServerServlet {
 	private String verifyIdentity(HttpServletRequest req) throws ServletException {
 	  ParameterList openIdResp = new ParameterList(req.getParameterMap());
     DiscoveryInformation discovered = (DiscoveryInformation) req.getSession().getAttribute(SubmitServerConstants.OPENID_DISCOVERED);
-    if (discovered == null)
-        return null;
     
     StringBuffer receivingUrl = req.getRequestURL();
     String queryString = req.getQueryString();
