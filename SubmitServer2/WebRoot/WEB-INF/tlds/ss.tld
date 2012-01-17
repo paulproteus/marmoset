@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
-  version="2.0">
+<taglib xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+  version="2.1">
 
   <description>Marmoset submitserver tags</description>
   <display-name>submitserver</display-name>
   <tlib-version>1.0</tlib-version>
   <short-name>ss</short-name>
   <uri>http://www.cs.umd.edu/marmoset/ss</uri>
+
+  <tag>
+    <name>brandingProperty</name>
+    <tag-class>edu.umd.cs.submitServer.tags.BrandingPropertyTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>key</name>
+      <required>true</required>
+    </attribute>
+    <attribute>
+      <name>safeHtml</name>
+      <required>false</required>
+    </attribute>
+  </tag>
 
 <tag-file>
     <name>createCourseForm</name>
@@ -187,6 +200,7 @@
     <name>sourceFilesTable</name>
     <path>/WEB-INF/tags/tableTags/sourceFilesTable.tag</path>
   </tag-file>
+
   <!--
   Functions
   -->
@@ -566,7 +580,5 @@
     Name: ${ss:urlDecode(strToScrub)}
   </example>
   </function>
-
-
 
 </taglib>
