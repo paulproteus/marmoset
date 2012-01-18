@@ -73,6 +73,8 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 	
 	private boolean isInstructor(Connection conn, int coursePK) throws SQLException {
+	    if (student.isSuperUser())
+	        return true;
 		PreparedStatement st = null;
 		try {
 			st = conn.prepareStatement("SELECT instructor_capability FROM student_registration "

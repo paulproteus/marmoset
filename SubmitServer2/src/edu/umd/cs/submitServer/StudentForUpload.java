@@ -139,7 +139,7 @@ public class StudentForUpload {
 		lastname = parser.getCheckedParameter("lastname");
 		firstname = parser.getCheckedParameter("firstname");
 		campusUID = parser.getCheckedParameter("campusUID");
-		classAccount = parser.getCheckedParameter("classAccount");
+		classAccount = parser.getOptionalCheckedParameter("classAccount");
 		loginName = parser.getCheckedParameter("loginName");
 		// XXX section is optional until I get the section integrated into
 		section = parser.getOptionalCheckedParameter("section");

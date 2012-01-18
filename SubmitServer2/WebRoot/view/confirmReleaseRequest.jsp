@@ -35,6 +35,8 @@
 <ss:header />
 <ss:breadCrumb />
 
+ <ss:releaseTokens/>
+
 <h2>Are you sure you want to release test submission
 ${ss:scrub(param.submissionPK)}?</h2>
 

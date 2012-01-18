@@ -49,6 +49,7 @@
             <c:if test="${user.superUser}">
                 <li><a href="admin/">Superuser functions</a></li>
             </c:if>
+            <c:if test="${user.canImportCourses}">
             <c:choose>
                 <c:when test="${gradesServer}">
                     <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
@@ -59,8 +60,10 @@
                     <li><a href="${createCourseLink}">Create course</a></li>
                 </c:otherwise>
             </c:choose>
+
             <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
             <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>
+            </c:if>
             <c:if test="${not empty userSession.superuserPK}">
             <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />     
                <li><form method="POST" action="${authenticateAsLink}">
