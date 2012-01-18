@@ -32,7 +32,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<ss:headContent title="Editing student record for ${ss:escapeHtml(editStudent.loginName)}" />
+<ss:headContent title="Editing student record for ${ss:escapeHtml(student.fullname)}" />
 <style>
 form ul {list-style-type: none;}
 form ul label {display: block;}
@@ -43,23 +43,23 @@ form li.required label {font-weight: bold;}
 <body>
 <ss:header />
 <ss:instructorBreadCrumb />
-<h1>Edit student account for ${ss:escapeHtml(editStudent.loginName)}</h1>
+<h1>Edit student account for <c:out value="${student.fullname}"/></h1>
 <c:url value="/action/admin/EditStudentAccount" var="actionUrl" />
 <form action="${actionUrl}" method="POST" id="edit-form">
-<input type="hidden" name="studentPK" value="${editStudent.studentPK}" />
+<input type="hidden" name="studentPK" value="${student.studentPK}" />
 		<ul>
 			<li class="required">
 				<label for="firstname-input">Name:</label>
-				<input type="text" name="firstname" id="firstname-input" placeholder="First" class="required" required="required" value="${ss:escapeHtml(editStudent.firstname)}"/>
-				<input type="text" name="lastname" id="lastname-input" placeholder="Last" class="required" required="required" value="${ss:escapeHtml(editStudent.lastname)}"/>
+				<input type="text" name="firstname" id="firstname-input" placeholder="First" class="required" required="required" value="${ss:escapeHtml(student.firstname)}"/>
+				<input type="text" name="lastname" id="lastname-input" placeholder="Last" class="required" required="required" value="${ss:escapeHtml(student.lastname)}"/>
 			</li>
 			<li class="required">
 				<label for="email-input">Email:</label>
-				<input type="text" name="email" id="email-input" placeholder="email" class="email required" required="required" value="${ss:escapeHtml(editStudent.email)}" />
+				<input type="text" name="email" id="email-input" placeholder="email" class="email required" required="required" value="${ss:escapeHtml(student.email)}" />
 			</li>
 			<li class="required">
 				<label for="login-input">Username:</label>
-				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required" value="${ss:escapeHtml(editStudent.loginName)}" />
+				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required" value="${ss:escapeHtml(student.loginName)}" />
 			</li>
 		</ul>
 		<button name="action" value="UPDATE" type="submit">Update Student</button>

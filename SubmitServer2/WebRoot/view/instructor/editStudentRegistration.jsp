@@ -58,12 +58,9 @@
 	    <th> dropped </th>
 		<th> First Name </th>
 		<th> Last Name </th>
-		<th> DirectoryID </th>
-		<th> Employee Num</th>
-		<th> Class Account <br>(use directoryID for courses <br>without class accounts)</th>
-		<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService' || (student.password != NULL && student.password != '0')}">
-		<th> Password <br>(keep this blank to leave password unchanged)</th>
-		</c:if>
+		<th> login name </th>
+		<th> UID</th>
+		<th> Class Account <br>(use login name for courses <br>without class accounts)</th>
 	</tr>
 	<tr>
 	    <td> <input name="inactive" type="checkbox" ${ss:isChecked(studentRegistration.inactive)} />
@@ -77,20 +74,10 @@
 		<td> <input name="loginName" type="text" value="${student.loginName}"/> </td>
 		<td> <input name="campusUID" type="text" value="${student.campusUID}"/> </td>
 		<td> <input name="classAccount" type="text" value="${studentRegistration.classAccount}"/> </td>
-		<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService' || (student.password != NULL && student.password != '0')}">
-		<td> <input name="password" type="text" value=""/> </td>
-		</c:if>
+		
 	</tr>
 	<tr>
-		<c:choose>
-		<c:when test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'
-		|| (student.password != NULL && student.password != '0')}">
 		<td colspan="8"> <input type="submit" value="Update record!"/> </td>
-		</c:when>
-		<c:otherwise>
-		<td colspan="7"> <input type="submit" value="Update record!"/> </td>
-		</c:otherwise>
-		</c:choose>
 
 	</tr>
 </table>

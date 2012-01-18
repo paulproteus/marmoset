@@ -231,7 +231,13 @@
     	<h3>Edit student account</h3>
     	<c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
     	<form method="GET" action="${editStudentUrl}">
-    		<input type="text" required="required" name="login_name" placeholder="Login name"/>
+              <select name="studentPK">
+                 <c:forEach var="student" items="${allStudents}" varStatus="counter">
+                    <option value="${student.studentPK}">
+                        <c:out value="${student.fullname}" />
+                    </option>
+                </c:forEach>
+            </select> 
     		<button type="submit">Edit</button>
     	</form>
 
