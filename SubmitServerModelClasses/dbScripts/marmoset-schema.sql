@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `buildservers`
 --
 
-CREATE TABLE IF NOT EXISTS `buildservers` (
+CREATE TABLE `buildservers` (
   `buildserver_pk` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `remote_host` varchar(200) COLLATE utf8_bin NOT NULL,
@@ -38,9 +38,13 @@ CREATE TABLE IF NOT EXISTS `buildservers` (
   `last_job` datetime DEFAULT NULL,
   `last_success` datetime DEFAULT NULL,
   `system_load` varchar(250) COLLATE utf8_bin NOT NULL,
+  `last_built_submission_pk` int(11) NOT NULL DEFAULT '0',
+  `last_testrun_pk` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
 
 -- --------------------------------------------------------
 
