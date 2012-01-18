@@ -1,8 +1,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.cs.umd.edu/marmoset/ss" prefix="ss" %>
 <div class="breadcrumb">
 <div class="logout">
 <p>&nbsp;
 </div>
-<p>Welcome to the UMD Computer Science Project Submission Server
+<p><ss:brandingProperty key="branding.welcome"/></p>
 </div>

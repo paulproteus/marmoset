@@ -228,6 +228,12 @@
     <ss:createCourseForm/>
     
     <h2>User actions</h2>
+    	<h3>Edit student account</h3>
+    	<c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
+    	<form method="GET" action="${editStudentUrl}">
+    		<input type="text" required="required" name="login_name" placeholder="Login name"/>
+    		<button type="submit">Edit</button>
+    	</form>
 
         <h3>Allow course creation</h3>
         <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
