@@ -38,7 +38,6 @@ import java.util.Map;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import javax.annotation.meta.TypeQualifier;
-import javax.annotation.meta.When;
 
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
@@ -79,7 +78,7 @@ public class Student  implements Comparable<Student> {
   private boolean superUser = false;
   private String givenConsent = PENDING;
   private String accountType=NORMAL_ACCOUNT;
-  private String password;
+  @Deprecated private String password;
   private String email;
   private boolean hasPicture;
   private boolean canImportCourses;
