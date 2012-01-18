@@ -62,23 +62,32 @@ public class RegisterOneStudent extends SubmitServerServlet {
 			}
 			
 			Course course = (Course) request.getAttribute("course");
-			String classAccount = parser.getOptionalCheckedParameter("classAccount");
-			if (classAccount == null)
-				classAccount = student.getLoginName();
-			String capability = parser
-					.getOptionalCheckedParameter("capability");
-			if ("".equals(capability) || "student".equals("capability"))
-				capability = null;
+			if (course != null) {
+			    String classAccount = parser.getOptionalCheckedParameter("classAccount");
+			    if (classAccount == null)
+			        classAccount = student.getLoginName();
+			    String capability = parser
+			            .getOptionalCheckedParameter("capability");
+			    if ("".equals(capability) || "student".equals("capability"))
+			        capability = null;
 
-			StudentForUpload.registerStudent(course,
-					student, classAccount, capability, conn);
+			    StudentForUpload.registerStudent(course,
+			            student, classAccount, capability, conn);
+			}
 
 			conn.commit();
 			transactionSuccess = true;
 
-			String redirectUrl = request.getContextPath()
+			
+			String redirectUrl;
+			if (course != null)
+			    redirectUrl = request.getContextPath()
 					+ "/view/instructor/course.jsp?coursePK="
 					+ course.getCoursePK();
+			else
+			    redirectUrl = request.getContextPath()
+                + "/view/index.jsp";
+			    
 			response.sendRedirect(redirectUrl);
 		} catch (ClientRequestException e) {
 			throw new ServletException(e);

@@ -30,11 +30,11 @@
 <!DOCTYPE HTML>
 <html>
 
-<ss:head title="Administrative actions" />
+<ss:head title="Superuser menu" />
 <body>
     <ss:header />
     <ss:instructorBreadCrumb />
-    <h1>Administrative info/status</h1>
+    <h1>Superuser info/status</h1>
 
     <c:if test="${! empty recentErrors }">
         <h2>Recent errors</h2>
@@ -270,7 +270,7 @@
     <form name="MakeSuperuser" method="post" action="${makeSuperuserLink}">
         <select name="studentPK">
             <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                <c:if test="${student.canImportCourses}">
+                <c:if test="${!student.superUser }">
                     <option value="${student.studentPK}">
                         <c:out value="${student.fullname}" />
                     </option>
@@ -279,6 +279,9 @@
         </select> <input type="submit" value="Make superuser account for" />
     </form>
 
+   <c:url var="registerPerson" value="/view/instructor/registerPerson.jsp" />
+
+    <p><a href="${registerPerson}">Register person</a></p>
     <ss:footer />
 </body>
 </html>

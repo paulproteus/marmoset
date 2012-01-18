@@ -869,6 +869,10 @@
 		<servlet-class> edu.umd.cs.submitServer.servlets.AllowCourseCreation </servlet-class>
 	</servlet>
 	<servlet>
+        <servlet-name>MakeSuperuser</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.MakeSuperuser </servlet-class>
+    </servlet>
+	<servlet>
 		<servlet-name>AuthenticateAs</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.AuthenticateAs </servlet-class>
 	</servlet>
@@ -1158,6 +1162,10 @@
 		<url-pattern>/action/AuthenticateAs</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+        <servlet-name>MakeSuperuser</servlet-name>
+        <url-pattern>/action/admin/MakeSuperuser</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
 		<servlet-name>PerformLogin</servlet-name>
 		<url-pattern>/authenticate/ldap/PerformLogin</url-pattern>
 	</servlet-mapping>

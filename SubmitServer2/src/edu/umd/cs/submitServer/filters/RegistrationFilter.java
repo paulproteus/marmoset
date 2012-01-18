@@ -27,16 +27,19 @@ import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
  */
 public class RegistrationFilter extends SubmitServerFilter {
 
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-	    throws IOException, ServletException {
-	    HttpServletRequest request = (HttpServletRequest) req;
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
-        HttpSession session = request.getSession();
-		Student user = (Student) request.getAttribute(SubmitServerConstants.USER);
-		RegistrationDao dao = new MySqlRegistrationDaoImpl(user, submitServerDatabaseProperties);
-		request.setAttribute("pendingRequests", dao.getPendingRequests());
-		request.setAttribute(SubmitServerConstants.OPEN_COURSES, dao.getOpenCourses());
-		chain.doFilter(request, response);
-	}
+
+        String gradesServer = request.getServletContext().getInitParameter("grades.server");
+        if (gradesServer == null) {
+            Student user = (Student) request.getAttribute(SubmitServerConstants.USER);
+            RegistrationDao dao = new MySqlRegistrationDaoImpl(user, submitServerDatabaseProperties);
+            request.setAttribute("pendingRequests", dao.getPendingRequests());
+            request.setAttribute(SubmitServerConstants.OPEN_COURSES, dao.getOpenCourses());
+        }
+        chain.doFilter(request, response);
+    }
 }
