@@ -204,6 +204,14 @@
   <!--
   Functions
   -->
+  
+  <function>
+    <description>Escape HTML in a variable</description>
+    <name>escapeHtml</name>
+    <function-class>org.apache.commons.lang3.StringEscapeUtils</function-class>
+    <function-signature>java.lang.String escapeHtml4(java.lang.String)</function-signature>
+    <example>${ss:escapeHtml(someStringWithHtml)}</example>
+  </function>
 
   <function>
     <description>
