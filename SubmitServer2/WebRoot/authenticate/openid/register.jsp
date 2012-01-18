@@ -19,19 +19,50 @@
 <script
 	src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
 	type="text/javascript"></script>
-<script>
-	$(document).ready(function() {
-		$("#registration-form").validate();
-	});
-</script>
 
+<c:url var="checkRegistrationUrl" value="/authenticate/CheckRegistration" />
 <style>
 form ul {list-style-type: none;}
 form ul label {display: block;}
 form ul li {margin-bottom: 1em;}
 form li.required label {font-weight: bold;}
 </style>
-
+	<script type="text/javascript">
+	$.validator.addMethod("regex", function(value, element, regexpString){
+		var regexp = new RegExp(regexpString);
+		return this.optional(element) || regexp.test(value);
+	});
+	$(document).ready(function() {
+		$("#registration-form").validate({
+			rules: {
+				login: {
+					required: true,
+					remote: "${checkRegistrationUrl}",
+					maxlength: 20,
+					minlength: 2,
+					regex: "^[a-zA-Z][a-zA-Z0-9]+$"
+				},
+				email: {
+					required: true,
+					email: true,
+					remote: "${checkRegistrationUrl}"
+				}
+			},
+			messages: {
+				login: {
+					required: "Enter a login name",
+					minlength: $.format("Enter at least {0} characters"),
+					maxlength: $.format("Enter at most {0} characters"),
+					remote: "Login is already taken",
+					regex: "Login name is invalid."
+				},
+				email: {
+					remote: "Email is already in use"
+				}
+			}
+		});
+	});
+</script>
 </head>
 <body>
 	<ss:header />
@@ -59,12 +90,13 @@ form li.required label {font-weight: bold;}
             </li>
         
 			<li class="required">
-				<label for="login-input">Username:</label>
-				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required"/>
+				<label for="login">Username:</label>
+				<input type="text" name="login" id="login" placeholder="username" required="required" />
 			</li>
 							</ul>
 		    <input type="submit" value="Register" />
 	</form>
+
 	<ss:footer />
 </body>
 </html>
