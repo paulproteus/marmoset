@@ -827,15 +827,10 @@ public class Student  implements Comparable<Student> {
             Connection conn)
     throws SQLException
     {
-        // For demo accounts, we are storing:
-        // email address in the campus_uid
-        // password in the password field
-        // random garbage in the employee_num field to start with that will be replaced with the
-        // database primary key that will be generated
         String query =
             " SELECT " +ATTRIBUTES+
             " FROM " +TABLE_NAME+
-            " WHERE campus_uid = ? ";
+            " WHERE email = ? ";
 
         PreparedStatement stmt= conn.prepareStatement(query);
         stmt.setString(1, emailAddress);

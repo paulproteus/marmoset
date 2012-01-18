@@ -1708,6 +1708,15 @@
     	<url-pattern>/authenticate/openid/register</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+      <servlet-name>CheckRegistration</servlet-name>
+      <servlet-class>edu.umd.cs.submitServer.servlets.CheckRegistration</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>CheckRegistration</servlet-name>
+      <url-pattern>/authenticate/CheckRegistration</url-pattern>
+    </servlet-mapping>
+    
     <filter>
     	<filter-name>OpenIdRegistrationFilter</filter-name>
     	<filter-class>edu.umd.cs.submitServer.filters.OpenIdRegistrationFilter</filter-class>
