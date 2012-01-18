@@ -32,7 +32,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<ss:headContent title="Instructor view of course ${course.courseName}" />
+<ss:headContent title="Editing student record for ${ss:escapeHtml(editStudent.loginName)}" />
 <style>
 form ul {list-style-type: none;}
 form ul label {display: block;}
@@ -42,10 +42,11 @@ form li.required label {font-weight: bold;}
 </head>
 <body>
 <ss:header />
-<h1>Edit student account</h1>
+<ss:instructorBreadCrumb />
+<h1>Edit student account for ${ss:escapeHtml(editStudent.loginName)}</h1>
 <c:url value="/action/admin/EditStudentAccount" var="actionUrl" />
 <form action="${actionUrl}" method="POST" id="edit-form">
-<input type="hidden" name="studentPK" value="${student.studentPK}" />
+<input type="hidden" name="studentPK" value="${editStudent.studentPK}" />
 		<ul>
 			<li class="required">
 				<label for="firstname-input">Name:</label>
@@ -61,8 +62,8 @@ form li.required label {font-weight: bold;}
 				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required" value="${ss:escapeHtml(editStudent.loginName)}" />
 			</li>
 		</ul>
-		<button name="action" value="update" type="submit">Update Student</button>
-		<button name="action" value="delete" type="submit">Delete Student</button>
+		<button name="action" value="UPDATE" type="submit">Update Student</button>
+		<!-- <button name="action" value="DELETE" type="submit">Delete Student</button> -->
 	</form>
 <ss:footer />
 <script

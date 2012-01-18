@@ -1190,6 +1190,14 @@
 		<servlet-name>Fixup</servlet-name>
 		<url-pattern>/action/admin/Fixup</url-pattern>
 	</servlet-mapping>
+  <servlet>
+    <servlet-name>EditStudentAccount</servlet-name>
+    <servlet-class>edu.umd.cs.submitServer.servlets.EditStudentAccount</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EditStudentAccount</servlet-name>
+    <url-pattern>/action/admin/EditStudentAccount</url-pattern>
+  </servlet-mapping>
 	<!--
 	TODO Admin privileges should be required, not instructor privileges, correct?
 	-->
