@@ -363,35 +363,35 @@ public class Student  implements Comparable<Student> {
         String loginName,
         @Nullable String email,
         Connection conn) throws SQLException {
-    if (FAKE_NAMES)
+    if (FAKE_NAMES) {
       throw new IllegalStateException();
-      Student student = lookupByLoginNameAndCampusUID(loginName, campusUID, conn);
-      if (student == null)
-         student = lookupByCampusUID(campusUID, conn);
-      if (student == null) {
-        student = new Student();
-            student.setLoginName(loginName);
-            student.setCampusUID(campusUID);
-            student.setFirstname(firstname);
-            student.setLastname(lastname);
-            if (email != null) {
-              student.setEmail(email);
-            }
-            student.insert(conn);
-      } else if (student.loginName.endsWith(ADMIN_SUFFIX)) {
-        // do nothing
-      } else if (student.loginName.endsWith(STUDENT_SUFFIX)) {
-        // do nothing
-      } else if (!student.lastname.equals(lastname)
-          || !student.firstname.equals(firstname)
-          || !student.loginName.equals(loginName)) {
-        student.lastname = lastname;
-        student.firstname = firstname;
-        student.loginName = loginName;
-        student.update(conn);
-      }
-      return student;
-      }
+    }
+		Student student = lookupByLoginNameAndCampusUID(loginName, campusUID, conn);
+		if (student == null)
+			student = lookupByCampusUID(campusUID, conn);
+		if (student == null) {
+			student = new Student();
+			student.setLoginName(loginName);
+			student.setCampusUID(campusUID);
+			student.setFirstname(firstname);
+			student.setLastname(lastname);
+			if (email != null) {
+				student.setEmail(email);
+			}
+			student.insert(conn);
+		} else if (student.loginName.endsWith(ADMIN_SUFFIX)) {
+			// do nothing
+		} else if (student.loginName.endsWith(STUDENT_SUFFIX)) {
+			// do nothing
+		} else if (!student.lastname.equals(lastname) || !student.firstname.equals(firstname)
+		    || !student.loginName.equals(loginName)) {
+			student.lastname = lastname;
+			student.firstname = firstname;
+			student.loginName = loginName;
+			student.update(conn);
+		}
+		return student;
+	}
 
   public static Student insertOrUpdateByLoginNameAndCampusUID(String campusUID,
       String firstname,
