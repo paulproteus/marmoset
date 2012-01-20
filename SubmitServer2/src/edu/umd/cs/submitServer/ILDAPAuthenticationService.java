@@ -42,7 +42,7 @@ import edu.umd.cs.marmoset.modelClasses.Student;
  *
  * @author jspacco
  */
-public interface IAuthenticationService {
+public interface ILDAPAuthenticationService {
 	@Nonnull
 	public Student authenticateLDAP(String campusUID, String uidPassword,
 			Connection conn, boolean skipLDAP) throws SQLException,

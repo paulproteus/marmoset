@@ -49,7 +49,7 @@ import edu.umd.cs.marmoset.modelClasses.Student;
  * GenericLDAPAuthenticationService
  * 
  */
-public class GenericLDAPAuthenticationService implements IAuthenticationService {
+public class GenericLDAPAuthenticationService implements ILDAPAuthenticationService {
     protected boolean useSSL = true;
 
     String ldapURL = "";

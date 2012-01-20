@@ -778,6 +778,19 @@ public class Project implements Serializable {
         }
         return result;
     }
+    public static Project lookupByCourseAndProjectNumber(int coursePK, String projectNumber,
+            Connection conn) throws SQLException {
+        String query = "SELECT " + ATTRIBUTES + " FROM " + " projects " 
+               + " WHERE project.coursePK = ? "
+                + " AND projects.project_number = ? ";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+
+        stmt.setInt(1, coursePK);
+        stmt.setString(2, projectNumber);
+        return  getFromPreparedStatement(stmt);
+    }
+
 
 	public static Project lookupByCourseProjectSemester(
         String courseName,

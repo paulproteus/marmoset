@@ -837,6 +837,15 @@
       <url-pattern>/authenticate/*</url-pattern>
     </filter-mapping>
     
+    <filter>
+      <filter-name>SubmitStatusFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.SubmitStatusFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>SubmitStatusFilter</filter-name>
+      <url-pattern>/view/submitStatus.jsp</url-pattern>
+    </filter-mapping>
+    
     <servlet>
         <servlet-name>CreateBuildserverConfigFile</servlet-name>
         <servlet-class> edu.umd.cs.submitServer.servlets.CreateBuildserverConfigFile </servlet-class>

@@ -218,8 +218,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	 * since that uniquely identifies a StudentSubmitStatus.
 	 *
 	 * @param conn the connection to the database
-	 * @return true if a new row was added to the database, false if the row
-	 * already existed and no new row was added
+	 * @return the StudentSubmitStatus to use
 	 * @throws SQLException
 	 */
 	private StudentSubmitStatus insert(Connection conn)
@@ -230,7 +229,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		        getProjectPK(),
 		        conn);
 
-		// if the row already exists, simply return false
+		// if the row already exists, return the existing record
 		if (studentSubmitStatus != null)
 		    return studentSubmitStatus;
 
@@ -239,9 +238,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		PreparedStatement stmt = conn.prepareStatement(query);
 
 		putValues(stmt, 1);
-
 		executeUpdate(stmt);
-
+		
 		return this;
 	}
 	private void putValues(PreparedStatement stmt, int index) throws SQLException {
@@ -305,17 +303,15 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	    return studentSubmitStatus.insert(conn);
 	}
 
-	private void executeUpdate(PreparedStatement stmt) throws SQLException {
+	private int executeUpdate(PreparedStatement stmt) throws SQLException {
 		try {
-			stmt.executeUpdate();
+			return stmt.executeUpdate();
 		} finally {
 			try {
-				if (stmt != null)
 					stmt.close();
 			} catch (SQLException ignore) {
 				// ignore
 			}
-			stmt = null;
 		}
 	}
 

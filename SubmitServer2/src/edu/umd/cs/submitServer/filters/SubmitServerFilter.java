@@ -38,6 +38,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -144,6 +145,28 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
             getSubmitServerFilterLog().warn(e.getMessage(), e);
         }
     }
+    
+    protected void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
+            boolean transactionSuccess, HttpServletRequest req, Connection conn) {
+        try {
+            if (!transactionSuccess && conn != null) {
+                // TODO Log a stack trace as well!
+                String reqStr = req.getRequestURI();
+                if (req.getQueryString() != null) {
+                    reqStr += "?" + req.getQueryString();
+                }
+                getSubmitServerFilterLog().warn(
+                        "Unable to rollback connection: " + reqStr);
+                conn.rollback();
+            }
+        } catch (SQLException ignore) {
+            getSubmitServerFilterLog().warn("Unable to rollback connection",
+                    ignore);
+            // ignore
+        }
+        releaseConnection(conn);
+    }
+
 
     protected void handleSQLException(SQLException e) {
         // log SQLException

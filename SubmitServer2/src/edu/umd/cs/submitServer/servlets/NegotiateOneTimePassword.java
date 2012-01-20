@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
@@ -69,47 +70,72 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         boolean transactionSuccess = false;
         Connection conn = null;
+        String courseKey = null;
         String courseName = null;
-        String section = null;
         String projectNumber = null;
-        String semester = null;
-        String campusUID = null;
-        String uidPassword = null;
+        String loginName = null;
+        String password = null;
         Project project = null;
+        Student student = null;
         StudentRegistration studentRegistration = null;
+      
         
         try {
             conn = getConnection();
             RequestParser parser = new RequestParser(request, getSubmitServerServletLog(), strictParameterChecking());
-            courseName = parser.getCheckedParameter("courseName");
-            section = parser.getOptionalCheckedParameter("section");
+            courseKey = parser.getCheckedParameter("courseKey");
             projectNumber = parser.getCheckedParameter("projectNumber");
-            semester = parser.getCheckedParameter("semester");
-            campusUID = parser.getCheckedParameter("campusUID");
-            uidPassword = parser.getPasswordParameter("uidPassword");
+            
+            loginName = parser.getCheckedParameter("loginName");
+            if (loginName == null)
+                loginName = parser.getCheckedParameter("campusUID");
+           
+            password = parser.getPasswordParameter("password");
+            if (password == null)
+                password = parser.getPasswordParameter("uidPassword");
 
-            getAccessLog().info(
-                    "NegotiateOneTimePassword attempt:\t" + campusUID + "\t" + semester + "\t" + courseName + "\t"
-                            + projectNumber);
+           
+            if (courseKey != null) {
+                getAccessLog().info(
+                        "NegotiateOneTimePassword attempt:\t" + loginName + "\t" + courseKey + "\t" 
+                                + projectNumber);
 
 
-
-            // fetch course and project records
-            // This cannot be done in a filter because this is the only place it
-            // happens
-            project = Project.lookupByCourseProjectSemester(courseName, section, projectNumber, semester, conn);
-            if (project == null) {
-                String msg = "Could not find record for project " + projectNumber + " in " + courseName + ", " + semester
-                        + "; you likely have an out of date .submit file";
-                ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + campusUID, null);
-                return;
+                Course course = Course.lookupByCourseKey(courseKey, conn);
+                if (course == null) {
+                    String msg = "Could not find record for courseKey " + courseKey 
+                            + "; you likely have an out of date .submit file";
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    return;
+                }
+                courseName = course.getCourseName();
+                project = Project.lookupByCourseAndProjectNumber(course.getCoursePK(), projectNumber, conn);
+                
+                if (project == null) {
+                    String msg = "Could not find record for project number " + projectNumber  + " in " + course.getCourseName()
+                            + "; you likely have an out of date .submit file";
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    return;
+                }
+                
+            } else {
+                courseName = parser.getCheckedParameter("courseName");
+                String semester = parser.getCheckedParameter("semester");
+                String section = parser.getCheckedParameter("section");
+                
+                project = Project.lookupByCourseProjectSemester(courseName, section, projectNumber, semester, conn);
+                if (project == null) {
+                    
+                    String msg = "Could not find record for project " + projectNumber + " in " + courseName + ", " + semester
+                            + "; you likely have an out of date .submit file";
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    return;
+                }
             }
+            
+           
             // authenticate the student and find their Student record
-
-            // [NAT P001] temporary, refactor this to do authentication in one
-            // place
-            Student student = PerformLogin.authenticateStudent(conn, campusUID, uidPassword, skipLDAP, getIAuthenticationService());
-            // [end NAT P001]
+            student = PerformLogin.authenticateStudent(conn, loginName, password, skipAuthentication, getIAuthenticationService());
 
             // I need to do my own logging here-- AccessLogFilter cannot be
             // applied
@@ -122,10 +148,10 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
 
             if (studentRegistration == null) {
 
-                String msg = student.getFirstname() + " " + student.getLastname() + " is not registered for this " + courseName
-                        + " in semester " + semester + ",  "
+                String msg = student.getFirstname() + " " + student.getLastname() + " is not registered for this " + courseName + ", "
+
                         + " If you changed your DirectoryID, please notify your instructor so that we can update the system.";
-                ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + campusUID, null);
+                ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
                 return;
             }
         } catch (SQLException e) {
@@ -133,10 +159,10 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         } catch (NamingException e) {
             throw new ServletException(e);
         } catch (ClientRequestException e) {
-            String msg = String.format("failed to negotiate oneTime password for %s in %s %s: %s", campusUID, courseName, semester,
+            String msg = String.format("failed to negotiate oneTime password for %s in %s %s: %s", loginName, courseName,
                     e.getMessage());
            
-            ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + campusUID, e);
+            ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, e);
            
             return;
 
@@ -158,13 +184,13 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
             conn.commit();
             transactionSuccess = true;
 
-            generateSubmitUser(response, studentRegistration, project, submitStatus);
+            generateSubmitUser(response, student, studentRegistration, courseName, project, submitStatus);
 
             getAccessLog().info(
                     "studentPK " + studentRegistration.getStudentPK() + " successful "
                             + SubmitServerUtilities.extractURL(request));
             getAuthenticationLog().info(
-                    "NegotiateOneTimePassword success:\t" + campusUID + "\t" + semester + "\t" + courseName + "\t"
+                    "NegotiateOneTimePassword success:\t" + loginName + "\t" + courseName + "\t"
                             + projectNumber);
 
         } catch (SQLException e) {
@@ -175,8 +201,11 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
     }
 
 
-    public static void generateSubmitUser(HttpServletResponse response, StudentRegistration studentRegistration,
-            Project project, StudentSubmitStatus submitStatus) throws IOException {
+    public static void generateSubmitUser(HttpServletResponse response, Student student,
+            StudentRegistration studentRegistration, String courseName, Project project, StudentSubmitStatus submitStatus) throws IOException {
+        
+        if (student.getStudentPK() != studentRegistration.getStudentPK())
+            throw new IllegalArgumentException("Student and StudentRegistration do not match");
         String classAccount = studentRegistration.getClassAccount();
         String oneTimePassword = submitStatus.getOneTimePassword();
 
@@ -184,15 +213,18 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         response.setContentType("text/plain");
         response.setHeader("Content-Disposition", "inline; filename=\".submitUser\"");
         PrintWriter out = response.getWriter();
+        printProperty(out,"loginName" , student.getLoginName());
+        
         printProperty(out,"classAccount" , classAccount);
         printProperty(out, "cvsAccount" , classAccount);
         printProperty(out,"oneTimePassword" , oneTimePassword);
         out.println();
         printComment(out, " for " + studentRegistration.getFullname());
+        printComment(out, " course " + courseName);
         printComment(out, " project " + project.getProjectNumber() + " : " + project.getTitle());
         out.flush();
         out.close();
     }
 
-    boolean skipLDAP;
+    boolean skipAuthentication;
 }

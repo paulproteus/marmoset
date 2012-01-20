@@ -42,7 +42,7 @@ import edu.umd.cs.marmoset.modelClasses.Student;
  * @author jspacco
  */
 public class GenericStudentPasswordAuthenticationService implements
-		IAuthenticationService {
+		ILDAPAuthenticationService {
 
 	@Override
 	public void initialize(ServletContext context) {

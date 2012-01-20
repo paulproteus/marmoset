@@ -331,6 +331,27 @@ public class Course {
 		return getAllFromPreparedStatement(stmt);
 	}
 
+	   /**
+     * Finds a cousre in the database based in the name of the course.
+     * @param courseName
+     * @param conn
+     * @return the Course object representing the row found in the DB; null if it can't be found
+     * @throws SQLException
+     */
+    public static Course lookupByCourseKey(String courseKey,
+            Connection conn) throws SQLException
+    {
+        String query = "SELECT " +ATTRIBUTES+ " " +
+                "FROM courses " +
+                "WHERE courses.submit_key = ? " ;
+
+        PreparedStatement stmt = null;
+
+        stmt = conn.prepareStatement(query);
+        stmt.setString(1, courseKey);
+
+        return getCourseFromPreparedStatement(stmt);
+    }
 	/**
 	 * Finds a course based on its course PK.
 	 *

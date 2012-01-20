@@ -48,7 +48,7 @@ import edu.umd.cs.submitServer.BadPasswordException;
 import edu.umd.cs.submitServer.CanNotFindDirectoryIDException;
 import edu.umd.cs.submitServer.ClientRequestException;
 import edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService;
-import edu.umd.cs.submitServer.IAuthenticationService;
+import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.TeamAuthenticationService;
 import edu.umd.cs.submitServer.UserSession;
@@ -250,7 +250,7 @@ public class PerformLogin extends SubmitServerServlet {
 	 */
 	public static Student authenticateStudent(Connection conn,
 			String campusUID, String uidPassword, boolean skipLDAP,
-			IAuthenticationService authenticationService) throws SQLException,
+			ILDAPAuthenticationService authenticationService) throws SQLException,
 			NamingException, ClientRequestException {
 		// [NAT P001]
 		// Lookup campusUID

@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
-import edu.umd.cs.submitServer.IAuthenticationService;
+import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.SubmitServerUtilities;
@@ -229,10 +229,10 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		releaseConnection(conn);
 	}
 
-	private IAuthenticationService authenticationService;
+	private ILDAPAuthenticationService authenticationService;
 
 	/**
-	 * Gets the implementatino of IAuthenticationService used to authenticate
+	 * Gets the implementation of LDAP IAuthenticationService used to authenticate
 	 * people for to the submitServer. The idea is that other institutions can
 	 * write their own implementations of IAuthenticationService to authenticate
 	 * however they want.
@@ -244,13 +244,19 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	 *         this web application for authentication.
 	 * @throws ServletException
 	 */
-	protected synchronized IAuthenticationService getIAuthenticationService()
+	protected synchronized ILDAPAuthenticationService getIAuthenticationService()
 			throws ServletException {
 		// Return cached copy if we've already loaded it
+	    
 		if (authenticationService != null)
 			return authenticationService;
-		// Otherwise we *MUST* be able to load the class used for authentication
-		// or we're screwed.
+		
+		String authenticationType = getServletContext()
+                .getInitParameter(AUTHENTICATION_TYPE);
+		if (!authenticationType.equals("ldap"))
+		    throw new IllegalStateException("Authentication service only available for ldap authentication");
+		
+
 		String authenticationServiceClassname = getServletContext()
 				.getInitParameter(AUTHENTICATION_LDAP_SERVICE);
 		if (authenticationServiceClassname == null)
@@ -258,7 +264,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		getSubmitServerServletLog()
 				.debug("authenticationServiceClass: "
 						+ authenticationServiceClassname);
-		authenticationService = (IAuthenticationService) SubmitServerUtilities
+		authenticationService = (ILDAPAuthenticationService) SubmitServerUtilities
 				.createNewInstance(authenticationServiceClassname);
 		authenticationService.initialize(getServletContext());
 		return authenticationService;

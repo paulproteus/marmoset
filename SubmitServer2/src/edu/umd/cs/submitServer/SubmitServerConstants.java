@@ -47,7 +47,8 @@ public interface SubmitServerConstants {
 	public static final String LDAP_URL = "authentication.ldap.provider_url";
 	public static final String LDAP_AUTH_MECHANISM = "authentication.ldap.authentication_mechanism";
 	public static final String LDAP_PRINCIPAL_FORMAT = "authentication.ldap.principal.format";
-	
+	public static final String AUTHENTICATION_TYPE = "authentication.type";
+
 	public static final String SKIP_AUTHENTICATION = "authentication.skip";
 
 	// Keys used for setting global properties about the submit server's

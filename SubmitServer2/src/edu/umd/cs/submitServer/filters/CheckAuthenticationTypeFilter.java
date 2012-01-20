@@ -13,6 +13,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.umd.cs.submitServer.SubmitServerConstants;
+
 /**
  * Filter that intercepts requests for authentication and checks that they're in keeping with the
  * authentication type set in {@code authentication.type}.
@@ -31,7 +33,7 @@ public class CheckAuthenticationTypeFilter implements Filter {
 	@Override
   public void init(FilterConfig filterConfig) throws ServletException {
 		ServletContext ctx = filterConfig.getServletContext();
-		authType = ctx.getInitParameter("authentication.type");
+		authType = ctx.getInitParameter(SubmitServerConstants.AUTHENTICATION_TYPE);
 		if (authType == null) {
 			authType = "openid";
 		}

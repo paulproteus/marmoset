@@ -282,7 +282,7 @@
     <form name="MakeSuperuser" method="post" action="${makeSuperuserLink}">
         <select name="studentPK">
             <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                <c:if test="${!student.superUser }">
+                <c:if test="${!student.superUser && student.canImportCourses }">
                     <option value="${student.studentPK}">
                         <c:out value="${student.fullname}" />
                     </option>

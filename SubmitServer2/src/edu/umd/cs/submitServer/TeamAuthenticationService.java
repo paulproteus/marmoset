@@ -44,7 +44,7 @@ import edu.umd.cs.submitServer.servlets.PerformLogin;
  * 
  * @author ayewah
  */
-public class TeamAuthenticationService implements IAuthenticationService {
+public class TeamAuthenticationService implements ILDAPAuthenticationService {
 
 	@Override
 	public void initialize(ServletContext context) {
@@ -61,7 +61,7 @@ public class TeamAuthenticationService implements IAuthenticationService {
 
 	public Student authenticateLDAP(String campusUID, String uidPassword,
 			Connection conn, boolean skipLDAP,
-			IAuthenticationService authenticationService) throws SQLException,
+			ILDAPAuthenticationService authenticationService) throws SQLException,
 			NamingException, ClientRequestException {
 		Student student = Student.lookupByLoginName(campusUID, conn);
 		if (student == null)

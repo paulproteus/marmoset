@@ -100,6 +100,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		Integer codeReviewerPK = parser.getIntegerParameter("codeReviewerPK", null);
 		Integer codeReviewAssignmentPK = parser.getIntegerParameter("codeReviewAssignmentPK", null);
 
+		
+		String courseKey = parser.getParameter("courseKey");
+		String projectNumber = parser.getParameter("projectNumber");
+        
 		String gradesServer = req.getServletContext().getInitParameter("grades.server");
         request.setAttribute("gradesServer", gradesServer);  
 		MultipartRequest multipartRequest = (MultipartRequest) request
@@ -152,7 +156,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				userSession.setOnlyCoursePK(coursePK);
 			} else
 				request.setAttribute("singleCourse", Boolean.FALSE);
-
+			if (courseKey != null && projectNumber != null) {
+			    course = Course.lookupByCourseKey(courseKey, conn);
+			    project = Project.lookupByCourseAndProjectNumber(course.getCoursePK(), projectNumber, conn);
+			}
 			if (studentRegistrationPK != null) {
 				studentRegistration = StudentRegistration
 						.lookupByStudentRegistrationPK(studentRegistrationPK,
@@ -187,9 +194,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				for(CodeReviewer  r : codeReviewersForAssignment) 
 				    if (!r.isInstructor() && !r.isAuthor())
 				        studentCodeReviewersForAssignment.add(r);
-				
 			}
-
 
 			if (testRunPK != null) {
 				// Get Test Run
@@ -251,8 +256,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 					throw new ServletException("Project is not visible");
 
 				request.setAttribute(PROJECT, project);
-
-
 
 				StudentRegistration canonicalAccount = StudentRegistration
 						.lookupByStudentRegistrationPK(

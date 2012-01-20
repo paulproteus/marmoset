@@ -21,31 +21,35 @@
  * 
  */
 
-package edu.umd.cs.submitServer.servlets;
+/*
+ * Created on Jun 8, 2005
+ */
+package edu.umd.cs.submitServer.filters;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 
-public class CreateDotSubmitUserFile extends SubmitServerServlet {
+public class SubmitStatusFilter extends SubmitServerFilter {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Course course = (Course) request.getAttribute(COURSE);
-        Project project = (Project) request.getAttribute(PROJECT);
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) resp;
+        Project project = (Project) request.getAttribute("project");
         StudentRegistration studentRegistration = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-        Student student = (Student) request.getAttribute(STUDENT);
-
+        StudentSubmitStatus submitStatus;
         Connection conn = null;
         boolean transactionSuccess = false;
         try {
@@ -53,16 +57,29 @@ public class CreateDotSubmitUserFile extends SubmitServerServlet {
             conn.setAutoCommit(false);
             conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-            StudentSubmitStatus submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
+            submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
                     studentRegistration.getStudentRegistrationPK(), conn);
+            conn.commit();
+            System.out.println("success");
             transactionSuccess = true;
-            NegotiateOneTimePassword.generateSubmitUser(response, student,
-                    studentRegistration, course.getCourseName(), project, submitStatus);
         } catch (SQLException e) {
             throw new ServletException(e);
         } finally {
-            rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
+            super.rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
         }
+        
+        request.setAttribute("submitStatus", submitStatus);
+        String code = studentRegistration.getClassAccount()+";" + submitStatus.getOneTimePassword();
+        int hash = code.hashCode() & 0xf;
+        if (hash < 0)
+            throw new IllegalStateException();
+        String checkSum = Integer.toHexString(hash);
+        if (checkSum.length() != 1)
+            throw new IllegalStateException();
+        code = code + checkSum;
+        request.setAttribute("submitStatusCode", code);
+        
+        chain.doFilter(request, response);
     }
 
 }

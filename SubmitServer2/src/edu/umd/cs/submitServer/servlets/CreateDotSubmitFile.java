@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.submitServer.SubmitServerConstants;
 
 public class CreateDotSubmitFile extends SubmitServerServlet {
 
@@ -44,13 +45,24 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
 		response.setHeader("Content-Disposition", "inline; filename=\".submit\"");
         
 		PrintWriter out = response.getWriter();
-		printProperty(out, "courseName", course.getCourseName());
-		printProperty(out, "courseKey" , course.getSubmitKey());
+		printComment(out, "Submit server .submit file for");
         
+		printComment(out, " Project " + project.getProjectNumber() + " for " + course.getCourseName());   
+		 
+		printProperty(out, "courseName", course.getCourseName());
+		 
 		printProperty(out, "section", course.getSection());
 		printProperty(out, "semester" ,course.getSemester());
         printProperty(out, "projectNumber",  project.getProjectNumber());
-		 
+        
+        printProperty(out, "courseKey" , course.getSubmitKey());
+        
+        String authentication = request.getServletContext().getInitParameter(SubmitServerConstants.AUTHENTICATION_TYPE);
+        printProperty(out, SubmitServerConstants.AUTHENTICATION_TYPE,  authentication );
+        printProperty(out, "baseURL", request.getScheme() + "://"
+                + request.getServerName() + ":" + request.getServerPort()
+                + request.getContextPath());
+
 		printProperty(out, "submitURL", request.getScheme() + "://"
 				+ request.getServerName() + ":" + request.getServerPort()
 				+ request.getContextPath() + ECLIPSE_SUBMIT_PATH);
