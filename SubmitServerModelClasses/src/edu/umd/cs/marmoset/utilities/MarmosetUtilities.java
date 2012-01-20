@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,29 +131,31 @@ public final class MarmosetUtilities
     }
 
     // [NAT P002]
-    // Generage a random password
-	private static SecureRandom rng = new SecureRandom();
+    // Generate a random password
+	private static SecureRandom srnd = new SecureRandom();
+	private static Random rng = new Random(srnd.nextLong() + System.nanoTime());
 
 	private static long nextRandomLong() {
 			return rng.nextLong();
 	}
 
-	private static long nextRandomNonnegativeLong() {
-			return rng.nextLong() & Long.MAX_VALUE;
-	}
 	/**
 	 * @return a random password
 	 */
 	public static String nextRandomPassword() {
-		String s = Long.toHexString(nextRandomLong());
-		return s.substring(s.length()-8);
+		String s =  Long.toHexString(nextRandomLong());
+		if (s.length() < 16) 
+		    s = "0000000000000000".substring(16-s.length()) + s;
+		if (s.length() != 16)
+		    throw new IllegalStateException("Generated password of '" + s + "'");
+		return s;
 	}
-    // [end NAT P002]
+
 
 
 	public static String nextLongRandomPassword() {
-		String s = Long.toString(nextRandomNonnegativeLong(), 36);
-		String t = Long.toString(nextRandomNonnegativeLong(), 36);
+		String s = nextRandomPassword();
+		String t = nextRandomPassword();
 		return s+t;
 		}
 
