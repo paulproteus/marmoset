@@ -59,10 +59,12 @@ public class VerifyOpenId extends SubmitServerServlet {
 		try {
 	    conn = getConnection();
 	    Student student;
-	    if (uid != null) 
+	    if (uid != null) { 
 	        student = Student.lookupByCampusUID(uid, conn);
-	    else 
+	    } else {
+	    	uid = loginName;
 	        student = Student.lookupByLoginName(loginName, conn);
+	    }
 	    
 	    String targetUrl = req.getParameter("marmoset.target");
 	    if (Strings.isNullOrEmpty(targetUrl)) {
