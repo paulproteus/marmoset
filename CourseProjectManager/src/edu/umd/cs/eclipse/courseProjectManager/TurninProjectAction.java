@@ -29,12 +29,18 @@ package edu.umd.cs.eclipse.courseProjectManager;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -84,7 +90,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
 
 /**
  * @author jspacco
@@ -671,31 +679,28 @@ public class TurninProjectAction implements IObjectActionDelegate {
 
 		Properties userProperties = getSubmitUserProperties(project);
 
+		String authentication = allSubmissionProps.getProperty("authentication.type");
 		Debug.print("properties: " + userProperties);
 
 		// classAccount will be null when we don't have a .submitUser file and
 		// need
 		// to fetch one from the server
-		if (validSubmitUser(userProperties)) {
-			// currently no .submituser file exists; negotiate with server
-			// for one
+		if (invalidSubmitUser(userProperties)) {
+			if (!authentication.equals("ldap") ){
+			    
+			} else {
 			PasswordDialog passwordDialog = new PasswordDialog(parent);
 			int passwordStatus = passwordDialog.open();
 			if (passwordStatus != PasswordDialog.OK) {
 				// TODO fail here in some useful way
 				Debug.print("PasswordDialog failed");
 			}
-			String campusUID = passwordDialog.getUsername();
-			String uidPassword = passwordDialog.getPassword();
-			Debug.print("from PasswordDialog, campusUID: " + campusUID);
-			// Debug.print("from PasswordDialog, uidpassword: " + uidPassword);
-
+			String username = passwordDialog.getUsername();
+			String password = passwordDialog.getPassword();
+			
 			InputStream inputStream = TurninProjectAction
-					.getSubmitUserFileFromServer(campusUID, uidPassword,
-							allSubmissionProps.getProperty("courseName"),
-							allSubmissionProps.getProperty("semester"),
-							allSubmissionProps.getProperty("projectNumber"),
-							allSubmissionProps.getProperty("submitURL"));
+					.getSubmitUserFileFromServer(username, password,
+					        allSubmissionProps);
 			Debug.print("I have input stream from the server");
 
 			// create .submituser file
@@ -711,30 +716,93 @@ public class TurninProjectAction implements IObjectActionDelegate {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 			}
+			}
 			Debug.print("created .submituser file");
 			userProperties = getSubmitUserProperties(project);
 		}
 
 		// open .submituser file, load properties, and add those properties
 		// the current set of properties
-		if (validSubmitUser(userProperties)) {
+		if (invalidSubmitUser(userProperties)) {
 			throw new IOException(
 					"Cannot find classAccount in user properties even after negotiating with the SubmitServer for a one-time password for this project");
 		}
 
 		// combine the two sets of properties
 		addPropertiesNotAlreadyDefined(allSubmissionProps, userProperties);
-		if (validSubmitUser(allSubmissionProps)) {
+		if (invalidSubmitUser(allSubmissionProps)) {
 			throw new IOException(
 					"Cannot find classAccount in all properties even after negotiating with the SubmitServer for a one-time password for this project");
 		}
 		return allSubmissionProps;
 	}
 
-	private boolean validSubmitUser(Properties userProperties) {
+	private boolean invalidSubmitUser(Properties userProperties) {
 		return userProperties.getProperty("cvsAccount") == null
 				&& userProperties.getProperty("classAccount") == null;
 	}
+
+	
+
+	public static boolean openURL(String u) {
+	       try {
+	           URL url = new URL(u);
+
+	           if (true) {
+	               IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().createBrowser("courseProjectManager");
+	               browser.openURL(url);
+	           } else {
+	               PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser().openURL(url);
+	           }
+	           return true;
+        } catch (PartInitException e) {
+            return false;
+        } catch (MalformedURLException e) {
+           return false;
+        }
+
+
+	}
+    public static String[] getSubmitUserForOpenId(String courseKey, String projectNumber, String baseURL)
+            throws UnsupportedEncodingException, URISyntaxException, IOException {
+        Console console = System.console();
+        
+        String encodedProjectNumber = URLEncoder.encode(projectNumber, "UTF-8");
+        String u = baseURL + "/view/submitStatus?courseKey=" + courseKey + "&projectNumber="
+                + encodedProjectNumber;
+
+        if (!openURL(u)) {
+
+            System.out.println("Please enter the following URL into your browser");
+            System.out.println("  " + u);
+            System.out
+                    .println("Your browser will connect to the submit server, which may require you to authenticate to the submit server");
+            System.out.println("Please do so, and then you will be shown a page with a textfield on it");
+            System.out.println("Then copy that text and paste it into the prompt here");
+        }
+
+        while (true) {
+            System.out.println("Information from browser? ");
+            String info = new String(console.readLine());
+            if (info.length() > 2) {
+                int checksum = Integer.parseInt(info.substring(info.length() - 1), 16);
+                info = info.substring(0, info.length() - 1);
+                int hash = info.hashCode() & 0x0f;
+                if (checksum == hash) {
+                    String fields[] = info.split(";");
+                    if (fields.length == 2) {
+                        return fields;
+
+                    }
+                }
+            }
+            System.out.println("That doesn't seem right");
+            System.out
+                    .println("The information should be your account name and a string of hexidecimal digits, separate by a semicolon");
+            System.out.println("Please try again");
+            System.out.println();
+        }
+    }
 
 	/**
 	 * @param cvsStatus
@@ -1047,23 +1115,22 @@ public class TurninProjectAction implements IObjectActionDelegate {
 
 	}
 
-	private static InputStream getSubmitUserFileFromServer(String campusUID,
-			String uidPassword, String courseName, String semester,
-			String projectNumber, String submitURL) throws IOException,
+	private static InputStream getSubmitUserFileFromServer(String loginName,
+			String password, Properties allProperties) throws IOException,
 			HttpException {
 		// TODO derive this from submitURL
-		int index = submitURL.indexOf("/eclipse/");
-		String url = submitURL.substring(0, index);
+	    String url = allProperties.getProperty("baseURL");
 		url += "/eclipse/NegotiateOneTimePassword";
 		// System.out.println(url);
 		// Debug.print("url: " +url);
 		PostMethod post = new PostMethod(url);
+		post.addParameter("loginName", loginName);
+		post.addParameter("password", password);
+		
+		addParameter(post, "courseKey", allProperties);
+		addParameter(post, "projectNumber", allProperties);
+        
 
-		post.addParameter("campusUID", campusUID);
-		post.addParameter("uidPassword", uidPassword);
-		post.addParameter("courseName", courseName);
-		post.addParameter("semester", semester);
-		post.addParameter("projectNumber", projectNumber);
 
 		HttpClient client = new HttpClient();
 		client.setConnectionTimeout(5000);
@@ -1080,4 +1147,9 @@ public class TurninProjectAction implements IObjectActionDelegate {
 
 		return post.getResponseBodyAsStream();
 	}
+	
+	static void addParameter(PostMethod post, String name, Properties properties) {
+	    post.addParameter(name, properties.getProperty(name));
+	}
+	
 }

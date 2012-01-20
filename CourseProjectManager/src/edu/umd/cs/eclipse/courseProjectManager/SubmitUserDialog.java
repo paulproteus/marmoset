@@ -39,11 +39,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-/**
- * @author jspacco
- * 
- */
-public class PasswordDialog extends Dialog {
+
+public class SubmitUserDialog extends Dialog {
 	private String username;
 	private String password;
 
@@ -53,20 +50,14 @@ public class PasswordDialog extends Dialog {
 
 	private Button okButton;
 
-	private String message = "Enter LDAP DirectoryID username and password";
-	private String title = "Enter LDAP DirectoryID username and password";
+	private String message = "Enter submit user data from submit server web page";
+	private String title = "User data from Submit server";
 
-	public PasswordDialog(Shell parent) {
+	public SubmitUserDialog(Shell parent) {
 		super(parent);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		// create composite
@@ -85,7 +76,7 @@ public class PasswordDialog extends Dialog {
 
 		// username prompt
 		Label usernameLabel = new Label(composite, SWT.WRAP);
-		usernameLabel.setText("DirectoryID:");
+		usernameLabel.setText("Info:");
 		GridData data = new GridData(GridData.GRAB_HORIZONTAL
 				| GridData.HORIZONTAL_ALIGN_BEGINNING);
 		data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
@@ -97,22 +88,7 @@ public class PasswordDialog extends Dialog {
 		usernameText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
 				| GridData.HORIZONTAL_ALIGN_FILL));
 
-		// password prompt
-		Label passwordLabel = new Label(composite, SWT.WRAP);
-		passwordLabel.setText("Password:");
-		GridData passwordGrid = new GridData(GridData.GRAB_HORIZONTAL
-				| GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL
-				| GridData.HORIZONTAL_ALIGN_BEGINNING);
-		passwordGrid.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
-		passwordLabel.setLayoutData(passwordGrid);
-		passwordLabel.setFont(parent.getFont());
-
-		// password textbox
-		passwordText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		passwordText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
-				| GridData.HORIZONTAL_ALIGN_FILL));
-		passwordText.setEchoChar('*');
-
+	
 		// Validate the user's input
 		usernameText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -139,8 +115,27 @@ public class PasswordDialog extends Dialog {
 	 * method is called whenever the text changes in the input field.
 	 * </p>
 	 */
+	String classAccount;
+	String oneTimePassword;
 	protected void validateInput() {
-		String errorMessage = null;
+	    String info = usernameText.getText();
+        if (info.length() > 2) {
+            int checksum = Integer.parseInt(info.substring(info.length() - 1), 16);
+            info = info.substring(0, info.length() - 1);
+            int hash = info.hashCode() & 0x0f;
+            if (checksum == hash) {
+                String fields[] = info.split(";");
+                if (fields.length == 2) {
+                    classAccount = fields[0];
+                    oneTimePassword = fields[1];
+                    setErrorMessage(null);
+                    return;
+
+                }
+            }
+        }
+        String errorMessage = "The information should be your account name and a string of hexidecimal digits, separated by a semicolon";
+        
 		setErrorMessage(errorMessage);
 	}
 
