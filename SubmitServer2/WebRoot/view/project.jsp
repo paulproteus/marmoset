@@ -32,6 +32,18 @@
 	title="All submissions for ${course.courseName} project ${project.projectNumber}" />
 
 <body>
+
+ <script type="text/javascript">
+                    function toggle(item) {
+                        obj = document.getElementById(item);
+                        if (obj.style.display == "none") {
+                            obj.style.display = "block";
+                        } else {
+                            obj.style.display = "none";
+                        }
+                    }
+                </script>
+                
 <ss:header />
 <ss:breadCrumb />
 
@@ -206,13 +218,45 @@
     <c:url var="submitProjectLink"
                     value="/view/submitProject.jsp">
                     <c:param name="projectPK" value="${project.projectPK}" />
-                    <c:param name="testSetupPK" value="${project.testSetupPK}" />
                 </c:url>
-<p> <a href="${submitProjectLink}"> web submission </a></p>
 
-<c:if test="${project.tested}">
-	<ss:inconsistentBackgroundRetestDescription />
-</c:if>
-<ss:footer />
+    <p>
+        <a href="${submitProjectLink}"> web submission </a>
+    </p>
+    <c:if test="${project.tested}">
+        <ss:inconsistentBackgroundRetestDescription />
+    </c:if>
+
+
+    <h3>
+        <a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">
+            Files for automatic submission tools (toggle)</a>
+    </h3>
+
+
+    <div id="submitFiles" style="display: none">
+        <p>These files are used by tools that submit projects (such as the Eclipse course project manager and the
+            command line submission tool). Normally, the .submit file is provided by the instructor, and the .submitUser
+            file is created the first time a project is submitted, after the tool authentications you. But direct links
+            are provided here as an alternative way to obtain these files.
+        <p>
+            Both of these files should be in the top level directory for the project.
+
+            <c:url var="dotSubmitLink" value="/data/GetDotSubmitFile">
+                <c:param name="projectPK" value="${project.projectPK}" />
+            </c:url>
+        <p>
+            <a href="${dotSubmitLink}">Get .submit file (identifies project)</a>
+            <c:url var="dotSubmitLink" value="/data/GetDotSubmitUserFile">
+                <c:param name="projectPK" value="${project.projectPK}" />
+            </c:url>
+        <p>
+            <a href="${dotSubmitLink}">Get .submitUser file (identifies a submission as being from <c:out
+                    value="${studentRegistration.fullname}" />; do not share with other students)
+            </a>
+        </p>
+    </div>
+
+    <ss:footer />
 </body>
 </html>
