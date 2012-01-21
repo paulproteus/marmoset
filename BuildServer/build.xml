@@ -29,7 +29,7 @@
 	
 	<property file="local.properties"/>
 	<property file="build.properties"/>
-	<property name="output.dir" value="bin"/>
+	<property name="output.dir" value="build/classes"/>
   <!-- 
   Assume findbugs is rooted one slot above the BuildServer unless
   explicitly over-ridden
@@ -69,6 +69,9 @@
 		</ant>
 	</target>
 
+
+
+
   <target name="findbugs" depends="init">
     <ant antfile="build.xml" dir="${findbugs.dir}" inheritAll="false"/>
   </target>
@@ -76,12 +79,12 @@
 	<target name="classes" depends="modelClasses">
 		<javac
 			srcdir="src"
-			destdir="bin"
+			destdir="build/classes"
 			includeantruntime="false"
 			debug="on">
 			<classpath refid="buildserver.classpath"/>
 		</javac>
-		<copy todir="bin">
+		<copy todir="build/classes">
 			<fileset dir="src">
 				<include name="**/*.policy"/>
 				<include name="**/*.properties"/>
@@ -90,10 +93,20 @@
 		</copy>
 	</target>
 	
+	<target name="dist" depends="clean,jar">
+	<mkdir dir="build/dist"/>
+	<mkdir dir="build/dist/lib"/>
+	<copy file="buildserver.jar" todir="build/dist"/> 
+	<copy todir="build/dist/lib">
+	  <fileset dir="lib"/>
+        </copy>
+	<zip destfile="build/buildserver.zip" basedir="build/dist"/>
+	</target>
+
 	<target name="jar" depends="classes">
 		<jar destfile="buildserver.jar"
   			manifest="etc/MANIFEST.MF">
-			<fileset dir="bin">
+			<fileset dir="build/classes">
 				<include name="**/*.class"/>
 				<include name="**/*.policy"/>
 				<include name="**/*.properties"/>
@@ -117,12 +130,11 @@
 
 	<target name="clean">
 		<delete file="buildserver.jar"/>
-		<delete>
-			<fileset dir="bin">
-			    <include name="**/*.class"/>
-			    <include name="lib/modelClasses.jar"/>
-		 	</fileset>
-		</delete>
+		<delete file="build/buildserver.zip"/>
+	        <delete file="lib/modelClasses.jar"/>
+	        <delete dir="build/classes"/>
+		<delete dir="build/dist"/>
+		<mkdir dir="build/classes"/>
 	</target>
 	
 	<target name="test">
