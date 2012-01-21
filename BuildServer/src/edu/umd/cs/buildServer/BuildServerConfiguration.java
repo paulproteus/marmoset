@@ -106,8 +106,9 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	    InetAddress localHost;
         try {
             localHost = InetAddress.getLocalHost();
-            return localHost.getHostName() +"/" + getBuildServerWorkingDir().getName();
-        } catch (UnknownHostException e) {
+            return localHost.getHostName() +"/" 
+                    + getBuildServerWorkingDir().getCanonicalFile().getName();
+        } catch (Exception e) {
             return "unknown";
         }
         
