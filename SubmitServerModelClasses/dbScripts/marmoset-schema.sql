@@ -35,6 +35,7 @@ CREATE TABLE `buildservers` (
   `remote_host` varchar(200) COLLATE utf8_bin NOT NULL,
   `courses` varchar(200) COLLATE utf8_bin NOT NULL,
   `last_request` datetime NOT NULL,
+  `last_request_submission_pk` int(11) NOT NULL DEFAULT '0',
   `last_job` datetime DEFAULT NULL,
   `last_success` datetime DEFAULT NULL,
   `system_load` varchar(250) COLLATE utf8_bin NOT NULL,
@@ -43,7 +44,6 @@ CREATE TABLE `buildservers` (
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 
 
 -- --------------------------------------------------------
