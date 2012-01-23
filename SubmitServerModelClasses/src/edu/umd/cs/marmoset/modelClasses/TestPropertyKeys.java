@@ -68,6 +68,9 @@ public interface TestPropertyKeys {
 	public static final String[] TEST_TIMEOUT =
 			{"test.timeout.testCase", "test.timeout", "test.timeout.testProcess", "timeout"};
 
+    public static final String[] BUILD_TIMEOUT =
+            {"build.timeout"};
+
 	/**
 	 * Property names to specify max number of bytes to be read from
 	 * a test process.

@@ -47,8 +47,10 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
 		PrintWriter out = response.getWriter();
 		printComment(out, "Submit server .submit file for");
         
-		printComment(out, " Project " + project.getProjectNumber() + " for " + course.getCourseName());   
-		 
+		printComment(out, " Course " + course.getCourseName());   
+		printComment(out, " Project " + project.getProjectNumber() + ": " + project.getTitle());   
+		    
+		out.println();
 		printProperty(out, "courseName", course.getCourseName());
 		 
 		printProperty(out, "section", course.getSection());

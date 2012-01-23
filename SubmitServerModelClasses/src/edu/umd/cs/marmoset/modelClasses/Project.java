@@ -781,8 +781,8 @@ public class Project implements Serializable {
     public static Project lookupByCourseAndProjectNumber(int coursePK, String projectNumber,
             Connection conn) throws SQLException {
         String query = "SELECT " + ATTRIBUTES + " FROM " + " projects " 
-               + " WHERE project.coursePK = ? "
-                + " AND projects.project_number = ? ";
+               + " WHERE course_pk = ? "
+                + " AND project_number = ? ";
 
         PreparedStatement stmt = conn.prepareStatement(query);
 

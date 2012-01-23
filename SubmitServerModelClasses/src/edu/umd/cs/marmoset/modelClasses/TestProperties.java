@@ -50,6 +50,8 @@ public class TestProperties implements TestPropertyKeys {
     // Shared
     private String language;
     private int testTimeoutInSeconds;
+    private int buildTimeoutInSeconds;
+    
     private int maxDrainOutputInBytes;
     private String ldLibraryPath;
     private String additionalSourceFileExtensions;
@@ -159,6 +161,7 @@ public class TestProperties implements TestPropertyKeys {
         // Note that we ignore test.timeout.testProcess since we're not timing out
         // the entire process anymore.
         setTestTimeoutInSeconds(getOptionalIntegerProperty(TEST_TIMEOUT, DEFAULT_PROCESS_TIMEOUT));
+        setBuildTimeoutInSeconds(getOptionalIntegerProperty(BUILD_TIMEOUT, 6*DEFAULT_PROCESS_TIMEOUT));
     }
 
 	/**
@@ -363,8 +366,14 @@ public class TestProperties implements TestPropertyKeys {
         return testTimeoutInSeconds;
     }
     public void setTestTimeoutInSeconds(int testTimeout) {
-        this.testTimeoutInSeconds=testTimeout;
+        this.testTimeoutInSeconds = testTimeout;
         setProperty(TEST_TIMEOUT[0], Integer.toString(this.testTimeoutInSeconds));
+    }
+    public int getBuildTimeoutInSeconds() {
+        return testTimeoutInSeconds;
+    }
+    public void setBuildTimeoutInSeconds(int buildTimeout) {
+        this.buildTimeoutInSeconds = buildTimeout;
     }
     /**
      * @return Returns the maxDrain.

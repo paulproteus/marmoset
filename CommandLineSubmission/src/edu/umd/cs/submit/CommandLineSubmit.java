@@ -70,13 +70,13 @@ import org.apache.commons.httpclient.protocol.Protocol;
  */
 public class CommandLineSubmit {
 
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.9.0";
     public static final int HTTP_TIMEOUT = Integer.getInteger("HTTP_TIMEOUT", 30).intValue() * 1000;
 
     public static void main(String[] args) {
         try {
             Protocol easyhttps = new Protocol("https", new EasySSLProtocolSocketFactory(), 443);
-            File home = args.length > 0 ? new File(args[0]) : new File("");
+            File home = args.length > 0 ? new File(args[0]) : new File(".");
 
             Protocol.registerProtocol("easyhttps", easyhttps);
             File submitFile = new File(home, ".submit");
@@ -86,6 +86,7 @@ public class CommandLineSubmit {
 
             if (!submitFile.canRead()) {
                 System.out.println("Must perform submit from a directory containing a \".submit\" file");
+                System.out.println("No such file found at " + submitFile.getCanonicalPath());
                 System.exit(1);
             }
 
@@ -103,8 +104,8 @@ public class CommandLineSubmit {
             String authenticationType = p.getProperty("authentication.type");
             String baseURL = p.getProperty("baseURL");
 
-            System.out.println("Submitting project " + projectNumber + " for " + courseName);
-
+            System.out.println("Submitting contents of " + home.getCanonicalPath());
+            System.out.println(" as project " + projectNumber + " for course " + courseName);
             FilesToIgnore ignorePatterns = new FilesToIgnore();
             addIgnoredPatternsFromFile(cvsIgnoreFile, ignorePatterns);
             addIgnoredPatternsFromFile(submitIgnoreFile, ignorePatterns);
@@ -118,8 +119,9 @@ public class CommandLineSubmit {
             }
             if (userProps.getProperty("cvsAccount") == null && userProps.getProperty("classAccount") == null
                     || userProps.getProperty("oneTimePassword") == null) {
+                System.out.println();
                 System.out
-                        .println("We need to authenticate you and create a .submitUser file so you can submit this directory as your project");
+                        .println("We need to authenticate you and create a .submitUser file so you can submit your project");
 
                 PrintWriter newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
                 if (authenticationType.equals("openid")) {
@@ -135,7 +137,6 @@ public class CommandLineSubmit {
                     
                     System.out.println("Please enter your LDAP username and password");
                     System.out.print("LDAP username: ");
-                    System.out.flush();
                     loginName = console.readLine();
                     System.out.println("Password: ");
                     password = new String(console.readPassword());
@@ -184,7 +185,12 @@ public class CommandLineSubmit {
 
             // ========================== assemble zip file in byte array
             // ==============================
-
+            String loginName = userProps.getProperty("loginName");
+            String classAccount = userProps.getProperty("classAccount");
+            String from = classAccount;
+            if (loginName != null && !loginName.equals(classAccount))
+                from += "/" + loginName;
+            System.out.println(" submitted by " + from); 
             System.out.println();
             System.out.println("Submitting the following files");
             ByteArrayOutputStream bytes = new ByteArrayOutputStream(4096);
@@ -253,14 +259,14 @@ public class CommandLineSubmit {
         
         boolean requested = false;
         String encodedProjectNumber = URLEncoder.encode(projectNumber, "UTF-8");
-        URI u = new URI(baseURL + "/view/submitStatus?courseKey=" + courseKey + "&projectNumber="
+        URI u = new URI(baseURL + "/view/submitStatus.jsp?courseKey=" + courseKey + "&projectNumber="
                 + encodedProjectNumber);
 
         if (java.awt.Desktop.isDesktopSupported()) {
             Desktop desktop = java.awt.Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                 System.out
-                        .println("Your browser will connect to the submit server, which may require you to authenticate to the submit server");
+                        .println("Your browser will connect to the submit server, which may require you to authenticate yourself");
                 System.out.println("Please do so, and then you will be shown a page with a textfield on it");
                 System.out.println("Then copy that text and paste it into the prompt here");
                 desktop.browse(u);
@@ -270,14 +276,16 @@ public class CommandLineSubmit {
         if (!requested) {
             System.out.println("Please enter the following URL into your browser");
             System.out.println("  " + u);
+            System.out.println();
             System.out
-                    .println("Your browser will connect to the submit server, which may require you to authenticate to the submit server");
+                    .println("Your browser will connect to the submit server, which may require you to authenticate yourself");
             System.out.println("Please do so, and then you will be shown a page with a textfield on it");
             System.out.println("Then copy that text and paste it into the prompt here");
 
         }
         while (true) {
-            System.out.println("Information from browser? ");
+            System.out.println();
+            System.out.println("Submission verification information from browser? ");
             String info = new String(console.readLine());
             if (info.length() > 2) {
                 int checksum = Integer.parseInt(info.substring(info.length() - 1), 16);

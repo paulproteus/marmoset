@@ -748,7 +748,7 @@ public class TurninProjectAction implements IObjectActionDelegate {
 	       try {
 	           URL url = new URL(u);
 
-	           if (true) {
+	           if (false) {
 	               IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().createBrowser("courseProjectManager");
 	               browser.openURL(url);
 	           } else {

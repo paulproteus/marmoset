@@ -76,6 +76,7 @@
         <tr>
             <th>Host</th>
             <th>Last request</th>
+            <th>now building</th>
             <th>Last job</th>
             <th>Last success</th>
             <th>Load</th>
@@ -85,6 +86,12 @@
             <tr class="$rowKind">
                 <td><c:out value="${buildServer.name}" /></td>
                 <td><fmt:formatDate value="${buildServer.lastRequest}" pattern="dd MMM, hh:mm a" /></td>
+                <td><c:if test="${buildServer.lastRequestSubmissionPK > 0}">
+                <c:url var="s" value="/view/instructor/submission.jsp">
+                <c:param name="submissionPK" value="${buildServer.lastRequestSubmissionPK}" />
+                </c:url>
+                <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                </c:if>
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
 
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>

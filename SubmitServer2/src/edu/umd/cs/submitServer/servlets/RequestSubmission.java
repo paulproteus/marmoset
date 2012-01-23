@@ -294,7 +294,7 @@ public class RequestSubmission extends SubmitServerServlet {
 
             OutputStream out = response.getOutputStream();
             IO.copyStream(bais, out);
-            BuildServer.submissionRequestedAndOProvided(conn, hostname, remoteHost, courses, now, load);
+            BuildServer.submissionRequestedAndProvided(conn, hostname, remoteHost, courses, now, load, submission);
         } catch (SQLException e) {
             handleSQLException(e);
             throw new ServletException(e);

@@ -19,6 +19,7 @@ public class BuildServer implements Comparable<BuildServer> {
 	String courses;
 	String remoteHost;
 	Timestamp lastRequest;
+	@Submission.PK int lastRequestSubmissionPK;
 	@CheckForNull
 	Timestamp lastSuccess;
 	@CheckForNull
@@ -27,7 +28,7 @@ public class BuildServer implements Comparable<BuildServer> {
 	public static final String TABLE_NAME = "buildservers";
 
 	static final String[] ATTRIBUTE_NAME_LIST = { "buildserver_pk", "name",
-			"remote_host", "courses", "last_request", "last_job", "last_success", "system_load" };
+			"remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "last_success", "system_load" };
 
 	public static final String ATTRIBUTES = Queries.getAttributeList(
 			TABLE_NAME, ATTRIBUTE_NAME_LIST);
@@ -38,16 +39,14 @@ public class BuildServer implements Comparable<BuildServer> {
 		remoteHost = rs.getString(startingFrom++);
 		courses = rs.getString(startingFrom++);
 		lastRequest = rs.getTimestamp(startingFrom++);
+		lastRequestSubmissionPK = Submission.asPK(rs.getInt(startingFrom++));
 		lastJob = rs.getTimestamp(startingFrom++);
 		lastSuccess = rs.getTimestamp(startingFrom++);
 		load = rs.getString(startingFrom++);
 	}
 
-	public boolean canBuild(String courseName) {
-		return courses != null && courses.contains(courseName);
-	}
 	public boolean canBuild(Course course) {
-		return courses != null && courses.contains(course.getCourseName());
+		return courses != null && courses.contains(course.getBuildserverKey());
 	}
 	public String getName() {
 		return name;
@@ -64,7 +63,9 @@ public class BuildServer implements Comparable<BuildServer> {
 	public Timestamp getLastRequest() {
 		return lastRequest;
 	}
-
+	public @Submission.PK int getLastRequestSubmissionPK() {
+        return lastRequestSubmissionPK;
+    }
 	public Timestamp getLastJob() {
 		return lastJob;
 	}
@@ -73,6 +74,7 @@ public class BuildServer implements Comparable<BuildServer> {
 		return lastSuccess;
 	}
 
+	
 	public String getLoad() {
 		return load;
 	}
@@ -81,28 +83,28 @@ public class BuildServer implements Comparable<BuildServer> {
 			String remoteHost, @CheckForNull String courses,
 			Timestamp lastRequest, String load) throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(new String[] {
-				"name", "remote_host", "courses", "last_request", "system_load" },
+				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "system_load" },
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
-			Queries.setStatement(stmt, name, remoteHost, courses, lastRequest,
-					load, remoteHost, courses, lastRequest,
+			Queries.setStatement(stmt, name, remoteHost, courses, lastRequest,0,
+					load, remoteHost, courses, lastRequest,0,
 					load);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);
 		}
 	}
-	public static void submissionRequestedAndOProvided(Connection conn, String name,
+	public static void submissionRequestedAndProvided(Connection conn, String name,
 			String remoteHost, @CheckForNull String courses,
-			Timestamp now, String load) throws SQLException {
+			Timestamp now, String load, Submission submission) throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(new String[] {
-				"name", "remote_host", "courses", "last_request", "last_job", "system_load" },
+				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "system_load" },
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
-			Queries.setStatement(stmt, name, remoteHost, courses, now, now,load, 
-					remoteHost, courses, now, now,load);
+			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, 
+					remoteHost, courses, now, submission.getSubmissionPK(), now,load);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);
@@ -114,15 +116,15 @@ public class BuildServer implements Comparable<BuildServer> {
 			Timestamp now, String load, Submission submission)
 			throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(
-				new String[] {"name", "remote_host","last_success" ,"last_built_submission_pk", "system_load",  "courses", "last_request" }, 
-				new String[] {"remote_host", "last_success","last_built_submission_pk", "system_load"}, 
+				new String[] {"name", "remote_host","last_success" ,"last_built_submission_pk", "last_request_submission_pk", "system_load",  "courses", "last_request" }, 
+				new String[] {"remote_host", "last_success","last_built_submission_pk", "last_request_submission_pk", "system_load"}, 
 				TABLE_NAME);
 		@Submission.PK int submissionPK = submission.getSubmissionPK();
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
 			Queries.setStatement(stmt,
-					name, remoteHost, now, submissionPK, load, "", now,
-					 remoteHost, now, submissionPK, load);
+					name, remoteHost, now, submissionPK, 0, load, "", now,
+					 remoteHost, now, submissionPK,0, load);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);

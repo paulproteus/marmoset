@@ -49,8 +49,12 @@ public class SubmitStatusFilter extends SubmitServerFilter {
         HttpServletResponse response = (HttpServletResponse) resp;
         Project project = (Project) request.getAttribute("project");
         StudentRegistration studentRegistration = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-        StudentSubmitStatus submitStatus;
+        StudentSubmitStatus submitStatus = (StudentSubmitStatus) request.getAttribute(STUDENT_SUBMIT_STATUS);
         Connection conn = null;
+        if (studentRegistration == null || project == null)
+            throw new NullPointerException();
+       
+        if (submitStatus != null) {
         boolean transactionSuccess = false;
         try {
             conn = getConnection();
@@ -69,6 +73,7 @@ public class SubmitStatusFilter extends SubmitServerFilter {
         }
         
         request.setAttribute("submitStatus", submitStatus);
+        }
         String code = studentRegistration.getClassAccount()+";" + submitStatus.getOneTimePassword();
         int hash = code.hashCode() & 0xf;
         if (hash < 0)

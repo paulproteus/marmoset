@@ -67,7 +67,8 @@ public class ProcessExitMonitor extends Thread {
 	}
 
 	/**
-	 * Wait given number of milliseconds for the process to exit.
+	 * Wait given number of milliseconds for the process to exit. If it does
+	 * not finish within that amount of time, kill the process;
 	 * 
 	 * @param millis
 	 *            number of milliseconds to wait for the process to exit
@@ -80,7 +81,11 @@ public class ProcessExitMonitor extends Thread {
 		if (!exited) {
 			wait(millis);
 		}
-		return exited;
+		if (exited) 
+		    return true;
+		 
+		process.destroy();
+		return false;
 	}
 
 	/**

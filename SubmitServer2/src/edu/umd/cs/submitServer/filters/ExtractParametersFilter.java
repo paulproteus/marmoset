@@ -537,6 +537,9 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (studentRegistration != null)
 				request.setAttribute(STUDENT_REGISTRATION, studentRegistration);
 
+			 if (project != null)
+	                request.setAttribute(PROJECT, project);
+
 			if (studentSubmitStatus != null)
 				request.setAttribute(STUDENT_SUBMIT_STATUS, studentSubmitStatus);
 

@@ -22,3 +22,4 @@ BuildServer/buildserver.jar
 local.build.properties
 local.web.properties
 CommandLineSubmission/bin
+CommandLineSubmission/submit.jar

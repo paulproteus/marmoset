@@ -37,6 +37,7 @@ import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.tester.CTester;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
+import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
@@ -165,22 +166,32 @@ public class CBuilder extends Builder implements TestPropertyKeys {
 					process.getInputStream(), process.getErrorStream());
 
 			monitor.start();
+			
+			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process);
+            exitMonitor.start();
 
-			int exitCode = process.waitFor();
-			finished = true;
+            long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;
 
-			monitor.join();
+            if (exitMonitor.waitForProcessToExit(processTimeoutMillis)) {
 
-			if (exitCode != 0) {
-				setCompilerOutput(monitor.getCombinedOutput());
+                int exitCode = process.waitFor();
+                finished = true;
 
-				throw new CompileFailureException("Compile failed for project "
-						+ getProjectSubmission().getZipFile().getPath(),
-						this.getCompilerOutput());
-			}
+                monitor.join();
 
-			// Wait for a while, to give files a chance to settle
-			pause(2000);
+                if (exitCode != 0) {
+                    setCompilerOutput(monitor.getCombinedOutput());
+
+                    throw new CompileFailureException("make failed for project " + getProjectSubmission().getZipFile().getPath(),
+                            this.getCompilerOutput());
+                }
+
+                // Wait for a while, to give files a chance to settle
+                pause(2000);
+            } else {
+                throw new CompileFailureException("make timed-out" + getProjectSubmission().getZipFile().getPath(),
+                        this.getCompilerOutput());
+            }
 		} catch (IOException e) {
 			throw new BuilderException("Could not execute make", e);
 		} catch (InterruptedException e) {
