@@ -118,4 +118,6 @@ public interface SubmitServerConstants {
 
   /** Key for accessing OpenID discovery information in a user session. */
   public static final String OPENID_DISCOVERED = "openid.discovered";
+  /** Map of AX attributes received from OpenID provider. */
+  public static final String OPENID_AX_MAP = "openidAx";
 }

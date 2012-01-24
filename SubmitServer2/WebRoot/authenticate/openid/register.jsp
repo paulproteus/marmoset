@@ -81,12 +81,15 @@ form li.required label {font-weight: bold;}
 		<ul>
                     <li class="required">
                 <label for="firstname-input">Name:</label>
-                <input type="text" name="firstname" id="firstname-input" placeholder="First" class="required" required="required"/>
-                <input type="text" name="lastname" id="lastname-input"  placeholder="Last" class="required" required="required"/>
+                <input type="text" name="firstname" id="firstname-input" placeholder="First" class="required" required="required"
+                value = "${openidAx.firstname}"/>
+                <input type="text" name="lastname" id="lastname-input"  placeholder="Last" class="required" required="required"
+                value = "${openidAx.lastname}"/>
             </li>
         <li class="required">
                 <label for="email-input">Email:</label>
-                <input type="text" name="email" id="email-input"  placeholder="email" class="email required" required="required"/>
+                <input type="text" name="email" id="email-input"  placeholder="email" class="email required" required="required"
+                value = "${openidAx.email}"/>
             </li>
         
 			<li class="required">
