@@ -127,10 +127,13 @@
      <fileset file="web.properties" />
      <fileset file="local.web.properties" />
      </concat>
+  	<concat destfile="${src}/branding.properties">
+  		<fileset file="branding.properties" />
+  		<fileset file="local.branding.properties" />
+  	</concat>
     <copy todir="${bin}" overwrite="true">
       <fileset dir="${src}">
         <include name="log4j.properties"/>
-        <include name="branding.properties" />
       </fileset>
       <filterset>
         <filter token="LOGS_LOCATION" value="${logs.location}"/>
