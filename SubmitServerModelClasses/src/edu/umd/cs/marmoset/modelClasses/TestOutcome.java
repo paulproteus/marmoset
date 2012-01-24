@@ -366,7 +366,7 @@ public class TestOutcome implements Serializable {
         
 		if (result.length() >  MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY)
 			result = result.substring(0,MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY)
-			+ String.format("\n ... %d characters trimmed ...", result.length() - MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY);
+			+ String.format("%n ... %d characters trimmed ...", result.length() - MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY);
 		return result;
 	}
 

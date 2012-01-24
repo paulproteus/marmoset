@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
@@ -221,7 +222,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	 * @return the StudentSubmitStatus to use
 	 * @throws SQLException
 	 */
-	private StudentSubmitStatus insert(Connection conn)
+	private @CheckReturnValue StudentSubmitStatus insert(Connection conn)
 		throws SQLException
 	{
 		StudentSubmitStatus studentSubmitStatus = StudentSubmitStatus.lookupByStudentRegistrationPKAndProjectPK(

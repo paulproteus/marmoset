@@ -273,6 +273,7 @@ public class FixZip {
             zOut.closeEntry();
         }
         zOut.close();
+        zf.close();
     }
 
     static boolean hasProblem(InputStream zipContents) throws IOException {

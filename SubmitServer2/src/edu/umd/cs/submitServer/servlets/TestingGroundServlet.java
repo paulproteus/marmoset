@@ -43,20 +43,7 @@ import edu.umd.cs.marmoset.utilities.Multiset;
 
 public class TestingGroundServlet extends SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to get.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
+
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -81,7 +68,7 @@ public class TestingGroundServlet extends SubmitServerServlet {
 		    Multiset<Date> dates = Submission.lookupSubmissionTimes(since, conn);
 		    out.println(dates.uniqueKeys().size() + " unique times");
 		    for(Map.Entry<Date, Integer> e : dates.entrySet()) {
-		        out.printf("%5d %s\n", e.getValue(), e.getKey());
+		        out.printf("%5d %s%n", e.getValue(), e.getKey());
 		    }
 		    out.flush();
 		    

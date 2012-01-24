@@ -54,23 +54,23 @@ public class SubmitStatusFilter extends SubmitServerFilter {
         if (studentRegistration == null || project == null)
             throw new NullPointerException();
        
-        if (submitStatus != null) {
-        boolean transactionSuccess = false;
-        try {
-            conn = getConnection();
-            conn.setAutoCommit(false);
-            conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+        if (submitStatus == null) {
+            boolean transactionSuccess = false;
+            try {
+                conn = getConnection();
+                conn.setAutoCommit(false);
+                conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-            submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
-                    studentRegistration.getStudentRegistrationPK(), conn);
-            conn.commit();
-            System.out.println("success");
-            transactionSuccess = true;
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        } finally {
-            super.rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
-        }
+                submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
+                        studentRegistration.getStudentRegistrationPK(), conn);
+                conn.commit();
+                System.out.println("success");
+                transactionSuccess = true;
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            } finally {
+                super.rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
+            }
         
         request.setAttribute("submitStatus", submitStatus);
         }

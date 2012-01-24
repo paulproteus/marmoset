@@ -159,7 +159,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         } catch (NamingException e) {
             throw new ServletException(e);
         } catch (ClientRequestException e) {
-            String msg = String.format("failed to negotiate oneTime password for %s in %s %s: %s", loginName, courseName,
+            String msg = String.format("failed to negotiate oneTime password for %s in %s: %s", loginName, courseName,
                     e.getMessage());
            
             ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, e);
