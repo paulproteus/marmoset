@@ -47,10 +47,8 @@ import edu.umd.cs.marmoset.utilities.Charsets;
 import edu.umd.cs.submitServer.BadPasswordException;
 import edu.umd.cs.submitServer.CanNotFindDirectoryIDException;
 import edu.umd.cs.submitServer.ClientRequestException;
-import edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.RequestParser;
-import edu.umd.cs.submitServer.TeamAuthenticationService;
 import edu.umd.cs.submitServer.UserSession;
 
 
@@ -258,30 +256,13 @@ public class PerformLogin extends SubmitServerServlet {
 		if (student == null)
 			throw new ClientRequestException("Cannot find user " + campusUID);
 
-		// If student is a team account, then authenticate its members
-		if (student.isTeamAccount()) {
-			student = new TeamAuthenticationService().authenticateLDAP(
-					campusUID, uidPassword, conn, skipLDAP,
-					authenticationService);
-		}
-
-		// Otherwise, if it has a password, authenticate generically
-		else if (student.getPassword() != null
-				&& !"0".equals(student.getPassword())) {
-			student = new GenericStudentPasswordAuthenticationService()
-					.authenticateLDAP(campusUID, uidPassword, conn, skipLDAP);
-
-		}
-
-		// otherwise authenticate via default service
-		else {
 
 			// Note: this is a read-only query.
 			// So, we do not start a transaction here.
 
 			student = authenticationService.authenticateLDAP(campusUID,
 					uidPassword, conn, skipLDAP);
-		}
+		
 		// [end NAT P001]
 		return student;
 	}

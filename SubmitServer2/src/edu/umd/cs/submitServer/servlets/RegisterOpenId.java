@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.utilities.Charsets;
+import edu.umd.cs.submitServer.SubmitServerConstants;
 
 /**
  * Complete registration of a new OpenID identifier. This servlet handles the form post from
@@ -26,6 +27,7 @@ public class RegisterOpenId extends SubmitServerServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 	    throws ServletException, IOException {
+		req.getSession().removeAttribute(SubmitServerConstants.OPENID_AX_MAP);
 		String uid = req.getParameter("uid");
 		logger.info("Registering uid " + uid);
 		String firstname = req.getParameter("firstname");

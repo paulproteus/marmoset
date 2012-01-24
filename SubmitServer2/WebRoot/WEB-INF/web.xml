@@ -1116,10 +1116,12 @@
 		<servlet-name>RegisterOneStudent</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterOneStudent</servlet-class>
 	</servlet>
+	<!--  
 	<servlet>
 		<servlet-name>RegisterOneTeam</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterOneTeam</servlet-class>
 	</servlet>
+	-->
 	<servlet>
 		<servlet-name>CreateDotSubmitFile</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.CreateDotSubmitFile</servlet-class>
@@ -1426,10 +1428,12 @@
 		<servlet-name>RegisterOneStudent</servlet-name>
 		<url-pattern>/action/instructor/RegisterOneStudent</url-pattern>
 	</servlet-mapping>
+	<!-- 
 	<servlet-mapping>
 		<servlet-name>RegisterOneTeam</servlet-name>
 		<url-pattern>/action/instructor/RegisterOneTeam</url-pattern>
 	</servlet-mapping>
+	 -->
 	<servlet-mapping>
 		<servlet-name>CreateDotSubmitFile</servlet-name>
 		<url-pattern>/data/instructor/CreateDotSubmitFile</url-pattern>

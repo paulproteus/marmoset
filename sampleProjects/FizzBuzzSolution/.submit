@@ -1,0 +1,9 @@
+# Submit server .submit file for
+#  Project 1 for Demo
+courseName=Demo
+semester=201201
+projectNumber=1
+courseKey=7c2435e280ea0dab
+authentication.type=openid
+baseURL=http://localhost:8080/submitServer
+submitURL=http://localhost:8080/submitServer/eclipse/SubmitProjectViaEclipse

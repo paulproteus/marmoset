@@ -52,7 +52,7 @@ public class UrlBuilder {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		String path = Joiner.on("/").join(pathElements);
-		builder.append(String.format("%s://%s:%d/%s",
+		builder.append(String.format("%s://%s:%d%s",
 		                             scheme,
 		                             host,
 		                             port,
