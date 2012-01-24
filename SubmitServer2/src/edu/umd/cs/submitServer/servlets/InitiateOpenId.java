@@ -3,6 +3,7 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 import org.openid4java.message.MessageException;
+import org.openid4java.message.ax.FetchRequest;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -31,6 +33,13 @@ import edu.umd.cs.submitServer.UrlBuilder;
  */
 public class InitiateOpenId extends SubmitServerServlet {
   private final transient ConsumerManager consumerManager = new ConsumerManager();
+  
+  private String getOpenidRealm(HttpServletRequest req) {
+  	return String.format("%s://%s:%d/",
+  	                     req.getScheme(),
+  	                     req.getServerName(),
+  	                     req.getServerPort());
+  }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -54,6 +63,16 @@ public class InitiateOpenId extends SubmitServerServlet {
     		returnUrl.setParameter("marmoset.target", targetPath);
     	}
       AuthRequest authReq = consumerManager.authenticate(discovered, returnUrl.toString());
+      String realm = getOpenidRealm(req);
+      getSubmitServerServletLog().info("Using openid realm " + realm);
+      authReq.setRealm(realm);
+      
+			FetchRequest fetch = FetchRequest.createFetchRequest();
+			fetch.addAttribute("firstname", "http://schema.openid.net/namePerson/first", true);
+			fetch.addAttribute("lastname", "http://schema.openid.net/namePerson/last", true);
+			fetch.addAttribute("email", "http://schema.openid.net/contact/email", true);
+      authReq.addExtension(fetch);
+      
       // Calling with "true" returns a URL suitable for a GET request.
       resp.sendRedirect(authReq.getDestinationUrl(true));
     } catch (MessageException e) {
