@@ -30,7 +30,6 @@
   <property file="build.properties" />
 
   <property name="modelClasses.home" value="../SubmitServerModelClasses"/>
-  <property name="shared.jarfile" value="sharedSubmitServer.jar"/>
 
 
   <!-- The classpath to be used to compile  -->
@@ -158,11 +157,6 @@
       >
       <fileset dir="WebRoot"/>
     </war>
-    <jar destfile="${dist}/${shared.jarfile}">
-      <fileset dir="${bin}">
-        <include name="**/shared/*class"/>
-      </fileset>
-    </jar>
   </target>
 
   <target name="distribution">
@@ -260,10 +254,6 @@
     <echo message="Copying war file..."/>
     <exec executable="scp">
       <arg line="${dist}/${warfile} ${generic.install.location}/${webapps}"/>
-    </exec>
-    <echo message="Copying shared jar file..."/>
-    <exec executable="scp">
-      <arg line="${dist}/${shared.jarfile} ${generic.install.location}/${shared.lib}"/>
     </exec>
     <echo message="Copying log4j.jar..."/>
     <exec executable="scp">
