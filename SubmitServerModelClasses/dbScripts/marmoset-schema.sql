@@ -340,7 +340,6 @@ CREATE TABLE IF NOT EXISTS `students` (
   `superuser` tinyint(1) NOT NULL DEFAULT '0',
   `given_consent` enum('yes','no','under 18','pending') NOT NULL DEFAULT 'pending',
   `account_type` enum('normal','demo','team','admin','pseudo','foobar') NOT NULL DEFAULT 'normal',
-  `password` varchar(50) DEFAULT NULL,
   `has_picture` tinyint(1) NOT NULL DEFAULT '0',
   `can_import_courses` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`student_pk`),
