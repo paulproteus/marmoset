@@ -78,16 +78,15 @@ public class Student  implements Comparable<Student> {
   private boolean superUser = false;
   private String givenConsent = PENDING;
   private String accountType=NORMAL_ACCOUNT;
-  @Deprecated private String password;
   private String email;
   private boolean hasPicture;
   private boolean canImportCourses;
 
 
-  public static final String DEMO_ACCOUNT = "demo";
+  public static final @Deprecated  String DEMO_ACCOUNT = "demo";
   public static final String NORMAL_ACCOUNT = "normal";
   // [NAT]
-  public static final String TEAM_ACCOUNT = "team";
+  public static final @Deprecated String TEAM_ACCOUNT = "team";
 
   public static final String TABLE_NAME="students";
 
@@ -99,7 +98,7 @@ public class Student  implements Comparable<Student> {
     static final String[] ATTRIBUTE_NAME_LIST = {
       "student_pk","login_name","campus_uid",
       "firstname","lastname","superuser","given_consent",
-      "account_type",	"password", "email", "has_picture",
+      "account_type", "email", "has_picture",
       "can_import_courses"
    };
 
@@ -268,21 +267,11 @@ public class Student  implements Comparable<Student> {
     /**
      * @return true if this is a team account, false otherwise
      */
-    public boolean isTeamAccount() {
+    public @Deprecated boolean isTeamAccount() {
       return TEAM_ACCOUNT.equals(getAccountType());
     }
 
-    @Deprecated
-     public String getPassword()
-    {
-        return password;
-    }
-     @Deprecated
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-    public String getEmail() {
+     public String getEmail() {
         if (FAKE_NAMES) {
             return FakeNames.getAccount(studentPK) + "@terpmail.umd.edu";
         }
@@ -316,7 +305,6 @@ public class Student  implements Comparable<Student> {
     setSuperUser(resultSet.getBoolean(startingFrom++));
     setGivenConsent(resultSet.getString(startingFrom++));
     setAccountType(resultSet.getString(startingFrom++));
-    setPassword(resultSet.getString(startingFrom++));
     setEmail(resultSet.getString(startingFrom++));
     setHasPicture(resultSet.getBoolean(startingFrom++));
     setCanImportCourses(resultSet.getBoolean(startingFrom++));
@@ -470,7 +458,6 @@ public class Student  implements Comparable<Student> {
     existingStudent.setLastname(lastname);
     existingStudent.setAccountType(accountType);
     existingStudent.setGivenConsent(givenConsent);
-    existingStudent.setPassword(password);
     existingStudent.setEmail(email);
     existingStudent.setHasPicture(hasPicture);
     existingStudent.setCanImportCourses(canImportCourses);
@@ -535,7 +522,6 @@ public class Student  implements Comparable<Student> {
       stmt.setBoolean(index++, superUser);
       stmt.setString(index++, getGivenConsent());
       stmt.setString(index++, getAccountType());
-      stmt.setString(index++, getPassword());
       stmt.setString(index++, email);
       stmt.setBoolean(index++, getHasPicture());
       stmt.setBoolean(index++, getCanImportCourses());
