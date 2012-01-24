@@ -173,8 +173,8 @@ public class Student  implements Comparable<Student> {
   /**
    * @param campusUID The loginName to set.
    */
-  public void setLoginName(String campusUID) {
-    this.loginName = campusUID;
+  public void setLoginName(String loginName) {
+    this.loginName = loginName;
   }
   /**
    * @return Returns the uid.

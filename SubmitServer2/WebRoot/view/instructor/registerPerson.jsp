@@ -28,7 +28,15 @@
 
 <!DOCTYPE HTML>
 <html>
+<c:choose>
+ <c:when test="${course}">
+            
 <ss:head title="Register Student for ${course.courseName}" />
+</c:when>
+<c:otherwise>
+<ss:head title="Register New Student" />
+</c:otherwise>
+</c:choose>
 <body>
 	<ss:header />
 	<ss:instructorBreadCrumb />
@@ -36,9 +44,21 @@
 	<div class="sectionTitle">
 		<h1>Student Registration</h1>
 
+<c:choose>
+ <c:when test="${course}">
+            
+<p class="sectionDescription">Use this form to register a person to ${course.courseName}</p>
+</c:when>
+<c:otherwise>
+<p class="sectionDescription">Use this form to register a person (but not enroll them in any courses)</p>
+</c:otherwise>
+</c:choose>
+
 		<p class="sectionDescription">Use this form to add a person to ${course.courseName}</p>
 	</div>
-
+            
+             <c:if test="${course}">
+            
 <div>
     <form name="registerExistingStudentForm"
         action='<c:url value="/action/instructor/RegisterOneStudent"/>'
@@ -90,11 +110,15 @@
     </form>
 
 </div>
+</c:if>
+            
 <div>
 	<form name="registerOneStudentForm"
 		action='<c:url value="/action/instructor/RegisterOneStudent"/>'
 		method="post">
+        <c:if test="${course}">
 		<input type="hidden" name="coursePK" value="${course.coursePK}" />
+        </c:if>
 		<table class="form">
 		  <tfoot>
             <tr class="submit">
@@ -124,6 +148,7 @@
 				<td class="input"><input name="campusUID" type="text" value="" autocorrect="off" autocapitalize="off" required/>
 				</td>
 			</tr>
+            <c:if test="${course}">
 			<tr>
 				<td class="label">Class account</td>
 				<td class="input"><input name="classAccount" type="text"
@@ -143,6 +168,7 @@
                             
                 </td>
             </tr>
+            </c:if>
 			</tbody>
 		
 		</table>

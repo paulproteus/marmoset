@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
 CREATE TABLE IF NOT EXISTS `students` (
   `student_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `login_name` varchar(50) NOT NULL DEFAULT '',
-  `campus_uid` varchar(40) NOT NULL DEFAULT '',
+  `campus_uid` varchar(80) NOT NULL DEFAULT '',
   `firstname` varchar(50) DEFAULT NULL,
   `lastname` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
