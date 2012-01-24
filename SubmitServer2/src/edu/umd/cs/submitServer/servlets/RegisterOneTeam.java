@@ -66,6 +66,8 @@ public class RegisterOneTeam extends SubmitServerServlet {
 			throws ServletException, IOException {
 		Connection conn = null;
 		boolean transactionSuccess = false;
+		if (true) 
+		    throw new UnsupportedOperationException("team projects not supported");
 		try {
 			conn = getConnection();
 			conn.setAutoCommit(false);

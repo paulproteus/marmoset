@@ -33,6 +33,10 @@
 <ss:header />
 <ss:instructorBreadCrumb />
 
+<p>Team projects not current supported.
+
+<!-- 
+
 <div class="sectionTitle">
 	<h1>New Team Registration</h1>
 	
@@ -95,5 +99,6 @@
 	</tr>
 </table>
 </form>
+ -->
 </body>
 </html>
