@@ -1,6 +1,5 @@
 package edu.umd.review.common.action;
 
-import net.customware.gwt.dispatch.client.DispatchAsync;
 import net.customware.gwt.dispatch.shared.Action;
 import edu.umd.review.gwt.rpc.dto.CommentDto;
 

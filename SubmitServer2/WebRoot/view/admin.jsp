@@ -42,7 +42,7 @@
 
     <div class="sectionTitle">
         <h1>Administrative actions</h1>
-        <p class="sectionDescription">Welcome ${user.firstname}</p>
+        <ss:hello/>
     </div>
 
         <ul>

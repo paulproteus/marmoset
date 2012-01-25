@@ -46,6 +46,18 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  */
 public class Course {
 	public static final String TABLE_NAME = "courses";
+	
+	public static String defaultSemester;
+	
+	public static void setDefaultSemester(String defaultSemester) {
+	    if (defaultSemester == null)
+	        return;
+	    if (Course.defaultSemester != null
+	            && !Course.defaultSemester.equals(defaultSemester))
+	        throw new IllegalArgumentException("Bad attempt to change default semester from " 
+	                + Course.defaultSemester + " to " + defaultSemester);
+	    Course.defaultSemester = defaultSemester;
+	}
 
 	private static SecureRandom random = new SecureRandom();
 	
@@ -105,18 +117,33 @@ public class Course {
 	public String getCourseName() {
 		return courseName;
 	}
-	public String getFullName() {
+	public StringBuilder getFullNameBuilder() {
 	    StringBuilder b = new StringBuilder(courseName);
 	    if (section != null && section.length() > 0) {
 	        b.append("-");
 	        b.append(section);
 	    }
-	    if (semester != null && semester.length() > 0) {
+	    if (semester != null && semester.length() > 0 
+	            && !semester.equals(defaultSemester)) {
             b.append(", ");
             b.append(semester);
         }
-	    return b.toString();
+	    return b;
 	}
+	public String getFullName() {
+	    return getFullNameBuilder().toString();
+    }
+	public String getFullname() {
+       return getFullName();
+    }
+	public String getFullDescription() {
+        StringBuilder b = getFullNameBuilder();
+        if (description != null && description.length() > 0) {
+            b.append(": ");
+            b.append(description);
+        }
+        return b.toString();
+    }
 	public String getBuildserverKey() {
 	    return buildserverKey;
 	}

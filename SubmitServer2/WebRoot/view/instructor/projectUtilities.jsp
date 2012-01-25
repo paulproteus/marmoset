@@ -40,7 +40,8 @@
 	<ss:projectMenu/>
 
 
-<h2>Instructor Utilities for Project ${project.projectNumber}: ${project.title}</h2>
+<h2>Instructor Utilities for Project 
+<c:out value="${project.fullTitle}"/></h2>
 
 
 <c:if test="${empty studentRegistrationSet}">

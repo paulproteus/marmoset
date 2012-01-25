@@ -27,7 +27,6 @@
 package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -35,12 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.Course;
-import edu.umd.cs.marmoset.modelClasses.EclipseLaunchEvent;
-import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Student;
-import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
-import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 
 
 public class AllowCourseCreation extends SubmitServerServlet {

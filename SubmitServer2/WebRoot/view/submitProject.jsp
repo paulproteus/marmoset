@@ -58,8 +58,9 @@ submission until the project has been activated by the instructor.
 <div class="sectionTitle">
 	<h1>File Upload for Project Submission</h1>
 
-	<p class="sectionDescription">Submit Project ${project.projectNumber}
-			for ${course.courseName} in ${course.semester}</p>
+	<p class="sectionDescription">Submit Project 
+    <c:out value="${project.fullTitle}"/>
+			for <c:out value="${course.fullName}"/></p>
 </div>
 
 <h2>Submitting a zip file</h2>

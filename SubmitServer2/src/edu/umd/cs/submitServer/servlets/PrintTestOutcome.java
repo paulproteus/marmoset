@@ -25,24 +25,14 @@ package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import edu.umd.cs.marmoset.modelClasses.ServerError;
-import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
-import edu.umd.cs.marmoset.utilities.Multiset;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
 

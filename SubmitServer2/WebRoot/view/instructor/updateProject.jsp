@@ -109,7 +109,9 @@ function changedIsTested(isTested)
 	<h1>Update Project</h1>
 
 	<p class="sectionDescription">Fill out the following form to
-	update project ${project.projectNumber} for ${course.courseName} in ${course.semester}</p>
+	update project 
+    <c:out value="${project.projectNumber}"/> for 
+    <c:out value="${course.fullname}"/></p>
 </div>
 
 <p>

@@ -32,7 +32,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<ss:head title="Code review for Project ${project.projectNumber} : ${project.title}" />
+<ss:head title="Code review for Project ${project.fullTitle}" />
 </head>
 
 <body>
@@ -40,7 +40,7 @@
 <ss:instructorBreadCrumb />
 
 <div class="sectionTitle">
-	<h2> Code Review for project  ${project.projectNumber} : ${project.title}</h2>
+	<h2> Code Review for project <c:out value="${project.fullTitle}"/></h2>
 	<p> <c:out value="${codeReviewAssignment.description}" />
 	<p> Due <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" />
 

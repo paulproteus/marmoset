@@ -280,7 +280,7 @@
 			<td class="description"><c:if
 				test="${studentRegistration.instructorLevel > 0}">* </c:if>
 				<a href="${studentLink}">
-				<c:out value="${studentRegistration.lastname}, ${studentRegistration.firstname}"/></a></td>
+				<c:out value="${studentRegistration.fullname}"/></a></td>
 			<c:if test="${project.tested}">
 			<c:set var="partner" value="${partnerMap[studentRegistration]}"/>
 			<td>

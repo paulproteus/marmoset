@@ -65,7 +65,7 @@
 </script>
 
 <ss:headContent
-	title="Create code review for Project ${project.projectNumber} : ${project.title}" />
+	title="Create code review for Project ${project.fullTitle}" />
 
 
 </head>
@@ -75,11 +75,10 @@
 	<ss:instructorBreadCrumb />
 
 	<div class="sectionTitle">
-		<h1>New Code Review for project ${project.projectNumber}</h1>
+		<h1>New Code Review for project <c:out value="${project.projectNumber}"/></h1>
 
 		<p class="sectionDescription">Fill out the following form to
-			create a new code review for project ${project.projectNumber} :
-			${project.title}</p>
+			create a new code review for project  <c:out value="${project.fullTitle}"/></p>
 	</div>
 
 	<p></p>
@@ -137,7 +136,8 @@
 							<c:forEach var="studentRegistration"
 								items="${staffStudentSubmissions}">
 									<option
-									value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">${studentRegistration.fullname}</option>
+									value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
+                                    <c:out value="${studentRegistration.fullname}"/></option>
 
 							</c:forEach>
 					</select>
@@ -169,7 +169,8 @@
 						<c:forEach var="studentRegistration" items="${courseInstructors}">
 							<br>
 							<INPUT TYPE="CHECKBOX"
-								NAME="reviewer-${studentRegistration.studentPK}">${studentRegistration.fullname}
+								NAME="reviewer-${studentRegistration.studentPK}">
+                                <c:out value="${studentRegistration.fullname}"/>
 			</c:forEach></td>
 				</tr>
 

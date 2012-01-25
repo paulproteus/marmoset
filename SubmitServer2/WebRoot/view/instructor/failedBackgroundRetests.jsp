@@ -71,7 +71,8 @@ mechanism) and returned different results.
 				<c:param name="studentPK" value="${studentRegistrationMap[submission.studentRegistrationPK].studentPK}"/>
 				<c:param name="projectPK" value="${project.projectPK}"/>
 			</c:url>
-			<td><a href="${studentLink}">${studentRegistrationMap[submission.studentRegistrationPK].classAccount}</a></td>
+			<td><a href="${studentLink}">
+            <c:out value="${studentRegistrationMap[submission.studentRegistrationPK].classAccount}"/></a></td>
 
 			<c:url var="submissionAllTestsLink" value="/view/instructor/submissionAllTests.jsp">
 				<c:param name="submissionPK" value="${submission.submissionPK}"/>

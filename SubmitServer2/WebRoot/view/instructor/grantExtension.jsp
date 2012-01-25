@@ -29,14 +29,16 @@
 
 <!DOCTYPE HTML>
 <html>
-	<ss:head title="Grant an extension to ${student.firstname} ${student.lastname}" />
+	<ss:head title="Grant an extension to ${student.fullname}" />
 <body>
 <ss:header />
 <ss:instructorBreadCrumb />
 <body>
 <ss:studentPicture />
 <p>
-Grant an extension to ${studentRegistration.fullname} for project ${project.projectNumber}
+Grant an extension to 
+<c:out value="${studentRegistration.fullname}"/> for project 
+<c:out value="${project.projectNumber}"/>
 <p>
 <b><font color=red>NOTE:</font></b> Extension are given in hours
 <form class="form" name="form" action="<c:url value="/action/instructor/GrantExtension"/>" method="POST">

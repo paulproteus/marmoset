@@ -56,6 +56,7 @@
     <pathelement location="${eclipse.home}/plugins/org.junit_3.8.1/junit.jar"/>
   </path>
 
+ <import file="${tomcat.home}/bin/catalina-tasks.xml" optional="true" />
 
   <!-- ====================================================================== -->
   <!-- Init -->
@@ -354,16 +355,56 @@
         <taskdef resource="edu/umd/cs/findbugs/anttask/tasks.properties" classpath="${anttask.jar}"/>
     <findbugs home="${findbugs.home}"
                cloud="edu.umd.cs.findbugs.cloud.appengine.findbugs-cloud"
+              excludeFilter="findbugsExclude.xml"
+	      maxRank="18"
               jvmargs="-ea -Xmx1200m"
               projectName="Marmoset"
               outputFile="bugs.xml"
             >
+  <class location="compiledJspClasses"/>
   <class location="WebRoot/WEB-INF/classes"/>
   <class location="WebRoot/WEB-INF/lib/modelClasses.jar"/>
-        <sourcePath path="src/:gwt-src/:../SubmitServerModelClasses/src"/>
+        <sourcePath path="src/:gwt-src/:../SubmitServerModelClasses/src:compiledJspSrc"/>
         <auxClasspath refid="base.classpath"/>
 
     </findbugs>
 </target>
+
+<target name="compileJsp">
+
+     <mkdir dir="compiledJspSrc" />
+   <jasper
+             validateXml="false"
+             uriroot="WebRoot"
+             webXmlFragment="compiledJspSrc/generated_web.xml"
+             outputDir="compiledJspSrc" />
+
+     <mkdir dir="compiledJspClasses" />
+
+
+    <javac destdir="compiledJspClasses"
+           optimize="off"
+	   includeantruntime="false"
+           debug="on" failonerror="false"
+           srcdir="compiledJspSrc"
+           excludes="**/*.smap">
+      <classpath>
+        <pathelement location="WebRoot/WEB-INF/classes"/>
+        <fileset dir="WebRoot/WEB-INF/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${tomcat.home}/lib"/>
+        <fileset dir="${tomcat.home}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.home}/bin">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <include name="**" />
+      <exclude name="tags/**" />
+    </javac>
+
+  </target>
 
 </project>

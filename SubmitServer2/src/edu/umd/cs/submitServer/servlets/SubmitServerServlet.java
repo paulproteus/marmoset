@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
@@ -150,6 +151,10 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 
 		strictParameterChecking = "true".equalsIgnoreCase(getServletContext()
 				.getInitParameter("strict.parameter.checking"));
+		
+		String defaultSemester = servletContext.getInitParameter("semester");
+		if (defaultSemester != null)
+		    Course.setDefaultSemester(defaultSemester);
 	}
 
 	/*

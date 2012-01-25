@@ -45,7 +45,6 @@ import org.apache.commons.io.IOUtils;
 import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
-import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.ZipFileAggregator;
 

@@ -13,8 +13,6 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
 
-import edu.umd.cs.marmoset.modelClasses.CodeReviewThread;
-
 /**
  * DTO for a thread. A thread belongs to a single file, and has 0 or more published comments, and 0
  * or 1 draft comments.

@@ -80,7 +80,7 @@ addLoadEvent(function() {
 	<ss:instructorBreadCrumb/>
 
 	<div class="sectionTitle">
-		<h1>Project ${project.projectNumber}: ${project.title}</h1>
+		<h1><c:out value="${project.fullDescription}"/> </h1>
 
 		<p class="sectionDescription">${project.description}</p>
 	</div>
@@ -91,7 +91,8 @@ addLoadEvent(function() {
     <li> Testing setup
      tested  <fmt:formatDate value="${testSetup.datePosted}" pattern="E',' dd MMM 'at' hh:mm a"/>
     <li> Test-setup comment: <input type="text" name="comment" value="${testSetup.comment}" size="30"/>
-    <li> Solution submitted by ${studentRegistration.classAccount}
+    <li> Solution submitted by 
+    <c:out value="${studentRegistration.classAccount}"/>
     at <fmt:formatDate value="${submission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a"/>
     <c:if test="${testSetup.jarfileStatus == 'failed'}">
 					<c:url var="canonicalRunLink"
@@ -133,7 +134,7 @@ No previous activated test setup
 		</c:forEach>
 		<tr>
 			<td colspan=3>total</td>
-			<td><input type="text" name="total" size="3" readonly="true"></td>
+			<td><input type="text" name="total" size="3" readonly="readonly"></td>
 		</tr>
 		<tr class="submit">
 		<td class="label" colspan=4>

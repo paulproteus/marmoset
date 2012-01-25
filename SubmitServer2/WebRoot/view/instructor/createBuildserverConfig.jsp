@@ -44,7 +44,7 @@
 
     <div class="sectionTitle">
         <h1>Create Buildserver config</h1>
-        <p class="sectionDescription">Welcome ${user.firstname}</p>
+        <ss:hello/>
     </div>
 
     <c:url var="url" value="/action/instructor/CreateBuildserverConfigFile" />
@@ -55,13 +55,7 @@
             <c:forEach var="course" items="${courseList}">
                 <c:if test="${user.superUser || statusMap[course.coursePK]}">
                     <option value="${course.coursePK}" SELECTED>
-                        <c:out value="${course.courseName}" />
-                        <c:if test="${not empty course.section}">
-                            <c:out value="${course.section}" />
-                        </c:if>
-                        <c:if test="${not empty course.description}">
-                        : <c:out value="${course.description}" />
-                        </c:if>
+                        <c:out value="${course.fullDescription}" />
                     </option>
                 </c:if>
             </c:forEach>

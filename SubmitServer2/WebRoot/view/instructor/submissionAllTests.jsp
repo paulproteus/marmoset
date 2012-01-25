@@ -40,7 +40,7 @@
 <h1>Project <c:out value="${project.projectNumber}"/>:
 <c:out value="${project.title}"/></h1>
 <ss:studentPicture />
-<h1>${studentRegistration.fullname}</h1>
+<h1><c:out value="${studentRegistration.fullname}"/></h1>
 <h2>Submission # ${submission.submissionNumber}, <fmt:formatDate
 	value="${submission.submissionTimestamp}" pattern="dd MMM, hh:mm a" /></h2>
 
