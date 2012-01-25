@@ -79,27 +79,25 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
         Student student = null;
         StudentRegistration studentRegistration = null;
       
-        
         try {
             conn = getConnection();
             RequestParser parser = new RequestParser(request, getSubmitServerServletLog(), strictParameterChecking());
-            courseKey = parser.getCheckedParameter("courseKey");
+            courseKey = parser.getOptionalCheckedParameter("courseKey");
+            
             projectNumber = parser.getCheckedParameter("projectNumber");
             
-            loginName = parser.getCheckedParameter("loginName");
+            loginName = parser.getOptionalCheckedParameter("loginName");
             if (loginName == null)
                 loginName = parser.getCheckedParameter("campusUID");
            
-            password = parser.getPasswordParameter("password");
+            password = parser.getOptionalPasswordParameter("password");
             if (password == null)
                 password = parser.getPasswordParameter("uidPassword");
 
-           
             if (courseKey != null) {
                 getAccessLog().info(
                         "NegotiateOneTimePassword attempt:\t" + loginName + "\t" + courseKey + "\t" 
                                 + projectNumber);
-
 
                 Course course = Course.lookupByCourseKey(courseKey, conn);
                 if (course == null) {
@@ -120,8 +118,10 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                 
             } else {
                 courseName = parser.getCheckedParameter("courseName");
-                String semester = parser.getCheckedParameter("semester");
-                String section = parser.getCheckedParameter("section");
+                String semester = parser.getOptionalCheckedParameter("semester");
+                if (semester == null)
+                    semester = request.getServletContext().getInitParameter("semester");
+                String section = parser.getOptionalCheckedParameter("section");
                 
                 project = Project.lookupByCourseProjectSemester(courseName, section, projectNumber, semester, conn);
                 if (project == null) {
