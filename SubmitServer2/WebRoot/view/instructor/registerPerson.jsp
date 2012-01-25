@@ -29,7 +29,7 @@
 <!DOCTYPE HTML>
 <html>
 <c:choose>
- <c:when test="${course}">
+ <c:when test="${course != null}">
             
 <ss:head title="Register Student for ${course.courseName}" />
 </c:when>
@@ -45,7 +45,7 @@
 		<h1>Student Registration</h1>
 
 <c:choose>
- <c:when test="${course}">
+ <c:when test="${course != null}">
             
 <p class="sectionDescription">Use this form to register a person to ${course.courseName}</p>
 </c:when>
@@ -57,7 +57,7 @@
 		<p class="sectionDescription">Use this form to add a person to ${course.courseName}</p>
 	</div>
             
-             <c:if test="${course}">
+             <c:if test="${course != null}">
             
 <div>
     <form name="registerExistingStudentForm"
@@ -116,7 +116,7 @@
 	<form name="registerOneStudentForm"
 		action='<c:url value="/action/instructor/RegisterOneStudent"/>'
 		method="post">
-        <c:if test="${course}">
+        <c:if test="${course != null}">
 		<input type="hidden" name="coursePK" value="${course.coursePK}" />
         </c:if>
 		<table class="form">
@@ -148,7 +148,7 @@
 				<td class="input"><input name="campusUID" type="text" value="" autocorrect="off" autocapitalize="off" required/>
 				</td>
 			</tr>
-            <c:if test="${course}">
+            <c:if test="${course != null}">
 			<tr>
 				<td class="label">Class account</td>
 				<td class="input"><input name="classAccount" type="text"
