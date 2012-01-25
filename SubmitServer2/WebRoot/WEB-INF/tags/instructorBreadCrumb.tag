@@ -11,13 +11,6 @@
  <!-- <a href="<c:url value='/status/QueryBuildServerStatus'/>" title="Query the build server status" >BuildServerStatus</a> |  -->
 </c:if>
 
-<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService' || (user.password != NULL && user.password != '0')}">
-	<c:url var="changePasswordLink" value="/view/changePassword.jsp">
-		<c:param name="studentPK" value="${user.studentPK}"/>
-	</c:url>
-	<a href="${changePasswordLink}" >Change Password</a> |
-</c:if>
-
 <c:choose>
 <c:when test="${true}">
 <!-- docs out of date, disabled -->

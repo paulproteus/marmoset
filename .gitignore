@@ -23,3 +23,5 @@ BuildServer/buildserver.jar
 local.*.properties
 CommandLineSubmission/bin
 CommandLineSubmission/submit.jar
+.DS_Store
+CourseProjectManager/dist/courseProjectManager.jar

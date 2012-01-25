@@ -79,13 +79,7 @@
 			<th> <ss:loginName /> </th>
 			<th> <ss:campusUID /></th>
 			<th> class account <br> (use <ss:loginName/> for courses <br> without class accounts)</th>
-			<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">
-			<%--
-				We only want a field for the password if we're using the generic password
-				authentication service.
-			--%>
-				<th> password </th>
-			</c:if>
+			
 		</tr>
 		<tr>
 			<td> <em>required</em> <select name="type1">
@@ -98,9 +92,7 @@
 			<td> <input name="loginName1" type="text" value=""/> </td>
 			<td> <input name="campusUID1" type="text" value=""/> </td>
 			<td> <input name="classAccount1" type="text" value=""/> </td>
-			<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">
-				<td> <input name="password1" type="text" value=""/><input type="hidden" name="authenticateType" value="generic" /> </td>
-			</c:if>
+			
 		</tr>
 
 		<tr>
@@ -114,9 +106,7 @@
 			<td> <input name="loginName2" type="text" value=""/> </td>
 			<td> <input name="campusUID2" type="text" value=""/> </td>
 			<td> <input name="classAccount2" type="text" value=""/> </td>
-			<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">
-				<td> <input name="password2" type="text" value=""/><input type="hidden" name="authenticateType" value="generic" /> </td>
-			</c:if>
+			
 		</tr>
 
 		<tr>
@@ -130,9 +120,7 @@
 			<td> <input name="loginName3" type="text" value=""/> </td>
 			<td> <input name="campusUID3" type="text" value=""/> </td>
 			<td> <input name="classAccount3" type="text" value=""/> </td>
-			<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">
-				<td> <input name="password3" type="text" value=""/><input type="hidden" name="authenticateType" value="generic" /> </td>
-			</c:if>
+			<
 		</tr>
 	</table>
 

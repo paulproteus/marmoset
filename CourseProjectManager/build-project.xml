@@ -63,7 +63,7 @@
 	
 	<target name="dist" depends="classes" description="Build a plugin distributable">
 
-		<jar destfile="${dist.dir}/autocvs.jar">
+		<jar destfile="${dist.dir}/courseProjectManager.jar">
 				<fileset dir="${bin.dir}" />
 				<fileset dir="${src.dir}" >
 				  <include name="**/*.properties"/>
