@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `code_reviewer` (
   `last_update` datetime DEFAULT NULL,
   `num_comments` int(11) NOT NULL DEFAULT '0',
   `known_as` varchar(100) NOT NULL,
-  `authentication_key` varchar(30) NOT NULL,
+  `authentication_key` varchar(40) NOT NULL,
   PRIMARY KEY (`code_reviewer_pk`),
   KEY `code_review_pk` (`student_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`),
