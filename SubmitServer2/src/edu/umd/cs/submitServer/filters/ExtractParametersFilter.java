@@ -160,10 +160,66 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			    course = Course.lookupByCourseKey(courseKey, conn);
 			    project = Project.lookupByCourseAndProjectNumber(course.getCoursePK(), projectNumber, conn);
 			}
-			if (studentRegistrationPK != null) {
+
+            if (testRunPK != null) {
+                // Get Test Run
+                testRun = TestRun.lookupByTestRunPK(testRunPK, conn);
+                submissionPK = testRun.getSubmissionPK();
+                submission = Submission
+                        .lookupBySubmissionPK(submissionPK, conn);
+            }
+            if (submissionPK != null) {
+                // Get Submission
+                submission = Submission
+                        .lookupBySubmissionPK(submissionPK, conn);
+                // get the defaultTestRun, unless we already got a test run from
+                // the previous
+                // if block
+                if (testRun == null) {
+                    testRun = TestRun.lookupByTestRunPK(
+                            submission.getCurrentTestRunPK(), conn);
+                }
+                // if we found a testRun, get its testOutcomeCollection
+                if (testRun != null) {
+                    testOutcomeCollection = TestOutcomeCollection
+                            .lookupByTestRunPK(testRun.getTestRunPK(), conn);
+                }
+
+                projectPK = submission.getProjectPK();
+                if (studentRegistration == null)
+                    studentRegistration = StudentRegistration.lookupBySubmissionPK(
+                            submissionPK, conn);
+                else if (!studentRegistration.getStudentRegistrationPK().equals(submission.getStudentRegistrationPK()))
+                        throw new ServletException("Inconsistent student registration and submission");
+                
+                if (submission.getNumTestRuns() >= 1) {
+                    List<TestRun> testRunList = TestRun
+                            .lookupAllBySubmissionPK(submissionPK, conn);
+                    request.setAttribute(TEST_RUN_LIST, testRunList);
+
+                    // Collections.reverse(testRunList);
+                    // map testSetupPKs to their corresponding project jarfiles
+                    Map<Integer, TestSetup> testSetupMap = new HashMap<Integer, TestSetup>();
+                    for (TestRun tr : testRunList) {
+                        // make sure we have already mapped the project jarfile
+                        // to its PK
+                        if (!testSetupMap.containsKey(tr.getTestSetupPK())) {
+                            TestSetup jarfile = TestSetup.lookupByTestSetupPK(
+                                    tr.getTestSetupPK(), conn);
+                            testSetupMap.put(jarfile.getTestSetupPK(), jarfile);
+                        }
+                    }
+                    request.setAttribute("testSetupMap", testSetupMap);
+                }
+            }
+
+            
+			if (studentRegistrationPK != null && studentRegistration == null) {
 				studentRegistration = StudentRegistration
 						.lookupByStudentRegistrationPK(studentRegistrationPK,
 								conn);
+			}
+			if (studentRegistration != null) {
 				studentPK = studentRegistration.getStudentPK();
 				coursePK = studentRegistration.getCoursePK();
 			}
@@ -194,55 +250,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				for(CodeReviewer  r : codeReviewersForAssignment) 
 				    if (!r.isInstructor() && !r.isAuthor())
 				        studentCodeReviewersForAssignment.add(r);
-			}
-
-			if (testRunPK != null) {
-				// Get Test Run
-				testRun = TestRun.lookupByTestRunPK(testRunPK, conn);
-				submissionPK = testRun.getSubmissionPK();
-				submission = Submission
-						.lookupBySubmissionPK(submissionPK, conn);
-			}
-			if (submissionPK != null) {
-				// Get Submission
-				submission = Submission
-						.lookupBySubmissionPK(submissionPK, conn);
-				// get the defaultTestRun, unless we already got a test run from
-				// the previous
-				// if block
-				if (testRun == null) {
-					testRun = TestRun.lookupByTestRunPK(
-							submission.getCurrentTestRunPK(), conn);
-				}
-				// if we found a testRun, get its testOutcomeCollection
-				if (testRun != null) {
-					testOutcomeCollection = TestOutcomeCollection
-							.lookupByTestRunPK(testRun.getTestRunPK(), conn);
-				}
-
-				projectPK = submission.getProjectPK();
-				if (studentRegistration == null)
-					studentRegistration = StudentRegistration.lookupBySubmissionPK(
-							submissionPK, conn);
-				if (submission.getNumTestRuns() >= 1) {
-					List<TestRun> testRunList = TestRun
-							.lookupAllBySubmissionPK(submissionPK, conn);
-					request.setAttribute(TEST_RUN_LIST, testRunList);
-
-					// Collections.reverse(testRunList);
-					// map testSetupPKs to their corresponding project jarfiles
-					Map<Integer, TestSetup> testSetupMap = new HashMap<Integer, TestSetup>();
-					for (TestRun tr : testRunList) {
-						// make sure we have already mapped the project jarfile
-						// to its PK
-						if (!testSetupMap.containsKey(tr.getTestSetupPK())) {
-							TestSetup jarfile = TestSetup.lookupByTestSetupPK(
-									tr.getTestSetupPK(), conn);
-							testSetupMap.put(jarfile.getTestSetupPK(), jarfile);
-						}
-					}
-					request.setAttribute("testSetupMap", testSetupMap);
-				}
 			}
 
 
