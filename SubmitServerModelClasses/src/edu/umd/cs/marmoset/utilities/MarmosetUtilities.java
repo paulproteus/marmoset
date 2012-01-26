@@ -149,13 +149,13 @@ public final class MarmosetUtilities
         
 	    return s;
 	}
-	/**
-	 * @return a random password
-	 */
+
 	public static String nextRandomPassword() {
-		String s =  Long.toHexString(nextRandomLong());
-		s = leftZeroPad(s);
-		return s;
+	    return toFullLengthHexString(nextRandomLong());
+	}
+	
+	public static String toFullLengthHexString(long x) {
+	    return leftZeroPad(Long.toHexString(x));
 	}
 
 
