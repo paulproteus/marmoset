@@ -8,10 +8,10 @@
                         }
                     }
                 </script>
-                <h3>
+                <p>
       <a href="javascript:toggle2('inconsistentResults')" title="Click to toggle display of explanation">
             Explanation of inconsistent test results (toggle) </a>
-            </h3>
+            </p>
   
  <div id="inconsistentResults" style="display: none">
    <blockquote>

@@ -80,7 +80,7 @@ addLoadEvent(function() {
 	<ss:instructorBreadCrumb/>
 
 	<div class="sectionTitle">
-		<h1><c:out value="${project.fullDescription}"/> </h1>
+		<h1><c:out value="${project.fullTitle}"/> </h1>
 
 		<p class="sectionDescription">${project.description}</p>
 	</div>

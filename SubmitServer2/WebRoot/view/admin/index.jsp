@@ -125,7 +125,7 @@
 
                 <td class="description"><c:url var="projectLink" value="/view/instructor/project.jsp">
                         <c:param name="projectPK" value="${project.projectPK}" />
-                    </c:url> <a href="${projectLink}"> <c:out value="${project.fullDescription}"/> </a></td>
+                    </c:url> <a href="${projectLink}"> <c:out value="${project.fullTitle}"/> </a></td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
                 <td><fmt:formatDate value="${project.late}" pattern="dd MMM, hh:mm a" /></td>
                 <c:choose>

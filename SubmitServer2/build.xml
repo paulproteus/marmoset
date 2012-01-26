@@ -285,6 +285,8 @@
 
   <target name="clean">
     <!-- Delete the ${dist} directory tree -->
+    <delete dir="compiledJspClasses"/>
+    <delete dir="compiledJspSrc"/>
     <delete dir="${dist}"/>
     <mkdir dir="${dist}" />
     <delete dir="WebRoot/WEB-INF/classes"/>
@@ -376,7 +378,7 @@
    <jasper
              validateXml="false"
              uriroot="WebRoot"
-             webXmlFragment="compiledJspSrc/generated_web.xml"
+             webXmlFragment="compiledJspSrc/generated_web_xml.txt"
              outputDir="compiledJspSrc" />
 
      <mkdir dir="compiledJspClasses" />

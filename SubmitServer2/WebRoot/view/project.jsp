@@ -228,10 +228,10 @@
     </c:if>
 
 
-    <h3>
+    <p>
         <a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">
             Files for automatic submission tools (toggle)</a>
-    </h3>
+    </p>
 
 
     <div id="submitFiles" style="display: none">

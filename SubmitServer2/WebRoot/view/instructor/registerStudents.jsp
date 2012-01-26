@@ -33,6 +33,13 @@
 <ss:header />
 <ss:instructorBreadCrumb />
 
+<c:choose>
+<c:when test="${!gradesServer}">
+<jsp:forward page="registerPerson.jsp" >
+  <jsp:param name="coursePK" value="course.coursePK" />
+</jsp:forward>
+</c:when>
+<c:otherwise>
 <div class="sectionTitle">
 	<h1>Register Students</h1>
 	
@@ -43,7 +50,9 @@
 
 <p>
 
-<form action="<c:url value="/action/instructor/RegisterStudents"/>"
+<c:url var="registerStudents" value="/action/instructor/RegisterStudents"/>
+
+<form action="${registerStudents}"
 	method="POST" enctype="multipart/form-data">
 
 	<input type="hidden" name="coursePK" value="${course.coursePK}" />
@@ -52,39 +61,20 @@
 	<tr>
 		<td class="label">File containing student registrations:
 		<td class="input"><input type="file" size="40" name="file" />
-		
-		<c:if test="${initParam['authentication.service']=='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">
-		<input type="hidden" name="authenticateType" value="generic" />
-		</c:if>
-
-	<c:if test="${initParam['authentication.service']!='edu.umd.cs.submitServer.GenericStudentPasswordAuthenticationService'}">		
-	<tr>
-		<td colspan="5">
-		<center>
-		<table>
-			<tr>
-				<td>Use Default Authentication Service (directory ID and password)</td>
-				<td><input type="radio" name="authenticateType" value="default" checked>
-			</tr>
-			<tr>
-				<td>Use Marmoset for Authentication (Marmoset will generate passwords)</td>
-				<td><input type="radio" name="authenticateType" value="generic">
-			</tr>
-		</table>		
-		</center>
-		</td>
-	</tr>
-	</c:if>
-	
-	<tr>
+		<input type="hidden" name="authenticateType" value="default" />
+        	
+	<tr  class="submit">
 		<td colspan=2 class="submit"><input type="submit"
 			value="Register students" />
-	<tr>
-		<td colspan=2 class="description">
-		<ss:registerStudentsFileFormat />
+	
+
 </table>
 </form>
 
+        <ss:registerStudentsFileFormat />
+
+        </c:otherwise>
+        </c:choose>
 <ss:footer />
 </body>
 </html>
