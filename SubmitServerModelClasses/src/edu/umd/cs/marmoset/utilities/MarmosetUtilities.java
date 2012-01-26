@@ -139,15 +139,22 @@ public final class MarmosetUtilities
 			return rng.nextLong();
 	}
 
+	public static String leftZeroPad(String s) {
+	    if (s.length() < 16)  {
+            String padding = "0000000000000000".substring(0,16-s.length());
+            s = padding + s;
+	    }
+	    if (s.length() != 16)
+            throw new IllegalStateException("Generated result of '" + s + "'");
+        
+	    return s;
+	}
 	/**
 	 * @return a random password
 	 */
 	public static String nextRandomPassword() {
 		String s =  Long.toHexString(nextRandomLong());
-		if (s.length() < 16) 
-		    s = "0000000000000000".substring(16-s.length()) + s;
-		if (s.length() != 16)
-		    throw new IllegalStateException("Generated password of '" + s + "'");
+		s = leftZeroPad(s);
 		return s;
 	}
 
