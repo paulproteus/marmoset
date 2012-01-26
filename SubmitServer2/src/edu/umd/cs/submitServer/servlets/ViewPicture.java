@@ -40,25 +40,26 @@ public class ViewPicture extends SubmitServerServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		Connection conn = null;
+        Connection conn = null;
 
-		try {
-			conn = getConnection();
+        try {
+            conn = getConnection();
 
-			StudentRegistration sr  = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-			StudentPicture studentPicture = StudentPicture.lookupByStudentPK(sr.getStudentPK(), conn);
-			if (studentPicture == null)
-				throw new ServletException("No picture");
-			response.setContentType(studentPicture.getType());
-			response.setContentLength(studentPicture.getImage().length);
-			response.getOutputStream().write(studentPicture.getImage());
-
-			response.getOutputStream().close();
-		} catch (SQLException e) {
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
+            StudentRegistration sr = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+            StudentPicture studentPicture = StudentPicture.lookupByStudentPK(sr.getStudentPK(), conn);
+            if (studentPicture == null) {
+                request.getRequestDispatcher("/images/noImageAvailable.png").forward(request, response);
+            } else {
+                response.setContentType(studentPicture.getType());
+                response.setContentLength(studentPicture.getImage().length);
+                response.getOutputStream().write(studentPicture.getImage());
+                response.getOutputStream().close();
+            }
+        } catch (SQLException e) {
+            throw new ServletException(e);
+        } finally {
+            releaseConnection(conn);
+        }
 	}
 
 }
