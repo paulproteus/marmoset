@@ -31,7 +31,6 @@ import edu.umd.review.gwt.event.EvaluationSavedEvent;
 import edu.umd.review.gwt.event.NewDraftEvent;
 import edu.umd.review.gwt.event.NewRubricEvaluationEvent;
 import edu.umd.review.gwt.event.PublishAllEvent;
-import edu.umd.review.gwt.event.PublishEvent;
 import edu.umd.review.gwt.event.RubricAssignedEvent;
 import edu.umd.review.gwt.event.RubricDiscardEvent;
 import edu.umd.review.gwt.event.SessionExpiryEvent;

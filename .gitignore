@@ -11,6 +11,9 @@ SubmitServer2/WebRoot/codereview/
 SubmitServer2/dist
 SubmitServer2/gwt-unitCache
 .gwt
+SubmitServer2/bugs.xml
+submitServer2/compiledJspSrc
+submitServer2/compiledJspClasses
 SubmitServer2/src/web.properties
 SubmitServer2/src/branding.properties
 SubmitServer2/WebRoot/WEB-INF/deploy

@@ -40,7 +40,7 @@
 <ss:projectTitle />
 <ss:projectMenu />
 
-<h2>Starter/baseline files for Project ${project.projectNumber}</h2>
+<h2>Starter/baseline files for Project <c:out value="${project.projectNumber}"/></h2>
 
     <p>The baseline is used for two purposes:
         <ul>
@@ -51,7 +51,7 @@
 
 
 <c:choose>
-	<c:when test="${project.archivePK == null  || project.archivePK  == 0}">
+	<c:when test="${project.archivePK == null  || project.archivePK == 0}">
 		<p>This project doesn't currently have any baseline/starting code.
 
 		<p>A "starter file archive" is a collection of resources students

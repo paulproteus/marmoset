@@ -50,7 +50,7 @@
 
     <div class="sectionTitle">
         <h1>Home</h1>
-        <p class="sectionDescription">Welcome ${user.firstname}</p>
+        <ss:hello/>
     </div>
 
     <c:set var="statusMap" value="${userSession.instructorStatus}" />
@@ -90,10 +90,7 @@
                         <c:url var="courseLink" value="${courseURL}">
                             <c:param name="coursePK" value="${course.coursePK}" />
                         </c:url>
-                        <a href="${courseLink}"> <c:out value="${course.courseName}" /> <c:if
-                                test="${not empty course.section}">
-                                <c:out value="${course.section}" />
-                            </c:if>: <c:out value="${course.description}" />
+                        <a href="${courseLink}"> <c:out value="${course.fullDescription}" /> 
                         </a>
                     </c:forEach>
 
@@ -112,7 +109,7 @@
                 </tr>
                 <c:forEach var="course" items="${pendingRequests}">
                     <tr>
-                        <td><c:out value="${course.courseName}" /></td>
+                        <td><c:out value="${course.fullname}" /></td>
                         <td><c:out value="${course.description}" /></td>
                         <!-- TODO(rwsims): Allow students to cancel registration requests? -->
                     </tr>
@@ -136,7 +133,7 @@
                         <tr>
                             <c:set var="checkboxName" value="course-pk-${course.coursePK}" />
                             <td><input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" /></td>
-                            <td><label for="${checkboxName}-box"><c:out value="${course.courseName}" /></label></td>
+                            <td><label for="${checkboxName}-box"><c:out value="${course.fullname}" /></label></td>
                             <td><c:out value="${course.description}" /></td>
                         </tr>
                     </c:forEach>

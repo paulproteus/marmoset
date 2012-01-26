@@ -38,7 +38,7 @@
 
 
 <ss:studentPicture />
-<h1>${studentRegistration.fullname}</h1>
+<h1><c:out value="${studentRegistration.fullname}"/></h1>
 <p><ss:studentEmail/>
 
 <c:choose>

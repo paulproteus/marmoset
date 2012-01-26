@@ -42,6 +42,11 @@
     </tag-file>
 
   <tag-file>
+    <name>hello</name>
+    <path>/WEB-INF/tags/hello.tag</path>
+  </tag-file>
+
+  <tag-file>
     <name>studentEmail</name>
     <path>/WEB-INF/tags/studentEmail.tag</path>
   </tag-file>

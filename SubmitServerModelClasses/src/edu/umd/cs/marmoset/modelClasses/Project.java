@@ -282,6 +282,12 @@ public class Project implements Serializable {
 			return description;
 		return "Project " + getProjectNumber();
 	}
+	
+	public String getFullTitle() {
+	    if (title == null)
+	        return getProjectNumber();
+	    return  getProjectNumber() + ": " + title;
+	}
 	/**
 	 * @param description The description to set.
 	 */

@@ -46,7 +46,7 @@
 </c:url>
 
 
-<h2>${studentRegistration.fullname}</h2>
+<h2><c:out value="${studentRegistration.fullname}"/></h2>
 <h2>Submission #${submission.submissionNumber}, submitted at <fmt:formatDate
 	value="${submission.submissionTimestamp}"
 	pattern="E',' dd MMM 'at' hh:mm a" /></h2>

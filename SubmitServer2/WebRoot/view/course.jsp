@@ -36,10 +36,9 @@
 <ss:breadCrumb />
 
 <div class="sectionTitle">
-	<h1><a href="${course.url}">${course.courseName}</a>,
-	${course.semester}: ${course.description}</h1>
+	<h1><a href="${course.url}"><c:out value="${course.fullDescription}"/></a></h1>
 
-	<p class="sectionDescription">Welcome ${user.firstname}</p>
+	<ss:hello/>
 </div>
 
 <ss:codeReviews title="Pending Code reviews"/>

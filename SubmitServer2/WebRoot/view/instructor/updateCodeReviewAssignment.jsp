@@ -66,7 +66,7 @@
 </script>
 
 <ss:headContent
-	title="Update code review for Project ${project.projectNumber} : ${project.title}" />
+	title="Update code review for Project ${project.fullTitle}" />
 
 
 </head>
@@ -76,11 +76,12 @@
 	<ss:instructorBreadCrumb />
 
 	<div class="sectionTitle">
-		<h1>Update Code Review for project ${project.projectNumber}</h1>
+		<h1>Update Code Review for project
+        <c:out value="${project.projectNumber}"/></h1>
 
 		<p class="sectionDescription">Update  the following form to
-			modify the existing code review  for project ${project.projectNumber} :
-			${project.title}</p>
+			modify the existing code review  for project
+            <c:out value="${project.fullTitle}"/></p>
 		
 	</div>
 
@@ -170,7 +171,8 @@
                         <td class="label">Reviewer for additional reviews<br></td>
                         <td><select name="reviewer">
                                 <c:forEach var="studentRegistration" items="${courseInstructors}">
-                                    <option value="${studentRegistration.studentPK}">${studentRegistration.fullname}</option>
+                                    <option value="${studentRegistration.studentPK}">
+                                    <c:out value="${studentRegistration.fullname}"/></option>
                                 </c:forEach>
                         </select></td>
                     </tr>

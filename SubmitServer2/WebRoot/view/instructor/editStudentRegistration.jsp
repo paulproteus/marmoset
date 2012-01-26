@@ -29,7 +29,7 @@
 
 <!DOCTYPE HTML>
 <html>
-	<ss:head title="Edit registration for ${student.firstname} ${student.lastname} in ${course.courseName}" />
+	<ss:head title="Edit registration for ${student.fullname} in ${course.courseName}" />
 <body>
 <ss:header />
 <ss:instructorBreadCrumb />
@@ -38,7 +38,8 @@
 	<h1>Edit Registration</h1>
 <ss:studentPicture />
 	<p class="sectionDescription">Edit registration for
-	${student.firstname} ${student.lastname} in ${course.courseName}</p>
+	<c:out value="${student.fullname}"/>
+     in ${course.courseName}</p>
 
 	<c:if test="${not empty course.courseIDs}">
 	<h2>WARNING: this course is synchronized to the grades server</h2>
@@ -64,10 +65,8 @@
 	</tr>
 	<tr>
 	    <td> <input name="inactive" type="checkbox" ${ss:isChecked(studentRegistration.inactive)} />
-
 	         </td>
 	 	<td> <input name="dropped" type="checkbox" ${ss:isChecked(studentRegistration.dropped)} />
-
 	         </td>
 		<td> <input name="firstname" type="text" value="${student.firstname}"/> </td>
 		<td> <input name="lastname" type="text" value="${student.lastname}"/> </td>

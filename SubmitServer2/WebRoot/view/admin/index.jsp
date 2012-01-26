@@ -62,10 +62,8 @@
                 <c:url var="courseLink" value="/view/instructor/course.jsp">
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url>
-                <li><a href="${courseLink}"> <c:out value="${course.courseName}" /> <c:if
-                            test="${not empty course.section}">
-                            <c:out value="${course.section}" />
-                        </c:if>: <c:out value="${course.description}" />
+                <li><a href="${courseLink}"> 
+                <c:out value="${course.fullDescription}" /> 
                 </a></li>
             </c:forEach>
         </ul>
@@ -127,7 +125,7 @@
 
                 <td class="description"><c:url var="projectLink" value="/view/instructor/project.jsp">
                         <c:param name="projectPK" value="${project.projectPK}" />
-                    </c:url> <a href="${projectLink}"> ${project.projectNumber}: ${project.title} </a></td>
+                    </c:url> <a href="${projectLink}"> <c:out value="${project.fullDescription}"/> </a></td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
                 <td><fmt:formatDate value="${project.late}" pattern="dd MMM, hh:mm a" /></td>
                 <c:choose>

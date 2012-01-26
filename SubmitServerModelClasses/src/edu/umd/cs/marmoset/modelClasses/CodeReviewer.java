@@ -80,8 +80,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		"is_instructor",
 		"last_update",
 		"num_comments",
-		"known_as",
-		"authentication_key"
+		"known_as"
 
 	};
 
@@ -117,7 +116,6 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	private final  @Submission.PK int submissionPK;
 	private final  @Student.PK int studentPK;
 	private final boolean isAuthor;
-	private final String authenticationKey;
 	private final @Nonnull String knownAs;
 	private Timestamp lastUpdate = null;
 	private final boolean isInstructor;
@@ -191,10 +189,6 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	}
 	public Student getStudent() {
 		return student;
-	}
-
-	public String getAuthenticationKey() {
-		return authenticationKey;
 	}
 
 	public void addComments(Connection conn, int num, Timestamp now) throws SQLException {
@@ -300,8 +294,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	    this.isAuthor = isAuthor;
 	    this.isInstructor = isInstructor;
 	    this.knownAs = knownAs;
-	    this.authenticationKey = MarmosetUtilities.nextLongRandomPassword();
-
+	    
 	    PreparedStatement stmt = null;
 	    try {
 	        stmt = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
@@ -314,7 +307,6 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	        stmt.setTime(col++, null);
 	        stmt.setInt(col++, 0);
 	        stmt.setString(col++, knownAs);
-	        stmt.setString(col++, authenticationKey);
 	        stmt.executeUpdate();
 
 	        this.codeReviewerPK = CodeReviewer.asPK(Queries.getGeneratedPrimaryKey(stmt));
@@ -337,7 +329,6 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		this.lastUpdate = resultSet.getTimestamp(startingFrom++);
 		this.numComments = resultSet.getInt(startingFrom++);
 		this.knownAs = resultSet.getString(startingFrom++);
-		this.authenticationKey = resultSet.getString(startingFrom++);
 	}
 	public  CodeReviewer(ResultSet resultSet, int startingFrom, Connection conn)
 	throws SQLException

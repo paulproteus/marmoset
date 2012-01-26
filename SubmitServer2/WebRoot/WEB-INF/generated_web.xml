@@ -1,0 +1,592 @@
+
+<!--
+Automatically created by Apache Tomcat JspC.
+Place this fragment in the web.xml before all icon, display-name,
+description, distributable, and context-param elements.
+-->
+
+    <servlet>
+        <servlet-name>org.apache.jsp.courseRequest_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.courseRequest_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.error_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.error_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.initialize_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.initialize_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.page_005fnot_005ffound_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.page_005fnot_005ffound_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.admin_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.admin_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.allSourceCode_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.allSourceCode_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.baselineSource_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.baselineSource_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.codeReview_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.codeReview_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.codeReviews_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.codeReviews_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.confirmReleaseRequest_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.confirmReleaseRequest_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.course_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.course_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.fixedSubmissionUpload_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.fixedSubmissionUpload_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.gwtCodeReviewHead_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.gwtCodeReviewHead_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.project_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.project_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.sourceCode_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.sourceCode_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.sourceFiles_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.sourceFiles_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.studentSurvey_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.studentSurvey_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.submission_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.submission_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.submissionAllTests_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.submissionAllTests_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.submitProject_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.submitProject_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.submitStatus_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.submitStatus_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.assignPoints_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.assignPoints_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.codeReviewAssignment_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.codeReviewAssignment_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.confirmChangeSubmissionBuildStatus_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.confirmChangeSubmissionBuildStatus_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.course_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.course_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.createBuildserverConfig_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.createBuildserverConfig_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.createCodeReviewAssignment_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.createCodeReviewAssignment_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.createCourse_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.createCourse_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.createProject_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.createProject_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.editStudentRegistration_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.editStudentRegistration_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.failedBackgroundRetests_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.failedBackgroundRetests_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.grantExtension_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.grantExtension_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.project_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.project_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.projectTestHistory_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.projectTestHistory_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.projectTestResults_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.projectTestResults_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.projectUtilities_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.projectUtilities_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.registerPerson_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.registerPerson_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.registerStudents_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.registerStudents_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.student_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.student_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.studentProject_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.studentProject_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.submission_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.submission_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.submissionAllTests_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.submissionAllTests_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.updateCodeReviewAssignment_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.updateCodeReviewAssignment_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.updateProject_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.updateProject_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.uploadProjectStarterFiles_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.uploadProjectStarterFiles_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.uploadTestSetup_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.uploadTestSetup_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.instructor.warningWithCoverage_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.instructor.warningWithCoverage_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.import_.importCourse_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.import_.importCourse_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.codeReview.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.codeReview.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.admin.badZip_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.admin.badZip_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.admin.editStudent_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.admin.editStudent_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.view.admin.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.view.admin.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.authenticate.openid.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.authenticate.openid.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.authenticate.openid.register_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.authenticate.openid.register_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.authenticate.ldap.index_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.authenticate.ldap.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.authenticate.ldap.initialize_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.authenticate.ldap.initialize_jsp</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.courseRequest_jsp</servlet-name>
+        <url-pattern>/courseRequest.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.error_jsp</servlet-name>
+        <url-pattern>/error.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.index_jsp</servlet-name>
+        <url-pattern>/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.initialize_jsp</servlet-name>
+        <url-pattern>/initialize.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.page_005fnot_005ffound_jsp</servlet-name>
+        <url-pattern>/page_not_found.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.admin_jsp</servlet-name>
+        <url-pattern>/view/admin.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.allSourceCode_jsp</servlet-name>
+        <url-pattern>/view/allSourceCode.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.baselineSource_jsp</servlet-name>
+        <url-pattern>/view/baselineSource.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.codeReview_jsp</servlet-name>
+        <url-pattern>/view/codeReview.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.codeReviews_jsp</servlet-name>
+        <url-pattern>/view/codeReviews.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.confirmReleaseRequest_jsp</servlet-name>
+        <url-pattern>/view/confirmReleaseRequest.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.course_jsp</servlet-name>
+        <url-pattern>/view/course.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.fixedSubmissionUpload_jsp</servlet-name>
+        <url-pattern>/view/fixedSubmissionUpload.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.gwtCodeReviewHead_jsp</servlet-name>
+        <url-pattern>/view/gwtCodeReviewHead.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.index_jsp</servlet-name>
+        <url-pattern>/view/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.project_jsp</servlet-name>
+        <url-pattern>/view/project.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.sourceCode_jsp</servlet-name>
+        <url-pattern>/view/sourceCode.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.sourceFiles_jsp</servlet-name>
+        <url-pattern>/view/sourceFiles.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.studentSurvey_jsp</servlet-name>
+        <url-pattern>/view/studentSurvey.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.submission_jsp</servlet-name>
+        <url-pattern>/view/submission.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.submissionAllTests_jsp</servlet-name>
+        <url-pattern>/view/submissionAllTests.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.submitProject_jsp</servlet-name>
+        <url-pattern>/view/submitProject.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.submitStatus_jsp</servlet-name>
+        <url-pattern>/view/submitStatus.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.assignPoints_jsp</servlet-name>
+        <url-pattern>/view/instructor/assignPoints.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.codeReviewAssignment_jsp</servlet-name>
+        <url-pattern>/view/instructor/codeReviewAssignment.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.confirmChangeSubmissionBuildStatus_jsp</servlet-name>
+        <url-pattern>/view/instructor/confirmChangeSubmissionBuildStatus.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.course_jsp</servlet-name>
+        <url-pattern>/view/instructor/course.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.createBuildserverConfig_jsp</servlet-name>
+        <url-pattern>/view/instructor/createBuildserverConfig.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.createCodeReviewAssignment_jsp</servlet-name>
+        <url-pattern>/view/instructor/createCodeReviewAssignment.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.createCourse_jsp</servlet-name>
+        <url-pattern>/view/instructor/createCourse.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.createProject_jsp</servlet-name>
+        <url-pattern>/view/instructor/createProject.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.editStudentRegistration_jsp</servlet-name>
+        <url-pattern>/view/instructor/editStudentRegistration.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.failedBackgroundRetests_jsp</servlet-name>
+        <url-pattern>/view/instructor/failedBackgroundRetests.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.grantExtension_jsp</servlet-name>
+        <url-pattern>/view/instructor/grantExtension.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.project_jsp</servlet-name>
+        <url-pattern>/view/instructor/project.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.projectTestHistory_jsp</servlet-name>
+        <url-pattern>/view/instructor/projectTestHistory.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.projectTestResults_jsp</servlet-name>
+        <url-pattern>/view/instructor/projectTestResults.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.projectUtilities_jsp</servlet-name>
+        <url-pattern>/view/instructor/projectUtilities.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.registerPerson_jsp</servlet-name>
+        <url-pattern>/view/instructor/registerPerson.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.registerStudents_jsp</servlet-name>
+        <url-pattern>/view/instructor/registerStudents.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.student_jsp</servlet-name>
+        <url-pattern>/view/instructor/student.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.studentProject_jsp</servlet-name>
+        <url-pattern>/view/instructor/studentProject.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.submission_jsp</servlet-name>
+        <url-pattern>/view/instructor/submission.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.submissionAllTests_jsp</servlet-name>
+        <url-pattern>/view/instructor/submissionAllTests.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.updateCodeReviewAssignment_jsp</servlet-name>
+        <url-pattern>/view/instructor/updateCodeReviewAssignment.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.updateProject_jsp</servlet-name>
+        <url-pattern>/view/instructor/updateProject.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.uploadProjectStarterFiles_jsp</servlet-name>
+        <url-pattern>/view/instructor/uploadProjectStarterFiles.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.uploadTestSetup_jsp</servlet-name>
+        <url-pattern>/view/instructor/uploadTestSetup.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.instructor.warningWithCoverage_jsp</servlet-name>
+        <url-pattern>/view/instructor/warningWithCoverage.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.import_.importCourse_jsp</servlet-name>
+        <url-pattern>/view/import/importCourse.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.codeReview.index_jsp</servlet-name>
+        <url-pattern>/view/codeReview/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.admin.badZip_jsp</servlet-name>
+        <url-pattern>/view/admin/badZip.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.admin.editStudent_jsp</servlet-name>
+        <url-pattern>/view/admin/editStudent.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.view.admin.index_jsp</servlet-name>
+        <url-pattern>/view/admin/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.authenticate.openid.index_jsp</servlet-name>
+        <url-pattern>/authenticate/openid/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.authenticate.openid.register_jsp</servlet-name>
+        <url-pattern>/authenticate/openid/register.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.authenticate.ldap.index_jsp</servlet-name>
+        <url-pattern>/authenticate/ldap/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.authenticate.ldap.initialize_jsp</servlet-name>
+        <url-pattern>/authenticate/ldap/initialize.jsp</url-pattern>
+    </servlet-mapping>
+
+<!--
+All session-config, mime-mapping, welcome-file-list, error-page, taglib,
+resource-ref, security-constraint, login-config, security-role,
+env-entry, and ejb-ref elements should follow this fragment.
+-->

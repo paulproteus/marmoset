@@ -59,8 +59,9 @@
                     
                 <tr class="r${counter.index % 2}">
                 <td><a href="${submissionLink}">${submission.submissionNumber}</a></td>
-                <td><a href="${projectLink}">${project.projectNumber}: ${project.title}</a></td>
-                 <td><a href="${studentRegistrationLink}">${studentRegistration.fullname}</a></td>
+                <td><a href="${projectLink}"><c:out value="${project.fullDescription}"/></a></td>
+                 <td><a href="${studentRegistrationLink}">
+                 <c:out value="${studentRegistration.fullname}"/></a></td>
             </tr>
 		</c:forEach>
 			

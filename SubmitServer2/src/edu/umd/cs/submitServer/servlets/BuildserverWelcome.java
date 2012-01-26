@@ -28,37 +28,18 @@
  */
 package edu.umd.cs.submitServer.servlets;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.BuildServer;
 import edu.umd.cs.marmoset.modelClasses.Course;
-import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
-import edu.umd.cs.marmoset.modelClasses.IO;
-import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.Queries;
-import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
-import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
-import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
 
 /**
  * @author jspacco

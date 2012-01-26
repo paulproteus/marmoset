@@ -42,21 +42,11 @@
 <ss:projectMenu />
 
 <ss:studentPicture />
-<h2>${studentRegistration.fullname} </h2>
+<h2><c:out value="${studentRegistration.fullname}"/> </h2>
 <p><ss:studentEmail/>
 
 <c:set var="testCols" value="3" />
-<c:if test="${user.superUser and initParam['research.server']=='true'}">
-<c:url var="researchView" value="/research/studentProject.jsp">
-	<c:param name="projectPK" value="${project.projectPK}" />
-	<c:param name="studentPK" value="${studentRegistration.studentPK}" />
-</c:url>
 
-
-
-<p>
-<a href="${researchView}">Research view of ${studentRegistration.classAccount}'s submissions for  project ${project.projectNumber}</a>
-</c:if>
 
 <p>
 <c:url var="grantExtensionLink" value="/view/instructor/grantExtension.jsp">
@@ -67,8 +57,10 @@
 <p>
 <c:if test="${studentSubmitStatus.extension > 0}">
 Current Extension: ${studentSubmitStatus.extension}<br></c:if>
-<a href="${grantExtensionLink}"> Grant ${studentRegistration.fullname}
-an extension on project ${project.projectNumber}</a>
+<a href="${grantExtensionLink}"> Grant 
+<c:out value="${studentRegistration.fullname}"/>
+an extension on project
+<c:out value="${project.projectNumber}"/></a>
 
 
 <h2>Submissions</h2>

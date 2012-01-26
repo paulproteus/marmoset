@@ -131,7 +131,7 @@ public class UpdateCodeReviewAssignment extends SubmitServerServlet {
 			assignment.update(conn);
 
 			if (addReviews) {
-			    @Student.PK int reviewer = parser.getIntegerParameter("reviewer");
+			    @Student.PK int reviewer = parser.getIntParameter("reviewer");
 			    Map<Integer, Submission> submissionsThatNeedReview 
 	             =     (Map<Integer, Submission>) request.getAttribute("submissionsThatNeedReview");
 			    for(Submission s : submissionsThatNeedReview.values()) {

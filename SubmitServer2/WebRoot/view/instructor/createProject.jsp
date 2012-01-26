@@ -178,11 +178,11 @@ function changedIsTested(isTested)
                 <c:choose>
                    <c:when test="${studentRegistration.studentRegistrationPK == studentRegistrationPK}">
                     <option value="${studentRegistration.studentRegistrationPK}" selected="selected">
-                    ${studentRegistration.fullname} </option>
+                   <c:out value="${studentRegistration.fullname}"/> </option>
                     </c:when>
                     <c:otherwise>
                     <option value="${studentRegistration.studentRegistrationPK}">
-                    ${studentRegistration.fullname} </option>
+                   <c:out value="${studentRegistration.fullname}"/> </option>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>

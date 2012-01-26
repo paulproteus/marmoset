@@ -42,10 +42,11 @@ tr.reject {background: #f33}
 
     <div class="sectionTitle">
         <h1>
-            <a href="${course.url}">${course.fullName}</a>: ${course.description} (Instructor View)
+            <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
+            (Instructor View)
         </h1>
 
-        <p class="sectionDescription">Welcome ${user.firstname}</p>
+        <p class="sectionDescription"><ss:hello/></p>
     </div>
 
     <script type="text/javascript">
@@ -144,11 +145,11 @@ tr.reject {background: #f33}
                             <c:choose>
                                 <c:when test="${studentRegistration.studentRegistrationPK == studentRegistrationPK}">
                                     <option value="${studentRegistration.studentRegistrationPK}" selected="selected">
-                                        ${studentRegistration.classAccount}</option>
+                                      <c:out value="${studentRegistration.classAccount}"/></option>
                                 </c:when>
                                 <c:otherwise>
                                     <option value="${studentRegistration.studentRegistrationPK}">
-                                        ${studentRegistration.classAccount}</option>
+                                       <c:out value="${studentRegistration.classAccount}"/></option>
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
@@ -189,9 +190,10 @@ tr.reject {background: #f33}
                     </c:url>
                     <td title="registration status is controlled through grades.cs.umd.edu"><input name="active"
                         type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled /></td>
-                    <td class="description"><a href="${studentLink}">${studentRegistration.lastname},
-                            ${studentRegistration.firstname} </a></td>
-                    <td><a href="${studentLink}">${studentRegistration.classAccount}</a></td>
+                    <td class="description"><a href="${studentLink}">
+                    <c:out value="${studentRegistration.fullname}"/></a></td>
+                    <td><a href="${studentLink}">
+                    <c:out value="${studentRegistration.classAccount}"/></a></td>
                 </tr>
             </c:forEach>
         </table>
@@ -199,7 +201,7 @@ tr.reject {background: #f33}
 
 	<c:if test="${not empty pendingRegistrations}">
 	<h3>
-		<a id="requests" name="requests">Registration Requests</a>
+		<a id="requests">Registration Requests</a>
 	</h3>
 	<c:url var="updateRegistrations" value="/action/instructor/UpdatePendingRegistrations" />
 	<form action="${updateRegistrations}" method="POST">
@@ -247,9 +249,10 @@ tr.reject {background: #f33}
                 </c:url>
                 <td><input name="active" type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled />
                 </td>
-                <td class="description"><a href="${studentLink}">${studentRegistration.lastname},
-                        ${studentRegistration.firstname} </a></td>
-                <td><a href="${studentLink}">${studentRegistration.classAccount}</a></td>
+                <td class="description"><a href="${studentLink}">
+                <c:out value="${studentRegistration.fullname}"/></a></td>
+                <td><a href="${studentLink}">
+                <c:out value="${studentRegistration.classAccount}"/></a></td>
 
                 <c:set var="modifyPermission" value="${studentRegistration.instructorCapability == 'modify'}" />
                 <td><input name="modify" type="checkbox" ${ss:isChecked(modifyPermission)}  disabled /></td>
@@ -310,14 +313,14 @@ tr.reject {background: #f33}
 
     <c:if test="${instructorActionCapability}">
         <h3>
-            <a id="update" name="update">Update</a>
+            <a id="update" >Update</a>
         </h3>
         <c:url var="updateCourseLink" value="/action/instructor/UpdateCourse" />
         <c:set var="currentURL">
             <c:out value="${course.url}" />
         </c:set>
         <c:set var="currentDescription">
-            <c:out value="${course.description}" />
+            <c:out value="${course.fullDescription}" />
         </c:set>
         <form action="${updateCourseLink}" method="post" name="updateCourseForm">
             <input type="hidden" name="coursePK" value="${course.coursePK}">
