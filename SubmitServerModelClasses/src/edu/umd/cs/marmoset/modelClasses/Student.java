@@ -160,9 +160,16 @@ public class Student  implements Comparable<Student> {
             return false;
         return true;
     }
+    
+
+    @Override
+    public String toString() {
+        return getFullname() + "; studentPK=" + studentPK;
+    }
+
     public void setSuperUser(boolean superUser) {
-    this.superUser = superUser;
-  }
+        this.superUser = superUser;
+    }
   /**
    * @return Returns the loginName.
    */
