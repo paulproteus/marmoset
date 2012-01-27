@@ -25,7 +25,6 @@ package edu.umd.cs.eclipse.courseProjectManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -62,7 +61,6 @@ class EclipseLaunchEventLog {
 	static final String LOG_NAME = ".cpmLOG";
 	private static final Map<IProject, EclipseLaunchEventLog> map = new HashMap<IProject, EclipseLaunchEventLog>();
 
-	private static int numLaunchEventsLoggedToFile = 0;
 	/**
 	 * Only upload to server after at least this many events have been cached in
 	 * the file
@@ -124,7 +122,6 @@ class EclipseLaunchEventLog {
 		} catch (CoreException e) {
 			throw new IOException(e.getMessage());
 		}
-		numLaunchEventsLoggedToFile = 0;
 	}
 
 	private String getEvents() throws IOException {
@@ -154,31 +151,6 @@ class EclipseLaunchEventLog {
 		}
 	}
 
-	private byte[] getBytes() throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		// FileInputStream fis= new FileInputStream(file.getContents());
-		InputStream is = null;
-		try {
-			is = file.getContents();
-			byte[] bytes = new byte[2048];
-			while (true) {
-				// int numBytes = fis.read(bytes);
-				int numBytes = is.read(bytes);
-				if (numBytes == -1)
-					break;
-				baos.write(bytes);
-			}
-			baos.flush();
-			baos.close();
-			return baos.toByteArray();
-			// } finally { fis.close(); }
-		} catch (CoreException e) {
-			throw new IOException(e.getMessage());
-		} finally {
-			if (is != null)
-				is.close();
-		}
-	}
 
 	static void postEventLogToServer(IProject project) {
 		// Log to the course project manager log (visible to users).

@@ -28,17 +28,15 @@
 package edu.umd.cs.eclipse.courseProjectManager;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -232,6 +230,7 @@ public class TurninProjectAction implements IObjectActionDelegate {
 				fileInputStream = new FileInputStream(submitUserResource
 						.getRawLocation().toString());
 				userProperties.load(fileInputStream);
+			} catch (FileNotFoundException e) {
 			} finally {
 				if (fileInputStream != null)
 					fileInputStream.close();
@@ -686,8 +685,10 @@ public class TurninProjectAction implements IObjectActionDelegate {
 		// need
 		// to fetch one from the server
 		if (invalidSubmitUser(userProperties)) {
+		    InputStream submitUser = null;
 			if (!authentication.equals("ldap") ){
-			    
+			   
+			    submitUser = getSubmitUserForOpenId(parent, allSubmissionProps);
 			} else {
 			PasswordDialog passwordDialog = new PasswordDialog(parent);
 			int passwordStatus = passwordDialog.open();
@@ -698,9 +699,10 @@ public class TurninProjectAction implements IObjectActionDelegate {
 			String username = passwordDialog.getUsername();
 			String password = passwordDialog.getPassword();
 			
-			InputStream inputStream = TurninProjectAction
+			submitUser = TurninProjectAction
 					.getSubmitUserFileFromServer(username, password,
 					        allSubmissionProps);
+			}
 			Debug.print("I have input stream from the server");
 
 			// create .submituser file
@@ -709,14 +711,14 @@ public class TurninProjectAction implements IObjectActionDelegate {
 					.findMember(AutoCVSPlugin.SUBMITUSER);
 			Debug.print("\nsubmitUserResource = " + submitUserResource + "\n");
 			if (submitUserResource == null)
-				submitUserFile.create(inputStream, true, null);
+				submitUserFile.create(submitUser, true, null);
 			else
-				submitUserFile.setContents(inputStream, true, false, null);
+				submitUserFile.setContents(submitUser, true, false, null);
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 			}
-			}
+			
 			Debug.print("created .submituser file");
 			userProperties = getSubmitUserProperties(project);
 		}
@@ -742,8 +744,6 @@ public class TurninProjectAction implements IObjectActionDelegate {
 				&& userProperties.getProperty("classAccount") == null;
 	}
 
-	
-
 	public static boolean openURL(String u) {
 	       try {
 	           URL url = new URL(u);
@@ -763,53 +763,33 @@ public class TurninProjectAction implements IObjectActionDelegate {
 
 
 	}
-    public static String[] getSubmitUserForOpenId(String courseKey, String projectNumber, String baseURL)
-            throws UnsupportedEncodingException, URISyntaxException, IOException {
-        Console console = System.console();
+    public static InputStream getSubmitUserForOpenId(Shell parent, Properties properties) 
+            throws IOException {
+        String courseKey = properties.getProperty("courseKey");
+        String projectNumber = properties.getProperty("projectNumber");
+        String baseURL = properties.getProperty("baseURL");
         
         String encodedProjectNumber = URLEncoder.encode(projectNumber, "UTF-8");
-        String u = baseURL + "/view/submitStatus?courseKey=" + courseKey + "&projectNumber="
+        String u = baseURL + "/view/submitStatus.jsp?courseKey=" + courseKey + "&projectNumber="
                 + encodedProjectNumber;
+        SubmitUserDialog submitUserDialog = new SubmitUserDialog(parent);
+        System.out.println(u);
+        openURL(u);
+        int status = submitUserDialog.open();
 
-        if (!openURL(u)) {
-
-            System.out.println("Please enter the following URL into your browser");
-            System.out.println("  " + u);
-            System.out
-                    .println("Your browser will connect to the submit server, which may require you to authenticate to the submit server");
-            System.out.println("Please do so, and then you will be shown a page with a textfield on it");
-            System.out.println("Then copy that text and paste it into the prompt here");
+        if (status != SubmitUserDialog.OK) {
+            // TODO fail here in some useful way
+            Debug.print("SubmitUserDialog failed");
         }
-
-        while (true) {
-            System.out.println("Information from browser? ");
-            String info = new String(console.readLine());
-            if (info.length() > 2) {
-                int checksum = Integer.parseInt(info.substring(info.length() - 1), 16);
-                info = info.substring(0, info.length() - 1);
-                int hash = info.hashCode() & 0x0f;
-                if (checksum == hash) {
-                    String fields[] = info.split(";");
-                    if (fields.length == 2) {
-                        return fields;
-
-                    }
-                }
-            }
-            System.out.println("That doesn't seem right");
-            System.out
-                    .println("The information should be your account name and a string of hexidecimal digits, separate by a semicolon");
-            System.out.println("Please try again");
-            System.out.println();
-        }
+    
+         String classAccount = submitUserDialog.getClassAccount();
+         String oneTimePassword = submitUserDialog.getOneTimePassString();
+         String results = String.format("classAccount=%s%noneTimePassword=%s%n",
+                 classAccount, oneTimePassword);
+         return new ByteArrayInputStream(results.getBytes());
+        
     }
 
-	/**
-	 * @param cvsStatus
-	 * @param project
-	 * @param addedFiles
-	 * @return
-	 */
 	private static String forceCommit(IProject project, IResource[] addedFiles) {
 		String cvsStatus = "(already submitted backup copy via CVS)";
 		try {
@@ -1118,8 +1098,7 @@ public class TurninProjectAction implements IObjectActionDelegate {
 	private static InputStream getSubmitUserFileFromServer(String loginName,
 			String password, Properties allProperties) throws IOException,
 			HttpException {
-		// TODO derive this from submitURL
-	    String url = allProperties.getProperty("baseURL");
+		String url = allProperties.getProperty("baseURL");
 		url += "/eclipse/NegotiateOneTimePassword";
 		// System.out.println(url);
 		// Debug.print("url: " +url);

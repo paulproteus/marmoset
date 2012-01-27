@@ -713,20 +713,7 @@ public class CVSOperations {
 		exec(runnable, syncMode, IN_STATUS_BAR, context);
 	}
 
-	/**
-	 * @deprecated Converts an array of IResources to an array of ICVSResources.
-	 * @param arr
-	 *            the array of IResources
-	 * @return an array of ICVSResources
-	 */
-	private static ICVSResource[] convertIResourcesToICVSResources(
-			IResource[] arr) {
-		ICVSResource[] result = new ICVSResource[arr.length];
-		for (int ii = 0; ii < arr.length; ii++) {
-			result[ii] = CVSWorkspaceRoot.getCVSResourceFor(arr[ii]);
-		}
-		return result;
-	}
+
 
 	private static class TagSetHolder {
 		public CVSTag[] tagSet;
@@ -883,16 +870,6 @@ public class CVSOperations {
 		};
 
 		exec(runnable, syncMode, IN_STATUS_BAR, null);
-	}
-
-	private static String resourceArrayToString(IResource[] resourceList) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < resourceList.length; i++) {
-			buf.append(resourceList[i].getName());
-			if (i < resourceList.length - 1)
-				buf.append(',');
-		}
-		return buf.toString();
 	}
 
 	/**

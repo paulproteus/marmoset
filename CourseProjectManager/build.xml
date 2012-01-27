@@ -54,6 +54,7 @@
 		  destdir="${bin.dir}"
                 source="1.5"
                 target="1.5"
+		includeantruntime="true"
                 debug="on">
             <classpath refid="plugin.classpath"/>
         </javac>
@@ -80,5 +81,15 @@
 		<copy todir="${dist.dir}/META-INF">
 			<fileset dir="META-INF"/>
 		</copy>
+		<jar destfile="${dist.dir}/edu.umd.cs.eclipse.courseProjectManager.jar"
+			manifest="${dist.dir}/META-INF/MANIFEST.MF"
+			>
+			<fileset dir="${dist.dir}">
+				  <include name="plugin.xml"/>
+				  <include name="courseProjectManager.jar"/>
+				  <include name="lib/*.jar"/>
+			</fileset>
+		</jar>
+			  
 	</target>
 </project>

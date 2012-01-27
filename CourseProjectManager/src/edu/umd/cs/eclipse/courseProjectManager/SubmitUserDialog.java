@@ -41,11 +41,10 @@ import org.eclipse.swt.widgets.Text;
 
 
 public class SubmitUserDialog extends Dialog {
-	private String username;
-	private String password;
-
-	private Text usernameText;
-	private Text passwordText;
+	private String userData;
+	private String classAccount;
+	private String oneTimePassword;
+	private Text userDataText;
 	private Text errorMessageText;
 
 	private Button okButton;
@@ -84,13 +83,13 @@ public class SubmitUserDialog extends Dialog {
 		usernameLabel.setFont(parent.getFont());
 
 		// username textbox
-		usernameText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		usernameText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
+		userDataText = new Text(composite, SWT.SINGLE | SWT.BORDER);
+		userDataText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
 				| GridData.HORIZONTAL_ALIGN_FILL));
 
 	
 		// Validate the user's input
-		usernameText.addModifyListener(new ModifyListener() {
+		userDataText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				validateInput();
 			}
@@ -115,10 +114,8 @@ public class SubmitUserDialog extends Dialog {
 	 * method is called whenever the text changes in the input field.
 	 * </p>
 	 */
-	String classAccount;
-	String oneTimePassword;
 	protected void validateInput() {
-	    String info = usernameText.getText();
+	    String info = userDataText.getText();
         if (info.length() > 2) {
             int checksum = Integer.parseInt(info.substring(info.length() - 1), 16);
             info = info.substring(0, info.length() - 1);
@@ -181,41 +178,30 @@ public class SubmitUserDialog extends Dialog {
 				IDialogConstants.OK_LABEL, true);
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
-		if (password != null) {
-			passwordText.setText(password);
-			passwordText.selectAll();
-		}
+		
 
-		usernameText.setFocus();
-		if (username != null) {
-			usernameText.setText(username);
-			usernameText.selectAll();
+		userDataText.setFocus();
+		if (userData != null) {
+			userDataText.setText(userData);
+			userDataText.selectAll();
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Dialog.
-	 */
+
 	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
-			username = usernameText.getText();
-			password = passwordText.getText();
+			userData = userDataText.getText();
 		}
 		super.buttonPressed(buttonId);
 	}
 
-	/**
-	 * @return Returns the password.
-	 */
-	public String getPassword() {
-		return password;
-	}
 
-	/**
-	 * @return Returns the username.
-	 */
-	public String getUsername() {
-		return username;
+	public String getClassAccount() {
+		return classAccount;
 	}
+	
+	   public String getOneTimePassString() {
+	        return oneTimePassword;
+	    }
 }
