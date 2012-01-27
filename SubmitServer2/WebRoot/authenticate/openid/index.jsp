@@ -30,14 +30,15 @@
   <ss:loginBreadCrumb/>
   <ss:loginTitle/>
   
+      <c:set var="target">
+        <c:out value="${param.target}" />
+    </c:set>
+    
   <!-- Simple Open ID Selector -->
   <c:url var="initiateUrl" value="/authenticate/openid/initiate" />
   <form method="POST" id="openid_form" action="${initiateUrl}">
     <input type="hidden" name="action" value="verify" />
-    <c:set var="target">
-    	<c:out value="${param.target}" />
-    </c:set>
-    <input type="hidden" name="target" value="${target}" />
+    <input type="hidden" name="marmoset.target" value="${target}" />
     <fieldset>
       <legend>Sign-in or Create New Account</legend>
       <div id="openid_choice">
@@ -62,12 +63,12 @@
 			making OpenID requests from localhost can have strange semantics, and
 			some providers may refuse to authenticate at all.</p>
 		<form action="${verifyOpenId}" method="GET">
-  		<input type="hidden" name="target" value="${target}" />
+  		<input type="hidden" name="marmoset.target" value="${target}" />
   		<input type="text" name="uid" placeholder="Enter a fake OpenID identity" />
   		<input type="submit" />
   	</form>
     <form action="${verifyOpenId}" method="GET">
-        <input type="hidden" name="target" value="${target}" />
+        <input type="hidden" name="marmoset.target" value="${target}" />
         <input type="text" name="login_name" placeholder="Enter existing username" />
         <input type="submit" />
     </form>
