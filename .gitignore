@@ -28,3 +28,8 @@ CommandLineSubmission/bin
 CommandLineSubmission/submit.jar
 .DS_Store
 CourseProjectManager/dist/courseProjectManager.jar
+CourseProjectManager/.settings/
+CourseProjectManager/dist/edu.umd.cs.eclipse.courseProjectManager.jar
+CourseProjectManager/local.properties
+SubmitServer2/localhost.web.properties
+SubmitServer2/umd.web.properties

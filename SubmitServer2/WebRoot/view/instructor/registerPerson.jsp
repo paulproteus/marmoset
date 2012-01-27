@@ -112,6 +112,7 @@
 </div>
 </c:if>
             
+<c:if test="${gradesServer}">
 <div>
 	<form name="registerOneStudentForm"
 		action='<c:url value="/action/instructor/RegisterOneStudent"/>'
@@ -175,5 +176,6 @@
 	</form>
 
 </div>
+</c:if>
 </body>
 </html>

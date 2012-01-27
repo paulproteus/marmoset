@@ -8,7 +8,10 @@
 
 <c:if test="${user.superUser}">
  <a href="<c:url value='/view/admin/index.jsp'/>" title="Access superuser capabilities" >SuperUser</a> |
- <!-- <a href="<c:url value='/status/QueryBuildServerStatus'/>" title="Query the build server status" >BuildServerStatus</a> |  -->
+ </c:if>
+
+<c:if test="${user.canImportCourses}">
+ <a href="<c:url value='/view/admin.jsp'/>">Admin</a> |
 </c:if>
 
 <c:choose>

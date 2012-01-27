@@ -369,9 +369,11 @@ tr.reject {background: #f33}
                     <c:out value="${studentRegistration.fullname}" />
                     <input type="submit" value="Go">
                 </form></li>
+            <c:if test="${gradesServer}">
             <li><c:url var="registerStudentsLink" value="/view/instructor/registerStudents.jsp">
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url> <a href="${registerStudentsLink}"> Register students for this course by uploading a text file </a></li>
+                </c:if>
             <li><c:url var="registerPersonLink" value="/view/instructor/registerPerson.jsp">
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url> <a href="${registerPersonLink}"> Register one person course using a web interface</a></li>
