@@ -223,7 +223,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				studentPK = studentRegistration.getStudentPK();
 				coursePK = studentRegistration.getCoursePK();
 			}
-			boolean studentSpecifiedByInstructor = studentPK != null;
+			boolean studentSpecifiedByInstructor = studentPK != null && !studentPK.equals(userSession.getStudentPK());
 
 			if (studentPK == null)
 				studentPK = userSession.getStudentPK();
