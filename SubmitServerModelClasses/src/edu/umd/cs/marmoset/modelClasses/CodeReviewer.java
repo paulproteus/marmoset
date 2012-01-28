@@ -80,8 +80,8 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		"is_instructor",
 		"last_update",
 		"num_comments",
-		"known_as"
-
+		"known_as",
+		"is_automated"
 	};
 
 	/**
@@ -119,6 +119,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	private final @Nonnull String knownAs;
 	private Timestamp lastUpdate = null;
 	private final boolean isInstructor;
+	private final boolean isAutomated;
+	
+	public boolean isAutomated() {
+		return isAutomated;
+	}
+	
 	public boolean isInstructor() {
 		return isInstructor;
 	}
@@ -234,7 +240,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
         		throw new IllegalArgumentException("Existing codeReviewer has inconsistent isAuthor value");
         	return result;
         }
-        return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor());
+        return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor(), false);
 	}
 
 	public static @Nonnull CodeReviewer lookupOrAddAdhocReviewer(Connection conn,  @Submission.PK int submissionPK,
@@ -245,7 +251,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 				throw new IllegalArgumentException("Existing codeReviewer has inconsistent isAuthor value");
 			return result;
 		}
-		return new CodeReviewer(conn, 0, submissionPK, studentPK, knownAs, isAuthor, isInstructor);
+		return new CodeReviewer(conn, 0, submissionPK, studentPK, knownAs, isAuthor, isInstructor, false);
 	}
 
     public static CodeReviewer updateOrInsert(Connection conn, 
@@ -278,12 +284,20 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
             return result;
         }
 
-        return new CodeReviewer(conn, codeReviewAssignmentPK, submissionPK, studentPK, knownAs, isAuthor, isInstructor);
+        return new CodeReviewer(conn, codeReviewAssignmentPK, submissionPK, studentPK, knownAs, isAuthor, isInstructor, false);
     }
 
 	public  CodeReviewer(Connection conn, @CodeReviewAssignment.PK int codeReviewAssignmentPK,   
 			@Submission.PK int submissionPK,
 			@Student.PK int studentPK, String knownAs, boolean isAuthor, boolean isInstructor)
+	throws SQLException
+	{
+		this(conn, codeReviewAssignmentPK, submissionPK, studentPK, knownAs,
+				isAuthor, isInstructor, false);
+	}
+	public  CodeReviewer(Connection conn, @CodeReviewAssignment.PK int codeReviewAssignmentPK,   
+			@Submission.PK int submissionPK,
+			@Student.PK int studentPK, String knownAs, boolean isAuthor, boolean isInstructor, boolean isAutomated)
 	throws SQLException
 	{
 	    String insert = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
@@ -294,6 +308,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	    this.isAuthor = isAuthor;
 	    this.isInstructor = isInstructor;
 	    this.knownAs = knownAs;
+	    this.isAutomated = isAutomated;
 	    
 	    PreparedStatement stmt = null;
 	    try {
@@ -307,6 +322,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	        stmt.setTime(col++, null);
 	        stmt.setInt(col++, 0);
 	        stmt.setString(col++, knownAs);
+	        stmt.setBoolean(col++, isAutomated);
 	        stmt.executeUpdate();
 
 	        this.codeReviewerPK = CodeReviewer.asPK(Queries.getGeneratedPrimaryKey(stmt));
@@ -329,6 +345,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		this.lastUpdate = resultSet.getTimestamp(startingFrom++);
 		this.numComments = resultSet.getInt(startingFrom++);
 		this.knownAs = resultSet.getString(startingFrom++);
+		this.isAutomated = resultSet.getBoolean(startingFrom++);
 	}
 	public  CodeReviewer(ResultSet resultSet, int startingFrom, Connection conn)
 	throws SQLException

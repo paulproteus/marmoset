@@ -31,7 +31,7 @@ import edu.umd.cs.marmoset.utilities.Objects;
 public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	private static final String FINDBUGS_TEST_TYPE = "findbugs";
 
-	private static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java): \\[line: (\\d+)\\]");
+	private static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java):\\[line (\\d+)\\]");
 
   final @Nonnull Submission submission;
   final @Nonnull  Project project;
@@ -78,10 +78,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				submission.getSubmissionPK(), conn);
 
 		this.assignment = reviewer.getCodeReviewAssignment();
+		
 		CodeReviewer findbugsReviewer = createOrGetFindbugsReviewer(conn);
 		if (!hasFindbugsThreads(conn, findbugsReviewer)) {
 			createFindbugsThreads(findbugsReviewer, conn);
 		}
+		
 		for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
 			reviewers.put(r.getCodeReviewerPK(), r);
 		}
@@ -525,13 +527,16 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	private CodeReviewer createOrGetFindbugsReviewer(Connection conn) throws SQLException {
 		PreparedStatement st = conn
 				.prepareStatement("SELECT * FROM code_reviewer "
-						+ "WHERE is_automated = 1 AND known_as = ?");
-		Queries.setStatement(st, "FindBugs");
+						+ "WHERE is_automated = 1 AND known_as = ? "
+						+ "AND code_review_assignment_pk = ? "
+						+ "AND submission_pk = ?");
+		int assignmentPk = (assignment == null) ? 0 : assignment.getCodeReviewAssignmentPK();
+		Queries.setStatement(st, "FindBugs", assignmentPk, submission.getSubmissionPK());
 		ResultSet rs = st.executeQuery();
 		if (!rs.next()) {
-			return new CodeReviewer(conn,
-					assignment.getCodeReviewAssignmentPK(),
-					submission.getSubmissionPK(), -1, "FindBugs", false, false);
+			return new CodeReviewer(conn, assignmentPk,
+					submission.getSubmissionPK(), -1, "FindBugs", false, false,
+					false);
 		}
 		return new CodeReviewer(rs, 1);
 	}
@@ -554,7 +559,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	 */
 	private void createFindbugsThreads(CodeReviewer findbugsReviewer, Connection conn) throws SQLException {
 		PreparedStatement findbugsOutcomes = conn
-				.prepareStatement("SELECT test_outcomes.* FROM test_outcomes"
+				.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
 						+ "JOIN test_runs USING (test_run_pk) "
 						+ "WHERE submission_pk = ? AND test_type = ?");
 		Queries.setStatement(findbugsOutcomes, submission.getSubmissionPK(), FINDBUGS_TEST_TYPE);
