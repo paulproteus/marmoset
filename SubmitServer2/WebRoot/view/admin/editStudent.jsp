@@ -62,7 +62,7 @@ form li.required label {font-weight: bold;}
 				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required" value="${ss:escapeHtml(student.loginName)}" />
 			</li>
 		</ul>
-		<button name="action" value="UPDATE" type="submit">Update Student</button>
+		<button name="action" value="UPDATE" type="submit">Update</button>
 		<!-- <button name="action" value="DELETE" type="submit">Delete Student</button> -->
 	</form>
 <ss:footer />

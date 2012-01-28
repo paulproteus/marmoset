@@ -11,7 +11,7 @@
 </c:if>
 
 <c:if test="${user.canImportCourses}">
- <a href="<c:url value='/view/admin.jsp'/>">Admin</a> |
+ <a href="<c:url value='/view/manage.jsp'/>">Manage</a> |
 </c:if>
 
 <c:if test="${!singleCourse}">

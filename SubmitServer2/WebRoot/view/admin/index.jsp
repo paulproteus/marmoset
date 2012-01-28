@@ -231,74 +231,49 @@
 
     <h2>Create course</h2>
     <ss:createCourseForm/>
-    
+
     <h2>User actions</h2>
-    	<h3>Edit student account</h3>
-    	<c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
-    	<form method="GET" action="${editStudentUrl}">
-              <select name="studentPK">
-                 <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                    <option value="${student.studentPK}">
-                        <c:out value="${student.fullname}" />
-                    </option>
-                </c:forEach>
-            </select> 
-    		<button type="submit">Edit</button>
-    	</form>
-
-        <h3>Allow course creation</h3>
-        <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
-        <p>
-        <form name="AllowCourseCreation" method="post" action="${allowCourseCreationLink}">
-            <select name="studentPK">
-                <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                  <c:if test="${!student.canImportCourses}">
-                    <option value="${student.studentPK}">
-                        <c:out value="${student.fullname}" />
-                    </option>
-                    </c:if>
-                </c:forEach>
-            </select> <input type="submit" value="Allow course creation" />
-        </form>
-
-
-    <h3>Authenticate as</h3>
-    <p>This allows you to log in as any other user, and allow you to view the submit server as that user would. Once
-        you have authenticated as another user, you will have to log out and log in as yourself in order to perform
-        actions as yourself.</p>
-
-    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
+    <c:url var="registerPerson" value="/view/instructor/registerPerson.jsp" />
 
     <p>
-    <form name="AuthenticateAs" method="post" action="${authenticateAsLink}">
-        <select name="studentPK">
-            <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                <option value="${student.studentPK}">
-                    <c:out value="${student.fullname}" />
-                </option>
-            </c:forEach>
-        </select> <input type="submit" value="Authenticate as" />
-    </form>
+        <a href="${registerPerson}">Register person</a>
+    </p>
 
+    <c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
+    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
+    <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
     <c:url var="makeSuperuserLink" value="/action/admin/MakeSuperuser" />
 
-    <h3>Create superuser account</h3>
-    <p>
-    <form name="MakeSuperuser" method="post" action="${makeSuperuserLink}">
-        <select name="studentPK">
-            <c:forEach var="student" items="${allStudents}" varStatus="counter">
-                <c:if test="${!student.superUser && student.canImportCourses }">
-                    <option value="${student.studentPK}">
-                        <c:out value="${student.fullname}" />
-                    </option>
-                </c:if>
-            </c:forEach>
-        </select> <input type="submit" value="Make superuser account for" />
-    </form>
+    <table>
+        <c:forEach var="student" items="${allStudents}" varStatus="counter">
+            <tr class="r${counter.index % 2}">
+                <td><c:out value="${student.fullname}" /></td>
+                <td><form method="GET" action="${editStudentUrl}">
+                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
+                        <button type="submit">Edit</button>
+                    </form></td>
+                <td><form method="post" action="${authenticateAsLink}">
+                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
+                        <button type="submit">Become</button>
+                    </form></td>
+                <td><c:if test="${!student.canImportCourses}">
+                        <form method="post" action="${allowCourseCreationLink}">
+                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
+                            <button type="submit">Allow course creation</button>
+                        </form>
+                    </c:if></td>
+                <td><c:if test="${student.canImportCourses && !student.superUser}">
+                        <form method="post" action="${makeSuperuserLink}">
+                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
+                            <button type="submit">Make superuser</button>
+                        </form>
+                    </c:if></td>
+            </tr>
+        </c:forEach>
+    </table>
 
-   <c:url var="registerPerson" value="/view/instructor/registerPerson.jsp" />
 
-    <p><a href="${registerPerson}">Register person</a></p>
+
     <ss:footer />
 </body>
 </html>

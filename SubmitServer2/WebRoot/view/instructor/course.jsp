@@ -67,7 +67,38 @@ tr.reject {background: #f33}
 
     <ss:codeReviews title="Pending Code reviews" />
 
-
+    <c:if test="${not empty pendingRegistrations}">
+    <h2>
+        <a id="requests">Registration Requests</a>
+    </h2>
+    <c:url var="updateRegistrations" value="/action/instructor/UpdatePendingRegistrations" />
+    <form action="${updateRegistrations}" method="POST">
+    <input type="hidden" value="${course.coursePK}" name="course" />
+    <table id="pending-table">
+        <tr>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+        <c:forEach var="student" items="${pendingRegistrations}">
+        <tr>
+            <td><c:out value="${student.lastname}" />, <c:out value="${student.firstname}" /></td>
+            <td>
+                <c:set var="radioName" value="request-pk-${student.studentPK}" />
+                <input type="radio" name="${radioName}" value="accept" id="accept-${radioName}"/>
+                <label for="accept-${radioName}">accept</label>
+                &nbsp;&nbsp;
+                <input type="radio" name="${radioName}" value="reject" id="reject-${radioName}"/>
+                <label for="reject-${radioName}">reject</label>
+            </td>
+        </tr>
+        </c:forEach>
+    </table>
+    <button id="set-all-accept-button">Set all to "accept"</button>
+    <button id="clear-all-button">Clear all</button>
+    <input type="submit" value="Submit" />
+    </form>
+    </c:if>
+    
     <h2>
         <a id="projects">Projects</a>
     </h2>
@@ -199,37 +230,7 @@ tr.reject {background: #f33}
         </table>
     </div>
 
-	<c:if test="${not empty pendingRegistrations}">
-	<h3>
-		<a id="requests">Registration Requests</a>
-	</h3>
-	<c:url var="updateRegistrations" value="/action/instructor/UpdatePendingRegistrations" />
-	<form action="${updateRegistrations}" method="POST">
-	<input type="hidden" value="${course.coursePK}" name="course" />
-	<table id="pending-table">
-		<tr>
-			<th>Name</th>
-			<th>Action</th>
-		</tr>
-		<c:forEach var="student" items="${pendingRegistrations}">
-		<tr>
-			<td><c:out value="${student.lastname}" />, <c:out value="${student.firstname}" /></td>
-			<td>
-				<c:set var="radioName" value="request-pk-${student.studentPK}" />
-				<input type="radio" name="${radioName}" value="accept" id="accept-${radioName}"/>
-				<label for="accept-${radioName}">accept</label>
-				&nbsp;&nbsp;
-				<input type="radio" name="${radioName}" value="reject" id="reject-${radioName}"/>
-				<label for="reject-${radioName}">reject</label>
-			</td>
-		</tr>
-		</c:forEach>
-	</table>
-	<button id="set-all-accept-button">Set all to "accept"</button>
-	<button id="clear-all-button">Clear all</button>
-	<input type="submit" value="Submit" />
-	</form>
-	</c:if>
+
 
 	<h2>
         <a id="staff">Staff</a>

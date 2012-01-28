@@ -33,7 +33,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<ss:headContent title="Submit Server Administrative Actions" />
+<ss:headContent title="Submit Server Course Management Actions" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>

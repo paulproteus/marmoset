@@ -41,23 +41,21 @@
 	<ss:header />
 	<ss:instructorBreadCrumb />
 
-	<div class="sectionTitle">
-		<h1>Student Registration</h1>
+    <div class="sectionTitle">
+        <h1>Student Registration</h1>
 
-<c:choose>
- <c:when test="${course != null}">
-            
-<p class="sectionDescription">Use this form to register a person to ${course.courseName}</p>
-</c:when>
-<c:otherwise>
-<p class="sectionDescription">Use this form to register a person (but not enroll them in any courses)</p>
-</c:otherwise>
-</c:choose>
+        <c:choose>
+            <c:when test="${course != null}">
+                <p class="sectionDescription">Use this form to add a person to ${course.courseName}</p>
+            </c:when>
+            <c:otherwise>
+                <p class="sectionDescription">Use this form to register a person (but not enroll them in any
+                    courses)</p>
+            </c:otherwise>
+        </c:choose>
+    </div>
 
-		<p class="sectionDescription">Use this form to add a person to ${course.courseName}</p>
-	</div>
-            
-             <c:if test="${course != null}">
+    <c:if test="${course != null}">
             
 <div>
     <form name="registerExistingStudentForm"
