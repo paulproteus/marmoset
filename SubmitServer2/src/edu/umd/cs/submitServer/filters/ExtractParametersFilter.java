@@ -168,6 +168,18 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                 submission = Submission
                         .lookupBySubmissionPK(submissionPK, conn);
             }
+            if (codeReviewerPK != null) {
+                reviewer = CodeReviewer.lookupByPK(codeReviewerPK, conn);
+                if (userSession.getStudentPK()
+                        != reviewer.getStudentPK()) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Authentication Error: you can only specify your own reviews");
+                    return;
+                }
+                submissionPK = reviewer.getSubmissionPK();
+                codeReviewAssignmentPK = reviewer.getCodeReviewAssignmentPK();
+            }
+
             if (submissionPK != null) {
                 // Get Submission
                 submission = Submission
@@ -228,17 +240,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (studentPK == null)
 				studentPK = userSession.getStudentPK();
 
-			if (codeReviewerPK != null) {
-				reviewer = CodeReviewer.lookupByPK(codeReviewerPK, conn);
-				if (userSession.getStudentPK()
-						!= reviewer.getStudentPK()) {
-					response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Authentication Error: you can only specify your own reviews");
-					return;
-				}
-				submissionPK = reviewer.getSubmissionPK();
-				codeReviewAssignmentPK = reviewer.getCodeReviewAssignmentPK();
-			}
 
 			if (codeReviewAssignmentPK != null && codeReviewAssignmentPK.intValue() != 0) {
 				codeReviewAssignment = CodeReviewAssignment.lookupByPK(codeReviewAssignmentPK, conn);

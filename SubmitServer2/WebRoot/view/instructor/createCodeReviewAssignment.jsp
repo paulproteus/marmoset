@@ -221,27 +221,27 @@
         </script>
 	<script id="numericTemplate" type="text/x-jquery-tmpl">
             <label for="{{=prefix}}-min-input">min:</label>
-            <input type="text" name="{{=prefix}}-min" id="{{=prefix}}-min-input" placeholder="min"  size="4">
+            <input type="number" name="{{=prefix}}-min" id="{{=prefix}}-in-input" placeholder="min"  size="4">
 
             <label for="{{=prefix}}-max-input">max:</label>
-            <input type="text" name="{{=prefix}}-max" id="{{=prefix}}-max-input" placeholder="max"  size="4">
+            <input type="number" name="{{=prefix}}-max" id="{{=prefix}}-max-input" placeholder="max"  size="4">
 
             <label for="{{=prefix}}-default-input">default:</label>
-            <input type="text" name="{{=prefix}}-default" id="{{=prefix}}-default-input" placeholder="default"  size="4">
+            <input type="number" name="{{=prefix}}-default" id="{{=prefix}}-default-input" placeholder="default"  size="4">
         </script>
 	<script id="checkboxTemplate" type="text/x-jquery-tmpl">
             <input type="checkbox" value="ignore" onclick="return false;"  >
-            <input type="text" name="{{=prefix}}-false" title="value if not checked" size="4" value="0" required="required">
+            <input type="number" name="{{=prefix}}-false" title="value if not checked" size="4" value="0" required="required">
             &nbsp;
             <input type="checkbox" value="ignore"   onclick="return false;"  CHECKED >
-            <input type="text" name="{{=prefix}}-true" title="value if checked"  size="4" required="required">
+            <input type="number" name="{{=prefix}}-true" title="value if checked"  size="4" required="required">
         </script>
 
 	<div id="edit-dialog" style="display: none">
 		<select id="edit-dialog-dropdown-select"></select>
 		<div>
-			<input type="text" id="edit-dialog-value-input" />
-			<input type="number" id="edit-dialog-score-input" min="-1000" max="1000" />
+			<input type="text" id="edit-dialog-value-input" placeholder="name"/>
+			<input type="text" id="edit-dialog-score-input" placeholder="score"  />
 		</div>
 		<div>
 			<span id="edit-dialog-controls">

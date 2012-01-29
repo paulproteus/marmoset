@@ -49,6 +49,14 @@
 		<ss:studentPicture/>
 	</c:if>
 
+<c:if test="${reviewer != null}">
+<c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
+<c:param name="submissionPK" value="${submission.submissionPK}"/>
+<c:param name="reviewerPK" value="${reviewer.codeReviewerPK}"/>
+</c:url>
+<p><a href="${codeReviewLink}">Code Review</a>
+</c:if>
+
 	<h3>Pretty Print Options</h3>
 
 	<c:set var="baseURL"  value="${pageContext.request.requestURL}?"/>

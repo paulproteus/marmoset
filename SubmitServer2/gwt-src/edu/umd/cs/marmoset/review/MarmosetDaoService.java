@@ -95,22 +95,6 @@ public class MarmosetDaoService implements ReviewDao {
       this.database = database;
     }
 
-    public MarmosetDaoService XXbuildAdHoc(@Submission.PK int submissionPK, UserSession userSession) {
-      Connection conn = null;
-      try {
-        conn = database.getConnection();
-        CodeReviewer reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submissionPK, userSession.getStudentPK(), "", false, true);
-        CodeReviewSummary s = new CodeReviewSummary(conn, reviewer);
-        Preconditions.checkArgument(userSession.hasInstructorCapability(s.getProject().getCoursePK()),
-                                    "User %s must have instructor capability", userSession.getStudentPK());
-        return new MarmosetDaoService(database, reviewer, Submission.lookupBySubmissionPK(submissionPK, conn));
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      } finally {
-        release(conn);
-      }
-    }
-
     public MarmosetDaoService buildAssigned(@CodeReviewer.PK int reviewerPK) {
       Connection conn = null;
       try {

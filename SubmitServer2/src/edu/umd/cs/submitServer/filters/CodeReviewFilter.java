@@ -48,7 +48,6 @@ public class CodeReviewFilter extends SubmitServerFilter {
 
             conn = getConnection();
 
-
             if (reviewer == null) {
                 StudentRegistration commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
                         course.getCoursePK(), conn);
