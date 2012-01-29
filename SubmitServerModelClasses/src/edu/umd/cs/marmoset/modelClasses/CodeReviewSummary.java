@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import edu.umd.cs.marmoset.modelClasses.CodeReviewer.Builder;
 import edu.umd.cs.marmoset.utilities.Objects;
 
 /** Provide a summary of a code review */
@@ -534,9 +535,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		Queries.setStatement(st, "FindBugs", assignmentPk, submission.getSubmissionPK());
 		ResultSet rs = st.executeQuery();
 		if (!rs.next()) {
-			return new CodeReviewer(conn, assignmentPk,
-					submission.getSubmissionPK(), -1, "FindBugs", false, false,
-					false);
+			CodeReviewer.Builder builder =  new CodeReviewer.Builder(conn, submission.getSubmissionPK());
+			builder.setAutomated("FindBugs");
+			if (assignment != null) {
+				builder.setAssignment(assignment);
+			}
+			return builder.build();
 		}
 		return new CodeReviewer(rs, 1);
 	}
@@ -573,7 +577,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				continue;
 			}
 			String file = m.group(1);
-			int line = Integer.parseInt(m.group(2));
+			// lines are 0-indexed in thread objects.
+			int line = Integer.parseInt(m.group(2)) - 1;
 			CodeReviewThread thread = new CodeReviewThread(conn,
 					submission.getSubmissionPK(), file, line, now,
 					findbugsReviewer.getCodeReviewerPK());
