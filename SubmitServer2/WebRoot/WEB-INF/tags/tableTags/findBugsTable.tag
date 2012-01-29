@@ -8,8 +8,6 @@
 <c:set var="instructor" value="${fn:contains(pageContext.request.servletPath,'instructor')}"/>
 <c:if test="${not empty testOutcomeCollection.findBugsOutcomes}">
 	<h2>FindBugs warnings</h2>
-	<p>${pageContext.request.servletPath}
-	<p>
 	<table>
 			<tr>
 				<th>Location</th>

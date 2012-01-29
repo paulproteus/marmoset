@@ -1,24 +1,24 @@
 /**
  * Marmoset: a student project snapshot, submission, testing and code review
  * system developed by the Univ. of Maryland, College Park
- * 
+ *
  * Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
  * by William Pugh. See http://marmoset.cs.umd.edu/
- * 
+ *
  * Copyright 2005 - 2011, Univ. of Maryland
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  */
 
 /*
@@ -93,7 +93,7 @@ public abstract class AbstractFindBugsRunner implements
 		        projectSubmission.getConfig().getBuildServerRoot() + "/findbugs");
 
 		String findbugsCmd = null;
-		if (findBugsHome != null) {    
+		if (findBugsHome != null) {
 		    File fb = new File(findBugsHome);
 		    File findBugsJar = new File(new File(fb, "lib"), "findbugs.jar");
 		    if (fb.exists() && fb.isDirectory() && fb.canRead() && findBugsJar.canRead() ) {
@@ -101,8 +101,8 @@ public abstract class AbstractFindBugsRunner implements
 		        args.add("-jar");
 		        args.add(findBugsJar.getAbsolutePath());
 		    }
-		} 
-		
+		}
+
 		if (findbugsCmd == null) {
 		    findbugsCmd = "findbugs";
 		    if (!warnedAboutFindBugs) {
@@ -111,12 +111,12 @@ public abstract class AbstractFindBugsRunner implements
 		    System.err.println("didn't find findbugs; hoping it is on the path");
 		    }
 		}
-			
 
-		
-		
+
+
+
 		// Build argument list
-		args.add(findbugsCmd);
+		args.add(0, findbugsCmd);
 		args.add("-textui");
 		// See if findbugs options were specified in the test properties file.
 		if (projectSubmission.getTestProperties().getOptionalStringProperty(
