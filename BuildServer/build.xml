@@ -100,6 +100,9 @@
 	<copy todir="build/dist/lib">
 	  <fileset dir="lib"/>
         </copy>
+	<copy todir="build/dist/findbugs">
+	  <fileset dir="findbugs"/>
+        </copy>
 	<zip destfile="build/buildserver.zip" basedir="build/dist"/>
 	</target>
 
