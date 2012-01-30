@@ -36,24 +36,44 @@
     <ss:instructorBreadCrumb />
     <h1>Superuser info/status</h1>
 
-    <c:if test="${! empty recentErrors }">
+    <c:if test="${! empty recentExceptions }">
+        <h2>Recent Exceptions</h2>
+        <table>
+            <tr>
+                <th>PK</th>
+                <th>When</th>
+                <th>Message</th>
+            </tr>
+            <c:forEach var="error" items="${recentExceptions}" varStatus="counter">
+                    <tr class="r${counter.index % 2}">
+                    <td>${error.errorPK}</td>
+                    <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
+                    <td class="description"><c:out value="${error.message}" /></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:if>
+    <!-- 
+      <c:if test="${! empty recentErrors }">
         <h2>Recent errors</h2>
-
         <table>
             <tr>
                 <th></th>
                 <th>When</th>
-                <th>Message <c:forEach var="error" items="${recentErrors}" varStatus="counter">
-                        <tr class="$rowKind">
-                            <td>${error.errorPK}</td>
-                            <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
-                            <td class="description"><c:out value="${error.message}" /></td>
-                        </tr>
-                    </c:forEach>
-                </th>
+                <th>Kind</th>
+                <th>Message</th>
             </tr>
+            <c:forEach var="error" items="${recentErrors}" varStatus="counter">
+                    <tr class="r${counter.index % 2}">
+                    <td>${error.errorPK}</td>
+                    <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
+                    <td>${error.kind}
+                    <td class="description"><c:out value="${error.message}" /></td>
+                </tr>
+            </c:forEach>
         </table>
     </c:if>
+     -->
 
     <c:if test="${! empty coursesThatNeedBuildServers }">
         <h2>Courses that need build servers</h2>
@@ -81,7 +101,7 @@
         </tr>
 
         <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
-            <tr class="$rowKind">
+            <tr class="r${counter.index % 2}">
                 <td><c:out value="${buildServer.name}" /></td>
                 <td><fmt:formatDate value="${buildServer.lastRequest}" pattern="dd MMM, hh:mm a" /></td>
                 <td><c:if test="${buildServer.lastRequestSubmissionPK > 0}">
@@ -119,7 +139,7 @@
         </tr>
 
         <c:forEach var="project" items="${upcomingProjects}" varStatus="counter">
-            <tr class="$rowKind">
+            <tr class="r${counter.index % 2}">
 
                 <td class="description"><c:out value="${courseMap[project.coursePK].courseName}" /></td>
 
@@ -174,7 +194,7 @@
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url>
 
-                <tr class="$rowKind">
+                    <tr class="r${counter.index % 2}">
                     <td class="description"><a href="${courseLink}"> <c:out value="${course.courseName}" />
                     </a></td>
 

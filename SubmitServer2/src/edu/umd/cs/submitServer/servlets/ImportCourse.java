@@ -208,7 +208,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 					String msg = "Error trying to insert/update " + campusUID
 						+ " " + loginName + ":" + e.getMessage();
 					String msg2 = "For " + course.getCourseName() + " with courseID " + courseID;
-					ServerError.insert(conn, null, null, null, null, null, null, msg + "\n" + msg2, "", "", "", "", "", "", e);
+					ServerError.insert(conn, ServerError.Kind.EXCEPTION, null, null, null, null, null, null, msg + "\n" + msg2, "", "", "", "", "", "", e);
 					out.println(msg);
 					out.println(msg2);
 					e.printStackTrace(out);

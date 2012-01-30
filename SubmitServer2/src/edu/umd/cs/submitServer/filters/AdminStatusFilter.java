@@ -69,9 +69,11 @@ public class AdminStatusFilter extends SubmitServerFilter {
 		       
 			Timestamp since = new Timestamp(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS));
             
+	        List<ServerError> exceptions = ServerError.recentErrors(20,  ServerError.Kind.EXCEPTION, since, conn);
+	        request.setAttribute("recentExceptions", exceptions);
 	        List<ServerError> errors = ServerError.recentErrors(20, since, conn);
-	        request.setAttribute("recentErrors", errors);;
-            
+            request.setAttribute("recentErrors", errors);;
+         
 	            
 			List<Course> courseList = Course.lookupAll(conn);
 			request.setAttribute(COURSE_LIST, courseList);

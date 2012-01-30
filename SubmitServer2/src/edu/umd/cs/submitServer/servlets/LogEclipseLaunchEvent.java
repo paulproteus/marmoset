@@ -42,6 +42,7 @@ import org.apache.commons.fileupload.FileItem;
 
 import edu.umd.cs.marmoset.modelClasses.EclipseLaunchEvent;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
@@ -145,9 +146,9 @@ public class LogEclipseLaunchEvent extends SubmitServerServlet {
             }
 
 		} catch (InvalidRequiredParameterException e) {
-		    ServletExceptionFilter.logErrorAndSendServerError(conn, request, null, "LogEclipseLaunchEvent missing required parameter", "", e);
+		    ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.BAD_PARAMETERS, request, null, "LogEclipseLaunchEvent missing required parameter", "", e);
 		} catch (SQLException e) {
-		    ServletExceptionFilter.logErrorAndSendServerError(conn, request, null, "LogEclipseLaunchEvent missing required parameter", "", e);
+		    ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.EXCEPTION, request, null, "LogEclipseLaunchEvent missing required parameter", "", e);
 		} finally {
 			releaseConnection(conn);
 			if (reader != null)

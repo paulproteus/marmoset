@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
@@ -103,7 +104,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                 if (course == null) {
                     String msg = "Could not find record for courseKey " + courseKey 
                             + "; you likely have an out of date .submit file";
-                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.SUBMIT, request, response, msg, "login name: " + loginName, null);
                     return;
                 }
                 courseName = course.getCourseName();
@@ -112,7 +113,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                 if (project == null) {
                     String msg = "Could not find record for project number " + projectNumber  + " in " + course.getCourseName()
                             + "; you likely have an out of date .submit file";
-                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.SUBMIT, request, response, msg, "login name: " + loginName, null);
                     return;
                 }
                 
@@ -128,7 +129,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                     
                     String msg = "Could not find record for project " + projectNumber + " in " + courseName + ", " + semester
                             + "; you likely have an out of date .submit file";
-                    ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                    ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.SUBMIT, request, response, msg, "login name: " + loginName, null);
                     return;
                 }
             }
@@ -151,7 +152,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                 String msg = student.getFirstname() + " " + student.getLastname() + " is not registered for this " + courseName + ", "
 
                         + " If you changed your DirectoryID, please notify your instructor so that we can update the system.";
-                ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, null);
+                ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.NOT_REGISTERED, request, response, msg, "login name: " + loginName, null);
                 return;
             }
         } catch (SQLException e) {
@@ -162,7 +163,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
             String msg = String.format("failed to negotiate oneTime password for %s in %s: %s", loginName, courseName,
                     e.getMessage());
            
-            ServletExceptionFilter.logErrorAndSendServerError(conn, request, response, msg, "login name: " + loginName, e);
+            ServletExceptionFilter.logErrorAndSendServerError(conn, ServerError.Kind.BAD_AUTHENTICATION, request, response, msg, "login name: " + loginName, e);
            
             return;
 

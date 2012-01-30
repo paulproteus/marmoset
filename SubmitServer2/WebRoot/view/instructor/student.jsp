@@ -65,23 +65,20 @@
 
 	<c:set var="numDisplayed" value="0" />
 	<c:forEach var="project" items="${projectList}" varStatus="counter">
-		<c:if test="${project.visibleToStudents}">
+    <c:set var="submitStatus" value="${projectToStudentSubmitStatusMap[project.projectPK]}"/>
+                
+		<c:if test="${project.visibleToStudents || not empty submitStatus}}">
 			<tr class="r${numDisplayed % 2}">
 
-				<c:set var="submitStatus" value="${projectToStudentSubmitStatusMap[project.projectPK]}"/>
 				<td><c:choose>
-
 					<c:when test="${project.url != null}">
 						<a href="<c:url value="${project.url}"/>">
 						${project.projectNumber} </a>
 					</c:when>
-
 					<c:otherwise>
 					${project.projectNumber}
 					</c:otherwise>
-
 				</c:choose></td>
-
 
 				<c:choose>
 				<c:when test="${not empty submitStatus}">
