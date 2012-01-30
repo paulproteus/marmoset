@@ -656,7 +656,14 @@
 		<filter-name>AdminFilter</filter-name>
 		<url-pattern>/view/admin/*</url-pattern>
 	</filter-mapping>
-
+    <filter>
+        <filter-name>QueryErrorFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.QueryErrorFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>QueryErrorFilter</filter-name>
+        <url-pattern>/view/admin/error.jsp</url-pattern>
+    </filter-mapping>
 
 	<filter>
 		<filter-name>SourceCodeFilter</filter-name>

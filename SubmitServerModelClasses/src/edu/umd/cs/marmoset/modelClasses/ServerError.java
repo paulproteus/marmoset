@@ -7,9 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 public class ServerError {
@@ -78,6 +79,47 @@ public class ServerError {
         return message;
     }
 
+    
+    public static ServerError getError(int errorPK, Connection conn) throws SQLException {
+        String query = "SELECT error_pk, `when`, kind, message FROM " + TABLE_NAME 
+                + " WHERE `error_pk` = ? "
+                + " ORDER BY  `errors`.`when` DESC ";
+        PreparedStatement stmt = Queries.setStatement(conn,  query, errorPK);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            return new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
+        }
+        return null;
+    }
+    public static Map<Object,Object> getAllFields(Connection conn, int errorPK) 
+            throws SQLException {
+        
+        HashMap<Object,Object> result = new HashMap<Object,Object>();
+        String query = "SELECT " +ATTRIBUTES+
+                " FROM errors  where error_pk = ?";
+        PreparedStatement stmt = Queries.setStatement(conn,  query, errorPK);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int col = 1;
+            for(String c : ATTRIBUTE_NAME_LIST) {
+                Object value;
+                if (c.endsWith("_pk"))
+                    value = rs.getInt(col);
+                else if (c.equals("throwable"))
+                    value = rs.getBlob(col);
+                else if (c.equals("when"))
+                    value = rs.getDate(col);
+                else value = rs.getString(col);
+                col++;
+                result.put(c, value);
+            }
+        }
+        
+        return result;
+        
+    }
+
+     
     public static List<ServerError> recentErrors(int limit, Timestamp maxAge, Connection conn) throws SQLException {
         String query = "SELECT error_pk, `when`, kind, message FROM " + TABLE_NAME 
                 + " WHERE `when` >= ? "
@@ -85,6 +127,20 @@ public class ServerError {
                 + " LIMIT ?";
         List<ServerError> result = new ArrayList<ServerError>();
         PreparedStatement stmt = Queries.setStatement(conn,  query, maxAge, limit);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            ServerError e = new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
+            result.add(e);
+        }
+        return result;
+    }
+    public static List<ServerError> recentErrorsExcludingKind(int limit, Kind kind, Timestamp maxAge, Connection conn) throws SQLException {
+        String query = "SELECT error_pk, `when`,kind, message FROM " + TABLE_NAME 
+                + " WHERE `when` >= ?  and `kind` != ? "
+                + " ORDER BY  `errors`.`when` DESC "
+                + " LIMIT ?";
+        List<ServerError> result = new ArrayList<ServerError>();
+        PreparedStatement stmt = Queries.setStatement(conn,  query, maxAge, kind, limit);
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             ServerError e = new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));

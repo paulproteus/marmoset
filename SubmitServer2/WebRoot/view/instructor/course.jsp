@@ -49,17 +49,6 @@ tr.reject {background: #f33}
         <p class="sectionDescription"><ss:hello/></p>
     </div>
 
-    <script type="text/javascript">
-					function toggle(item) {
-						obj = document.getElementById(item);
-						if (obj.style.display == "none") {
-							obj.style.display = "block";
-						} else {
-							obj.style.display = "none";
-						}
-					}
-				</script>
-
     <div class="projectMenu">
         <a href="#projects">Projects</a> &nbsp;|&nbsp; <a href="#students">Students</a> &nbsp;|&nbsp; <a href="#staff">Staff</a>
         &nbsp;|&nbsp; <a href="#status">Status</a> &nbsp;|&nbsp; <a href="#update">Update</a>

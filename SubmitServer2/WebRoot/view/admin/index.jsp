@@ -46,16 +46,22 @@
             </tr>
             <c:forEach var="error" items="${recentExceptions}" varStatus="counter">
                     <tr class="r${counter.index % 2}">
-                    <td>${error.errorPK}</td>
+                    <td><c:url var="errorLink" value="error.jsp">
+                            <c:param name="errorPK" value="${error.errorPK}" />
+                        </c:url> <a href="${errorLink}">${error.errorPK}</a></td>
                     <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
                     <td class="description"><c:out value="${error.message}" /></td>
                 </tr>
             </c:forEach>
         </table>
     </c:if>
-    <!-- 
+
       <c:if test="${! empty recentErrors }">
-        <h2>Recent errors</h2>
+        <h2> <a href="javascript:toggle('errorList')" title="Click to toggle display of errors" id="errors"> 
+        ${fn:length(recentErrors)} Recent errors
+        </a></h2>
+        
+        <div  id="errorList" style="display: none">
         <table>
             <tr>
                 <th></th>
@@ -65,15 +71,18 @@
             </tr>
             <c:forEach var="error" items="${recentErrors}" varStatus="counter">
                     <tr class="r${counter.index % 2}">
-                    <td>${error.errorPK}</td>
-                    <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
+                        <td><c:url var="errorLink" value="error.jsp">
+                                <c:param name="errorPK" value="${error.errorPK}" />
+                            </c:url> <a href="${errorLink}">${error.errorPK}</a></td>
+                        <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
                     <td>${error.kind}
                     <td class="description"><c:out value="${error.message}" /></td>
                 </tr>
             </c:forEach>
         </table>
+        </div>
     </c:if>
-     -->
+
 
     <c:if test="${! empty coursesThatNeedBuildServers }">
         <h2>Courses that need build servers</h2>
@@ -147,7 +156,9 @@
                         <c:param name="projectPK" value="${project.projectPK}" />
                     </c:url> <a href="${projectLink}"> <c:out value="${project.fullTitle}"/> </a></td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
-                <td><fmt:formatDate value="${project.late}" pattern="dd MMM, hh:mm a" /></td>
+                <td>
+                <c:if test="${project.ontime != project.late}">
+                <fmt:formatDate value="${project.late}" pattern="dd MMM, hh:mm a" /></c:if></td>
                 <c:choose>
                     <c:when test="${project.tested}">
                         <td><c:out value="${buildStatusCount[project]['new']}" /></td>
@@ -267,7 +278,7 @@
     <table>
         <c:forEach var="student" items="${allStudents}" varStatus="counter">
             <tr class="r${counter.index % 2}">
-                <td><c:out value="${student.fullname}" /></td>
+                <td class="description"><c:out value="${student.fullname}" /></td>
                 <td><form method="GET" action="${editStudentUrl}">
                         <input type="hidden" name="studentPK" value="${student.studentPK}" />
                         <button type="submit">Edit</button>

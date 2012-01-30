@@ -71,7 +71,7 @@ public class AdminStatusFilter extends SubmitServerFilter {
             
 	        List<ServerError> exceptions = ServerError.recentErrors(20,  ServerError.Kind.EXCEPTION, since, conn);
 	        request.setAttribute("recentExceptions", exceptions);
-	        List<ServerError> errors = ServerError.recentErrors(20, since, conn);
+	        List<ServerError> errors = ServerError.recentErrorsExcludingKind(20, ServerError.Kind.EXCEPTION, since, conn);
             request.setAttribute("recentErrors", errors);;
          
 	            
