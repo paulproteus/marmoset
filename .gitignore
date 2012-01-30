@@ -33,3 +33,4 @@ CourseProjectManager/dist/edu.umd.cs.eclipse.courseProjectManager.jar
 CourseProjectManager/local.properties
 SubmitServer2/localhost.web.properties
 SubmitServer2/umd.web.properties
+SubmitServer2/openid-local.web.properties

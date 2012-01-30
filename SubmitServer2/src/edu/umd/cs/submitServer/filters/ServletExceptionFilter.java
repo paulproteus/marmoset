@@ -130,6 +130,13 @@ public class ServletExceptionFilter extends SubmitServerFilter {
             releaseConnection(conn);
         }
     }
+    
+    public static void logError(Connection conn, 
+            Kind kind, 
+            HttpServletRequest request,
+          String message, String type, @CheckForNull Throwable e) {
+        logErrorAndSendServerError(conn, kind, request, null, message, type, e);
+    }
 
     public static void logErrorAndSendServerError(Connection conn, 
             Kind kind, 

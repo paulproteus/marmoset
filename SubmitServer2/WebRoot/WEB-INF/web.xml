@@ -99,6 +99,10 @@
 		<filter-class> edu.umd.cs.submitServer.filters.MultipartRequestFilter </filter-class>
 	</filter>
 
+<filter-mapping>
+        <filter-name>MultipartRequestFilter</filter-name>
+        <url-pattern>/view/instructor/studentsRegistered.jsp</url-pattern>
+    </filter-mapping>
 	<filter-mapping>
 		<filter-name>MultipartRequestFilter</filter-name>
 		<url-pattern>/action/SubmitProjectViaWeb</url-pattern>
@@ -804,7 +808,14 @@
       <url-pattern>/view/index.jsp</url-pattern>
     </filter-mapping>
 
-
+    <filter>
+      <filter-name>RegisterStudentsFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.RegisterStudentsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>RegisterStudentsFilter</filter-name>
+      <url-pattern>/view/instructor/studentsRegistered.jsp</url-pattern>
+    </filter-mapping>
 	<filter>
 		<filter-name>WarningWithCoverageFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.WarningWithCoverageFilter</filter-class>
@@ -978,10 +989,6 @@
 	<servlet>
 		<servlet-name>Logout</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.Logout</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>RegisterStudents</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterStudents</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>DownloadTestSetup</servlet-name>
@@ -1289,10 +1296,6 @@
 	<servlet-mapping>
 		<servlet-name>DownloadSubmission</servlet-name>
 		<url-pattern>/data/DownloadSubmission</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>RegisterStudents</servlet-name>
-		<url-pattern>/action/instructor/RegisterStudents</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DownloadTestSetup</servlet-name>
