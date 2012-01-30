@@ -131,7 +131,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public boolean isReviewerIsTheAuthor() {
-	    return author.equals(viewerAsReviewer);
+	    return author != null && author.equals(viewerAsReviewer);
 	}
 	private boolean isDebug() {
 		return false;

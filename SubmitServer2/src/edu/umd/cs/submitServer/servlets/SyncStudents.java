@@ -117,6 +117,9 @@ public class SyncStudents extends GradeServerInterfaceServlet {
 			String firstname = rs.getString(col++);
 			String nickname = rs.getString(col++);
 
+			if (nickname != null)
+			    firstname = nickname;
+			
 			String loginName = rs.getString(col++);
 			String email = rs.getString(col++);
 

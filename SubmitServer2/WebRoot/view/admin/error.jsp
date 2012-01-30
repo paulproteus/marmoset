@@ -47,11 +47,11 @@
     <br>User: ${errorField['user_pk']}
      <c:if test="${not empty errorField['student_pk']  && errorField['user_pk'] != errorField['student_pk'] }">
     <br>Student: ${errorField['student_pk']}
-    </p></c:if>
+    </c:if>
     <br>Project: ${errorField['project_pk']}
     <c:if test="${not empty errorField['submission']}}">
     <br>Submission: ${errorField['submission']}
-    </p></c:if>
+    </c:if>
     <br>
         Code:
         <c:out value="${errorField['code']}" />

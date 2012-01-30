@@ -136,7 +136,7 @@ public class ServerError {
     }
     public static List<ServerError> recentErrorsExcludingKind(int limit, Kind kind, Timestamp maxAge, Connection conn) throws SQLException {
         String query = "SELECT error_pk, `when`,kind, message FROM " + TABLE_NAME 
-                + " WHERE `when` >= ?  and `kind` != ? "
+                + " WHERE `when` >= ?  and (`kind` != ?  OR `kind` is NULL) "
                 + " ORDER BY  `errors`.`when` DESC "
                 + " LIMIT ?";
         List<ServerError> result = new ArrayList<ServerError>();

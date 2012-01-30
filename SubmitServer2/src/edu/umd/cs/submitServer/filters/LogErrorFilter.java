@@ -90,7 +90,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 			        : ServerError.Kind.UNKNOWN,
 					userPK, 
 							student == null ? null : student.getStudentPK(),
-									course == null ? null : course.getCoursePK(),
+									coursePK,
 											project == null ? null : project.getProjectPK(),
 							submission == null ? null : submission.getSubmissionPK(), code, message,
 					type, servletName, requestURI, queryString, remoteHost, referer, throwable);

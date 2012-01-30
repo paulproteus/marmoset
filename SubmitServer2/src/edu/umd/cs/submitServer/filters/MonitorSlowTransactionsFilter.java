@@ -141,8 +141,9 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 	}
 
 
-    public static void insertServerError(Connection conn, HttpServletRequest request, String msg, Integer userPK, Integer coursePK,
-            Student student, Project project, Submission submission) throws SQLException {
+    public static void insertServerError(Connection conn, HttpServletRequest request, String msg,
+            @Student.PK Integer userPK, Integer coursePK,
+            Student student,  Project project, Submission submission) throws SQLException {
         ServerError.insert(conn, ServerError.Kind.SLOW, 
                 userPK, 
                 student == null ? null : student.getStudentPK(),
