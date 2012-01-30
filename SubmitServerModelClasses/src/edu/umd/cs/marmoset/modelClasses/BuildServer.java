@@ -171,7 +171,7 @@ public class BuildServer implements Comparable<BuildServer> {
 		
 		for (BuildServer bs : collection) {
 			if (bs.courses == null || bs.courses.isEmpty()
-					|| bs.courses.contains(course.getCourseName()))
+					|| bs.courses.contains(course.getBuildserverKey()))
 				result.add(bs);
 		}
 		return result;
