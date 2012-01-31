@@ -440,9 +440,6 @@ tr.reject {background: #f33}
     </c:if>
     
     <ss:footer />
-	<script
-		src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-		type="text/javascript"></script>
 	<script type="text/javascript">
     window.$marmoset = {
     	acceptRadios: $("#pending-table").find('input[type="radio"][value="accept"]'),

@@ -1,5 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 <!DOCTYPE html>
@@ -11,11 +9,7 @@
           Note that this discards any "target" parameter, but that's unlikely to matter.-->
 	<c:redirect url="/authenticate/openid/login.jsp" />
 </c:if>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <ss:headContent title="OpenID Registration" />
-<script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-	type="text/javascript"></script>
 <script
 	src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
 	type="text/javascript"></script>
