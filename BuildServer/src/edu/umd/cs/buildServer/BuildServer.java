@@ -444,6 +444,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 			}
 		}
 
+		String threshold = config.getConfig().getOptionalProperty(ConfigurationKeys.LOG4J_THRESHOLD);
+		if (threshold != null)
+		    log4jProperties.setProperty("log4j.appender.fileAppender.Threshold", threshold);
 		PropertyConfigurator.configure(log4jProperties);
 
 		Logger logger = Logger.getLogger(BuildServer.class.getName());
@@ -460,7 +463,6 @@ public abstract class BuildServer implements ConfigurationKeys {
 		}
 
 		return logger;
-		// return new Log4JLogger(logger);
 	}
 
 	/**
@@ -849,7 +851,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		// Start by listing out the contents:
 		List<File> afterInspectionState = BuildServerUtilities
 				.listDirContents(buildDirectory);
-		getLog().trace("Should I clean the directory?");
+		getLog().trace("After inspection");
 		for (File file : afterInspectionState) {
 			getLog().trace(file.getAbsolutePath());
 		}

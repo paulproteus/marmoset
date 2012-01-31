@@ -72,21 +72,13 @@ public class CTester extends Tester {
 				directoryFinder);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see edu.umd.cs.buildServer.Tester#loadTestProperties()
-	 */
+
 	@Override
 	protected void loadTestProperties() throws BuilderException {
 		super.loadTestProperties();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see edu.umd.cs.buildServer.Tester#execute()
-	 */
+
 	@Override
 	protected void executeTests() throws BuilderException {
 		loadTestProperties();
@@ -136,34 +128,41 @@ public class CTester extends Tester {
 		boolean finished = false;
 
 		CombinedStreamMonitor streamMonitor = null;
+		
+		String execString = getTestProperties().getTestExec(testType, exeName);
+		if (execString == null) {
+		    // Hopefully the test executable is really there.
+            checkTestExe(exeName);
+		    execString = "./"+exeName;
+		}
 
 		try {
-			// Hopefully the test executable is really there.
-			checkTestExe(exeName);
+		
 
 			// Run the test executable in the build directory.
 			getLog().debug(
 					"Running C test number " + testNumber + ": " + exeName
 							+ " process in directory "
 							+ getDirectoryFinder().getBuildDirectory());
+			getLog().debug(
+                    "executing " + execString);
+            
 			// Add LD_LIBRARY_PATH according to the environment, if requested
 			String[] environment = null;
 			if (getTestProperties().getLdLibraryPath() != null) {
 				environment = new String[] { getTestProperties()
 						.getLdLibraryPath() };
-				getLog().debug(getTestProperties().getLdLibraryPath());
+				getLog().debug("Library path: " + getTestProperties().getLdLibraryPath());
 			}
 
 			int testTimeoutInSeconds = getTestProperties()
 					.getTestTimeoutInSeconds();
-			int maxTime = testTimeoutInSeconds;
-			maxTime += 1;
 			
-			process = Untrusted.execute(new String[] { exeName }, environment,
+			process = Untrusted.execute(execString, environment,
 					getDirectoryFinder().getBuildDirectory());
 
 			// Read the stdout/stderr from the test executable.
-			getLog().debug("Starting stream monitor");
+			getLog().trace("Starting stream monitor");
 			streamMonitor = new CombinedStreamMonitor(process.getInputStream(),
 					process.getErrorStream());
 			streamMonitor.start();
@@ -172,7 +171,7 @@ public class CTester extends Tester {
 			// The issue here is that Java has timed monitor waits,
 			// but not timed process waits. We emulate the latter
 			// using the former.
-			getLog().debug("Starting exit monitor");
+			getLog().trace("Starting exit monitor");
 			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process);
 			exitMonitor.start();
 
@@ -184,16 +183,15 @@ public class CTester extends Tester {
 			long processTimeoutMillis = testTimeoutInSeconds * 1000L;
 
 			// Wait for the process to exit.
-			getLog().debug(
+			getLog().trace(
 					"Waiting " + testTimeoutInSeconds
 							+ " seconds for the process to stop...");
 			if (exitMonitor.waitForProcessToExit(processTimeoutMillis)) {
-				getLog().debug("Process exited...");
 				int exitCode = exitMonitor.getExitCode();
-				getLog().debug("Exit code: " + exitCode);
+				getLog().debug("Process exited with exit code: " + exitCode);
 				finished = true;
 				streamMonitor.join();
-				getLog().debug("Joined with stream monitor " + exitCode);
+				getLog().trace("Joined with stream monitor " + exitCode);
 
 				// Use the process exit code to decide whether the test
 				// passed or failed.
@@ -216,7 +214,6 @@ public class CTester extends Tester {
 				// Test timed out!
 				getLog().warn("Process timed out!");
 
-				// XXX this should be set to failed! Why not "timeout"?
 				testOutcome.setOutcome(TestOutcome.TIMEOUT);
 				testOutcome.setShortTestResult("Test " + exeName
 						+ " did not complete before the timeout of "
@@ -261,6 +258,7 @@ public class CTester extends Tester {
 		while (tries++ < 5) {
 			if (exeFile.isFile())
 				break;
+
 			getLog().warn(
 					"Test executable " + exeFile + " doesn't exist -- sleeping");
 			try {
@@ -269,5 +267,9 @@ public class CTester extends Tester {
 				// Ignore
 			}
 		}
+		if (!exeFile.canExecute())
+		    getLog().warn(
+                    "Test executable " + exeFile + " isn't executable");
+            
 	}
 }
