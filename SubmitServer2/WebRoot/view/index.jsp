@@ -42,7 +42,6 @@
 <html>
 <head>
 <ss:headContent title="Submit Server Home Page" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
     <ss:header />
