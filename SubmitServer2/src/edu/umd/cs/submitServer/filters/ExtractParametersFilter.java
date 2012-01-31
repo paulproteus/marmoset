@@ -40,6 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.FilterChain;
@@ -404,6 +406,23 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						justStudentRegistrationSet);
 				request.setAttribute(STAFF_STUDENT_REGISTRATION_SET,
 						staffStudentRegistrationSet);
+				TreeMap<String, SortedSet<StudentRegistration>> sectionMap =
+				        new TreeMap<String, SortedSet<StudentRegistration>>();
+				for(StudentRegistration sr : justStudentRegistrationSet) {
+				    String section = sr.getSection();
+				    if (section == null || section.isEmpty())
+				        continue;
+				    SortedSet<StudentRegistration> inSection = sectionMap.get(section);
+				    if (inSection == null) {
+				        inSection = new TreeSet<StudentRegistration>();
+				        sectionMap.put(section, inSection);
+				    }
+				    inSection.add(sr);
+				}
+				request.setAttribute(SECTION_MAP,
+				        sectionMap);
+				request.setAttribute(SECTIONS, sectionMap.keySet());
+                
 
 			}
 
