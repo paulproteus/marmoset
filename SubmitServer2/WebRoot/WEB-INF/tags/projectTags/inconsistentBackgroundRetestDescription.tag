@@ -1,13 +1,4 @@
-  <script type="text/javascript">
-                    function toggle2(item) {
-                        obj = document.getElementById(item);
-                        if (obj.style.display == "none") {
-                            obj.style.display = "block";
-                        } else {
-                            obj.style.display = "none";
-                        }
-                    }
-                </script>
+
                 <p>
       <a href="javascript:toggle2('inconsistentResults')" title="Click to toggle display of explanation">
             Explanation of inconsistent test results (toggle) </a>

@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
 -- Table structure for table `errors`
 --
 
-CREATE TABLE IF NOT EXISTS `errors` (
+CREATE TABLE `errors` (
   `error_pk` int(11) NOT NULL AUTO_INCREMENT,
   `when` datetime NOT NULL,
   `user_pk` int(11) DEFAULT NULL,
@@ -203,14 +203,17 @@ CREATE TABLE IF NOT EXISTS `errors` (
   `referer` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `throwable_as_string` text COLLATE utf8_bin,
   `throwable` blob,
+  `kind` varchar(30) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`error_pk`),
   KEY `when` (`when`),
   KEY `user_pk` (`user_pk`),
   KEY `student_pk` (`student_pk`),
   KEY `course_pk` (`course_pk`),
   KEY `project_pk` (`project_pk`),
-  KEY `submission_pk` (`submission_pk`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin  ;
+  KEY `submission_pk` (`submission_pk`),
+  KEY `kind` (`kind`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 
 -- --------------------------------------------------------
 

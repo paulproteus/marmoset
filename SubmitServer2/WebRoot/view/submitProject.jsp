@@ -72,11 +72,11 @@ and src/ directories at the root of the archive.
 <p>Files generated during compilation (i.e. .class or .o files) will be discarded by the server,
 so don't worry if your submission includes them.
 
-<h2>Submitting a flat list of files</h2>
-<p>You can also submit a set of files from a single directory. 
-All of the submitted files need to come from the same directory.
-This works only on browsers that support HTML 5, and
- won't work if you need to submit files from different directories.
+<h2>Submitting multiple text files</h2>
+<p>You can also submit multiple files, typically all source files.
+If the files need to be in a particularly directory structure, then all of the submitted
+files need to be ones in the baseline submission, otherwise we can't recreate the intended directory
+structure. 
 
 <form name="submitform" enctype="multipart/form-data"
 	action="<c:url value="/action/SubmitProjectViaWeb"/>" method="POST"><input type="hidden"
@@ -84,7 +84,7 @@ This works only on browsers that support HTML 5, and
 	name="submitClientTool" value="web" />
 <table class="form">
 <tr><th colspan=2>file(s) for submission</th>
-<tr><td>File(s) to Submit: <td class="input"><input type="file" name="file" class="multi" size=40 multiple/>
+<tr><td>File(s) to Submit: <td class="input"><input type="file" name="file" class="multi" size=60 />
 <tr class="submit"><td class="submit" colspan="2"><input type="submit" value="Submit project!">
 </table>
 </form>

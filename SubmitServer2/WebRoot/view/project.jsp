@@ -32,18 +32,6 @@
 	title="All submissions for ${course.courseName} project ${project.projectNumber}" />
 
 <body>
-
- <script type="text/javascript">
-                    function toggle(item) {
-                        obj = document.getElementById(item);
-                        if (obj.style.display == "none") {
-                            obj.style.display = "block";
-                        } else {
-                            obj.style.display = "none";
-                        }
-                    }
-                </script>
-                
 <ss:header />
 <ss:breadCrumb />
 

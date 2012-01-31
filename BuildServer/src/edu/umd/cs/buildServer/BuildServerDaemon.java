@@ -481,17 +481,14 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 		try {
 			c.write(out);
-			if (false) {
-				out.writeObject(new byte[696645]);
-			}
 		} catch (IOException ignore) {
-			getLog().error("IOException writing to ObjectOutputStream");
+			getLog().error("IOException writing to ObjectOutputStream", ignore);
 		} catch (Error e) {
 			// Can happen if the long test output is really long; we
 			// truncate down to 64K (also the limit imposed by the
 			// MySQL 'text' type) in order to avoid this, but we should
 			// note it.
-			getLog().error("While writing, caught Error: " + e);
+			getLog().error("While writing, caught Error", e);
 			getLog().error("Rethrowing...");
 			throw (e);
 		}
@@ -582,9 +579,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	 * Command-line interface.
 	 */
 	public static void main(String[] args) {
-		if (args.length < 1 || args.length > 3) {
+		if (args.length < 1 || args.length > 4) {
 			System.err.println("Usage: " + BuildServerDaemon.class.getName()
-					+ " <config properties> [ once | <submissionPK> ]");
+					+ " <config properties> [ once | <submissionPK>  [<testPK> [<log4j-level>]]");
 			System.exit(1);
 		}
 
@@ -609,23 +606,32 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 				buildServer.getConfig().setProperty(DEBUG_DO_NOT_LOOP, "true");
 				buildServer.getConfig().setProperty(
 						DEBUG_PRESERVE_SUBMISSION_ZIPFILES, "true");
-				if (!args[1].equalsIgnoreCase("once")) {
+				if (args[1].equalsIgnoreCase("once")) {
+				    if (args.length == 3)
+				        buildServer.getConfig().setProperty(
+				                LOG4J_THRESHOLD, args[2]);
+                        
+				} else {
 					try {
 						Integer.parseInt(args[1]);
 						buildServer.getConfig().setProperty(
 								DEBUG_SPECIFIC_SUBMISSION, args[1]);
-						if (args.length == 3) {
+						if (args.length >= 3) {
 							Integer.parseInt(args[2]);
 							buildServer.getConfig().setProperty(
 									DEBUG_SPECIFIC_TESTSETUP, args[2]);
-						
+							if (args.length >= 4)
+		                        buildServer.getConfig().setProperty(
+		                                LOG4J_THRESHOLD, args[3]);
 						}
 					} catch (NumberFormatException e) {
 						throw new NumberFormatException("'" + args[1] + "'"
 								+ " isn't a valid submissionPK");
 					}
 				}
+
 			}
+
 			buildServer.executeServerLoop();
 			buildServer.getLog().info("Shutting down");
 			timedSystemExit0();

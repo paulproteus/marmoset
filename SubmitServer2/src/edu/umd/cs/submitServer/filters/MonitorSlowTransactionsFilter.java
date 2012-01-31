@@ -141,26 +141,27 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 	}
 
 
-    public static void insertServerError(Connection conn, HttpServletRequest request, String msg, Integer userPK, Integer coursePK,
-            Student student, Project project, Submission submission) throws SQLException {
-        ServerError.insert(conn, userPK, 
-                student == null ? null : student.getStudentPK(), 
-                coursePK,
-                project == null ? null : project.getProjectPK(), 
-                submission == null ? null : submission.getSubmissionPK(),
-                        null, msg, "", "Slow", 
-                        request.getRequestURI(), 
+    public static void insertServerError(Connection conn, HttpServletRequest request, String msg,
+            @Student.PK Integer userPK, Integer coursePK,
+            Student student,  Project project, Submission submission) throws SQLException {
+        ServerError.insert(conn, ServerError.Kind.SLOW, 
+                userPK, 
+                student == null ? null : student.getStudentPK(),
+                coursePK, 
+                project == null ? null : project.getProjectPK(),
+                        submission == null ? null : submission.getSubmissionPK(), null, msg, "", 
+                        "Slow", 
+                        request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(),
-                        request.getHeader("referer"), null);
+                        request.getRemoteHost(), request.getHeader("referer"), null);
     }
     public static void insertServerError(Connection conn, HttpServletRequest request,
            String msg, String type, String servlet) throws SQLException {
-        ServerError.insert(conn, null, null, null, null, null,
-                        null, msg, type, servlet, 
-                        request.getRequestURI(), 
+        ServerError.insert(conn, ServerError.Kind.SLOW, null, null, null, null,
+                        null, null, msg, type, 
+                        servlet, 
+                        request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(),
-                        request.getHeader("referer"), null);
+                        request.getRemoteHost(), request.getHeader("referer"), null);
     }
 }

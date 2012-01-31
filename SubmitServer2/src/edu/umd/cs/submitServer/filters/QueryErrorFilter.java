@@ -21,16 +21,15 @@
  * 
  */
 
-/**
- * Created on Oct 25, 2005
- *
- * @author jspacco
+/*
+ * Created on Apr 8, 2005
  */
 package edu.umd.cs.submitServer.filters;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -38,13 +37,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import edu.umd.cs.marmoset.modelClasses.ServerError;
+import edu.umd.cs.marmoset.utilities.XSSScrubber;
+import edu.umd.cs.submitServer.RequestParser;
+import edu.umd.cs.submitServer.UserSession;
 
 /**
- * ResearchSnapshotFilter
- * 
  * @author jspacco
+ * 
  */
-public class ResearchSnapshotFilter extends SubmitServerFilter {
+public class QueryErrorFilter extends SubmitServerFilter {
 
 	/*
 	 * (non-Javadoc)
@@ -57,12 +61,30 @@ public class ResearchSnapshotFilter extends SubmitServerFilter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
+		HttpSession session = request.getSession();
+		UserSession userSession = (UserSession) session
+				.getAttribute(USER_SESSION);
+		if (!userSession.isSuperUser()) {
+            // System.out.println("not super user, sending error");
+            String scrubbedURI = XSSScrubber.scrubbedStr(request
+                    .getRequestURI());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "You need admin privileges to view " + scrubbedURI);
+            return;
+        }
+		RequestParser parser = new RequestParser(request,
+                getSubmitServerFilterLog(), strictParameterChecking());
+        int errorPK = parser.getIntParameter("errorPK");
 		Connection conn = null;
 		try {
 			conn = getConnection();
 
-			String projectPK = (String) request.getAttribute("projectPK");
-
+			ServerError error = ServerError.getError(errorPK, conn);
+			request.setAttribute("error", error);
+            
+			Map<Object,Object> errorField = ServerError.getAllFields(conn, errorPK);
+			request.setAttribute("errorField", errorField);
+			
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
@@ -70,4 +92,5 @@ public class ResearchSnapshotFilter extends SubmitServerFilter {
 		}
 		chain.doFilter(request, response);
 	}
+
 }

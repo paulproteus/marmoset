@@ -50,7 +50,7 @@
 
 <p>
 
-<c:url var="registerStudents" value="/action/instructor/RegisterStudents"/>
+<c:url var="registerStudents" value="/view/instructor/studentsRegistered.jsp"/>
 
 <form action="${registerStudents}"
 	method="POST" enctype="multipart/form-data">

@@ -109,8 +109,6 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
 
         submitServerDatabaseProperties = new SubmitServerDatabaseProperties(servletContext);
         
-        getSubmitServerFilterLog().debug("Initializing logger for " + getClass());
-
         strictParameterChecking = "true".equalsIgnoreCase(servletContext.getInitParameter("strict.parameter.checking"));
     }
 

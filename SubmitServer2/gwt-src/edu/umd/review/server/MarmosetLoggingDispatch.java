@@ -77,6 +77,7 @@ public class MarmosetLoggingDispatch extends SimpleDispatch {
     try {
       conn = submitServerDatabaseProperties.getConnection();
       ServerError.insert(conn,
+                         ServerError.Kind.EXCEPTION,
                          userSession.getStudentPK(),
                          userSession.getStudentPK(),
                          null,
@@ -89,8 +90,7 @@ public class MarmosetLoggingDispatch extends SimpleDispatch {
                          requestURI,
                          request.getQueryString(),
                          request.getRemoteHost(),
-                         "",
-                         thrown);
+                         "", thrown);
     } catch (SQLException sqlException) {
       assert true; // ignore
     } finally {

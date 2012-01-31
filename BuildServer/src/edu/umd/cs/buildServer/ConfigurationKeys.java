@@ -178,6 +178,8 @@ public interface ConfigurationKeys {
 	/** Debug property: don't loop, build specific submission */
 	public static final String DEBUG_SPECIFIC_SUBMISSION = DEBUG_PFX
 			+ "submission";
+	
+	public static final String LOG4J_THRESHOLD = "log4j.Threshold";
 
 	/** Debug property: don't loop, build specific submission */
 	public static final String DEBUG_SPECIFIC_TESTSETUP = DEBUG_PFX

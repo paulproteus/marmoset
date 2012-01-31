@@ -293,7 +293,7 @@ public class EditDistance<T> {
 
           @Override
           public int costToInsert(String newValue) {
-              String s = newValue.trim();
+              newValue = newValue.trim();
               if (newValue.length() == 0)
                   return 2;
               return 5;

@@ -49,17 +49,6 @@ tr.reject {background: #f33}
         <p class="sectionDescription"><ss:hello/></p>
     </div>
 
-    <script type="text/javascript">
-					function toggle(item) {
-						obj = document.getElementById(item);
-						if (obj.style.display == "none") {
-							obj.style.display = "block";
-						} else {
-							obj.style.display = "none";
-						}
-					}
-				</script>
-
     <div class="projectMenu">
         <a href="#projects">Projects</a> &nbsp;|&nbsp; <a href="#students">Students</a> &nbsp;|&nbsp; <a href="#staff">Staff</a>
         &nbsp;|&nbsp; <a href="#status">Status</a> &nbsp;|&nbsp; <a href="#update">Update</a>
@@ -125,7 +114,7 @@ tr.reject {background: #f33}
                     <c:set var="rowKind" value="r${counter.index % 2}" />
                 </c:otherwise>
             </c:choose>
-            <tr class="$rowKind">
+            <tr class="${rowKind}">
 
                 <td>${project.projectNumber}</td>
 
@@ -299,7 +288,7 @@ tr.reject {background: #f33}
                     </tr>
 
                     <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
-                        <tr class="$rowKind">
+                        <tr class="r${counter.index % 2}">
                             <td><c:out value="${buildServer.name}" />
                             <td><fmt:formatDate value="${buildServer.lastRequest}" pattern="dd MMM, hh:mm a" /></td>
                             <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
@@ -404,7 +393,7 @@ tr.reject {background: #f33}
                         <c:set var="rowKind" value="r${counter.index % 2}" />
                     </c:otherwise>
                 </c:choose>
-                <tr class="$rowKind">
+                    <tr class="r${counter.index % 2}">
 
                     <td>${project.projectNumber}</td>
 

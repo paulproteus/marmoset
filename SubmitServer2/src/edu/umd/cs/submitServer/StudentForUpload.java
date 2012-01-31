@@ -101,7 +101,7 @@ public class StudentForUpload {
 	 */
 	public StudentForUpload(String line, String delimiter) throws IllegalStateException {
 		String tokens[] = line.split(delimiter);
-
+		// Last,First,UID,section,ClassAcct,DirectoryID
 		// remove leading/trailing whitespace
 		lastname = tokens[0].replaceAll("^\\s+", "").replaceAll("\\s+$", "");
 		if (lastname.equals(""))
@@ -122,14 +122,15 @@ public class StudentForUpload {
 		// TODO add a column to studentRegistration record for the section
 		// number
 		section = tokens[3];
-
-		classAccount = tokens[4].replaceAll("\\s+", "");
-		if (classAccount.equals(""))
-			throw new IllegalStateException("Class account CANNOT be empty!");
 		loginName = tokens[5].replaceAll("\\s+", "");
-		if (loginName.equals(""))
-			throw new IllegalStateException("Campus UID CANNOT be empty!");
+        if (loginName.equals(""))
+            throw new IllegalStateException("Campus UID CANNOT be empty!");
 
+        String classAccount = tokens[4].replaceAll("\\s+", "");
+
+		if (classAccount.equals(""))
+		    classAccount = loginName;
+		this.classAccount  = classAccount;
 		
 		inactive = false;
 		dropped = false;
@@ -163,7 +164,7 @@ public class StudentForUpload {
 		registerStudent( course,  student, s.classAccount, capability, conn);
 	}
 	
-	public static void registerStudent(Course course, Student student,
+	public static StudentRegistration registerStudent(Course course, Student student,
 			String classAccount,
 			@Capability String capability, Connection conn) throws SQLException {
 		
@@ -181,6 +182,7 @@ public class StudentForUpload {
 			registration.setLastname(student.getLastname());
 			registration.insert(conn);
 		} 
+		return registration;
 	}
 	
 	/**
