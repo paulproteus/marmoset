@@ -34,3 +34,5 @@ CourseProjectManager/local.properties
 SubmitServer2/localhost.web.properties
 SubmitServer2/umd.web.properties
 SubmitServer2/openid-local.web.properties
+BuildServer/findbugs
+SubmitServer2/ldap-local.web.properties
