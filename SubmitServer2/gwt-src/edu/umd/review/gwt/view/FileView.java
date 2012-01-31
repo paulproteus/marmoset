@@ -24,7 +24,7 @@ public interface FileView extends IsWidget {
   void setFileName(String name);
 
   /** Set the file to display. */
-  void setFile(FileDto file, boolean collapseUnmodifiedLines);
+  void setFile(FileDto file);
 
   /** Return a view for a thread at {@code line}.
    * @param before {@code ThreadView} to insert before, if null insert at end of list
@@ -56,7 +56,5 @@ public interface FileView extends IsWidget {
     void registerDropController(DropController controller);
 
     DragController getDragController();
-
-    void onCollapseToggle();
   }
 }

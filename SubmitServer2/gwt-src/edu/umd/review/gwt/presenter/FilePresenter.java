@@ -39,7 +39,6 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
   private final ScrollManager scrollManager;
   private final PickupDragController dragController;
   private final Map<Integer, ThreadView.Presenter> threadPresenters = Maps.newTreeMap();
-  private boolean isCollapsed = true;
 
   @Inject
   FilePresenter(@Assisted FileView view, PresenterFactory presenterFactory,
@@ -57,7 +56,7 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
   public void start() {
     view.setPresenter(this);
     view.setFileName(file.getPath());
-    showFile(isCollapsed);
+    showFile();
   }
 
   @Override
@@ -124,8 +123,8 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
     threadPresenters.put(thread.getId(), threadPresenter);
   }
 
-  private void showFile(boolean collapseUnmodified) {
-    view.setFile(file, isCollapsed);
+  private void showFile() {
+    view.setFile(file);
     scrollManager.registerFile(file.getPath(), view);
     for (ThreadDto thread : file.getThreads()) {
       ThreadView threadView = view.getThreadView(thread.getLine(), null);
@@ -137,11 +136,5 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
         old.finish();
       }
     }
-  }
-
-  @Override
-  public void onCollapseToggle() {
-    isCollapsed = !isCollapsed;
-    showFile(isCollapsed);
   }
 }
