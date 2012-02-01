@@ -392,7 +392,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 							registration);
 					if (registration.isInstructor())
 						staffStudentRegistrationSet.add(registration);
-					else
+					else if (!registration.isNormalStudent())
 						justStudentRegistrationSet.add(registration);
 				}
 				
@@ -410,16 +410,26 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						staffStudentRegistrationSet);
 				TreeMap<String, SortedSet<StudentRegistration>> sectionMap =
 				        new TreeMap<String, SortedSet<StudentRegistration>>();
+				
+				TreeSet<StudentRegistration> noSection = new TreeSet<StudentRegistration>();
 				for(StudentRegistration sr : justStudentRegistrationSet) {
 				    String section = sr.getSection();
-				    if (section == null || section.isEmpty())
+				    if (section == null || section.isEmpty()) {
+				        noSection.add(sr);
 				        continue;
+				    }
 				    SortedSet<StudentRegistration> inSection = sectionMap.get(section);
 				    if (inSection == null) {
 				        inSection = new TreeSet<StudentRegistration>();
 				        sectionMap.put(section, inSection);
 				    }
 				    inSection.add(sr);
+				}
+				if (!sectionMap.isEmpty() && !noSection.isEmpty()) {
+				    if (sectionMap.containsKey("none"))
+				        sectionMap.get("none").addAll(noSection);
+				    else
+				        sectionMap.put("none", noSection);
 				}
 				request.setAttribute(SECTION_MAP,
 				        sectionMap);

@@ -56,7 +56,6 @@
 	| <a href="${projectLink}"
 		title="Instructor overview of project ${project.projectNumber}" >${project.projectNumber}</a>
 
-
 	<c:if test="${instructorViewOfStudent || submission != null}">
 		<c:url var="studentLink" value="/view/instructor/studentProject.jsp">
 			<c:param name="projectPK" value="${project.projectPK}" />

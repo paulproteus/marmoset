@@ -38,6 +38,10 @@
 
 
 <h1>Create course</h1>
+<c:if test="${gradesServer}">
+<p>This course will <em>not</em> be synchronized with the grades server.
+</p>
+</c:if>
 <ss:createCourseForm/>
 
 	<ss:footer/>

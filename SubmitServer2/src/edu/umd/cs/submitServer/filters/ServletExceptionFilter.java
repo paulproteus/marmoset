@@ -134,14 +134,15 @@ public class ServletExceptionFilter extends SubmitServerFilter {
     public static void logError(Connection conn, 
             Kind kind, 
             HttpServletRequest request,
-          String message, String type, @CheckForNull Throwable e) {
+          String message, @CheckForNull String type, @CheckForNull Throwable e) {
         logErrorAndSendServerError(conn, kind, request, null, message, type, e);
     }
 
     public static void logErrorAndSendServerError(Connection conn, 
             Kind kind, 
             HttpServletRequest request,
-            @CheckForNull HttpServletResponse response, String message, String logOnlyMessage, @CheckForNull Throwable e) {
+            @CheckForNull HttpServletResponse response, String message,
+            @CheckForNull String logOnlyMessage, @CheckForNull Throwable e) {
 
         try {
         String referer = request.getHeader("referer");

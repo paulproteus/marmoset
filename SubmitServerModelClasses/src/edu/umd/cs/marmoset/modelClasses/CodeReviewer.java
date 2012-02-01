@@ -493,6 +493,31 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			stmt.close();
 		}
 	}
+	
+	public @CheckForNull @CodeReviewer.PK Integer getNext(Connection conn) throws SQLException {
+	    if (codeReviewAssignmentPK == 0)
+	        return null;
+	    String query = "SELECT code_reviewer_pk FROM " + TABLE_NAME
+                + " WHERE student_pk =  ? " 
+                + " AND code_review_assignment_pk = ? "
+                + " AND code_reviewer_pk  > ? "
+                + " ORDER BY code_reviewer_pk "
+                + " LIMIT 1";
+	    PreparedStatement stmt = Queries.setStatement(conn, query, getStudentPK(),
+	            getCodeReviewAssignmentPK(), getCodeReviewerPK());
+	    try {
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next())
+	            return CodeReviewer.asPK(rs.getInt(1));
+	        
+	        return null;
+	    }  finally {
+            stmt.close();
+        }
+
+	    
+	    
+	}
 
 	@Override
 	public int compareTo(CodeReviewer o) {

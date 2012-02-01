@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.WillClose;
 
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
@@ -596,7 +597,7 @@ public final class Queries {
 		}
 	}
 
-	public static PreparedStatement setStatement(Connection conn, String query, Object... args) throws SQLException {
+	public static @CheckReturnValue PreparedStatement setStatement(Connection conn, String query, Object... args) throws SQLException {
 	    PreparedStatement stmt = conn.prepareStatement(query);
 	    setStatement(stmt, args);
 	    return stmt;

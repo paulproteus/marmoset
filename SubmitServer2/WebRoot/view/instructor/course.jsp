@@ -179,6 +179,7 @@ tr.reject {background: #f33}
         </ul>
     </c:if>
 
+
     <h2>
         <a href="javascript:toggle('studentList')" title="Click to toggle display of students" id="students"> <c:out
                 value="${fn:length(justStudentRegistrationSet)}" /> Students
@@ -205,8 +206,9 @@ tr.reject {background: #f33}
             <c:choose>
             <c:when test="${not empty sections}">
              <c:forEach var="section" items="${sections}" >
-           <tr><td colspan="3">Section <c:out value="${section}"/></td></tr>
-            <c:forEach var="studentRegistration" items="${sectionMap[section]}" varStatus="counter">
+             <c:set var="inSection" value="${sectionMap[section]}"/>
+           <tr><td colspan="3">${fn:length(inSection)} Students in Section <c:out value="${section}"/></td></tr>
+            <c:forEach var="studentRegistration" items="${inSection}" varStatus="counter">
                 <tr class="r${counter.index % 2}">
                     <c:url var="studentLink" value="/view/instructor/student.jsp">
                         <c:param name="studentPK" value="${studentRegistration.studentPK}" />
