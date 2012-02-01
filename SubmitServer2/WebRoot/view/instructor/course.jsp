@@ -179,6 +179,7 @@ tr.reject {background: #f33}
         </ul>
     </c:if>
 
+
     <h2>
         <a href="javascript:toggle('studentList')" title="Click to toggle display of students" id="students"> <c:out
                 value="${fn:length(justStudentRegistrationSet)}" /> Students

@@ -652,7 +652,8 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 	        " SELECT " +ATTRIBUTES+
 	        " FROM student_registration " +
 	        " WHERE course_pk = ? " +
-	        " AND instructor_capability IS NOT NULL";
+	        " AND instructor_capability IS NOT NULL" +
+	        " AND instructor_capability != '" + PSEUDO_STUDENT_CAPABILITY + "'";
 
         PreparedStatement stmt = null;
         try {

@@ -1446,7 +1446,7 @@ public class Submission implements ITestSummary<Submission> {
     }
 
     public static void lookupAllWithFailedBackgroundRetestsByProjectPK(
-        Integer projectPK,
+        @Project.PK int projectPK,
         List<Submission> submissionList,
         Connection conn)
     throws SQLException
@@ -1459,7 +1459,6 @@ public class Submission implements ITestSummary<Submission> {
     		+ "     submissions.project_pk = projects.project_pk "
     		+ " AND submissions.current_test_run_pk = test_runs.test_run_pk "
     		+ " AND projects.project_pk = ? "
-
     		+ " AND test_runs.test_setup_pk = projects.test_setup_pk "
     		+ " AND num_failed_background_retests > 0";
 
@@ -1476,6 +1475,38 @@ public class Submission implements ITestSummary<Submission> {
             Queries.closeStatement(stmt);
         }
     }
+
+    public static void lookupAllWithFailedBackgroundRetestsByProjectPK(
+            @Project.PK int projectPK,
+            @StudentRegistration.PK  int studentRegistrationPK,
+            List<Submission> submissionList,
+            Connection conn)
+        throws SQLException
+        {
+
+            String query =
+                " SELECT " +ATTRIBUTES
+                + " FROM submissions, test_runs, projects "
+                + " WHERE "
+                + "     submissions.project_pk = projects.project_pk "
+                + " AND submissions.current_test_run_pk = test_runs.test_run_pk "
+                + " AND projects.project_pk = ? "
+                + " AND submission.student_registration_pk = ? "
+                + " AND test_runs.test_setup_pk = projects.test_setup_pk "
+                + " AND num_failed_background_retests > 0";
+
+            PreparedStatement stmt=null;
+            try {
+                stmt = Queries.setStatement(conn, query, projectPK, studentRegistrationPK);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    Submission submission = new Submission(rs, 1);
+                    submissionList.add(submission);
+                }
+            } finally {
+                Queries.closeStatement(stmt);
+            }
+        }
 
     /**
      * Adjusts the scores of this submission based on the results of background retests.

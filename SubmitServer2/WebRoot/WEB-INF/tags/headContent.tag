@@ -6,13 +6,14 @@
  <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
 	type="text/javascript"></script>
-<script type="text/javascript">
+    <script type="text/javascript">
  function toggle(item) {
-     obj = document.getElementById(item);
-     if (obj.style.display == "none") {
-         obj.style.display = "block";
-     } else {
-         obj.style.display = "none";
-     }
+     $(document.getElementById(item)).slideToggle("slow");
+ }
+ function showItem(item) {
+     $(document.getElementById(item)).show("slow");
+ }
+ function hideItem(item) {
+     $(document.getElementById(item)).hide("slow");
  }
 </script>

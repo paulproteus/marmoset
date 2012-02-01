@@ -13,9 +13,6 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 public class ReviewerDto implements IsSerializable {
   private String username;
   private String key;
-  private String headerTitle;
-  private String headerBackUrl;
-  private String headerBackLinkText;
   private @CodeReviewer.PK int codeReviewerPK;
   private @Submission.PK int submissionPK;
   private boolean isAuthor = false;
@@ -40,24 +37,6 @@ public class ReviewerDto implements IsSerializable {
     this.key = key;
     this.codeReviewerPK = codeReviewerPK;
     this.submissionPK = submissionPK;
-  }
-
-  public void setHeaderInfo(String title, String backUrl, String backText) {
-    this.headerTitle = title;
-    this.headerBackUrl = backUrl;
-    this.headerBackLinkText = backText;
-  }
-
-  public String getHeaderBackLinkText() {
-    return headerBackLinkText;
-  }
-
-  public String getHeaderBackUrl() {
-    return headerBackUrl;
-  }
-
-  public String getHeaderTitle() {
-    return headerTitle;
   }
 
   public boolean isAuthor() {

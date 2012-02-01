@@ -118,6 +118,8 @@ public interface SubmitServerConstants {
 	public static final String UPCOMING_PROJECTS = "upcomingProjects";
 	public static final String PROJECT_BUILD_STATUS_COUNT = "buildStatusCount";
     public static final String CODE_REVIEW_ASSIGNMENT = "codeReviewAssignment";
+    public static final String NEXT_CODE_REVIEW = "nextCodeReview";
+    
 
   /** Key for accessing OpenID discovery information in a user session. */
   public static final String OPENID_DISCOVERED = "openid.discovered";
