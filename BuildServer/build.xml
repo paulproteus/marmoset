@@ -94,16 +94,16 @@
 	</target>
 	
 	<target name="dist" depends="clean,jar">
-	<mkdir dir="build/dist"/>
-	<mkdir dir="build/dist/lib"/>
-	<copy file="buildserver.jar" todir="build/dist"/> 
-	<copy todir="build/dist/lib">
+	<mkdir dir="build/BuildServer"/>
+	<mkdir dir="build/BuildServer/lib"/>
+	<copy file="buildserver.jar" todir="build/BuildServer"/> 
+	<copy todir="build/BuildServer/lib">
 	  <fileset dir="lib"/>
         </copy>
-	<copy todir="build/dist/findbugs">
+	<copy todir="build/BuildServer/findbugs">
 	  <fileset dir="findbugs"/>
         </copy>
-	<zip destfile="build/buildserver.zip" basedir="build/dist"/>
+	<zip destfile="build/buildserver.zip" basedir="build" includes="BuildServer/**" />
 	</target>
 
 	<target name="jar" depends="classes">
