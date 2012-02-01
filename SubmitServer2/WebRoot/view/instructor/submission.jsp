@@ -108,8 +108,9 @@ Submission # ${submission.submissionNumber}, <fmt:formatDate
 	&nbsp;|&nbsp;
 	<c:url var="markBrokenLink" value="/view/instructor/confirmChangeSubmissionBuildStatus.jsp">
 		<c:param name="submissionPK" value="${submission.submissionPK}" />
-		<c:param name="title" value="Are you sure you want to mark submission ${submission.submissionPK} broken?  Broken submissions are not tested unless you specifically mark them for retest."/>
-		<c:param name="buildStatus" value="broken"/>
+		<c:param name="title" value="Are you sure you want to mark submission ${submission.submissionPK} broken?"/>
+		<c:param name="subtitle" value="Broken submissions are not tested unless you specifically mark them for retest."/>
+        <c:param name="buildStatus" value="broken"/>
 	</c:url>
 	<a href="${markBrokenLink}">mark broken</a>
 	</c:when>

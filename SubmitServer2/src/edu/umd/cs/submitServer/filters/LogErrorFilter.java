@@ -86,13 +86,14 @@ public class LogErrorFilter extends SubmitServerFilter {
 			try {
 			conn = getConnection();
 
-			int errorPK = ServerError.insert(conn, userPK, 
-					student == null ? null : student.getStudentPK(), 
-							course == null ? null : course.getCoursePK(),
-									project == null ? null : project.getProjectPK(),
-											submission == null ? null : submission.getSubmissionPK(),
-							code, message, type,
-					servletName, requestURI, queryString, remoteHost, referer, throwable);
+			int errorPK = ServerError.insert(conn,throwable != null ? ServerError.Kind.EXCEPTION 
+			        : ServerError.Kind.UNKNOWN,
+					userPK, 
+							student == null ? null : student.getStudentPK(),
+									coursePK,
+											project == null ? null : project.getProjectPK(),
+							submission == null ? null : submission.getSubmissionPK(), code, message,
+					type, servletName, requestURI, queryString, remoteHost, referer, throwable);
 			req.setAttribute("errorPK", errorPK);
 		} catch (Exception t) {
 			getSubmitServerFilterLog().warn(t);
@@ -107,13 +108,13 @@ public class LogErrorFilter extends SubmitServerFilter {
 			try {
 				getSubmitServerFilterLog().warn(e);
 				conn = getConnection();
-				ServerError.insert(conn, userPK, 
-						student == null ? null : student.getStudentPK(), 
-								course == null ? null : course.getCoursePK(),
-										project == null ? null : project.getProjectPK(),
-												submission == null ? null : submission.getSubmissionPK(),
-								code, message, type,
-								"on chain", requestURI, queryString, remoteHost, referer, e);
+				ServerError.insert(conn, ServerError.Kind.EXCEPTION, 
+						userPK, 
+								student == null ? null : student.getStudentPK(),
+										course == null ? null : course.getCoursePK(),
+												project == null ? null : project.getProjectPK(),
+								submission == null ? null : submission.getSubmissionPK(), code, message,
+								type, "on chain", requestURI, queryString, remoteHost, referer, e);
 			} catch (SQLException e2) {
 				getSubmitServerFilterLog().warn(e2);
 			} finally {

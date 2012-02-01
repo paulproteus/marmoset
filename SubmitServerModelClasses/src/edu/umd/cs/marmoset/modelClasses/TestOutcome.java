@@ -955,8 +955,6 @@ public class TestOutcome implements Serializable {
     	truncateLongTestResult();
         stream.writeInt(serialMinorVersion);
         stream.defaultWriteObject();
-        //stream.writeObject(coarsestCoverageLevel);
-        //stream.writeBoolean(exceptionSourceCoveredElsewhere);
     }
 
     public String getExceptionClassName()

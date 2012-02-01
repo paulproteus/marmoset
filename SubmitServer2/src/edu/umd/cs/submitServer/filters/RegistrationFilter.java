@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
 import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
 
@@ -21,6 +22,7 @@ import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
  *
  */
 public class RegistrationFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -28,7 +30,7 @@ public class RegistrationFilter extends SubmitServerFilter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
-        String gradesServer = request.getServletContext().getInitParameter("grades.server");
+        String gradesServer = webProperties.getProperty("grades.server");
         if (gradesServer == null) {
             Student user = (Student) request.getAttribute(SubmitServerConstants.USER);
             RegistrationDao dao = new MySqlRegistrationDaoImpl(user, submitServerDatabaseProperties);

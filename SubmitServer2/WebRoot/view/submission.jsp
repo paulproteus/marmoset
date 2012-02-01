@@ -57,6 +57,13 @@
 </c:if>
 
 <p><a href="${viewSubmissionSourceLink}">Source</a>
+<c:if test="${reviewer != null}">
+<c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
+<c:param name="submissionPK" value="${submission.submissionPK}"/>
+<c:param name="reviewerPK" value="${reviewer.codeReviewerPK}"/>
+</c:url>
+| <a href="${codeReviewLink}">Code Review</a>
+</c:if>
 
     <p>
         build status: ${submission.buildStatus}

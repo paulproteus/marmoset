@@ -1,5 +1,6 @@
 package edu.umd.review.gwt.view.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -75,13 +76,6 @@ public class FileViewImpl extends Composite implements FileView {
     } else {
       Label label = new Label(Strings.isNullOrEmpty(code) ? " " : code);
       label.addStyleName("code");
-      label.addStyleName("collapse-toggle");
-      label.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          presenter.onCollapseToggle();
-        }
-      });
       return label;
     }
   }
@@ -89,13 +83,6 @@ public class FileViewImpl extends Composite implements FileView {
   private Widget makeElidedLabel(int elidedCount) {
     Label label = new Label("..." + elidedCount + " lines elided...");
     label.addStyleName("code");
-    label.addStyleName("collapse-toggle");
-    label.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        presenter.onCollapseToggle();
-      }
-    });
     return label;
   }
 
@@ -103,8 +90,16 @@ public class FileViewImpl extends Composite implements FileView {
     codeGrid.removeAllRows();
     int row = 0;
     int[] linesToShow = file.getLinesToShow();
+    if (linesToShow[0] > 0) {
+        // Many lines elided.
+        int dist = linesToShow[0];
+        codeGrid.setWidget(row, 1, makeElidedLabel(dist));
+        codeGrid.getRowFormatter().setStylePrimaryName(row, "elided-code-label");
+        row++;
+    }
     List<String> lines = file.getLines();
-    for (int i = 0; i < linesToShow.length; i++) {
+    int i;
+    for (i = 0; i < linesToShow.length; i++) {
       int line = linesToShow[i];
       String code = lines.get(line);
       setLineNumber(row, line);
@@ -130,40 +125,21 @@ public class FileViewImpl extends Composite implements FileView {
         row++;
       }
     }
-  }
-
-  private void showAllCode(FileDto file) {
-    codeGrid.removeAllRows();
-    int row = 0;
-    List<String> lines = file.getLines();
-    for (int line = 0; line < lines.size(); line++) {
-      String code = lines.get(line);
-      setLineNumber(row, line);
-      FlowPanel codePanel = new FlowPanel();
-      codePanel.setStylePrimaryName("code-panel");
-      if (file.isModified(line)) {
-        codeGrid.getRowFormatter().setStylePrimaryName(row, "modified-code-row");
-      } else {
-        codeGrid.getRowFormatter().setStylePrimaryName(row, "unmodified-code-row");
-      }
-      Widget codeWidget = makeCodeLabel(line, code, file.isModified(line));
-      codePanel.add(codeWidget);
-      codeGrid.setWidget(row, 1, codePanel);
-      codePanels.put(line, codePanel);
-      linesToRows.put(line, row);
-      row++;
+    int lastLine = linesToShow[i - 1];
+    if (lastLine < lines.size() - 1) {
+        // Many lines elided.
+        int dist = (lines.size() - 1) - lastLine;
+        codeGrid.setWidget(row, 1, makeElidedLabel(dist));
+        codeGrid.getRowFormatter().setStylePrimaryName(row, "elided-code-label");
+        row++;
     }
   }
 
   @Override
-  public void setFile(FileDto file, boolean collapseUnmodified) {
+  public void setFile(FileDto file) {
     Preconditions.checkNotNull(presenter, "Must set presenter before setting lines.");
     codeGrid.removeAllRows();
-    if (collapseUnmodified) {
-      showCollapsedCode(file);
-    } else {
-      showAllCode(file);
-    }
+    showCollapsedCode(file);
     // TODO(rwsims): Syntax highlighting. Tried external prettify.js library, but prettifying eats
     //               the event handling.
   }

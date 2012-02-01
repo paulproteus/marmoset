@@ -34,8 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class ImportInstructors extends GradeServerInterfaceServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +48,7 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
 		boolean transactionSuccess = false;
 		String term = request.getParameter("semester");
 		if (term == null)
-			term = getServletContext().getInitParameter("semester");
+			term = webProperties.getRequiredProperty("semester");
 		response.setContentType("text/plain");
 		try {
 			gradesConn = getGradesConnection();

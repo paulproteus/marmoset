@@ -53,6 +53,7 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
 
 /**
@@ -60,7 +61,7 @@ import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
  * 
  */
 public class RequestSubmission extends SubmitServerServlet {
-
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
     private static final int LOG_REQUESTS_MORE_THAN_MS = 9000;
 
     static HashSet<String> complainedAbout = new HashSet<String>();
@@ -316,7 +317,7 @@ public class RequestSubmission extends SubmitServerServlet {
     public void init() throws ServletException {
         // TODO Auto-generated method stub
         super.init();
-        String performBackgroundRetestingStr = getServletContext().getInitParameter("perform.background.retesting");
+        String performBackgroundRetestingStr = webProperties.getProperty("perform.background.retesting");
         if ("true".equals(performBackgroundRetestingStr))
             performBackgroundRetesting = true;
     }

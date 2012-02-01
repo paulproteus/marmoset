@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.umd.cs.marmoset.utilities.JavaMail;
 import edu.umd.cs.marmoset.utilities.XSSScrubber;
 import edu.umd.cs.submitServer.RequestParser;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * @author Nat Ayewah
@@ -47,6 +48,7 @@ import edu.umd.cs.submitServer.RequestParser;
  */
 @SuppressWarnings("serial")
 public class RequestCourse extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
     @Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -165,11 +167,9 @@ public class RequestCourse extends SubmitServerServlet {
 	private void sendEmailToAdmin(String content, String requestEmail,
 			String semester) throws MessagingException {
 		ServletContext servletContext = getServletContext();
-		String adminEmail = servletContext.getInitParameter(ADMIN_EMAIL);
-		String host 
-		= servletContext.getInitParameter(SMTP_HOST);
-		String fromEmail 
-		= servletContext.getInitParameter(EMAIL_RETURN_ADDRESS);
+		String adminEmail = webProperties.getProperty(ADMIN_EMAIL);
+		String host = webProperties.getProperty(SMTP_HOST);
+		String fromEmail = webProperties.getProperty(EMAIL_RETURN_ADDRESS);
 		
 		if (fromEmail == null)
 			fromEmail = adminEmail;

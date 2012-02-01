@@ -49,17 +49,6 @@ tr.reject {background: #f33}
         <p class="sectionDescription"><ss:hello/></p>
     </div>
 
-    <script type="text/javascript">
-					function toggle(item) {
-						obj = document.getElementById(item);
-						if (obj.style.display == "none") {
-							obj.style.display = "block";
-						} else {
-							obj.style.display = "none";
-						}
-					}
-				</script>
-
     <div class="projectMenu">
         <a href="#projects">Projects</a> &nbsp;|&nbsp; <a href="#students">Students</a> &nbsp;|&nbsp; <a href="#staff">Staff</a>
         &nbsp;|&nbsp; <a href="#status">Status</a> &nbsp;|&nbsp; <a href="#update">Update</a>
@@ -125,7 +114,7 @@ tr.reject {background: #f33}
                     <c:set var="rowKind" value="r${counter.index % 2}" />
                 </c:otherwise>
             </c:choose>
-            <tr class="$rowKind">
+            <tr class="${rowKind}">
 
                 <td>${project.projectNumber}</td>
 
@@ -190,6 +179,7 @@ tr.reject {background: #f33}
         </ul>
     </c:if>
 
+
     <h2>
         <a href="javascript:toggle('studentList')" title="Click to toggle display of students" id="students"> <c:out
                 value="${fn:length(justStudentRegistrationSet)}" /> Students
@@ -213,6 +203,28 @@ tr.reject {background: #f33}
                 <th>Name</th>
                 <th>class account</th>
             </tr>
+            <c:choose>
+            <c:when test="${not empty sections}">
+             <c:forEach var="section" items="${sections}" >
+             <c:set var="inSection" value="${sectionMap[section]}"/>
+           <tr><td colspan="3">${fn:length(inSection)} Students in Section <c:out value="${section}"/></td></tr>
+            <c:forEach var="studentRegistration" items="${inSection}" varStatus="counter">
+                <tr class="r${counter.index % 2}">
+                    <c:url var="studentLink" value="/view/instructor/student.jsp">
+                        <c:param name="studentPK" value="${studentRegistration.studentPK}" />
+                        <c:param name="coursePK" value="${course.coursePK}" />
+                    </c:url>
+                    <td title="registration status is controlled through grades.cs.umd.edu"><input name="active"
+                        type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled /></td>
+                    <td class="description"><a href="${studentLink}">
+                    <c:out value="${studentRegistration.fullname}"/></a></td>
+                    <td><a href="${studentLink}">
+                    <c:out value="${studentRegistration.classAccount}"/></a></td>
+                </tr>
+            </c:forEach>
+            </c:forEach>
+            </c:when>
+            <c:otherwise>
             <c:forEach var="studentRegistration" items="${justStudentRegistrationSet}" varStatus="counter">
                 <tr class="r${counter.index % 2}">
                     <c:url var="studentLink" value="/view/instructor/student.jsp">
@@ -227,6 +239,9 @@ tr.reject {background: #f33}
                     <c:out value="${studentRegistration.classAccount}"/></a></td>
                 </tr>
             </c:forEach>
+            </c:otherwise>
+            </c:choose>
+            
         </table>
     </div>
 
@@ -299,7 +314,7 @@ tr.reject {background: #f33}
                     </tr>
 
                     <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
-                        <tr class="$rowKind">
+                        <tr class="r${counter.index % 2}">
                             <td><c:out value="${buildServer.name}" />
                             <td><fmt:formatDate value="${buildServer.lastRequest}" pattern="dd MMM, hh:mm a" /></td>
                             <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
@@ -404,7 +419,7 @@ tr.reject {background: #f33}
                         <c:set var="rowKind" value="r${counter.index % 2}" />
                     </c:otherwise>
                 </c:choose>
-                <tr class="$rowKind">
+                    <tr class="r${counter.index % 2}">
 
                     <td>${project.projectNumber}</td>
 
@@ -426,9 +441,6 @@ tr.reject {background: #f33}
     </c:if>
     
     <ss:footer />
-	<script
-		src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-		type="text/javascript"></script>
 	<script type="text/javascript">
     window.$marmoset = {
     	acceptRadios: $("#pending-table").find('input[type="radio"][value="accept"]'),

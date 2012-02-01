@@ -42,8 +42,10 @@ import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class ImportCourse extends GradeServerInterfaceServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	Pattern courseNamePattern = Pattern.compile("[\\w-]+");
 	Pattern termPattern = Pattern.compile("\\d{6}");
@@ -73,7 +75,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 
 		String term = request.getParameter("term");
 		if (term == null)
-			term = getServletContext().getInitParameter("semester");
+			term = webProperties.getRequiredProperty("semester");
 
 		if (!termPattern.matcher(term).matches())
 			throw new ServletException("Invalid term");
@@ -208,7 +210,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 					String msg = "Error trying to insert/update " + campusUID
 						+ " " + loginName + ":" + e.getMessage();
 					String msg2 = "For " + course.getCourseName() + " with courseID " + courseID;
-					ServerError.insert(conn, null, null, null, null, null, null, msg + "\n" + msg2, "", "", "", "", "", "", e);
+					ServerError.insert(conn, ServerError.Kind.EXCEPTION, null, null, null, null, null, null, msg + "\n" + msg2, "", "", "", "", "", "", e);
 					out.println(msg);
 					out.println(msg2);
 					e.printStackTrace(out);

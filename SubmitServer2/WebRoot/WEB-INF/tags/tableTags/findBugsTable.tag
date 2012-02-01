@@ -47,7 +47,7 @@
 
 				<td class="description">${test.findBugsRankDescription}</td>
 
-				<td><a href="${initParam.findbugsDescriptionsURL}#${test.testName}">${test.testName}</a></td>
+				<td><a href="${ss:webProperty('findbugsDescriptionsURL')}#${test.testName}">${test.testName}</a></td>
 			</tr>
 			</c:forEach>
 	</table>

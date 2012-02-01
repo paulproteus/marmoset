@@ -2,6 +2,7 @@ package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,7 @@ public class UpdatePendingRegistrations extends SubmitServerServlet {
 		RegistrationDao dao = new MySqlRegistrationDaoImpl(user, getDatabaseProps());
 		
 		int coursePK = Integer.parseInt(Preconditions.checkNotNull(req.getParameter("course")));
-		for (Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
+		for (Entry<String, String[]> entry : (Set<Entry<String, String[]>>) req.getParameterMap().entrySet()) {
 			Matcher matcher = requestParam.matcher(entry.getKey());
 			if (!matcher.matches()) {
 				continue;

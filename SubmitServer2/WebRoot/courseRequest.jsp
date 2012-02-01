@@ -60,7 +60,7 @@
 		<tr>
 			<td class="label">Semester:</td>
 			<td class="input">
-				<input type="text" name="semester" value="${initParam['semester']}"/>
+				<input type="text" name="semester" value="${ss:webProperty('semester')}"/>
 			<%--
 				<select name="semester">
 				<option value="Spring2005"> Spring2005 </option>

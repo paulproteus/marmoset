@@ -38,8 +38,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class GradeServerCourseFilter extends GradeServerInterfaceFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
@@ -53,7 +55,7 @@ public class GradeServerCourseFilter extends GradeServerInterfaceFilter {
 			Student user = (Student) request.getAttribute(USER);
 			String term = request.getParameter("semester");
 			if (term == null)
-				term = servletContext.getInitParameter("semester");
+				term = webProperties.getProperty("semester");
 
 			request.setAttribute("semester", term);
 			String query  = "SELECT DISTINCT course, gradesSection, courseID"

@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 <h1>Results for each test case for each students' most recent submission</h1>
@@ -19,7 +20,9 @@
 				<c:param name="projectPK" value="${project.projectPK}" />
 				<c:param name="sortKey" value="score" />
 			</c:url>
-
+<c:set var="inconsistentResults"
+        value="${fn:length(failedBackgroundRetestSubmissionList)}" />
+    
 <c:set var="cols" value="7" />
 <c:set var="showCodeCoverage"
     value="${testProperties.performCodeCoverage and instructorCapability and ! empty coverageScore}" />
@@ -29,6 +32,9 @@
 <c:if test="${showCodeCoverage}">
     <c:set var="cols" value="${1+cols}" />
 </c:if>
+<c:if test="${inconsistentResults == 0}">
+   <c:set var="cols" value="${cols-1}" />
+   </c:if>
 <c:set var="anyOutdated" value="false"/>
 <p>
 		<table>
@@ -45,8 +51,9 @@
 		<th class="number" rowspan="2"><a href="${sortByScore}" title="sort by score">Score</a>
 		 <c:if test="${showCodeCoverage}">
          <th rowspan="2">Code<br>coverage<br>score</c:if>
-        
+        <c:if test="${inconsistentResults > 0}">
          <th rowspan="2"># inconsistent<br>background<br>retests</th>
+         </c:if>
 		<c:if test="${testProperties.language=='java'}">
 		<th rowspan="2"># FindBugs<br>warnings</th>
 		<th rowspan="2"># student<br>written tests</th>
@@ -97,6 +104,7 @@
          <td class="number">${coverageScore[submission.submissionPK]}
          </c:if>
          
+                 <c:if test="${inconsistentResults > 0}">
                     <td >
 						<c:if test="${submission.numFailedBackgroundRetests > 0 }">
 						<c:url var="submissionAllTestsLink" value="/view/instructor/submissionAllTests.jsp">
@@ -108,6 +116,7 @@
 						</a>
 						</c:if>
 						</td>
+                        </c:if>
 
 						<c:if test="${testProperties.language=='java'}">
 							<td ><c:if test="${submission.numFindBugsWarnings > 0 }">

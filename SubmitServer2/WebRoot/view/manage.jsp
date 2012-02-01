@@ -32,10 +32,7 @@
 
 <!DOCTYPE HTML>
 <html>
-<head>
-<ss:headContent title="Submit Server Course Management Actions" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
-</head>
+<ss:head title="Submit Server Course Management Actions" />
 <body>
     <ss:header />
     <ss:breadCrumb />
@@ -50,16 +47,13 @@
                 <li><a href="admin/">Superuser functions</a></li>
             </c:if>
             <c:if test="${user.canImportCourses}">
-            <c:choose>
-                <c:when test="${gradesServer}">
+
+                <c:if test="${gradesServer}">
                     <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
                     <li><a href="${importCourseLink}">Import course from grade server</a></li>
-                </c:when>
-                <c:otherwise>
+                </c:if>
                     <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
-                    <li><a href="${createCourseLink}">Create course</a></li>
-                </c:otherwise>
-            </c:choose>
+                    <li><a href="${createCourseLink}">Create course via web form</a></li>
 
             <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
             <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>

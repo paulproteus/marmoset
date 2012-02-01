@@ -95,22 +95,6 @@ public class MarmosetDaoService implements ReviewDao {
       this.database = database;
     }
 
-    public MarmosetDaoService XXbuildAdHoc(@Submission.PK int submissionPK, UserSession userSession) {
-      Connection conn = null;
-      try {
-        conn = database.getConnection();
-        CodeReviewer reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submissionPK, userSession.getStudentPK(), "", false, true);
-        CodeReviewSummary s = new CodeReviewSummary(conn, reviewer);
-        Preconditions.checkArgument(userSession.hasInstructorCapability(s.getProject().getCoursePK()),
-                                    "User %s must have instructor capability", userSession.getStudentPK());
-        return new MarmosetDaoService(database, reviewer, Submission.lookupBySubmissionPK(submissionPK, conn));
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      } finally {
-        release(conn);
-      }
-    }
-
     public MarmosetDaoService buildAssigned(@CodeReviewer.PK int reviewerPK) {
       Connection conn = null;
       try {
@@ -146,11 +130,12 @@ public class MarmosetDaoService implements ReviewDao {
       this.project = getSummary().getProject();
 
       this.codeAuthor = getSummary().getAuthor();
-      StudentRegistration authorAsStudent = null;
-
-      if (codeAuthor == null || reviewer.isInstructor())
-        authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(),
-                                                                            conn);
+     
+      if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
+          StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
+          authorName=  authorAsStudent.getFullname();
+      } else
+          authorName =  codeAuthor.getName();    
 
       byte[] archive = submission.downloadArchive(conn);
       text = TextUtilities.scanTextFilesInZip(archive);
@@ -177,20 +162,6 @@ public class MarmosetDaoService implements ReviewDao {
                                     reviewer.getSubmissionPK(),
                                     "review-dao-" + reviewer.getCodeReviewerPK());
       reviewerDto.setAuthor(isAuthor);
-      String url = database.getContextPath() + "/view/project.jsp?projectPK="
-          + project.getProjectPK();
-      String authorName;
-
-      if (codeAuthor == null || reviewer.isInstructor())
-        authorName = authorAsStudent.getFullname();
-      else
-        authorName = codeAuthor.getName();
-
-      reviewerDto.setHeaderInfo(String.format("Project %s submission, written by %s",
-                                              project.getProjectNumber(),
-                                              authorName),
-                                url,
-                                "Review by " + student.getFullname());
 
     } catch (RuntimeException e) {
       e.printStackTrace();
@@ -206,6 +177,7 @@ public class MarmosetDaoService implements ReviewDao {
     }
   }
 
+  private final String authorName;
   public MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer thisReviewer) {
 
     this.database = database;
@@ -221,15 +193,18 @@ public class MarmosetDaoService implements ReviewDao {
       this.project = getSummary().getProject();
       
       this.codeAuthor = getSummary().getAuthor();
-      StudentRegistration authorAsStudent = null;
 
-      if (codeAuthor == null || reviewer.isInstructor())
-        authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
+
+      if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
+          StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
+          authorName=  authorAsStudent.getFullname();
+      } else
+          authorName =  codeAuthor.getName();
 
 
       byte[] archive = submission.downloadArchive(conn);
       text = TextUtilities
-          .scanTextFilesInZip(archive);
+              .scanTextFilesInZip(archive);
       Map<String, BitSet> changed = project.computeDiff(conn, submission, text);
       for (Map.Entry<String, List<String>> e : text.entrySet()) {
         String path = e.getKey();
@@ -261,19 +236,6 @@ public class MarmosetDaoService implements ReviewDao {
                                     reviewer.getSubmissionPK(),
                                     "review-dao-" + reviewer.getCodeReviewerPK());
       reviewerDto.setAuthor(isAuthor);
-      String url = database.getContextPath()
-          + "/view/project.jsp?projectPK=" + project.getProjectPK();
-      String authorName;
-
-      if (codeAuthor == null || reviewer.isInstructor())
-        authorName = authorAsStudent.getFullname();
-      else
-        authorName = codeAuthor.getName();
-
-      reviewerDto.setHeaderInfo(
-          String.format("Project %s submission, written by %s",
-              project.getProjectNumber(), authorName), url,
-          "Review by " + student.getFullname());
 
     } catch (RuntimeException e) {
       e.printStackTrace();
@@ -290,6 +252,10 @@ public class MarmosetDaoService implements ReviewDao {
 
   }
 
+  public String getAuthorName() {
+      return authorName;
+  }
+   
   /**
    * Return a BitSet with one bit for every line in a file, where a set bit indicates a thread is
    * present on that line.
@@ -321,8 +287,6 @@ public class MarmosetDaoService implements ReviewDao {
     }
   }
 
-
-  @SuppressWarnings("rawtypes")
 
   public TreeSet<RubricDto> getUnusedRubrics() {
     TreeSet<RubricDto> unassignedRubrics = new TreeSet<RubricDto>();

@@ -228,11 +228,13 @@
 	<tr>
 		<th>#</th>
 		<th><a href="${sortByName}">Name</a></th>
-		<c:if test="${project.tested}">
+		<c:if test="${not empty partnerMap}">
 		<th>Partner</th>
 		</c:if>
 		<th><a href="${sortByAcct}">Acct</a></th>
-
+        <c:if test="${not empty sections}">
+        <th>Section</th>
+        </c:if>
 		<th>#<br>
 		subs</th>
 		<!-- 
@@ -242,7 +244,7 @@
 		</c:if>
 		 -->
 
-		<c:if test="${project.tested}">
+		<c:if test="${project.tested && inconsistentResults > 0}">
 		<th># inconsistent<br>
 		background<br>
 		retests</th>
@@ -279,9 +281,11 @@
 
 			<td class="description"><c:if
 				test="${studentRegistration.instructorLevel > 0}">* </c:if>
-				<a href="${studentLink}">
+				<a href="${studentLink}" title="info on student">
 				<c:out value="${studentRegistration.fullname}"/></a></td>
-			<c:if test="${project.tested}">
+                
+                
+			<c:if test="${not empty partnerMap}">
 			<c:set var="partner" value="${partnerMap[studentRegistration]}"/>
 			<td>
 			<c:if test="${not empty partner }">
@@ -294,9 +298,11 @@
 				value="/view/instructor/studentProject.jsp">
 				<c:param name="projectPK" value="${project.projectPK}" />
 				<c:param name="studentPK" value="${studentRegistration.studentPK}" />
-			</c:url> <a href="${studentProjectLink}">
-			${studentRegistration.classAccount} </a></td>
-
+			</c:url> <a href="${studentProjectLink}" title="info on student's project submissions">
+			<c:out value="${studentRegistration.classAccount}"/> </a></td>
+            <c:if test="${not empty sections}">
+            <td><c:out value="${studentRegistration.section}"/> </td></c:if>
+      
 			<td class="number">
 			${studentSubmitStatusMap[studentRegistration.studentRegistrationPK].numberSubmissions}
 			</td>
@@ -308,7 +314,7 @@
 			</c:if>
 			 -->
 
-			<c:if test="${project.tested}">
+			<c:if test="${project.tested && inconsistentResults > 0}">
 			<td class="number">
 			<c:if test="${thisLastSubmission.numFailedBackgroundRetests > 0}">
 			${thisLastSubmission.numFailedBackgroundRetests}

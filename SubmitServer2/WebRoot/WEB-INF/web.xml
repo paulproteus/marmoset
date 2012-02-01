@@ -13,6 +13,8 @@
 	&custom;
 	<xi:include href="custom.xml" xpointer="xpointer(/web-app/*)"/>
 -->
+<!--
+Deprecated - set these in local.web.properties or web.properties instead.
 <context-param>
         <param-name>perform.background.retesting</param-name>
         <param-value>true</param-value>
@@ -34,6 +36,11 @@
 		<param-name>findbugsDescriptionsURL</param-name>
 		<param-value>http://findbugs.sourceforge.net/allBugDescriptions.html</param-value>
 	</context-param>
+-->
+
+<listener>
+   <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
+</listener>
 
 	<security-constraint>
 		<web-resource-collection>
@@ -99,6 +106,10 @@
 		<filter-class> edu.umd.cs.submitServer.filters.MultipartRequestFilter </filter-class>
 	</filter>
 
+<filter-mapping>
+        <filter-name>MultipartRequestFilter</filter-name>
+        <url-pattern>/view/instructor/studentsRegistered.jsp</url-pattern>
+    </filter-mapping>
 	<filter-mapping>
 		<filter-name>MultipartRequestFilter</filter-name>
 		<url-pattern>/action/SubmitProjectViaWeb</url-pattern>
@@ -656,7 +667,14 @@
 		<filter-name>AdminFilter</filter-name>
 		<url-pattern>/view/admin/*</url-pattern>
 	</filter-mapping>
-
+    <filter>
+        <filter-name>QueryErrorFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.QueryErrorFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>QueryErrorFilter</filter-name>
+        <url-pattern>/view/admin/error.jsp</url-pattern>
+    </filter-mapping>
 
 	<filter>
 		<filter-name>SourceCodeFilter</filter-name>
@@ -797,7 +815,14 @@
       <url-pattern>/view/index.jsp</url-pattern>
     </filter-mapping>
 
-
+    <filter>
+      <filter-name>RegisterStudentsFilter</filter-name>
+      <filter-class>edu.umd.cs.submitServer.filters.RegisterStudentsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>RegisterStudentsFilter</filter-name>
+      <url-pattern>/view/instructor/studentsRegistered.jsp</url-pattern>
+    </filter-mapping>
 	<filter>
 		<filter-name>WarningWithCoverageFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.WarningWithCoverageFilter</filter-class>
@@ -971,10 +996,6 @@
 	<servlet>
 		<servlet-name>Logout</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.Logout</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>RegisterStudents</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterStudents</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>DownloadTestSetup</servlet-name>
@@ -1282,10 +1303,6 @@
 	<servlet-mapping>
 		<servlet-name>DownloadSubmission</servlet-name>
 		<url-pattern>/data/DownloadSubmission</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>RegisterStudents</servlet-name>
-		<url-pattern>/action/instructor/RegisterStudents</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DownloadTestSetup</servlet-name>
@@ -1668,13 +1685,6 @@
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/error.jsp</location>
 	</error-page>
-
-<listener>
-    <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
-  </listener>
-<listener>
-    <listener-class>edu.umd.cs.submitServer.InitializeWebProperties</listener-class>
-  </listener>
 
 <!--
   <listener>

@@ -32,8 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.submitServer.IncorrectCourseProjectManagerPluginVersionException;
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class SubmitProjectViaBlueJ extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	/**
 	 * The doPost method of the servlet. <br>
@@ -63,8 +65,7 @@ public class SubmitProjectViaBlueJ extends SubmitServerServlet {
 				.getOptionalStringParameter("submitClientTool");
 		String submitClientVersion = multipartRequest
 				.getOptionalStringParameter("submitClientVersion");
-		String minimumCPMVersion = getServletContext().getInitParameter(
-				"minimum.bluej.to.marmoset.version");
+		String minimumCPMVersion = webProperties.getProperty("minimum.bluej.to.marmoset.version");
 		if (submitClientTool == null || submitClientVersion == null
 				|| submitClientTool.equals("BlueJ")
 				&& (submitClientVersion.compareTo(minimumCPMVersion) < 0)) {

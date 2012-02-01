@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.ServerError;
+import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
 
 /**
  * Catches the ServletExceptions and prints them to the response as text.
@@ -122,18 +123,26 @@ public class ServletExceptionFilter extends SubmitServerFilter {
         Connection conn = null;
         try {
             conn = getConnection();
-            logErrorAndSendServerError(conn, request, response, message,null, e);
+            logErrorAndSendServerError(conn, ServerError.Kind.EXCEPTION, request, response,message, null, e);
         } catch (Exception t) {
             getSubmitServerFilterLog().warn(t);
         } finally {
             releaseConnection(conn);
         }
     }
+    
+    public static void logError(Connection conn, 
+            Kind kind, 
+            HttpServletRequest request,
+          String message, @CheckForNull String type, @CheckForNull Throwable e) {
+        logErrorAndSendServerError(conn, kind, request, null, message, type, e);
+    }
 
     public static void logErrorAndSendServerError(Connection conn, 
-            HttpServletRequest request, 
-            @CheckForNull HttpServletResponse response,
-            String message, String logOnlyMessage, @CheckForNull Throwable e) {
+            Kind kind, 
+            HttpServletRequest request,
+            @CheckForNull HttpServletResponse response, String message,
+            @CheckForNull String logOnlyMessage, @CheckForNull Throwable e) {
 
         try {
         String referer = request.getHeader("referer");
@@ -154,17 +163,9 @@ public class ServletExceptionFilter extends SubmitServerFilter {
 
         String requestURI = request.getRequestURI();
 
-        /** public static int insert(Connection conn, @Student.PK Integer userPK, 
-                @Student.PK Integer studentPK,  Integer coursePK,
-                @Project.PK Integer projectPK, @Submission.PK Integer submissionPK, 
-                String code,
-                String message, String type, String servlet, String uri, String queryString, 
-                String remoteHost, String referer, Throwable t)
-             
-*/
-        ServerError.insert(conn, null, null, null,  /* project */ null, /* submission */ null, 
-                /* code */ null, message, type, null, requestURI, request.getQueryString(),
-                remoteHost, referer, e);
+        ServerError.insert(conn,kind, null, null,  null, /* project */ null, 
+                /* submission */ null, /* code */ null, message, type, null, requestURI,
+                request.getQueryString(), remoteHost, referer, e);
 
         if (response != null) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

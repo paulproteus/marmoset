@@ -46,6 +46,8 @@
 <p><ss:studentEmail/>
 
 <c:set var="testCols" value="3" />
+    <c:set var="inconsistentResults"
+        value="${fn:length(failedBackgroundRetestSubmissionList)}" />
 
 
 <p>
@@ -88,7 +90,9 @@ an extension on project
 					 </c:if>
 					 </th>
 		<th rowspan="2">release tested</th>
+        <c:if test="${inconsistentResults > 0}">
 		<th rowspan="2"># inconsistent<br>background<br>retests</th>
+        </c:if>
 		<c:if test="${testProperties.language=='java'}">
 		<c:set var="testCols" value="5" />
 		<th rowspan="2"># FindBugs<br>warnings</th>
@@ -142,11 +146,16 @@ an extension on project
                      </td>
 						<td><fmt:formatDate value="${submission.releaseRequest}"
 							pattern="dd MMM h:mm a" /></td>
-						<td><c:url var="submissionAllTestsLink"
+                            inconsistentResults
+                        <c:if test="${inconsistentResults > 0}">
+						<td>
+                        <c:if test="${submission.numFailedBackgroundRetests}">
+                        <c:url var="submissionAllTestsLink"
 							value="/view/instructor/submissionAllTests.jsp">
 							<c:param name="submissionPK" value="${submission.submissionPK}" />
 						</c:url> <a href="${submissionAllTestsLink}">
-						${submission.numFailedBackgroundRetests} </a></td>
+						${submission.numFailedBackgroundRetests} </a></c:if></td>
+                        </c:if>
 
 						<c:if test="${testProperties.language=='java'}">
 							<td><c:if test="${testOutcomesMap[submission.submissionPK].numFindBugsWarnings > 0}">
@@ -203,7 +212,7 @@ an extension on project
 
 </table>
 
-<c:if test="${not empty launchSummary}">
+<c:if test="${not empty launchSummary && userSession.superUser}">
 <h2>Eclipse launches</h2>
 <table>
 <tr>

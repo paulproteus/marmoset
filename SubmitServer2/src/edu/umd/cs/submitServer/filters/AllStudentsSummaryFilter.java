@@ -80,12 +80,12 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 			Set<StudentRegistration> registrationSet = (Set<StudentRegistration>) request
 					.getAttribute(STUDENT_REGISTRATION_SET);
 
-			// XXX Temporary Hack: provide access to the most recent ontime and
-			// late submission
+
 			boolean useDefault = false;
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerFilterLog(), strictParameterChecking());
 			useDefault = parser.getBooleanParameter("useDefault", false);
+			String section = parser.getParameter("section");
 			ChosenSubmissionPolicy bestSubmissionPolicy = null;
 
 			if (!project.isTested())
@@ -125,7 +125,6 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 			        submissionsWithOutdatedTestResults);
 			request.setAttribute("lastSubmission", lastSubmission);
 			request.setAttribute("submissionsThatNeedReview", submissionsThatNeedReview);
-            
 			request.setAttribute("lastOnTime", lastOnTime);
 			request.setAttribute(LAST_LATE, lastLate);
 			request.setAttribute("lastVeryLate", lastVeryLate);
@@ -149,14 +148,19 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 				sortedByScore.addAll(registrationSet);
 				request.setAttribute("studentRegistrationSet", sortedByScore);
 			}
+
 			TreeSet<StudentRegistration> justStudentSubmissions = new TreeSet<StudentRegistration>();
 			TreeSet<StudentRegistration> staffStudentSubmissions = new TreeSet<StudentRegistration>();
             for(StudentRegistration sr : registrationSet)
-			    if (sr.isNormalStudent())
-			        justStudentSubmissions.add(sr);
+			    if (sr.isNormalStudent()) {
+			        if (section == null || section.equals(sr.getSection())
+			                || section.equals("none") && sr.getSection() == null)
+			                justStudentSubmissions.add(sr);
+			    }
             else
                 staffStudentSubmissions.add(sr);
 			        
+          
 			 request.setAttribute("justStudentSubmissions", justStudentSubmissions);   
 			 request.setAttribute("staffStudentSubmissions", staffStudentSubmissions);   
 			 Map<Integer, StudentSubmitStatus> submitStatusMap = StudentSubmitStatus.lookupAllByProjectPK(project.getProjectPK(), conn);

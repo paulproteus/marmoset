@@ -26,27 +26,28 @@
 </c:otherwise>
 </c:choose>
 
-
 <c:if test="${!singleCourse}">
  <a href="<c:url value='/view/index.jsp'/>" title="view all courses you are registered for" >All Courses</a> |
 </c:if>
 
-		<c:url var="courseStudentLink" value="/view/course.jsp">
-                    <c:param name="coursePK" value="${course.coursePK}"/>
-			</c:url>
-			<a href="${courseStudentLink}" title="Your view as a student of this course" >Student view</a>
-
-<c:url var="courseLink" value="/view/instructor/course.jsp" >
-                    <c:param name="coursePK" value="${course.coursePK}"/>
-			</c:url>
-			| <a href="${courseLink}"
-	title="Instructor overview of ${course.courseName}" >${course.courseName}</a>
+        <c:if test="${not empty course}">
+            <c:url var="courseStudentLink" value="/view/course.jsp">
+                <c:param name="coursePK" value="${course.coursePK}" />
+            </c:url>
+            <a href="${courseStudentLink}" title="Your view as a student of this course">Student view</a> |
 
 
-<c:url var="codeReviewsLink" value="/view/codeReviews.jsp">
+            <c:url var="courseLink" value="/view/instructor/course.jsp">
+                <c:param name="coursePK" value="${course.coursePK}" />
+            </c:url>
+			<a href="${courseLink}" title="Instructor overview of ${course.courseName}">${course.courseName}</a> |
+        </c:if>
+
+        <c:url var="codeReviewsLink" value="/view/codeReviews.jsp">
 	<c:param name="coursePK" value="${course.coursePK}" />
 </c:url>
-| <a href="${codeReviewsLink}" title="All code reviews" >code reviews</a>
+
+ <a href="${codeReviewsLink}" title="All code reviews" >code reviews</a>
 
 <c:if test="${project != null}">
 	<c:url var="projectLink" value="/view/instructor/project.jsp">
@@ -54,7 +55,6 @@
 	</c:url>
 	| <a href="${projectLink}"
 		title="Instructor overview of project ${project.projectNumber}" >${project.projectNumber}</a>
-
 
 	<c:if test="${instructorViewOfStudent || submission != null}">
 		<c:url var="studentLink" value="/view/instructor/studentProject.jsp">

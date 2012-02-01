@@ -113,7 +113,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			for(Rubric r : Rubric.lookupByAssignment(assignment.getCodeReviewAssignmentPK(), conn)) 
 			    rubrics.put(r.getRubricPK(), r);
 			        
-	    unevaluatedRubrics.putAll(rubrics);
+		if (!isReviewerIsTheAuthor())
+	      unevaluatedRubrics.putAll(rubrics);
 	
         for (RubricEvaluation e : RubricEvaluation.lookupBySubmissionPK(submission.getSubmissionPK(), conn))
             if (isVisible(e)) {
@@ -147,6 +148,9 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		}  
 	}
 
+	public boolean isReviewerIsTheAuthor() {
+	    return author != null && author.equals(viewerAsReviewer);
+	}
 	private boolean isDebug() {
 		return false;
 	}

@@ -38,6 +38,9 @@
 	<h1>${ss:scrub(param.title)}</h1>	
 </div>
 
+<c:if test="${param.subtitle}">
+<p> ${ss:scrub(param.subtitle)}  
+</p></c:if>
 <p>Click OK to accept or the back button on your
 browser to cancel.</p>
 

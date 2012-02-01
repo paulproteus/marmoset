@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.WillClose;
 
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
@@ -596,7 +597,7 @@ public final class Queries {
 		}
 	}
 
-	public static PreparedStatement setStatement(Connection conn, String query, Object... args) throws SQLException {
+	public static @CheckReturnValue PreparedStatement setStatement(Connection conn, String query, Object... args) throws SQLException {
 	    PreparedStatement stmt = conn.prepareStatement(query);
 	    setStatement(stmt, args);
 	    return stmt;
@@ -609,6 +610,8 @@ public final class Queries {
 			int col = i + 1;
 			if (o instanceof String)
 				p.setString(col, (String) o);
+			else if (o instanceof Enum) 
+			    p.setString(col, ((Enum) o).name());
 			else if (o instanceof Integer)
 				p.setInt(col, (Integer) o);
 			else if (o instanceof Long)

@@ -180,9 +180,7 @@ public class TestProperties implements TestPropertyKeys {
     }
 
     public boolean isMakefileBased() {
-        return getLanguage().equalsIgnoreCase(C) ||
-            getLanguage().equalsIgnoreCase(RUBY) ||
-            getLanguage().equalsIgnoreCase(OCAML);
+        return !isJava();
     }
 
 	/**
@@ -214,6 +212,11 @@ public class TestProperties implements TestPropertyKeys {
 
 	}
 
+	public String getTestExec(String testType, String testName) {
+	        return  getOptionalStringProperty(TestPropertyKeys.TESTEXEC_PREFIX + testType
+	                +"." + testName);
+
+	    }
 	/**
 	 * Get an integer property from the loaded test properties.
 	 *

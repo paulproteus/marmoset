@@ -48,7 +48,6 @@ public class CodeReviewFilter extends SubmitServerFilter {
 
             conn = getConnection();
 
-
             if (reviewer == null) {
                 StudentRegistration commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
                         course.getCoursePK(), conn);
@@ -67,15 +66,18 @@ public class CodeReviewFilter extends SubmitServerFilter {
                 request.setAttribute(REVIEWER, reviewer);
                 codeReviewAssignment = reviewer.getCodeReviewAssignment();
                 request.setAttribute(CODE_REVIEW_ASSIGNMENT, codeReviewAssignment);
+                @CodeReviewer.PK Integer next = reviewer.getNext(conn);
+                if (next != null)
+                    request.setAttribute(NEXT_CODE_REVIEW, next);
             }
 
             ReviewDao dao = new MarmosetDaoService(submitServerDatabaseProperties, reviewer);
             ReviewerDto reviewerDto = dao.getReviewer();
             session.setAttribute(reviewerDto.getKey(), dao);
             request.setAttribute("reviewDaoKey", reviewerDto.getKey());
-            request.setAttribute("reviewTitle", reviewerDto.getHeaderTitle());
-            request.setAttribute("reviewBacklinkText", reviewerDto.getHeaderBackLinkText());
-            request.setAttribute("reviewBacklinkUrl", reviewerDto.getHeaderBackUrl());
+            request.setAttribute("reviewerDto", reviewerDto);
+            request.setAttribute("reviewDao", dao);
+  
 
         } catch (SQLException e) {
             throw new ServletException(e);

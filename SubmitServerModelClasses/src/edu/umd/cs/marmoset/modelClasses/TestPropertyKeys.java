@@ -62,6 +62,9 @@ public interface TestPropertyKeys {
 	 */
 	public static final String TESTCLASS_PREFIX = "test.class.";
 
+
+    public static final String TESTEXEC_PREFIX = "test.exec.";
+
 	/**
 	 * Property names to specify individual test timeout.
 	 */

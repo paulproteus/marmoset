@@ -61,7 +61,10 @@ public interface SubmitServerConstants {
 	public static final String STUDENT_REGISTRATION_SET = "studentRegistrationSet";
 	public static final String STAFF_STUDENT_REGISTRATION_SET = "staffStudentRegistrationSet";
 	public static final String JUST_STUDENT_REGISTRATION_SET = "justStudentRegistrationSet";
-	
+	public static final String SECTION_MAP = "sectionMap";
+	public static final String SECTIONS = "sections";
+	   
+    
 	public static final String TEST_PROPERTIES = "testProperties";
 	public static final String PROJECT = "project";
 	public static final String PROJECT_LIST = "projectList";
@@ -115,6 +118,8 @@ public interface SubmitServerConstants {
 	public static final String UPCOMING_PROJECTS = "upcomingProjects";
 	public static final String PROJECT_BUILD_STATUS_COUNT = "buildStatusCount";
     public static final String CODE_REVIEW_ASSIGNMENT = "codeReviewAssignment";
+    public static final String NEXT_CODE_REVIEW = "nextCodeReview";
+    
 
   /** Key for accessing OpenID discovery information in a user session. */
   public static final String OPENID_DISCOVERED = "openid.discovered";

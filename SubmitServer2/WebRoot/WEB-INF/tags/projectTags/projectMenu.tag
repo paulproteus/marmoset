@@ -36,13 +36,4 @@
 &nbsp;|&nbsp;
 <a href="${failedBackgroundRetestsLink}">Inconsistencies</a>
 
-<c:if test="${user.superUser and initParam['research.server'] =='true'}">
-<c:url var="researchView" value="/research/projectTestResults.jsp">
-	<c:param name="projectPK" value="${project.projectPK}" />
-	<c:param name="sortKey" value="${sortKey}" />
-</c:url>
-&nbsp;|&nbsp;
-<a href="${researchView}">Research view</a>
-</c:if>
-
 </div>

@@ -12,6 +12,9 @@ public class Untrusted {
     public static Process execute(String cmd[], String [] env, File cwd) throws IOException {
        return Runtime.getRuntime().exec(cmd, env, cwd);
     }
+    public static Process execute(String exec, String [] env, File cwd) throws IOException {
+        return Runtime.getRuntime().exec(exec, env, cwd);
+     }
 
     
 

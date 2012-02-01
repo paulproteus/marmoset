@@ -49,6 +49,7 @@ import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.SubmitServerUtilities;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
 
 /**
@@ -64,6 +65,7 @@ import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
  */
 public abstract class SubmitServerServlet extends HttpServlet implements
 		SubmitServerConstants {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 	// XXX Turn off BuildServerMonitor
 	// private BuildServerMonitor buildServerMonitor;
 	/**
@@ -106,7 +108,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		if (submitServerServletLog == null) {
 			submitServerServletLog = Logger
 					.getLogger(SubmitServerServlet.class);
-			if ("true".equals(getServletContext().getInitParameter("DEBUG"))) {
+			if ("true".equals(webProperties.getProperty("DEBUG"))) {
 				submitServerServletLog.setLevel(Level.DEBUG);
 			}
 		}
@@ -149,10 +151,9 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		getSubmitServerServletLog().debug(
 				"Initializing logger for " + getClass());
 
-		strictParameterChecking = "true".equalsIgnoreCase(getServletContext()
-				.getInitParameter("strict.parameter.checking"));
+		strictParameterChecking = "true".equalsIgnoreCase(webProperties.getProperty("strict.parameter.checking"));
 		
-		String defaultSemester = servletContext.getInitParameter("semester");
+		String defaultSemester = webProperties.getProperty("semester");
 		if (defaultSemester != null)
 		    Course.setDefaultSemester(defaultSemester);
 	}
@@ -256,14 +257,12 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		if (authenticationService != null)
 			return authenticationService;
 		
-		String authenticationType = getServletContext()
-                .getInitParameter(AUTHENTICATION_TYPE);
+		String authenticationType = webProperties.getRequiredProperty(AUTHENTICATION_TYPE);
 		if (!authenticationType.equals("ldap"))
 		    throw new IllegalStateException("Authentication service only available for ldap authentication");
 		
 
-		String authenticationServiceClassname = getServletContext()
-				.getInitParameter(AUTHENTICATION_LDAP_SERVICE);
+		String authenticationServiceClassname = webProperties.getProperty(AUTHENTICATION_LDAP_SERVICE);
 		if (authenticationServiceClassname == null)
 		    authenticationServiceClassname = GenericLDAPAuthenticationService.class.getName();
 		getSubmitServerServletLog()

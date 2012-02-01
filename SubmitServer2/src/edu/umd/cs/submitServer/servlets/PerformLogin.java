@@ -50,9 +50,11 @@ import edu.umd.cs.submitServer.ClientRequestException;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 
 public class PerformLogin extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -71,8 +73,7 @@ public class PerformLogin extends SubmitServerServlet {
 			}
 			session.invalidate();
 		}
-		boolean skipAuthentication = "true".equals(this.getServletContext()
-				.getInitParameter(SKIP_AUTHENTICATION));
+		boolean skipAuthentication = "true".equals(webProperties.getProperty(SKIP_AUTHENTICATION));
 
 		session = request.getSession(true);
 		String campusUID = parser.getOptionalCheckedParameter("loginName");

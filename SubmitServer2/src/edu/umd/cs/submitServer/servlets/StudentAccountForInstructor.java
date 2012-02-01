@@ -185,29 +185,4 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
 		}
 	}
 
-
-	public static void foo(String term, String courseId, Connection conn) throws SQLException {
-		String query = "SELECT DISTINCT lastName, firstName, uid, directoryID, role"
-			+ " FROM submitexport "
-			+ " WHERE term = ?"
-			+ " AND courseId = ?";
-		PreparedStatement stmt = conn.prepareStatement(query);
-		stmt.setString(1, term);
-		stmt.setString(2, courseId);
-		ResultSet rs = stmt.executeQuery();
-		while(rs.next()) {
-			String lastname = rs.getString(1);
-			String firstname = rs.getString(2);
-			String campusUID = rs.getString(3);
-			String loginName = rs.getString(4);
-			String role = rs.getString(5);
-
-			Student s = Student.insertOrUpdateByUID(campusUID, firstname, lastname, loginName, null, conn);
-
-		}
-
-
-
-	}
-
 }

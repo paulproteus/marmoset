@@ -33,10 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 @Deprecated
 public class ImportStudents extends GradeServerInterfaceServlet {
-
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	/**
 	 * The doPost method of the servlet. <br>
@@ -62,7 +63,7 @@ public class ImportStudents extends GradeServerInterfaceServlet {
 		boolean transactionSuccess = false;
 		String term = request.getParameter("term");
 		if (term == null)
-			term = getServletContext().getInitParameter("semester");
+			term = webProperties.getProperty("semester");
 		Course course = (Course) request.getAttribute(COURSE);
 		String [] courseIDs = request.getParameterValues("courseID");
 		response.setContentType("text/plain");

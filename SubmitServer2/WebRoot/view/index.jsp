@@ -42,7 +42,6 @@
 <html>
 <head>
 <ss:headContent title="Submit Server Home Page" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
     <ss:header />
@@ -61,16 +60,12 @@
                 <p>Not registered for any courses</p>
                  <c:if test="${user.canImportCourses}">
                  <ul>
-            <c:choose>
-                <c:when test="${gradesServer}">
+                <c:if test="${gradesServer}">
                     <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
                     <li><a href="${importCourseLink}">Import course from grade server</a></li>
-                </c:when>
-                <c:otherwise>
+                </c:if>
                     <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
-                    <li><a href="${createCourseLink}">Create course</a></li>
-                </c:otherwise>
-            </c:choose>
+                    <li><a href="${createCourseLink}">Create course via web form</a></li>
             </ul>
             </c:if>
             </c:when>

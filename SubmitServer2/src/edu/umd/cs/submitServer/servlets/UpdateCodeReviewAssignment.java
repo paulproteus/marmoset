@@ -125,6 +125,7 @@ public class UpdateCodeReviewAssignment extends SubmitServerServlet {
 			boolean anonymous = parser.getCheckbox("anonymous");
 			boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
 			 
+			assignment.setDescription(description);
 			assignment.setDeadline(deadline);
 			assignment.setAnonymous(anonymous);
 			assignment.setOtherReviewsVisible(canSeeOthers);

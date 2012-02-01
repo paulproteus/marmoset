@@ -40,6 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.FilterChain;
@@ -69,6 +71,7 @@ import edu.umd.cs.submitServer.ReleaseInformation;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * Requires a projectPK and optionally a studentRegistrationPK.
@@ -77,6 +80,7 @@ import edu.umd.cs.submitServer.UserSession;
  * studentSubmitStatus and submissionList attributes in the request.
  */
 public class ExtractParametersFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
@@ -104,7 +108,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		String courseKey = parser.getParameter("courseKey");
 		String projectNumber = parser.getParameter("projectNumber");
         
-		String gradesServer = req.getServletContext().getInitParameter("grades.server");
+		String gradesServer = webProperties.getProperty("grades.server");
         request.setAttribute("gradesServer", gradesServer);  
 		MultipartRequest multipartRequest = (MultipartRequest) request
 				.getAttribute(MULTIPART_REQUEST);
@@ -168,6 +172,18 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                 submission = Submission
                         .lookupBySubmissionPK(submissionPK, conn);
             }
+            if (codeReviewerPK != null) {
+                reviewer = CodeReviewer.lookupByPK(codeReviewerPK, conn);
+                if (userSession.getStudentPK()
+                        != reviewer.getStudentPK()) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Authentication Error: you can only specify your own reviews");
+                    return;
+                }
+                submissionPK = reviewer.getSubmissionPK();
+                codeReviewAssignmentPK = reviewer.getCodeReviewAssignmentPK();
+            }
+
             if (submissionPK != null) {
                 // Get Submission
                 submission = Submission
@@ -228,17 +244,6 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (studentPK == null)
 				studentPK = userSession.getStudentPK();
 
-			if (codeReviewerPK != null) {
-				reviewer = CodeReviewer.lookupByPK(codeReviewerPK, conn);
-				if (userSession.getStudentPK()
-						!= reviewer.getStudentPK()) {
-					response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Authentication Error: you can only specify your own reviews");
-					return;
-				}
-				submissionPK = reviewer.getSubmissionPK();
-				codeReviewAssignmentPK = reviewer.getCodeReviewAssignmentPK();
-			}
 
 			if (codeReviewAssignmentPK != null && codeReviewAssignmentPK.intValue() != 0) {
 				codeReviewAssignment = CodeReviewAssignment.lookupByPK(codeReviewAssignmentPK, conn);
@@ -387,7 +392,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 							registration);
 					if (registration.isInstructor())
 						staffStudentRegistrationSet.add(registration);
-					else
+					else if (!registration.isNormalStudent())
 						justStudentRegistrationSet.add(registration);
 				}
 				
@@ -403,6 +408,33 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						justStudentRegistrationSet);
 				request.setAttribute(STAFF_STUDENT_REGISTRATION_SET,
 						staffStudentRegistrationSet);
+				TreeMap<String, SortedSet<StudentRegistration>> sectionMap =
+				        new TreeMap<String, SortedSet<StudentRegistration>>();
+				
+				TreeSet<StudentRegistration> noSection = new TreeSet<StudentRegistration>();
+				for(StudentRegistration sr : justStudentRegistrationSet) {
+				    String section = sr.getSection();
+				    if (section == null || section.isEmpty()) {
+				        noSection.add(sr);
+				        continue;
+				    }
+				    SortedSet<StudentRegistration> inSection = sectionMap.get(section);
+				    if (inSection == null) {
+				        inSection = new TreeSet<StudentRegistration>();
+				        sectionMap.put(section, inSection);
+				    }
+				    inSection.add(sr);
+				}
+				if (!sectionMap.isEmpty() && !noSection.isEmpty()) {
+				    if (sectionMap.containsKey("none"))
+				        sectionMap.get("none").addAll(noSection);
+				    else
+				        sectionMap.put("none", noSection);
+				}
+				request.setAttribute(SECTION_MAP,
+				        sectionMap);
+				request.setAttribute(SECTIONS, sectionMap.keySet());
+                
 
 			}
 

@@ -29,18 +29,29 @@
 
 <!DOCTYPE HTML>
 <html>
-<ss:head title="${student.firstname} ${student.lastname} -- ${studentRegistration.classAccount}/${course.courseName} " />
+<c:choose>
+<c:when test="${empty studentRegistration}">
+<ss:head title="${student.fullname} " />
+</c:when>
+<c:otherwise>
+<ss:head title="${studentRegistration.fullname} -- ${course.courseName} " />
+</c:otherwise>
+</c:choose>
 
 <body>
 <ss:header />
 
 <ss:instructorBreadCrumb />
 
-
 <ss:studentPicture />
+<c:choose>
+<c:when test="${empty studentRegistration}">
+<h1><c:out value="${student.fullname}"/></h1>
+<p><ss:studentEmail/>
+</c:when>
+<c:otherwise>
 <h1><c:out value="${studentRegistration.fullname}"/></h1>
 <p><ss:studentEmail/>
-
 <c:choose>
 <c:when test="${studentRegistration.dropped}">
 <p>Student has dropped course (as reported to grade server)
@@ -52,67 +63,69 @@
 
 <p>
 <table>
-	<tr>
-		<th rowspan="2">project</th>
-		<th colspan=2>submissions</th>
-		<th rowspan="2">extension</th>
-		<th class="description" rowspan="2">Title</th>
-	</tr>
-	<tr>
-	<th>view</th>
-	<th>#</th>
-	</tr>
+    <tr>
+        <th rowspan="2">project</th>
+        <th colspan=2>submissions</th>
+        <th rowspan="2">extension</th>
+        <th class="description" rowspan="2">Title</th>
+    </tr>
+    <tr>
+    <th>view</th>
+    <th>#</th>
+    </tr>
 
-	<c:set var="numDisplayed" value="0" />
-	<c:forEach var="project" items="${projectList}" varStatus="counter">
-		<c:if test="${project.visibleToStudents}">
-			<tr class="r${numDisplayed % 2}">
+    <c:set var="numDisplayed" value="0" />
+    <c:forEach var="project" items="${projectList}" varStatus="counter">
+    <c:set var="submitStatus" value="${projectToStudentSubmitStatusMap[project.projectPK]}"/>
+                
+        <c:if test="${project.visibleToStudents || not empty submitStatus}}">
+            <tr class="r${numDisplayed % 2}">
 
-				<c:set var="submitStatus" value="${projectToStudentSubmitStatusMap[project.projectPK]}"/>
-				<td><c:choose>
+                <td><c:choose>
+                    <c:when test="${project.url != null}">
+                        <a href="<c:url value="${project.url}"/>">
+                        ${project.projectNumber} </a>
+                    </c:when>
+                    <c:otherwise>
+                    ${project.projectNumber}
+                    </c:otherwise>
+                </c:choose></td>
 
-					<c:when test="${project.url != null}">
-						<a href="<c:url value="${project.url}"/>">
-						${project.projectNumber} </a>
-					</c:when>
+                <c:choose>
+                <c:when test="${not empty submitStatus}">
+                <td><c:url var="projectLink" value="/view/instructor/studentProject.jsp">
+                    <c:param name="studentPK" value="${studentRegistration.studentPK}" />
+                    <c:param name="projectPK" value="${project.projectPK}" />
+                </c:url> <a href="${projectLink}"> view </a></td>
 
-					<c:otherwise>
-					${project.projectNumber}
-					</c:otherwise>
+                <td><c:out  value="${submitStatus.numberSubmissions }"/>
+                <td>
+                <c:url var="grantExtensionLink" value="/view/instructor/grantExtension.jsp">
+                    <c:param name="studentRegistrationPK" value="${studentRegistration.studentRegistrationPK}"/>
+                    <c:param name="projectPK" value="${project.projectPK}"/>
+                </c:url>
+                    <a href="${grantExtensionLink}">
+                    ${projectToStudentSubmitStatusMap[project.projectPK].extension}
+                    </a>
+                </td>
+                </c:when>
+                <c:otherwise>
+                <td colspan="3">No submissions</td>
+                </c:otherwise>
+                </c:choose>
 
-				</c:choose></td>
+                <td class="description">${project.title}</td>
 
-
-				<c:choose>
-				<c:when test="${not empty submitStatus}">
-				<td><c:url var="projectLink" value="/view/instructor/studentProject.jsp">
-					<c:param name="studentPK" value="${studentRegistration.studentPK}" />
-					<c:param name="projectPK" value="${project.projectPK}" />
-				</c:url> <a href="${projectLink}"> view </a></td>
-
-				<td><c:out  value="${submitStatus.numberSubmissions }"/>
-				<td>
-				<c:url var="grantExtensionLink" value="/view/instructor/grantExtension.jsp">
-					<c:param name="studentRegistrationPK" value="${studentRegistration.studentRegistrationPK}"/>
-					<c:param name="projectPK" value="${project.projectPK}"/>
-				</c:url>
-					<a href="${grantExtensionLink}">
-					${projectToStudentSubmitStatusMap[project.projectPK].extension}
-					</a>
-				</td>
-				</c:when>
-				<c:otherwise>
-				<td colspan="3">No submissions</td>
-				</c:otherwise>
-				</c:choose>
-
-				<td class="description">${project.title}</td>
-
-			</tr>
-			<c:set var="numDisplayed" value="${numDisplayed + 1}" />
-		</c:if>
-	</c:forEach>
+            </tr>
+            <c:set var="numDisplayed" value="${numDisplayed + 1}" />
+        </c:if>
+    </c:forEach>
 </table>
+
+</c:otherwise>
+</c:choose>
+
+
 
 <ss:footer />
 </body>
