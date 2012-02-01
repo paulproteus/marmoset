@@ -69,8 +69,7 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
 				s.setLastname(rs.getString(col++));
 				String firstname = rs.getString(col++);
 				String nickname = rs.getString(col++);
-				if (nickname != null && !nickname.isEmpty())
-					firstname = nickname;
+				firstname = ImportCourse.getEffectiveFirstname(firstname, nickname);
 				s.setFirstname(firstname);
 				s.setCampusUID(rs.getString(col++));
 				s.setLoginName(rs.getString(col++));

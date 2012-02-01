@@ -149,6 +149,10 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 		}
 
 	}
+	
+	public static String getEffectiveFirstname(String firstname, String nickname) {
+	    return firstname;
+	}
 
 	public static void importStudents(PrintWriter out, String term, Course course,
 			int courseID, boolean updatePictures, Connection gradesConn, Connection conn) throws SQLException {
@@ -172,8 +176,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			String lastname = rs.getString(col++);
 			String firstname = rs.getString(col++);
 			String nickname = rs.getString(col++);
-			if (nickname != null && !nickname.isEmpty())
-				firstname = nickname;
+			firstname = getEffectiveFirstname(firstname, nickname);
 			String campusUID = rs.getString(col++);
 			String loginName = rs.getString(col++);
 			String email = rs.getString(col++);

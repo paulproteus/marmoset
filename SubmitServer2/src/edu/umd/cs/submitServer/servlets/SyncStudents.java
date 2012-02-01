@@ -43,21 +43,6 @@ import edu.umd.cs.marmoset.modelClasses.StudentPicture;
 
 public class SyncStudents extends GradeServerInterfaceServlet {
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -117,12 +102,10 @@ public class SyncStudents extends GradeServerInterfaceServlet {
 			String firstname = rs.getString(col++);
 			String nickname = rs.getString(col++);
 
-			if (nickname != null && !nickname.isEmpty())
-			    firstname = nickname;
+			firstname = ImportCourse.getEffectiveFirstname(firstname, nickname);
 			
 			String loginName = rs.getString(col++);
 			String email = rs.getString(col++);
-
 
 				boolean same = lastname.equals(student.getLastname())
 						&& firstname.equals(student.getFirstname())
