@@ -345,14 +345,6 @@ public class Student  implements Comparable<Student> {
   }
 
   public static Student insertOrUpdateByUID(String campusUID,
-  String firstname,
-  String lastname,
-  String loginName,
-  Connection conn) throws SQLException {
-    return insertOrUpdateByUID(campusUID, firstname, lastname, loginName, null, conn);
-  }
-
-  public static Student insertOrUpdateByUID(String campusUID,
         String firstname,
         String lastname,
         String loginName,

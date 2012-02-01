@@ -44,7 +44,10 @@
     <br>
         kind:
         <c:out value="${errorField['kind']}" />
-    <br>User: ${errorField['user_pk']}
+        <c:url var="userLink" value="/view/instructor/student.jsp">
+                    <c:param name="studentPK" value="${errorField['user_pk']}" />
+                    </c:url>
+    <br>User: <a href="${userLink}">${errorField['user_pk']}</a>
      <c:if test="${not empty errorField['student_pk']  && errorField['user_pk'] != errorField['student_pk'] }">
     <br>Student: ${errorField['student_pk']}
     </c:if>

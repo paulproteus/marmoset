@@ -67,9 +67,6 @@ form li.required label {font-weight: bold;}
 	</form>
 <ss:footer />
 <script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-	type="text/javascript"></script>
-<script
 	src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
 	type="text/javascript"></script>
 <script>

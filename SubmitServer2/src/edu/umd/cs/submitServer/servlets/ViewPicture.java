@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentPicture;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 
@@ -46,7 +47,14 @@ public class ViewPicture extends SubmitServerServlet {
             conn = getConnection();
 
             StudentRegistration sr = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-            StudentPicture studentPicture = StudentPicture.lookupByStudentPK(sr.getStudentPK(), conn);
+            Student student = (Student) request.getAttribute(STUDENT);
+            @Student.PK int pk = -1;
+            if (sr != null)
+                pk = sr.getStudentPK();
+            else if (student != null)
+                pk = student.getStudentPK();
+            
+            StudentPicture studentPicture = StudentPicture.lookupByStudentPK(pk, conn);
             if (studentPicture == null) {
                 request.getRequestDispatcher("/images/noImageAvailable.png").forward(request, response);
             } else {

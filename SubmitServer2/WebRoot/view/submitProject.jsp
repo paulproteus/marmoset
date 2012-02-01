@@ -34,9 +34,6 @@
 	title="Submit project ${project.projectNumber} for ${course.courseName} in ${course.semester}" />
 
 <body>
-<script
-  src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-  type="text/javascript"></script>
   <c:url var="jsBase" value="/js" />
   <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
   

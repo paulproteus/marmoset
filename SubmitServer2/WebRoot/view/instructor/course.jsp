@@ -202,6 +202,27 @@ tr.reject {background: #f33}
                 <th>Name</th>
                 <th>class account</th>
             </tr>
+            <c:choose>
+            <c:when test="${not empty sections}">
+             <c:forEach var="section" items="${sections}" >
+           <tr><td colspan="3">Section <c:out value="${section}"/></td></tr>
+            <c:forEach var="studentRegistration" items="${sectionMap[section]}" varStatus="counter">
+                <tr class="r${counter.index % 2}">
+                    <c:url var="studentLink" value="/view/instructor/student.jsp">
+                        <c:param name="studentPK" value="${studentRegistration.studentPK}" />
+                        <c:param name="coursePK" value="${course.coursePK}" />
+                    </c:url>
+                    <td title="registration status is controlled through grades.cs.umd.edu"><input name="active"
+                        type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled /></td>
+                    <td class="description"><a href="${studentLink}">
+                    <c:out value="${studentRegistration.fullname}"/></a></td>
+                    <td><a href="${studentLink}">
+                    <c:out value="${studentRegistration.classAccount}"/></a></td>
+                </tr>
+            </c:forEach>
+            </c:forEach>
+            </c:when>
+            <c:otherwise>
             <c:forEach var="studentRegistration" items="${justStudentRegistrationSet}" varStatus="counter">
                 <tr class="r${counter.index % 2}">
                     <c:url var="studentLink" value="/view/instructor/student.jsp">
@@ -216,6 +237,9 @@ tr.reject {background: #f33}
                     <c:out value="${studentRegistration.classAccount}"/></a></td>
                 </tr>
             </c:forEach>
+            </c:otherwise>
+            </c:choose>
+            
         </table>
     </div>
 
@@ -415,9 +439,6 @@ tr.reject {background: #f33}
     </c:if>
     
     <ss:footer />
-	<script
-		src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
-		type="text/javascript"></script>
 	<script type="text/javascript">
     window.$marmoset = {
     	acceptRadios: $("#pending-table").find('input[type="radio"][value="accept"]'),

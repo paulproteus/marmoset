@@ -279,6 +279,7 @@
         <c:forEach var="student" items="${allStudents}" varStatus="counter">
             <tr class="r${counter.index % 2}">
                 <td class="description"><c:out value="${student.fullname}" /></td>
+                
                 <td><form method="GET" action="${editStudentUrl}">
                         <input type="hidden" name="studentPK" value="${student.studentPK}" />
                         <button type="submit">Edit</button>
