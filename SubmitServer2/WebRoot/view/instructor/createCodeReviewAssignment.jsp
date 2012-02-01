@@ -116,7 +116,7 @@ function updateForm(kind) {
 
           <table class="form">
             <colgroup>
-                <COL class="label" />
+                <COL class="label" width="200" />
                 <COL class="input" />
             </colgroup>
             <thead>
