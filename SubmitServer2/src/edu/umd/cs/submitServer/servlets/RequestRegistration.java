@@ -3,6 +3,7 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,7 @@ public class RequestRegistration extends SubmitServerServlet {
 			conn = getConnection();
 			Student student = Student.getByStudentPK(userSession.getStudentPK(), conn);
 			RegistrationDao dao = new MySqlRegistrationDaoImpl(student, getDatabaseProps());
-			for (String name : req.getParameterMap().keySet()) {
+			for (String name : (Set<String>) req.getParameterMap().keySet()) {
 				Matcher matcher = checkboxNamePattern.matcher(name);
 				if (!matcher.matches()) {
 					continue;
