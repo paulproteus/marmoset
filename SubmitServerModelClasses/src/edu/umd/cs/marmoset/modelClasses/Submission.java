@@ -1491,7 +1491,7 @@ public class Submission implements ITestSummary<Submission> {
                 + "     submissions.project_pk = projects.project_pk "
                 + " AND submissions.current_test_run_pk = test_runs.test_run_pk "
                 + " AND projects.project_pk = ? "
-                + " AND submission.student_registration_pk = ? "
+                + " AND submissions.student_registration_pk = ? "
                 + " AND test_runs.test_setup_pk = projects.test_setup_pk "
                 + " AND num_failed_background_retests > 0";
 
