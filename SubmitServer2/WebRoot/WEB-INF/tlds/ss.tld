@@ -593,5 +593,15 @@
     Name: ${ss:urlDecode(strToScrub)}
   </example>
   </function>
+  
+  <function>
+  	<description>Get a value from web.properties</description>
+  	<name>webProperty</name>
+  	<function-class>edu.umd.cs.submitServer.WebConfigProperties</function-class>
+  	<function-signature>java.lang.String getConfigProperty(java.lang.String)</function-signature>
+  	<example>
+  		Semester: ${ss:webProperty("semester")}
+  	</example>
+  </function>
 
 </taglib>

@@ -46,6 +46,7 @@ import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * If the user is not logged in, redirect to an appropriate login url, set in the
@@ -55,6 +56,7 @@ import edu.umd.cs.submitServer.UserSession;
  * 
  */
 public class AuthenticationFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	private static int getPort(URL u) throws ServletException {
 		int port = u.getPort();
@@ -100,10 +102,7 @@ public class AuthenticationFilter extends SubmitServerFilter {
 	public void init(FilterConfig filterConfig) throws ServletException {
 		super.init(filterConfig);
 		ServletContext ctx = filterConfig.getServletContext();
-		authType = ctx.getInitParameter("authentication.type");
-		if (authType == null) {
-			authType = "openid";
-		}
+		authType = webProperties.getRequiredProperty("authentication.type", "openid");
 	}
 	
 	@Override

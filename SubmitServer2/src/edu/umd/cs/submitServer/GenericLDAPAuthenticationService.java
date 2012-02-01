@@ -50,6 +50,7 @@ import edu.umd.cs.marmoset.modelClasses.Student;
  * 
  */
 public class GenericLDAPAuthenticationService implements ILDAPAuthenticationService {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
     protected boolean useSSL = true;
 
     String ldapURL = "";
@@ -59,12 +60,12 @@ public class GenericLDAPAuthenticationService implements ILDAPAuthenticationServ
     @Override
     public void initialize(ServletContext context) {
         // assume SSL is enabled by default
-        String skipLDAP = context.getInitParameter(SubmitServerConstants.LDAP_SSL_OFF);
+        String skipLDAP = webProperties.getProperty(SubmitServerConstants.LDAP_SSL_OFF);
         boolean skipSSL = "true".equalsIgnoreCase(skipLDAP);
         useSSL = !skipSSL;
-        ldapURL = context.getInitParameter(SubmitServerConstants.LDAP_URL);
-        authMechanism = context.getInitParameter(SubmitServerConstants.LDAP_AUTH_MECHANISM);
-        principleFormat = context.getInitParameter(SubmitServerConstants.LDAP_PRINCIPAL_FORMAT);
+        ldapURL = webProperties.getProperty(SubmitServerConstants.LDAP_URL);
+        authMechanism = webProperties.getProperty(SubmitServerConstants.LDAP_AUTH_MECHANISM);
+        principleFormat = webProperties.getProperty(SubmitServerConstants.LDAP_PRINCIPAL_FORMAT);
     }
 
     @Override

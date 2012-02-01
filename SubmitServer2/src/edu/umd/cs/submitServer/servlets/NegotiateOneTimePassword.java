@@ -49,6 +49,7 @@ import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.submitServer.ClientRequestException;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.SubmitServerUtilities;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.AccessLogFilter;
 import edu.umd.cs.submitServer.filters.ServletExceptionFilter;
 
@@ -57,6 +58,7 @@ import edu.umd.cs.submitServer.filters.ServletExceptionFilter;
  * 
  */
 public class NegotiateOneTimePassword extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
     private static Logger accessLog;
 
     private Logger getAccessLog() {
@@ -121,7 +123,7 @@ public class NegotiateOneTimePassword extends SubmitServerServlet {
                 courseName = parser.getCheckedParameter("courseName");
                 String semester = parser.getOptionalCheckedParameter("semester");
                 if (semester == null)
-                    semester = request.getServletContext().getInitParameter("semester");
+                    semester = webProperties.getRequiredProperty("semester");
                 String section = parser.getOptionalCheckedParameter("section");
                 
                 project = Project.lookupByCourseProjectSemester(courseName, section, projectNumber, semester, conn);

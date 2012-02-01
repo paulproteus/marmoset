@@ -42,8 +42,10 @@ import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class ImportCourse extends GradeServerInterfaceServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	Pattern courseNamePattern = Pattern.compile("[\\w-]+");
 	Pattern termPattern = Pattern.compile("\\d{6}");
@@ -73,7 +75,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 
 		String term = request.getParameter("term");
 		if (term == null)
-			term = getServletContext().getInitParameter("semester");
+			term = webProperties.getRequiredProperty("semester");
 
 		if (!termPattern.matcher(term).matches())
 			throw new ServletException("Invalid term");

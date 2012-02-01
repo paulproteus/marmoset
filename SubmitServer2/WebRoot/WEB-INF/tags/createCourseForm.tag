@@ -1,5 +1,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss" %>
 
 <c:url var="createCourseLink" value="/action/CreateCourse"/>
     <form action="${createCourseLink}" method="post" name="createCourseForm">
@@ -12,7 +13,7 @@
         <tr>
             <td class="label">Semester:</td>
             <td class="input">
-                <input type="text" name="semester" value="${initParam['semester']}"/>
+                <input type="text" name="semester" value="${ss:webProperty('semester')}"/>
             </td>
         </tr>
         <tr>

@@ -31,6 +31,7 @@ import com.google.common.collect.Maps;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * Servlet for verifying OpenID responses from the OP.
@@ -40,6 +41,7 @@ import edu.umd.cs.submitServer.SubmitServerConstants;
  * 
  */
 public class VerifyOpenId extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 	private static final String GOOGLE_ID_PREFIX = "https://www.google.com/accounts/o8/id";
 	private static final int MAX_ID_LENGTH = 80;
 	
@@ -52,7 +54,7 @@ public class VerifyOpenId extends SubmitServerServlet {
 	@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-		boolean skipAuthentication = "true".equals(req.getServletContext().getInitParameter("authentication.skip"));
+		boolean skipAuthentication = "true".equals(webProperties.getProperty("authentication.skip"));
 		String uid = null;
 		String loginName = null;
 		Map<String, String> openidAx = Maps.newTreeMap();

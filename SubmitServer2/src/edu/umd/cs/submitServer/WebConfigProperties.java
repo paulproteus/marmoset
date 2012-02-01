@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,5 +61,22 @@ public final class WebConfigProperties {
 	public String getProperty(String key) {
 		Preconditions.checkArgument(!Strings.isNullOrEmpty(key), "Key must not be empty or null");
 		return props.getProperty(key);
+	}
+	
+	@Nonnull
+	public String getRequiredProperty(String key) {
+		return Preconditions.checkNotNull(getProperty(key), "Required web property " + key + " is not set.");
+	}
+	
+	@Nonnull
+	public String getRequiredProperty(String key, String defaultValue) {
+		Preconditions.checkNotNull(defaultValue);
+		String property = getProperty(key);
+		return Strings.isNullOrEmpty(property) ? defaultValue : property; 
+	}
+	
+	@Nullable
+	public static String getConfigProperty(String key) {
+		return instance.getProperty(key);
 	}
 }

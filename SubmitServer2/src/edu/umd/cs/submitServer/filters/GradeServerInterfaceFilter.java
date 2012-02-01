@@ -9,8 +9,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import edu.umd.cs.submitServer.GradeServerDatabaseProperties;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public abstract class GradeServerInterfaceFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
     private GradeServerDatabaseProperties gradeServerDatabaseProperties;
 
@@ -19,7 +21,7 @@ public abstract class GradeServerInterfaceFilter extends SubmitServerFilter {
         super.init(filterConfig);
         ServletContext servletContext = filterConfig.getServletContext();
 
-        String user = servletContext.getInitParameter("grades.user");
+        String user = webProperties.getProperty("grades.user");
         if (user != null)
             gradeServerDatabaseProperties = new GradeServerDatabaseProperties(servletContext);
         else {

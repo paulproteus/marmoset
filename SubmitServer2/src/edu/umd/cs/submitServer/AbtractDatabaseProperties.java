@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletContext;
 
 public abstract class AbtractDatabaseProperties {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	protected final String databaseURL;
 	protected final String databaseUser;
@@ -28,20 +29,16 @@ public abstract class AbtractDatabaseProperties {
 			String databasePassword, String databaseDriver)  {
 
 		contextPath = servletContext.getContextPath();
-		String driver =getInitParameterOrOverride(databaseDriver,
-				servletContext);
+		String driver = webProperties.getRequiredProperty(databaseDriver);
 		try {
 			Class.forName(driver);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Unable to load sql driver " + driver);
 		}
 
-		String url = getInitParameterOrOverride(databaseURL,
-				servletContext);
-		String name =  getInitParameterOrOverride(databaseName,
-				servletContext);
-		String options = getInitParameterOrOverride(databaseOptions,
-				servletContext);
+		String url = webProperties.getRequiredProperty(databaseURL);
+		String name =  webProperties.getProperty(databaseName);
+		String options = webProperties.getRequiredProperty(databaseOptions);
 
 
 		if ("ssl".equals(options))
@@ -60,50 +57,12 @@ public abstract class AbtractDatabaseProperties {
 			url = url + "?" + options;
 
 		this.databaseURL = url;
-		this.databaseUser =  getInitParameterOrOverride(databaseUser,
-				servletContext);
-		this.databasePassword =  getInitParameterOrOverride(databasePassword,
-				servletContext);
+		this.databaseUser =  webProperties.getRequiredProperty(databaseUser);
+		this.databasePassword =  webProperties.getRequiredProperty(databasePassword);
 	}
 	
 	public String getContextPath() {
 		return contextPath;
-	}
-
-	/**
-	 * Retrieve either an initParameter or its over-ridden value from the given
-	 * servletContext.
-	 * <p>
-	 * Tomcat allows you to set initParameters in two different places
-	 * (tomcat/conf/web.xml for the entire tomcat server, or in
-	 * webapp/WEB-INF/web.xml of the web-app's warfile, which will be limited to
-	 * only that web-app). You unfortunately <b>cannot</b> set initParameters in
-	 * both files, or the server will fail when it tries to load. This is very,
-	 * very annoying.
-	 * <p>
-	 * This method (a hack that fixes this limitation) first looks for an
-	 * "override" parameter, which is an initParameter in webapp/WEB-INF/web.xml
-	 * with the suffix "__override" that has the same name as an initParameter
-	 * in tomcat/conf/web.xml. For example, tomcat/conf/web.xml may have
-	 * "database.user" set to "root", while webapp/WEB-INF/web.xml will have
-	 * "database.user__override" set to "normal_user" instead.
-	 * <p>
-	 * This method returns the override parameter, if any; otherwise if an
-	 * override parameter is not available, then the method instead returns the
-	 * regular initParameter.
-	 *
-	 * @param key
-	 *            The key of the initParameter.
-	 * @param servletContext
-	 *            The servletContext.
-	 * @return The value that the given initParameter key is bound to in the
-	 *         given servletContext.
-	 */
-	protected static String getInitParameterOrOverride(String key, ServletContext servletContext) {
-		String value = servletContext.getInitParameter(key + "__override");
-		if (value != null)
-			return value;
-		return servletContext.getInitParameter(key);
 	}
 
 

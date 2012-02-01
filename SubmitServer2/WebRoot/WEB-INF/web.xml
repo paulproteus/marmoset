@@ -13,6 +13,8 @@
 	&custom;
 	<xi:include href="custom.xml" xpointer="xpointer(/web-app/*)"/>
 -->
+<!--
+Deprecated - set these in local.web.properties or web.properties instead.
 <context-param>
         <param-name>perform.background.retesting</param-name>
         <param-value>true</param-value>
@@ -34,6 +36,11 @@
 		<param-name>findbugsDescriptionsURL</param-name>
 		<param-value>http://findbugs.sourceforge.net/allBugDescriptions.html</param-value>
 	</context-param>
+-->
+
+<listener>
+   <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
+</listener>
 
 	<security-constraint>
 		<web-resource-collection>
@@ -1678,13 +1685,6 @@
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/error.jsp</location>
 	</error-page>
-
-<listener>
-    <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
-  </listener>
-<listener>
-    <listener-class>edu.umd.cs.submitServer.InitializeWebProperties</listener-class>
-  </listener>
 
 <!--
   <listener>

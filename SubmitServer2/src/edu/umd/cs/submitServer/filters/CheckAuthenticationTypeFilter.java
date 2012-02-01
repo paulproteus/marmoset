@@ -14,6 +14,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.umd.cs.submitServer.SubmitServerConstants;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * Filter that intercepts requests for authentication and checks that they're in keeping with the
@@ -26,6 +27,7 @@ import edu.umd.cs.submitServer.SubmitServerConstants;
  * 
  */
 public class CheckAuthenticationTypeFilter implements Filter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 	private Pattern safeUrl;
 	private Pattern guardedUrl;
 	private String authType;
@@ -33,10 +35,7 @@ public class CheckAuthenticationTypeFilter implements Filter {
 	@Override
   public void init(FilterConfig filterConfig) throws ServletException {
 		ServletContext ctx = filterConfig.getServletContext();
-		authType = ctx.getInitParameter(SubmitServerConstants.AUTHENTICATION_TYPE);
-		if (authType == null) {
-			authType = "openid";
-		}
+		authType = webProperties.getRequiredProperty(SubmitServerConstants.AUTHENTICATION_TYPE, "openid");
 		safeUrl = Pattern.compile("^/authenticate/[a-zA-Z0-9]+(.jsp)?");
 	  guardedUrl = Pattern.compile("^/authenticate/([a-zA-Z0-9]+)/.*");
   }

@@ -33,8 +33,10 @@ import javax.servlet.http.HttpServletResponse;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.submitServer.SubmitServerConstants;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class CreateDotSubmitFile extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,7 +61,7 @@ public class CreateDotSubmitFile extends SubmitServerServlet {
         
         printProperty(out, "courseKey" , course.getSubmitKey());
         
-        String authentication = request.getServletContext().getInitParameter(SubmitServerConstants.AUTHENTICATION_TYPE);
+        String authentication = webProperties.getRequiredProperty(SubmitServerConstants.AUTHENTICATION_TYPE);
         printProperty(out, SubmitServerConstants.AUTHENTICATION_TYPE,  authentication );
         printProperty(out, "baseURL", request.getScheme() + "://"
                 + request.getServerName() + ":" + request.getServerPort()

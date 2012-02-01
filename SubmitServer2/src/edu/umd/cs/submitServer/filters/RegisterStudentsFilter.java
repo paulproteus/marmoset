@@ -53,12 +53,14 @@ import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.StudentForUpload;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * @author jspacco
  * 
  */
 public class RegisterStudentsFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
@@ -144,7 +146,7 @@ public class RegisterStudentsFilter extends SubmitServerFilter {
 
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
-        String delimiter = filterConfig.getServletContext().getInitParameter("register.students.delimiter");
+        String delimiter = webProperties.getProperty("register.students.delimiter");
         if (delimiter != null)
             this.delimiter = delimiter;
     }

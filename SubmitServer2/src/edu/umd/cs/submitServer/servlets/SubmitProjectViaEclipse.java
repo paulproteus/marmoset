@@ -37,12 +37,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.submitServer.IncorrectCourseProjectManagerPluginVersionException;
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * @author jspacco
  * 
  */
 public class SubmitProjectViaEclipse extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	/**
 	 * The doPost method of the servlet. <br>
@@ -72,8 +74,7 @@ public class SubmitProjectViaEclipse extends SubmitServerServlet {
 				.getOptionalStringParameter("submitClientTool");
 		String submitClientVersion = multipartRequest
 				.getOptionalStringParameter("submitClientVersion");
-		String minimumCPMVersion = getServletContext().getInitParameter(
-				"minimum.course.project.manager.version");
+		String minimumCPMVersion = webProperties.getProperty("minimum.course.project.manager.version");
 		if (submitClientTool == null || submitClientVersion == null
 				|| submitClientTool.equals("EclipsePlugin")
 				&& (submitClientVersion.compareTo(minimumCPMVersion) < 0)) {

@@ -9,12 +9,15 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import edu.umd.cs.submitServer.WebConfigProperties;
+
 public class SkipAuthenticationParameterFilter implements Filter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 	private boolean skipAuthentication;
 	
 	@Override
   public void init(FilterConfig filterConfig) throws ServletException {
-		skipAuthentication = "true".equals(filterConfig.getServletContext().getInitParameter("authentication.skip"));
+		skipAuthentication = "true".equals(webProperties.getProperty("authentication.skip"));
   }
 
 	@Override

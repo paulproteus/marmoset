@@ -71,6 +71,7 @@ import edu.umd.cs.submitServer.ReleaseInformation;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * Requires a projectPK and optionally a studentRegistrationPK.
@@ -79,6 +80,7 @@ import edu.umd.cs.submitServer.UserSession;
  * studentSubmitStatus and submissionList attributes in the request.
  */
 public class ExtractParametersFilter extends SubmitServerFilter {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
@@ -106,7 +108,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		String courseKey = parser.getParameter("courseKey");
 		String projectNumber = parser.getParameter("projectNumber");
         
-		String gradesServer = req.getServletContext().getInitParameter("grades.server");
+		String gradesServer = webProperties.getProperty("grades.server");
         request.setAttribute("gradesServer", gradesServer);  
 		MultipartRequest multipartRequest = (MultipartRequest) request
 				.getAttribute(MULTIPART_REQUEST);

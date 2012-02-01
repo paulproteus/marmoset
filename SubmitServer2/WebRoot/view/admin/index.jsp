@@ -239,7 +239,7 @@
 
                     <tr>
                         <td class="label">Semester:</td>
-                        <td class="input"><input type="text" name="semester" value="${initParam['semester']}" /></td>
+                        <td class="input"><input type="text" name="semester" value="${ss:webProperty('semester')}" /></td>
                     </tr>
                     <tr class="submit">
                         <td colspan="2"><input type="submit" value="Import all instructors"></td>

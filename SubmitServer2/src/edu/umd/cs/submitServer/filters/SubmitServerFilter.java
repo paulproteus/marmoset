@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.SubmitServerUtilities;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
 
 /**
@@ -57,6 +58,7 @@ import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
  * 
  */
 public abstract class SubmitServerFilter implements Filter, SubmitServerConstants {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
     private Logger authenticationLog;
 
     protected Logger getAuthenticationLog() {
@@ -103,13 +105,13 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
-        if ("true".equals(servletContext.getInitParameter("DEBUG"))) {
+        if ("true".equals(webProperties.getProperty("DEBUG"))) {
             submitServerFilterLog.setLevel(Level.DEBUG);
         }
 
         submitServerDatabaseProperties = new SubmitServerDatabaseProperties(servletContext);
         
-        strictParameterChecking = "true".equalsIgnoreCase(servletContext.getInitParameter("strict.parameter.checking"));
+        strictParameterChecking = "true".equalsIgnoreCase(webProperties.getProperty("strict.parameter.checking"));
     }
 
     /**

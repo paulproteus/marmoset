@@ -37,7 +37,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Strings;
+
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * @author jspacco
@@ -46,7 +49,7 @@ import edu.umd.cs.submitServer.MultipartRequest;
  *         more we will ignore them.
  */
 public class MultipartRequestFilter extends SubmitServerFilter {
-
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
@@ -54,8 +57,7 @@ public class MultipartRequestFilter extends SubmitServerFilter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 
-		int maxSize = Integer.parseInt(servletContext
-				.getInitParameter("fileupload.maxsize"));
+		int maxSize = Integer.parseInt(webProperties.getRequiredProperty("fileupload.maxsize"));
 		MultipartRequest multipartRequest = MultipartRequest.parseRequest(
 				request, maxSize, getSubmitServerFilterLog(),
 				strictParameterChecking(), servletContext);

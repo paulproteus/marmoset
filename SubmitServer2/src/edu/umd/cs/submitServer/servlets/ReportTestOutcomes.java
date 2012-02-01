@@ -57,12 +57,14 @@ import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.marmoset.utilities.JavaMail;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * @author jspacco Called (usually by the Build Server) to report the outcomes
  *         of a test run
  */
 public class ReportTestOutcomes extends SubmitServerServlet {
+	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 	private static Logger failedLog;
 
 	private static Logger getFailedBackgroundRetestLog() {
@@ -484,15 +486,15 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 	 */
 	private void logHotspotErrors(@Submission.PK int submissionPK, int testSetupPK,
 			String testMachine, TestOutcomeCollection testOutcomeCollection) {
-		String adminEmail = getServletContext().getInitParameter("admin.email");
+		String adminEmail = webProperties.getProperty("admin.email");
 		if (adminEmail == null || adminEmail.equals("")) {
 			getSubmitServerServletLog().error(
-					"Can't find admin.email in web.xml");
+					"Can't find admin.email in web.properties");
 		}
-		String adminSMTP = getServletContext().getInitParameter("admin.smtp");
+		String adminSMTP = webProperties.getProperty("admin.smtp");
 		if (adminSMTP == null || adminSMTP.equals("")) {
 			getSubmitServerServletLog().error(
-					"Can't find admin.smtp in web.xml");
+					"Can't find admin.smtp in web.properties");
 		}
 
 		for (TestOutcome outcome : testOutcomeCollection) {

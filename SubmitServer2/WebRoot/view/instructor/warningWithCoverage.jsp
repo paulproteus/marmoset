@@ -57,7 +57,7 @@
 				<%--</pre>--%>
 					</td>
 				<td class="description">${warning.exceptionClassName}</td>
-				<td><a href="${initParam.findbugsDescriptionsURL}#${warning.testName}">${warning.testName}</a></td>
+				<td><a href="${ss:webProperty('findbugsDescriptionURL')}#${warning.testName}">${warning.testName}</a></td>
 			</tr>
 	</table>
 
