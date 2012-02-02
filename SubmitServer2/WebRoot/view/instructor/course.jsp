@@ -336,7 +336,7 @@ tr.reject {background: #f33}
             <c:out value="${course.url}" />
         </c:set>
         <c:set var="currentDescription">
-            <c:out value="${course.fullDescription}" />
+            <c:out value="${course.description}" />
         </c:set>
         <form action="${updateCourseLink}" method="post" name="updateCourseForm">
             <input type="hidden" name="coursePK" value="${course.coursePK}">
