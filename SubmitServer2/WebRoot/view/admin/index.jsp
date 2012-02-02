@@ -37,7 +37,8 @@
     <h1>Superuser info/status</h1>
 
     <c:if test="${! empty recentExceptions }">
-        <h2>Recent Exceptions</h2>
+        <h2>  <a href="javascript:toggle('exceptions')">${fn:length(recentExceptions)} Recent Exceptions</a> </h2>
+        <div id="exceptions" style="display: none">
         <table>
             <tr>
                 <th>PK</th>
@@ -61,6 +62,7 @@
                 </tr>
             </c:forEach>
         </table>
+        </div>
     </c:if>
 
       <c:if test="${! empty recentErrors }">
@@ -143,7 +145,8 @@
 
 
 
-    <h2>Upcoming project deadlines</h2>
+    <h2><a href="javascript:toggle('upcomingProjects')">Upcoming project deadlines</a></h2>
+    <div id="upcomingProjects" style="display: none">
     <table>
         <tr>
             <th rowspan="2">Course</th>
@@ -189,11 +192,12 @@
 
         </c:forEach>
     </table>
+    </div>
 
 
     <c:if test="${! empty slowSubmissions}">
-        <h2>Submissions that took a long time to test</h2>
-        <table>
+        <h2><a href="javascript:toggle('slowSubmissions')">${fn:length(slowSubmissions)} Submissions that took a long time to test</a></h2>
+        <div id="slowSubmissions" style="display: none"><table>
 
             <tr>
                 <th>Course</th>
@@ -236,7 +240,55 @@
                 </tr>
             </c:forEach>
         </table>
+        </div>
     </c:if>
+
+<c:if test="${not empty brokenSubmissions}">
+<h2><a href="javascript:toggle('brokenSubmissions')">${fn:length(brokenSubmissions)} Broken submissions</h2>
+
+   <div id="brokenSubmissions" style="display: none"><table>
+
+            <tr>
+                <th>Course</th>
+                <th>Project</th>
+                <th>sub pk</th>
+                <th>build requests</th>
+                <th>submitted</th>
+
+            </tr>
+            <c:forEach var="submission" items="${brokenSubmissions}" varStatus="counter">
+
+                <c:set var="project" value="${projectMap[submission.projectPK]}" />
+                <c:set var="course" value="${courseMap[project.coursePK]}" />
+
+                <c:url var="submissionLink" value="/view/instructor/submission.jsp">
+                    <c:param name="submissionPK" value="${submission.submissionPK}" />
+                </c:url>
+                <c:url var="projectLink" value="/view/instructor/project.jsp">
+                    <c:param name="projectPK" value="${project.projectPK}" />
+                </c:url>
+                <c:url var="courseLink" value="/view/instructor/course.jsp">
+                    <c:param name="coursePK" value="${course.coursePK}" />
+                </c:url>
+
+                    <tr class="r${counter.index % 2}">
+                    <td class="description"><a href="${courseLink}"> <c:out value="${course.courseName}" />
+                    </a></td>
+
+                    <td class="description"><a href="${projectLink}"> <c:out value="${project.projectNumber}" />
+                            <c:out value="${project.title}" />
+                    </a></td>
+                    <td><a href="${submissionLink}">${submission.submissionPK}</a></td>
+                    <td>${submission.numPendingBuildRequests}</td>
+                    <td><fmt:formatDate value="${submission.submissionTimestamp}" pattern="dd MMM h:mm a" /></td>
+
+
+
+                </tr>
+            </c:forEach>
+        </table>
+        </div>
+</c:if>
 
 
     <h1>Administrative actions</h1>

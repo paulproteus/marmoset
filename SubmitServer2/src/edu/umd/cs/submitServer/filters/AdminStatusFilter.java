@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,9 +73,13 @@ public class AdminStatusFilter extends SubmitServerFilter {
 	        List<ServerError> exceptions = ServerError.recentErrors(20,  ServerError.Kind.EXCEPTION, since, conn);
 	        request.setAttribute("recentExceptions", exceptions);
 	        List<ServerError> errors = ServerError.recentErrorsExcludingKind(20, ServerError.Kind.EXCEPTION, since, conn);
-            request.setAttribute("recentErrors", errors);;
+            request.setAttribute("recentErrors", errors);
          
-	            
+            List<Submission> recentBrokenSubmissions = new ArrayList<Submission>();
+            Submission.lookupAllRecentBrokenSubmissions(since, 20, recentBrokenSubmissions, conn);
+            request.setAttribute("brokenSubmissions", recentBrokenSubmissions);
+            
+            
 			List<Course> courseList = Course.lookupAll(conn);
 			request.setAttribute(COURSE_LIST, courseList);
 			Map<Integer, Course> courseMap = new HashMap<Integer, Course>();

@@ -1445,6 +1445,32 @@ public class Submission implements ITestSummary<Submission> {
         }
     }
 
+    public static void lookupAllRecentBrokenSubmissions(
+            Timestamp when, int limit,
+            List<Submission> submissionList,
+            Connection conn)
+        throws SQLException
+        {
+
+            String query =
+                " SELECT " +ATTRIBUTES
+                + " FROM submissions "
+                + " WHERE submissions.build_status = ?"
+                + " AND submissions.submission_timestamp >= ? "
+                + " ORDER BY submissions.submission_timestamp DESC LIMIT ?";
+               
+            PreparedStatement stmt=Queries.setStatement(conn, query, Submission.BuildStatus.BROKEN, when, limit);
+            try {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    Submission submission = new Submission(rs, 1);
+                    submissionList.add(submission);
+                }
+            } finally {
+                Queries.closeStatement(stmt);
+            }
+        }
+    
     public static void lookupAllWithFailedBackgroundRetestsByProjectPK(
         @Project.PK int projectPK,
         List<Submission> submissionList,
