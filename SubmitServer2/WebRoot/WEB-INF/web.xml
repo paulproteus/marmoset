@@ -582,7 +582,7 @@ Deprecated - set these in local.web.properties or web.properties instead.
 	</filter>
 	<filter-mapping>
 		<filter-name>AllStudentsFilter</filter-name>
-		<url-pattern>/view/admin/index.jsp</url-pattern>
+		<url-pattern>/view/admin/person.jsp</url-pattern>
 	</filter-mapping>
 <filter-mapping>
         <filter-name>AllStudentsFilter</filter-name>

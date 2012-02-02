@@ -332,46 +332,10 @@
     <h2>User actions</h2>
     <c:url var="registerPerson" value="/view/instructor/registerPerson.jsp" />
 
-    <p>
-        <a href="${registerPerson}">Register person</a>
-    </p>
-
-    <c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
-    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
-    <c:url var="allowCourseCreationLink" value="/action/admin/AllowCourseCreation" />
-    <c:url var="makeSuperuserLink" value="/action/admin/MakeSuperuser" />
-
-    <table>
-        <c:forEach var="student" items="${allStudents}" varStatus="counter">
-            <tr class="r${counter.index % 2}">
-                <td class="description"><c:out value="${student.fullname}" /></td>
-                
-                <td><form method="GET" action="${editStudentUrl}">
-                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                        <button type="submit">Edit</button>
-                    </form></td>
-                <td><form method="post" action="${authenticateAsLink}">
-                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                        <button type="submit">Become</button>
-                    </form></td>
-                <td><c:if test="${!student.canImportCourses}">
-                        <form method="post" action="${allowCourseCreationLink}">
-                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                            <button type="submit">Allow course creation</button>
-                        </form>
-                    </c:if></td>
-                <td><c:if test="${student.canImportCourses && !student.superUser}">
-                        <form method="post" action="${makeSuperuserLink}">
-                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                            <button type="submit">Make superuser</button>
-                        </form>
-                    </c:if></td>
-            </tr>
-        </c:forEach>
-    </table>
-
-
-
+    <ul>
+        <li><a href="${registerPerson}">Register person</a>
+        <li><a href="person.jsp">Update person</a>
+    </ul>
     <ss:footer />
 </body>
 </html>
