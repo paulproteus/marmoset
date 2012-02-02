@@ -333,12 +333,11 @@
 										name="comment"></textarea>
 							</a>
 	
-							<td colspan="3">
+							<td colspan="5">
 <a title="zip/jar file to upload"><input type="file" name="file"
 									size=40>
 							</a>
-							</td>
-<td><input type="submit" value="Upload">
+							<input type="submit" value="Upload">
 </td>
 						</tr>
 					</form>
