@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 
-<c:if test="${project.visibleToStudents}">
+<c:if test="${project.visibleToStudents && not empty studentsWithoutSubmissions}">
 <h1>Active students without submissions</h1>
 <p>
 <table>
