@@ -72,9 +72,6 @@ public class FailedBackgroundRetestFilter extends SubmitServerFilter {
 
         StudentRegistration studentRegistration = (StudentRegistration) req.getAttribute(STUDENT_REGISTRATION);
         
-        if (studentRegistration == null)
-            throw new ServletException("No StudentRegistration");
-        
         Boolean instructor = (Boolean) request.getAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY);
         if (instructor == null)
             instructor = false;
