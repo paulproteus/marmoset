@@ -210,8 +210,8 @@
 
 				<th>activate/<br>inactivate</th>
 
-				<th><a
-							title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup broken.</a>
+				<th title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup broken.</a>
+                <th>Retest</a>
 
 
 				</th>
@@ -294,8 +294,7 @@
 					</td>
 
 					<td>
-						<c:if
-									test="${testSetup.jarfileStatus != 'active' and testSetup.jarfileStatus != 'inactive'}">
+						<c:if test="${testSetup.jarfileStatus != 'active' and testSetup.jarfileStatus != 'inactive'}">
 						<c:url var="markBrokenLink"
 										value="/action/instructor/ChangeTestSetupStatus">
 							<c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
@@ -304,7 +303,16 @@
 						<a href="${markBrokenLink}"> mark broken </a>
 						</c:if>
 					</td>
-
+                    <td>
+                        <c:if test="${testSetup.jarfileStatus == 'failed' or testSetup.jarfileStatus != 'pending'}">
+                        <c:url var="retestLink"
+                                        value="/action/instructor/ChangeTestSetupStatus">
+                            <c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
+                            <c:param name="jarfileStatus" value="new" />
+                        </c:url>
+                        <a href="${retestLink}"> retest </a>
+                        </c:if>
+                    </td>
 					<td><c:url var="downloadTestSetupLink"
 							value="/data/instructor/DownloadTestSetup">
 							<c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
