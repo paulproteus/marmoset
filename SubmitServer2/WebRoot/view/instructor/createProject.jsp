@@ -30,6 +30,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<ss:headContent title="Create new project for ${course.courseName}" />
 <c:url var="jsBase" value="/js" />
 
 <link
@@ -42,7 +43,7 @@
  <link href="${jsBase}/timePicker.css"  rel="stylesheet" type="text/css" />
 <script src="${jsBase}/jquery.timePicker.js" type="text/javascript"></script>
 
-<ss:headContent title="Create new project for ${course.courseName}" />
+
 <script type="text/javascript">
 $(function() {
 	 $( "#ontime-date" ).datepicker({
