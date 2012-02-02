@@ -45,20 +45,7 @@ import edu.umd.cs.submitServer.RequestParser;
  */
 public class ChangeTestSetupStatus extends SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
+
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -87,21 +74,15 @@ public class ChangeTestSetupStatus extends SubmitServerServlet {
 
 			if (jarfileStatus.equals(TestSetup.INACTIVE)) {
 				// Can only mark something INACTIVE that was previously ACTIVE
-				if (testSetup.getJarfileStatus().equals(TestSetup.ACTIVE)) {
+				if (testSetup.hasJarFileStatus(TestSetup.ACTIVE)) {
 					testSetup.setJarfileStatus(TestSetup.INACTIVE);
 					testSetup.update(conn);
 					project.setTestSetupPK(0);
 					project.update(conn);
 				}
 			} else if (jarfileStatus.equals(TestSetup.BROKEN)
-					&& (testSetup.getJarfileStatus().equals(TestSetup.FAILED)
-							|| testSetup.getJarfileStatus().equals(
-									TestSetup.TESTED)
-							|| testSetup.getJarfileStatus().equals(
-									TestSetup.INACTIVE)
-							|| testSetup.getJarfileStatus().equals(
-									TestSetup.PENDING) || testSetup
-							.getJarfileStatus().equals(TestSetup.NEW))) {
+					&& testSetup.hasJarFileStatus(TestSetup.FAILED, TestSetup.TESTED, TestSetup.INACTIVE, 
+					        TestSetup.PENDING, TestSetup.NEW)) {
 				// Can mark broken only if current state is:
 				// FAILED, TESTED, INACTIVE, or PENDING
 				// If you mark something BROKEN that was pending, it might
@@ -109,7 +90,11 @@ public class ChangeTestSetupStatus extends SubmitServerServlet {
 				// if the buildserver was stalled.
 				testSetup.setJarfileStatus(jarfileStatus);
 				testSetup.update(conn);
-			}
+			} else if (jarfileStatus.equals(TestSetup.NEW)
+                    && testSetup.hasJarFileStatus(TestSetup.FAILED, TestSetup.TESTED, TestSetup.PENDING)) {
+                testSetup.setJarfileStatus(jarfileStatus);
+                testSetup.update(conn);
+            }
 
 			conn.commit();
 			transactionSuccess = true;

@@ -156,6 +156,13 @@ public class TestSetup
     public void setProjectPK(int projectPK) {
         this.projectPK = projectPK;
     }
+    
+    public boolean hasJarFileStatus(String ... anyOf) {
+        for(String s : anyOf)
+            if (jarfileStatus.equals(s))
+                return true;
+        return false;
+    }
     /**
      * @return Returns the jarfileStatus.
      */
