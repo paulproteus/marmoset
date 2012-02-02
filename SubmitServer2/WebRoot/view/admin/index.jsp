@@ -244,7 +244,7 @@
     </c:if>
 
 <c:if test="${not empty brokenSubmissions}">
-<h2><a href="javascript:toggle('brokenSubmissions')">${fn:length(brokenSubmissions)} Broken submissions</h2>
+<h2><a href="javascript:toggle('brokenSubmissions')">${fn:length(brokenSubmissions)} Broken submissions</a></h2>
 
    <div id="brokenSubmissions" style="display: none"><table>
 
