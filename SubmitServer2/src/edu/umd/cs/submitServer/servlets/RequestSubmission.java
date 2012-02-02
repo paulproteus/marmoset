@@ -71,7 +71,7 @@ public class RequestSubmission extends SubmitServerServlet {
     private static Lock lock = new java.util.concurrent.locks.ReentrantLock();
 
     enum Kind {
-        UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP, BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS;
+        UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP, BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS;
     }
 
     public static void timeDump(StringBuffer buf, Timestamp started, String f, Object... args) {
@@ -98,8 +98,8 @@ public class RequestSubmission extends SubmitServerServlet {
         MultipartRequest multipartRequest = (MultipartRequest) request.getAttribute(MULTIPART_REQUEST);
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
-        // what courses does this buildServer support?
         String submissionPK = multipartRequest.getOptionalCheckedParameter("submissionPK");
+        String testSetupPK = multipartRequest.getOptionalCheckedParameter("testSetupPK");
 
         String hostname = multipartRequest.getOptionalStringParameter("hostname");
         String load = multipartRequest.getOptionalStringParameter("load");
@@ -114,8 +114,6 @@ public class RequestSubmission extends SubmitServerServlet {
             boolean foundNewTestSetup = false;
             boolean foundSubmissionForBackgroundRetesting = false;
 
-           
-           
             /**
              * We are going to use Java static locking as well as database
              * locking. If requests from two build servers come in at the same
@@ -138,9 +136,18 @@ public class RequestSubmission extends SubmitServerServlet {
                 if (submissionPK != null) {
                     submission = Submission.lookupBySubmissionPK(Submission.asPK(Integer.valueOf(submissionPK)), conn);
                     Project project = Project.lookupByProjectPK(submission.getProjectPK(), conn);
-                    testSetup = TestSetup.lookupByTestSetupPK(project.getTestSetupPK(), conn);
+                    if (testSetupPK != null) {
+                        testSetup = TestSetup.lookupByTestSetupPK(Integer.valueOf(testSetupPK), conn);
+                        if (testSetup !=null && testSetup.getProjectPK() != submission.getProjectPK())
+                            throw new ServletException("Submission " + submissionPK + " and test setup " + testSetupPK 
+                                    + " are for different projects");
+                    } else
+                        testSetup = TestSetup.lookupByTestSetupPK(project.getTestSetupPK(), conn);
                     if (testSetup != null) {
-                        kind = Kind.SPECIFIC_REQUEST;
+                        if (project.getTestSetupPK() == 0)
+                            kind = Kind.SPECIFIC_REQUEST_NEW_TESTUP;
+                        else
+                            kind = Kind.SPECIFIC_REQUEST;
                     } else {
                         kind = Kind.SPECIFIC_REQUEST_NO_TESTSETUP;
                     }
@@ -246,8 +253,8 @@ public class RequestSubmission extends SubmitServerServlet {
                             String.format("submission %d, project %d, no test setup", submission.getSubmissionPK(),
                                     submission.getProjectPK()));
 
-                // if we found a new project_jarfile, let the buildserver know
-                if (foundNewTestSetup && hasTestSetup) {
+                // if we found a new test setup, let the buildserver know
+                if (hasTestSetup && (foundNewTestSetup || kind == Kind.SPECIFIC_REQUEST_NEW_TESTUP)) {
                     response.setHeader(HttpHeaders.HTTP_NEW_TEST_SETUP, "yes");
                     // set the status to 'pending' and set the current time for
                     // datePosted
