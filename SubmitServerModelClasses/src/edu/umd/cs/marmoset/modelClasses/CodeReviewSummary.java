@@ -1,6 +1,8 @@
 package edu.umd.cs.marmoset.modelClasses;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -13,14 +15,24 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+
+import edu.umd.cs.marmoset.modelClasses.CodeReviewer.Builder;
 import edu.umd.cs.marmoset.utilities.Objects;
 
 /** Provide a summary of a code review */
 public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
+	private static final String FINDBUGS_TEST_TYPE = "findbugs";
+
+	private static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java):\\[line (\\d+)\\]");
 
   final @Nonnull Submission submission;
   final @Nonnull  Project project;
@@ -67,6 +79,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				submission.getSubmissionPK(), conn);
 
 		this.assignment = reviewer.getCodeReviewAssignment();
+		
+		CodeReviewer findbugsReviewer = createOrGetFindbugsReviewer(conn);
+		if (!hasFindbugsThreads(conn, findbugsReviewer)) {
+			createFindbugsThreads(findbugsReviewer, conn);
+		}
+		
 		for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
 			reviewers.put(r.getCodeReviewerPK(), r);
 		}
@@ -503,6 +521,77 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	public Rubric getRubric(@Rubric.PK int rubricPK) {
 		return rubrics.get(rubricPK);
 	}
+
+	/**
+	 * Tries to look up the FindBugs reviewer entity associated with this code review; creates it if necessary.
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	private CodeReviewer createOrGetFindbugsReviewer(Connection conn) throws SQLException {
+		PreparedStatement st = conn
+				.prepareStatement("SELECT * FROM code_reviewer "
+						+ "WHERE is_automated = 1 AND known_as = ? "
+						+ "AND code_review_assignment_pk = ? "
+						+ "AND submission_pk = ?");
+		int assignmentPk = (assignment == null) ? 0 : assignment.getCodeReviewAssignmentPK();
+		Queries.setStatement(st, "FindBugs", assignmentPk, submission.getSubmissionPK());
+		ResultSet rs = st.executeQuery();
+		if (!rs.next()) {
+			CodeReviewer.Builder builder =  new CodeReviewer.Builder(conn, submission.getSubmissionPK());
+			builder.setAutomated("FindBugs");
+			if (assignment != null) {
+				builder.setAssignment(assignment);
+			}
+			return builder.build();
+		}
+		return new CodeReviewer(rs, 1);
+	}
+	
+	private boolean hasFindbugsThreads(Connection conn, CodeReviewer findbugsReviewer) throws SQLException {
+		PreparedStatement st = conn.prepareStatement("SELECT COUNT(*) FROM code_review_thread " +
+				"WHERE created_by = ?");
+		Queries.setStatement(st, findbugsReviewer.getCodeReviewerPK());
+		ResultSet rs = st.executeQuery();
+		Preconditions.checkState(rs.next(), "COUNT must return exactly 1 row.");
+		return rs.getInt(1) >= 1;
+	}
+	
+	/** 
+	 * Create threads for all the FindBugs warnings for the submission.
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	private void createFindbugsThreads(CodeReviewer findbugsReviewer, Connection conn) throws SQLException {
+		PreparedStatement findbugsOutcomes = conn
+				.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
+						+ "JOIN test_runs USING (test_run_pk) "
+						+ "WHERE submission_pk = ? AND test_type = ?");
+		Queries.setStatement(findbugsOutcomes, submission.getSubmissionPK(), FINDBUGS_TEST_TYPE);
+		ResultSet rs = findbugsOutcomes.executeQuery();
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		while (rs.next()) {
+			String location = rs.getString("short_test_result");
+			Preconditions.checkState(!Strings.isNullOrEmpty(location), "Invalid findbugs location");
+			Matcher m = FINDBUGS_LOCATION_REGEX.matcher(location);
+			if (!m.matches() || m.groupCount() <= 1) {
+				continue;
+			}
+			String file = m.group(1);
+			// lines are 0-indexed in thread objects.
+			int line = Integer.parseInt(m.group(2)) - 1;
+			CodeReviewThread thread = new CodeReviewThread(conn,
+					submission.getSubmissionPK(), file, line, now,
+					findbugsReviewer.getCodeReviewerPK());
+			
+			String commentText = rs.getString("long_test_result");
+			new CodeReviewComment(thread, findbugsReviewer, commentText, now, false, conn);
+		}
+	}
+	
 	@Override
 	public int compareTo(CodeReviewSummary that) {
 		if (this == that)

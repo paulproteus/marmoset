@@ -149,7 +149,7 @@ public class CodeReviewComment implements Comparable<CodeReviewComment> {
 			CodeReviewer reviewer, String text, Timestamp now, boolean draft,
 			Connection conn) throws SQLException {
 		this( thread.getCodeReviewThreadPK(),
-				reviewer.getStudentPK(), text, draft, true, now, conn);
+				reviewer.getCodeReviewerPK(), text, draft, true, now, conn);
 	}
 
 	public CodeReviewComment(ResultSet rs, int from) throws SQLException {
