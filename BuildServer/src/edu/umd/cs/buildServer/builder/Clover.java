@@ -33,7 +33,7 @@ public class Clover {
     }
 
     public static File getCloverJar() {
-        return JavaBuilder.getJarFile(cloverInstr);
+        return JavaBuilder.getCodeBase(cloverInstr);
     }
 
     public static int cloverInstrMainImpl(String[] cliArgs) {

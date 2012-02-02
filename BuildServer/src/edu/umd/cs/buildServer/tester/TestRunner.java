@@ -454,10 +454,7 @@ public class TestRunner extends BaseTestRunner {
 	}
 
 	public static void main(String[] args) {
-	    Properties p = System.getProperties();
-	    for(Map.Entry<?,?> e : p.entrySet()) {
-	        System.out.println(e);
-	    }
+	    
 		int startTestNumber = -1;
 
 		int argCount = 0;
@@ -537,7 +534,12 @@ public class TestRunner extends BaseTestRunner {
 					new BufferedOutputStream(new FileOutputStream(outputFile)));
 
 			System.out.println("Writing test outcomes");
-			out.writeObject(r.getTestOutcomes());
+			Collection<TestOutcome> testOutcomes = r.getTestOutcomes();
+			for(TestOutcome t : testOutcomes) {
+			    System.out.println(t.getShortTestName() + " " + t.getOutcome());
+			    System.out.println(t.getCappedLongTestResult());
+			}
+            out.writeObject(testOutcomes);
 			out.close();
 
 			// Shutdown the process.

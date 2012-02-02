@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.zip.ZipFile;
 
+import edu.umd.cs.buildServer.builder.JavaBuilder;
+
+import junit.framework.TestCase;
+
 
 /**
  * Find trusted code bases on the system classpath.
@@ -38,12 +42,7 @@ import java.util.zip.ZipFile;
 final class TrustedCodeBaseFinder {
 	private final JavaTester tester;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param tester
-	 *            the JavaTester
-	 */
+
 	TrustedCodeBaseFinder(JavaTester tester) {
 		this.tester = tester;
 	}
@@ -54,12 +53,12 @@ final class TrustedCodeBaseFinder {
 	 * Build the list of trusted code bases.
 	 */
 	public void execute() {
-		StringTokenizer tok = new StringTokenizer(
-				System.getProperty("java.class.path"), File.pathSeparator);
-		while (tok.hasMoreTokens()) {
-			String element = tok.nextToken();
-			inspectEntry(element);
-		}
+	    File junit = JavaBuilder.getCodeBase(TestCase.class);
+	    tester.getLog().debug("junit at: " + junit);
+	    addTrustedCodeBase("buildserver.junit.jar.file", junit.getAbsolutePath());
+	    File buildserver = JavaBuilder.getCodeBase(Tester.class);
+        tester.getLog().debug("buildserver at: " + buildserver);
+        addTrustedCodeBase("buildserver.tester.codebase", buildserver.getAbsolutePath());
 	}
 
 	/**
@@ -69,67 +68,6 @@ final class TrustedCodeBaseFinder {
 	 */
 	public Collection<TrustedCodeBase> getCollection() {
 		return trustedCodeBaseList;
-	}
-
-	/**
-	 * Look at a classpath entry to decide whether or not it is a trusted code
-	 * base.
-	 *
-	 * @param entry
-	 *            the classpath entry
-	 */
-	private void inspectEntry(String entry) {
-	    try {
-	    File f = new File(entry);
-	    entry = f.getCanonicalPath();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-		if (entry.endsWith(File.separator + "junit.jar")) {
-			// JUnit
-			if (!hasJUnit)
-			  addTrustedCodeBase("buildserver.junit.jar.file", entry);
-			hasJUnit = true;
-		} else {
-			// See if this codebase has the testrunner in it
-			if (elementContainsClass(entry, Tester.class.getName()))
-				addTrustedCodeBase("buildserver.tester.codebase", entry);
-		}
-	}
-
-	private boolean hasJUnit = false;
-
-	/**
-	 * Determine if the given classpath entry contains the named class
-	 *
-	 * @param entry
-	 *            the classpath entry
-	 * @param className
-	 *            the class name
-	 * @return true if the class is defined in the entry
-	 */
-	private boolean elementContainsClass(String entry, String className) {
-		String fileName = className.replace('.', '/') + ".class";
-		File f = new File(entry);
-		if (f.isDirectory()) {
-			return new File(f, fileName).isFile();
-		} else if (f.isFile()) {
-			ZipFile z = null;
-			try {
-				z = new ZipFile(f);
-				return (z.getEntry(fileName) != null);
-			} catch (IOException e) {
-				// Ignore
-			} finally {
-				try {
-					if (z != null)
-						z.close();
-				} catch (IOException ignore) {
-					// Ignore
-				}
-			}
-		}
-		return false;
 	}
 
 	private void addTrustedCodeBase(String property, String value) {

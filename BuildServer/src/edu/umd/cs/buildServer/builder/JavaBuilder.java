@@ -405,26 +405,26 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		addFileToClasspath(buf, getDom4jJar());
 	}
 	public static File getJUnitJar() {
-		return getJarFile(TestCase.class);
+		return getCodeBase(TestCase.class);
 	}
 	public static File getBuildServerJar() {
-		return getJarFile(TestRunner.class);
+		return getCodeBase(TestRunner.class);
 	}
 	public static File getCloverJar() {
 		return Clover.getCloverJar();
 	}
 
 	public static File getLog4jJar() {
-		return getJarFile(org.apache.log4j.Logger.class);
+		return getCodeBase(org.apache.log4j.Logger.class);
 	}
 	public static File getDom4jJar() {
-		return getJarFile(DocumentException.class);
+		return getCodeBase(DocumentException.class);
 	}
 	public static File getSubmitServerModelClasses() {
-		return getJarFile(TestOutcome.class);
+		return getCodeBase(TestOutcome.class);
 	}
 
-	public static File getJarFile(Class<?> c) {
+	public static File getCodeBase(Class<?> c) {
 		ClassLoader cl = c.getClassLoader();
 		String classFileName = c.getName().replace('.', '/') + ".class";
 		URL u = cl.getResource(classFileName);

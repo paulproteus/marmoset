@@ -250,8 +250,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 			method.addParameter("submissionPK", specificSubmission);
 			System.out.printf("Requesting submissionPK %s%n", specificSubmission);
 		}
-		if (specificTestSetup != null)
+		if (specificTestSetup != null) {
+		    method.addParameter("testSetupPK", specificTestSetup);
 		    System.out.printf("Requesting testSetupPK %s%n", specificTestSetup);
+		}
 		
 		method.addParameter("hostname",
 				getBuildServerConfiguration().getHostname());
@@ -282,7 +284,6 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 				"content-type: " + method.getResponseHeader("Content-type"));
 		getLog().debug(
 				"content-length: " + method.getResponseHeader("content-length"));
-
 		// Ensure we have a submission PK.
 		String submissionPK = getRequiredHeaderValue(method,
 				HttpHeaders.HTTP_SUBMISSION_PK_HEADER);
@@ -321,6 +322,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		else
 			servletAppender.setThreshold(Level.INFO);
 
+		String kind = method.getResponseHeader(HttpHeaders.HTTP_KIND_HEADER).getValue();
+		getLog().info(
+                "Got submission " +submissionPK +  ", testSetup " + testSetupPK + ", kind: " + kind);
+        
 		ProjectSubmission projectSubmission = new ProjectSubmission(
 				getBuildServerConfiguration(), getLog(), submissionPK, testSetupPK,
 				isNewTestSetup, isBackgroundRetest);
@@ -474,9 +479,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 			to.truncateLongTestResult();
 			// Most important size to print is the longResult len - it
 			// can be really long
+			int length = to.getLongTestResult().length();
 			getLog().info(
-					"  Outcome " + to.getTestNumber() + ": " + to.getTestName() + " longResult len: "
-							+ to.getLongTestResult().length());
+					"  Outcome " + to.getTestNumber() + ": " + to.getTestName() + " = " + to.getOutcome() 
+					+ (length > 0 ?  ", longResult len: " +  length : ""));
+
 		}
 
 		try {

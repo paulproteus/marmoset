@@ -195,11 +195,11 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		javaArgs.add("-Dbuildserver.build.dir="
 				+ getDirectoryFinder().getBuildDirectory().getCanonicalPath());
 		// Add trusted code bases
-		for (Iterator<TrustedCodeBase> i = getTrustedCodeBaseFinder()
-				.getCollection().iterator(); i.hasNext();) {
-			TrustedCodeBase trustedCodeBase = i.next();
+		for (TrustedCodeBase trustedCodeBase 
+		        : getTrustedCodeBaseFinder().getCollection()) {
 			javaArgs.add("-D" + trustedCodeBase.getProperty() + "="
 					+ trustedCodeBase.getValue());
+			getLog().debug("adding trusted codebase " + trustedCodeBase);
 		}
 		// Let the test classes know where test files are.
 		// Append a separator to the end, because this makes it
@@ -272,12 +272,13 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		boolean isRunning = false;
 		try {
 			// Spawn the TestRunner process
+		    String cmd = MarmosetUtilities.commandToString(javaArgs);
+            getLog().debug("TestRunner command: " + cmd);
+            
 			testRunner = Untrusted.execute(
 					javaArgs.toArray(new String[javaArgs.size()]), environment,
 					testRunnerCWD);
 
-			String cmd = MarmosetUtilities.commandToString(javaArgs);
-			getLog().debug("TestRunner command: " + cmd);
 			try {
 				int pid = MarmosetUtilities.getPid(testRunner);
 				getLog().debug(

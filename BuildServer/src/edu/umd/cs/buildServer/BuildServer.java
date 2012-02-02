@@ -984,7 +984,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 			out.flush();
 		} catch (IOException e) {
 			throw new BuilderException(
-					"Could not create update security.policy file", e);
+					"Could not create/update security.policy file", e);
 		} finally {
 			IO.closeSilently(in, out);
 		}
