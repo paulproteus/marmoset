@@ -52,7 +52,7 @@
        User: <a href="${userLink}">${error.userPK}</a>
        </c:if>
        
-        <c:if test="${not empty errorField['student_pk']  && errorField['user_pk'] != errorField['student_pk'] }">
+        <c:if test="${not empty errorField['student_pk']  && errorField['student_pk'] != 0 && errorField['user_pk'] != errorField['student_pk'] }">
             <br>Student: ${errorField['student_pk']}
     </c:if>
     <c:if test="${errorField['project_pk'] != 0}">
@@ -71,8 +71,10 @@
         <c:out value="${errorField['servlet']}" />
         <br> URI:
         <c:out value="${errorField['uri']}" />
+        <c:if test="${not empty errorField['query_string'] }">
         <br> Query string:
         <c:out value="${errorField['query_string']}" />
+        </c:if>
         <br> remote_host:
         <c:out value="${errorField['remote_host']}" />
         <c:if test="${not empty errorField['referer'] }">
