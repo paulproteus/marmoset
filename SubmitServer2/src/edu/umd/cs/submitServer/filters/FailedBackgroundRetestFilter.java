@@ -59,27 +59,26 @@ import edu.umd.cs.submitServer.UserSession;
  */
 public class FailedBackgroundRetestFilter extends SubmitServerFilter {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-     * javax.servlet.ServletResponse, javax.servlet.FilterChain)
-     */
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp,
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
-        HttpSession session = request.getSession();
-
         Project project = (Project) req.getAttribute(PROJECT);
+        
+        if (project == null)
+            throw new ServletException("No project");
 
         StudentRegistration studentRegistration = (StudentRegistration) req.getAttribute(STUDENT_REGISTRATION);
-        UserSession userSession = (UserSession) session
-                .getAttribute(USER_SESSION);
-        boolean instructor = (Boolean) request.getAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY);
+        
+        if (studentRegistration == null)
+            throw new ServletException("No StudentRegistration");
+        
+        Boolean instructor = (Boolean) request.getAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY);
+        if (instructor == null)
+            instructor = false;
         List<Submission> failedBackgroundRetestSubmissionList = new LinkedList<Submission>();
-
 
         Connection conn = null;
         try {
