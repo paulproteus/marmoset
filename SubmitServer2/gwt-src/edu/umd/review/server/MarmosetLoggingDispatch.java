@@ -74,6 +74,8 @@ public class MarmosetLoggingDispatch extends SimpleDispatch {
     if (m != null)
       msg += ":" + m;
     SubmitServerDatabaseProperties submitServerDatabaseProperties = propsProvider.get();
+    String userAgent = request.getHeader("User-Agent");
+    
     try {
       conn = submitServerDatabaseProperties.getConnection();
       ServerError.insert(conn,
@@ -90,7 +92,7 @@ public class MarmosetLoggingDispatch extends SimpleDispatch {
                          requestURI,
                          request.getQueryString(),
                          request.getRemoteHost(),
-                         "", thrown);
+                         "", userAgent, thrown);
     } catch (SQLException sqlException) {
       assert true; // ignore
     } finally {

@@ -41,52 +41,58 @@
     <p>
         When:
         <fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" />
-    <br>
-        kind:
+        <br> kind:
         <c:out value="${errorField['kind']}" />
-        <c:url var="userLink" value="/view/instructor/student.jsp">
-                    <c:param name="studentPK" value="${errorField['user_pk']}" />
-                    </c:url>
-    <br>User: <a href="${userLink}">${errorField['user_pk']}</a>
-     <c:if test="${not empty errorField['student_pk']  && errorField['user_pk'] != errorField['student_pk'] }">
-    <br>Student: ${errorField['student_pk']}
+
+         <c:if test="${not empty error.userPK}">
+         <br>
+         <c:url var="userLink" value="/view/instructor/student.jsp">
+            <c:param name="studentPK" value="${error.userPK}" />
+        </c:url>
+       User: <a href="${userLink}">${error.userPK}</a>
+       </c:if>
+       
+        <c:if test="${not empty errorField['student_pk']  && errorField['user_pk'] != errorField['student_pk'] }">
+            <br>Student: ${errorField['student_pk']}
     </c:if>
-    <br>Project: ${errorField['project_pk']}
-    <c:if test="${not empty errorField['submission']}}">
-    <br>Submission: ${errorField['submission']}
+    <c:if test="${errorField['project_pk'] != 0}">
+        <br>Project: ${errorField['project_pk']}
+        </c:if>
+        <c:if test="${not empty errorField['submission']}}">
+            <br>Submission: ${errorField['submission']}
     </c:if>
-    <br>
-        Code:
+        <br> Code:
         <c:out value="${errorField['code']}" />
-    <br>
-        Message:
+        <br> Message:
         <c:out value="${errorField['message']}" />
-    <br>
-        Type:
+        <br> Type:
         <c:out value="${errorField['type']}" />
-    <br>
-        Servlet:
+        <br> Servlet:
         <c:out value="${errorField['servlet']}" />
-    <br>
-        URI:
+        <br> URI:
         <c:out value="${errorField['uri']}" />
-    <br>
-        Query string:
+        <br> Query string:
         <c:out value="${errorField['query_string']}" />
-    <br>
-        remote_host:
+        <br> remote_host:
         <c:out value="${errorField['remote_host']}" />
-    <br>
-        referer:
+        <c:if test="${not empty errorField['referer'] }">
+        <br> referer:
         <c:out value="${errorField['referer']}" />
-    <br>
-        thowable:
-       <blockquote> <pre><c:out value="${errorField['throwable_as_string']}" />
+        </c:if>
+         <c:if test="${not empty errorField['user_agent'] }">
+        <br> User-Agent:
+        <c:out value="${errorField['user_agent']}" />
+        </c:if>
+        <c:if test="${not empty errorField['throwable_as_string'] }">
+        <br> throwable:
+    <blockquote>
+        <pre><c:out value="${errorField['throwable_as_string']}" />
        </pre>
-       </blockquote>
+    </blockquote>
+    </c:if>
 
 
 
-        <ss:footer />
+    <ss:footer />
 </body>
 </html>

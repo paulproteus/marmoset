@@ -42,6 +42,7 @@
             <tr>
                 <th>PK</th>
                 <th>When</th>
+                <th>User</th>
                 <th>Message</th>
             </tr>
             <c:forEach var="error" items="${recentExceptions}" varStatus="counter">
@@ -50,6 +51,12 @@
                             <c:param name="errorPK" value="${error.errorPK}" />
                         </c:url> <a href="${errorLink}">${error.errorPK}</a></td>
                     <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
+                     <td><c:if test="${not empty error.userPK}">
+                                <c:url var="userLink" value="/view/instructor/student.jsp">
+                                    <c:param name="studentPK" value="${error.userPK}" />
+                                </c:url>
+                             <a href="${userLink}">${error.userPK}</a>
+                            </c:if></td>
                     <td class="description"><c:out value="${error.message}" /></td>
                 </tr>
             </c:forEach>
@@ -63,23 +70,30 @@
         
         <div  id="errorList" style="display: none">
         <table>
-            <tr>
-                <th></th>
-                <th>When</th>
-                <th>Kind</th>
-                <th>Message</th>
-            </tr>
-            <c:forEach var="error" items="${recentErrors}" varStatus="counter">
+                <tr>
+                    <th></th>
+                    <th>When</th>
+                    <th>User</th>
+                    <th>Kind</th>
+                    <th>Message</th>
+                </tr>
+                <c:forEach var="error" items="${recentErrors}" varStatus="counter">
                     <tr class="r${counter.index % 2}">
                         <td><c:url var="errorLink" value="error.jsp">
                                 <c:param name="errorPK" value="${error.errorPK}" />
                             </c:url> <a href="${errorLink}">${error.errorPK}</a></td>
+                        <td><c:if test="${not empty error.userPK}">
+                                <c:url var="userLink" value="/view/instructor/student.jsp">
+                                    <c:param name="studentPK" value="${error.userPK}" />
+                                </c:url>
+                             <a href="${userLink}">${error.userPK}</a>
+                            </c:if></td>
                         <td><fmt:formatDate value="${error.when}" pattern="dd MMM, hh:mm a" /></td>
-                    <td>${error.kind}
-                    <td class="description"><c:out value="${error.message}" /></td>
-                </tr>
-            </c:forEach>
-        </table>
+                        <td>${error.kind}
+                        <td class="description"><c:out value="${error.message}" /></td>
+                    </tr>
+                </c:forEach>
+            </table>
         </div>
     </c:if>
 

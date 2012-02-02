@@ -37,6 +37,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) rq;
 		HttpServletResponse resp = (HttpServletResponse) rs;
+		String userAgent = req.getHeader("User-Agent");
 
 		HttpSession session = req.getSession();
 		Connection conn = null;
@@ -63,6 +64,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 			Submission submission = (Submission) req.getAttribute(SUBMISSION);
 			String referer = req.getHeader("referer");
 			String remoteHost = req.getRemoteHost();
+			 
 			
 			String code = getOptionalParameterAsString(req,
 					"javax.servlet.error.status_code");
@@ -93,7 +95,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 									coursePK,
 											project == null ? null : project.getProjectPK(),
 							submission == null ? null : submission.getSubmissionPK(), code, message,
-					type, servletName, requestURI, queryString, remoteHost, referer, throwable);
+					type, servletName, requestURI, queryString, remoteHost, referer, userAgent, throwable);
 			req.setAttribute("errorPK", errorPK);
 		} catch (Exception t) {
 			getSubmitServerFilterLog().warn(t);
@@ -114,7 +116,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 										course == null ? null : course.getCoursePK(),
 												project == null ? null : project.getProjectPK(),
 								submission == null ? null : submission.getSubmissionPK(), code, message,
-								type, "on chain", requestURI, queryString, remoteHost, referer, e);
+								type, "on chain", requestURI, queryString, remoteHost, referer, userAgent, e);
 			} catch (SQLException e2) {
 				getSubmitServerFilterLog().warn(e2);
 			} finally {

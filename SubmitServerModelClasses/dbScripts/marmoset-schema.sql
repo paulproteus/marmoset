@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `code_reviewer` (
   `last_update` datetime DEFAULT NULL,
   `num_comments` int(11) NOT NULL DEFAULT '0',
   `known_as` varchar(100) NOT NULL,
-  `is_automated` int(1) NOT NULL,
+  `is_automated` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`code_reviewer_pk`),
   KEY `code_review_pk` (`student_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`),
@@ -201,6 +201,7 @@ CREATE TABLE `errors` (
   `throwable_as_string` text COLLATE utf8_bin,
   `throwable` blob,
   `kind` varchar(30) COLLATE utf8_bin DEFAULT NULL,
+  `user_agent` text COLLATE utf8_bin,
   PRIMARY KEY (`error_pk`),
   KEY `when` (`when`),
   KEY `user_pk` (`user_pk`),
@@ -282,7 +283,7 @@ CREATE TABLE IF NOT EXISTS `registration_requests` (
   UNIQUE KEY `student_pk` (`student_pk`),
   UNIQUE KEY `course_pk` (`course_pk`),
   UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 

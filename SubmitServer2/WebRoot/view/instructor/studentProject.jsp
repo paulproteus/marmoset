@@ -146,7 +146,7 @@ an extension on project
                      </td>
 						<td><fmt:formatDate value="${submission.releaseRequest}"
 							pattern="dd MMM h:mm a" /></td>
-                            inconsistentResults
+                     
                         <c:if test="${inconsistentResults > 0}">
 						<td>
                         <c:if test="${submission.numFailedBackgroundRetests}">

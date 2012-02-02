@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.CheckForNull;
+
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 public class ServerError {
@@ -20,7 +22,7 @@ public class ServerError {
 	static final String[] ATTRIBUTE_NAME_LIST = { "error_pk", "when",
 			"user_pk", "student_pk", "course_pk", "project_pk", "submission_pk", "code", "message", "type", "servlet", "uri",
 			"query_string","remote_host","referer",
-			"throwable_as_string", "throwable", "kind" };
+			"throwable_as_string", "throwable", "kind", "user_agent"};
 	
 	public enum Kind {
 	    SLOW(600), PAGE_NOT_FOUND(500), BAD_AUTHENTICATION(500), NOT_REGISTERED(500),
@@ -49,17 +51,19 @@ public class ServerError {
 	            TABLE_NAME, ATTRIBUTE_NAME_LIST);
 
 
-	 private ServerError(int errorPK, Timestamp when, Kind kind, String message) {
+	 private ServerError(int errorPK, int userPK, Timestamp when, Kind kind, String message) {
 	        this.errorPK = errorPK;
+	        this.userPK = userPK;
 	        this.when = when;
 	        this.kind = kind;
 	        this.message = message;
 	    }
-    private ServerError(int errorPK, Timestamp when, String kind, String message) {
-        this(errorPK, when, Kind.safeValueOf(kind), message);
+    private ServerError(int errorPK, int userPK, Timestamp when, String kind, String message) {
+        this(errorPK, userPK, when, Kind.safeValueOf(kind), message);
     }
 
     final int errorPK;
+    final int userPK;
     final Timestamp when;
 	final String message;
 	final Kind kind;
@@ -72,6 +76,11 @@ public class ServerError {
         return when;
     }
 
+    public @CheckForNull Integer getUserPK() {
+        if (userPK == 0)
+            return null;
+        return userPK;
+    }
     public Kind getKind() {
         return kind;
     }
@@ -81,13 +90,13 @@ public class ServerError {
 
     
     public static ServerError getError(int errorPK, Connection conn) throws SQLException {
-        String query = "SELECT error_pk, `when`, kind, message FROM " + TABLE_NAME 
+        String query = "SELECT error_pk, `when`, kind, message, user_pk FROM " + TABLE_NAME 
                 + " WHERE `error_pk` = ? "
                 + " ORDER BY  `errors`.`when` DESC ";
         PreparedStatement stmt = Queries.setStatement(conn,  query, errorPK);
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
-            return new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
+            return new ServerError(rs.getInt(1), rs.getInt(5), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
         }
         return null;
     }
@@ -109,58 +118,43 @@ public class ServerError {
                     value = rs.getBlob(col);
                 else if (c.equals("when"))
                     value = rs.getDate(col);
-                else value = rs.getString(col);
+                else 
+                    value = rs.getString(col);
                 col++;
                 result.put(c, value);
             }
         }
         
         return result;
-        
     }
 
+    public static List<ServerError> recentErrors(Connection conn, String constraint, Object... args) throws SQLException {
+        String query = "SELECT error_pk, user_pk , `when`, kind, message FROM " + TABLE_NAME + " "
+                + constraint;
+        List<ServerError> result = new ArrayList<ServerError>();
+        PreparedStatement stmt = Queries.setStatement(conn,  query, args);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            ServerError e = new ServerError(rs.getInt(1), rs.getInt(2), rs.getTimestamp(3), rs.getString(4), rs.getString(5));
+            result.add(e);
+        }
+        return result;
+    }
      
     public static List<ServerError> recentErrors(int limit, Timestamp maxAge, Connection conn) throws SQLException {
-        String query = "SELECT error_pk, `when`, kind, message FROM " + TABLE_NAME 
-                + " WHERE `when` >= ? "
-                + " ORDER BY  `errors`.`when` DESC "
-                + " LIMIT ?";
-        List<ServerError> result = new ArrayList<ServerError>();
-        PreparedStatement stmt = Queries.setStatement(conn,  query, maxAge, limit);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServerError e = new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
-            result.add(e);
-        }
-        return result;
+        return recentErrors(conn, " WHERE `when` >= ?  ORDER BY  `errors`.`when` DESC LIMIT ?",  
+                        maxAge, limit);
     }
+    
     public static List<ServerError> recentErrorsExcludingKind(int limit, Kind kind, Timestamp maxAge, Connection conn) throws SQLException {
-        String query = "SELECT error_pk, `when`,kind, message FROM " + TABLE_NAME 
-                + " WHERE `when` >= ?  and (`kind` != ?  OR `kind` is NULL) "
+        return recentErrors(conn, " WHERE `when` >= ?  and (`kind` != ?  OR `kind` is NULL) "
                 + " ORDER BY  `errors`.`when` DESC "
-                + " LIMIT ?";
-        List<ServerError> result = new ArrayList<ServerError>();
-        PreparedStatement stmt = Queries.setStatement(conn,  query, maxAge, kind, limit);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServerError e = new ServerError(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getString(4));
-            result.add(e);
-        }
-        return result;
+                + " LIMIT ?", maxAge, kind, limit);
     }
     public static List<ServerError> recentErrors(int limit, Kind kind, Timestamp maxAge, Connection conn) throws SQLException {
-        String query = "SELECT error_pk, `when`, message FROM " + TABLE_NAME 
-                + " WHERE `when` >= ?  and `kind` = ? "
+        return recentErrors(conn, " WHERE `when` >= ?  and `kind` = ? "
                 + " ORDER BY  `errors`.`when` DESC "
-                + " LIMIT ?";
-        List<ServerError> result = new ArrayList<ServerError>();
-        PreparedStatement stmt = Queries.setStatement(conn,  query, maxAge, kind, limit);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServerError e = new ServerError(rs.getInt(1), rs.getTimestamp(2), kind, rs.getString(3));
-            result.add(e);
-        }
-        return result;
+                + " LIMIT ?", maxAge, kind, limit);
     }
 
 	public static int insert(Connection conn, Kind kind, 
@@ -168,7 +162,7 @@ public class ServerError {
 			Integer coursePK, @Project.PK Integer projectPK, 
 			@Submission.PK Integer submissionPK,
 			String code, String message, String type, String servlet, String uri, 
-			String queryString, String remoteHost, String referer, Throwable t)
+			String queryString, String remoteHost, String referer, String userAgent, Throwable t)
 			throws SQLException {
 		if (conn == null)
 			return -1;
@@ -184,7 +178,7 @@ public class ServerError {
 		PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		try {
 			Queries.setStatement(stmt, now, userPK, studentPK, coursePK, projectPK, submissionPK, code, message, type,
-					servlet, uri, queryString, remoteHost, referer, throwableAsString, Queries.serialize(conn, t), kind);
+					servlet, uri, queryString, remoteHost, referer, throwableAsString, Queries.serialize(conn, t), kind, userAgent);
 			stmt.executeUpdate();
 			return Queries.getGeneratedPrimaryKey(stmt);
 		} finally {

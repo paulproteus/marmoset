@@ -162,10 +162,11 @@ public class ServletExceptionFilter extends SubmitServerFilter {
         }
 
         String requestURI = request.getRequestURI();
-
+        String userAgent = request.getHeader("User-Agent");
+        
         ServerError.insert(conn,kind, null, null,  null, /* project */ null, 
                 /* submission */ null, /* code */ null, message, type, null, requestURI,
-                request.getQueryString(), remoteHost, referer, e);
+                request.getQueryString(), remoteHost, referer, userAgent, e);
 
         if (response != null) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

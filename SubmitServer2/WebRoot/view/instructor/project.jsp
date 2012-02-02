@@ -208,6 +208,10 @@
 
 <h1>Submissions</h1>
 
+<c:if test="${project.visibleToStudents && not empty studentsWithoutSubmissions}">
+<p>${fn:length(studentsWithoutSubmissions)} active students without submissions
+</c:if>
+
 <c:url var="sortByTime"
 	value="${ss:scrub(pageContext.request.pathTranslated)}">
 	<c:param name="projectPK" value="${project.projectPK}" />
@@ -398,9 +402,7 @@
 </p>
 </c:if>
 
-<c:if test="${project.visibleToStudents}">
 <ss:studentsWithoutSubmissionsTable />
-</c:if>
 
 <ss:footer />
 </body>

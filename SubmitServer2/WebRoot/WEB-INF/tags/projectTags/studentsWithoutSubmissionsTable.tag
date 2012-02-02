@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+
+<c:if test="${project.visibleToStudents}">
 <h1>Active students without submissions</h1>
 <p>
 <table>
@@ -48,3 +50,4 @@
 		</c:if>
 	</c:forEach>
 </table>
+</c:if>

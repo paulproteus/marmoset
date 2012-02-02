@@ -201,9 +201,11 @@ exemplar
                             <c:out value="${section}" />
                             <select name="section-reviewer-${section}">
                             <c:forEach var="studentRegistration" items="${courseInstructors}">
+                              <c:if test="${empty studentRegistration.section || studentRegistration.section == section }">
                                 <option value="${studentRegistration.studentPK}">
                                 <c:out value="${studentRegistration.fullname}" />
                                 </option>
+                                </c:if>
                             </c:forEach>
                             </select>
                             <br>
@@ -216,7 +218,7 @@ exemplar
                     <td class="input"><input type="checkbox" name="anonymous" value="true" /></td>
                 </tr>
                 <tr>
-                    <td class="label">Can see comments<br>from other reviewers</td>
+                    <td class="label">Can see comments from <br>other reviewers</td>
                     <td class="input"><input type="checkbox" name="canSeeOthers" value="true" /></td>
                 </tr>
             </tbody>

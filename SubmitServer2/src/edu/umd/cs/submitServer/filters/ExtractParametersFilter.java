@@ -188,6 +188,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                 // Get Submission
                 submission = Submission
                         .lookupBySubmissionPK(submissionPK, conn);
+                if (submission == null)
+                    throw new ServletException("No such submission");
                 // get the defaultTestRun, unless we already got a test run from
                 // the previous
                 // if block
@@ -392,7 +394,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 							registration);
 					if (registration.isInstructor())
 						staffStudentRegistrationSet.add(registration);
-					else if (!registration.isNormalStudent())
+					else if (registration.isNormalStudent())
 						justStudentRegistrationSet.add(registration);
 				}
 				

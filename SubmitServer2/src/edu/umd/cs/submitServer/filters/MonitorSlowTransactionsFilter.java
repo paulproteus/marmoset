@@ -144,6 +144,7 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
     public static void insertServerError(Connection conn, HttpServletRequest request, String msg,
             @Student.PK Integer userPK, Integer coursePK,
             Student student,  Project project, Submission submission) throws SQLException {
+        String userAgent = request.getHeader("User-Agent");
         ServerError.insert(conn, ServerError.Kind.SLOW, 
                 userPK, 
                 student == null ? null : student.getStudentPK(),
@@ -153,15 +154,17 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
                         "Slow", 
                         request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(), request.getHeader("referer"), null);
+                        request.getRemoteHost(), request.getHeader("referer"), userAgent, null);
     }
     public static void insertServerError(Connection conn, HttpServletRequest request,
            String msg, String type, String servlet) throws SQLException {
+        String userAgent = request.getHeader("User-Agent");
+        
         ServerError.insert(conn, ServerError.Kind.SLOW, null, null, null, null,
                         null, null, msg, type, 
                         servlet, 
                         request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(), request.getHeader("referer"), null);
+                        request.getRemoteHost(), request.getHeader("referer"), userAgent, null);
     }
 }
