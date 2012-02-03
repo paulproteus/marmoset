@@ -37,7 +37,7 @@ public class ProcessTree {
                 int  ppid = Integer.parseInt(fields[1]);
                 children.put(ppid, pid);
             } catch (Exception e) {
-                log.error("Error while building process treee, parsing " + s, e);
+                log.error("Error while building process treee, parsing " + txt, e);
             }
            
         }
