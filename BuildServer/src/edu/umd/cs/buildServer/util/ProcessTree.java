@@ -25,8 +25,10 @@ public class ProcessTree {
         
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
+        
         while (s.hasNext()) {
             String txt = s.nextLine();
+            log.debug(txt);
             try {
                 String fields [] = txt.trim().split(" +");
                 if (fields.length != 2)
