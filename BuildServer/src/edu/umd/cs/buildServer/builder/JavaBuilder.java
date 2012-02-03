@@ -326,8 +326,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 
 		try {
 			Process javac = Untrusted.execute(
-					args.toArray(new String[args.size()]), null,
-					getDirectoryFinder().getBuildDirectory());
+					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
 
 			// Capture stdout and stderr from the process
 			CombinedStreamMonitor monitor = new CombinedStreamMonitor(

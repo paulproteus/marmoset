@@ -132,8 +132,7 @@ public class CTester extends Tester {
 		String execString = getTestProperties().getTestExec(testType, exeName);
 		if (execString == null) {
 		    // Hopefully the test executable is really there.
-            checkTestExe(exeName);
-		    execString = "./"+exeName;
+		    execString = checkTestExe(exeName);
 		}
 
 		try {
@@ -158,8 +157,9 @@ public class CTester extends Tester {
 			int testTimeoutInSeconds = getTestProperties()
 					.getTestTimeoutInSeconds();
 			
-			process = Untrusted.execute(execString, environment,
-					getDirectoryFinder().getBuildDirectory());
+			process = Untrusted.execute(getDirectoryFinder().getBuildDirectory(), 
+			        "/bin/bash", "-c", execString);
+					
 
 			// Read the stdout/stderr from the test executable.
 			getLog().trace("Starting stream monitor");
@@ -172,7 +172,7 @@ public class CTester extends Tester {
 			// but not timed process waits. We emulate the latter
 			// using the former.
 			getLog().trace("Starting exit monitor");
-			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process);
+			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
 			exitMonitor.start();
 
 			// Record a test outcome.
@@ -211,6 +211,7 @@ public class CTester extends Tester {
 				testOutcome
 						.setLongTestResult(streamMonitor.getCombinedOutput());
 			} else {
+			    finished = true;
 				// Test timed out!
 				getLog().warn("Process timed out!");
 
@@ -251,9 +252,15 @@ public class CTester extends Tester {
 	 * @param exeName
 	 *            name of the test executable.
 	 */
-	private void checkTestExe(String exeName) {
-		File exeFile = new File(getDirectoryFinder().getBuildDirectory(),
-				exeName);
+	private String checkTestExe(String exeName) {
+		File buildDirectory = getDirectoryFinder().getBuildDirectory();
+        File exeFile = new File(buildDirectory, exeName);
+        try {
+            if (!exeFile.getCanonicalPath().startsWith(buildDirectory.getCanonicalPath()))
+                    throw new IllegalArgumentException("executable not in build directory: " + exeName);
+        } catch (IOException e1) {
+            throw new IllegalArgumentException("Unable to resolve canonical path for " + exeFile.getAbsolutePath());
+        }
 		int tries = 0;
 		while (tries++ < 5) {
 			if (exeFile.isFile())
@@ -270,6 +277,7 @@ public class CTester extends Tester {
 		if (!exeFile.canExecute())
 		    getLog().warn(
                     "Test executable " + exeFile + " isn't executable");
+		return "./" + exeName;
             
 	}
 }

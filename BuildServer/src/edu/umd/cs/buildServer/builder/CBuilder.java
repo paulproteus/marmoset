@@ -159,15 +159,14 @@ public class CBuilder extends Builder implements TestPropertyKeys {
 			}
 
 			process = Untrusted.execute(
-					args.toArray(new String[args.size()]), null,
-					getDirectoryFinder().getBuildDirectory());
+					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
 
 			CombinedStreamMonitor monitor = new CombinedStreamMonitor(
 					process.getInputStream(), process.getErrorStream());
 
 			monitor.start();
 			
-			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process);
+			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
             exitMonitor.start();
 
             long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;

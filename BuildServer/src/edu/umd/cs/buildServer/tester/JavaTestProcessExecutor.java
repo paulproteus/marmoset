@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -66,7 +65,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	private String testMethod;
 	private JUnitTestCase testCase;
 	private int nextTestNumber;
-	private String[] environment = null;
 
 	/**
 	 * Constructor.
@@ -105,9 +103,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 						+ testMethod + ".out").getAbsolutePath();
 	}
 
-	public void setEnvironment(String[] environment) {
-		this.environment = environment;
-	}
 
 	/**
 	 * Set the starting test number to be used when collecting TestOutcomes.
@@ -260,12 +255,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
                 System.out.println("java args: ");
                 for (String s : javaArgs)
                     System.out.println("  " + s);
-                System.out.println("java env: ");
 
-                if (environment != null) {
-                    for (String e : environment)
-                        System.out.println("  " + e);
-                }
             }
 		
 		Process testRunner = null;
@@ -276,8 +266,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
             getLog().debug("TestRunner command: " + cmd);
             
 			testRunner = Untrusted.execute(
-					javaArgs.toArray(new String[javaArgs.size()]), environment,
-					testRunnerCWD);
+					testRunnerCWD, javaArgs.toArray(new String[javaArgs.size()]));
 
 			try {
 				int pid = MarmosetUtilities.getPid(testRunner);

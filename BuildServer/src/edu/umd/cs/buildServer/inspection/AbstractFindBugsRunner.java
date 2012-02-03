@@ -162,8 +162,7 @@ public abstract class AbstractFindBugsRunner implements
 				Thread.currentThread());
 		try {
 			process = Untrusted.execute(
-					args.toArray(new String[args.size()]), null,
-					projectSubmission.getBuildOutputDirectory());
+					projectSubmission.getBuildOutputDirectory(), args.toArray(new String[args.size()]));
 
 			alarm.start();
 

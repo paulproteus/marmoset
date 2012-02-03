@@ -24,16 +24,12 @@
 package edu.umd.cs.buildServer.tester;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.zip.ZipFile;
-
-import edu.umd.cs.buildServer.builder.JavaBuilder;
 
 import junit.framework.TestCase;
+import edu.umd.cs.buildServer.builder.JavaBuilder;
 
 
 /**

@@ -26,13 +26,18 @@
  */
 package edu.umd.cs.buildServer.util;
 
+import org.apache.log4j.Logger;
+
+
 /**
  * Wait a fixed amount of time for a process to exit.
  * 
  * @author David Hovemeyer
  */
 public class ProcessExitMonitor extends Thread {
-	private Process process;
+    
+    private final Logger log;
+	private final Process process;
 	private boolean exited;
 	private volatile int exitCode;
 
@@ -41,18 +46,16 @@ public class ProcessExitMonitor extends Thread {
 	 * 
 	 * @param process
 	 *            the process to monitor for exit
+	 * @param logger TODO
 	 */
-	public ProcessExitMonitor(Process process) {
+	public ProcessExitMonitor(Process process, Logger logger) {
 		this.setDaemon(true);
 		this.process = process;
+		this.log = logger;
 		this.exited = false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
+
 	@Override
 	public void run() {
 		try {
@@ -84,7 +87,7 @@ public class ProcessExitMonitor extends Thread {
 		if (exited) 
 		    return true;
 		 
-		process.destroy();
+		Untrusted.destroyProcessTree(process, log);
 		return false;
 	}
 

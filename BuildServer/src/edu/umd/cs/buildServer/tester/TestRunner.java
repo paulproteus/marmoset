@@ -34,8 +34,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Properties;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.JUnit4TestAdapter;

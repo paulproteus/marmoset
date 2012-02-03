@@ -313,8 +313,6 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		if (isBackgroundRetest == null)
 			isBackgroundRetest = "no";
 
-		getLog().debug("Background Retest: " + isBackgroundRetest);
-
 		ServletAppender servletAppender = (ServletAppender) getLog()
 				.getAppender("servletAppender");
 		if (isBackgroundRetest.equals("yes"))
