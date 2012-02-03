@@ -155,9 +155,16 @@
 												value="${submission.submissionTimestamp}"
 												pattern="dd MMM, hh:mm a" /> </a>
 									</td>
+                                    <c:choose>
+                                    <c:when test="${submission.buildStatus == 'COMPLETE'}">
 									<td>${submission.valuePublicTestsPassed}</td>
 									<td>${submission.valueReleaseTestsPassed}</td>
 									<td>${submission.valueSecretTestsPassed}</td>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <td colspan="3"><c:out value="${submission.buildStatus}"/></td>
+                                    </c:otherwise>
+                                    </c:choose>
 								</tr>
 							</c:forEach>
 
