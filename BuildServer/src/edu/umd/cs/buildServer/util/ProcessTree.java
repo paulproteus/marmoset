@@ -21,7 +21,7 @@ public class ProcessTree {
         this.log = log;
         String user = System.getProperty("user.name");
 
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "-u", user,
+        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "ax", 
                         "-o", "pid,ppid"});
         Process p = b.start();
         
