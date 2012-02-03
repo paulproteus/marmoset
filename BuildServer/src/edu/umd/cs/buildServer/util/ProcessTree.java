@@ -20,12 +20,13 @@ public class ProcessTree {
         String user = System.getProperty("user.name");
 
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "-u", user,
-                        "-o", "pid= ppid="});
+                        "-o", "pid,ppid"});
         Process p = b.start();
         
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
-        
+        String header = s.nextLine();
+        log.trace("ps header: " + header);
         while (s.hasNext()) {
             String txt = s.nextLine();
             log.debug(txt);
