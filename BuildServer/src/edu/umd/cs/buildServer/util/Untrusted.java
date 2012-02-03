@@ -22,7 +22,7 @@ public class Untrusted {
             pid = MarmosetUtilities.getPid(process);
 
             log.info("Killing process tree for " + pid);
-            ProcessTree tree = new ProcessTree();
+            ProcessTree tree = new ProcessTree(log);
             tree.killProcessTree(pid, 9);
         } catch (Exception e) {
             log.warn("Error trying to kill process tree for " + pid, e);

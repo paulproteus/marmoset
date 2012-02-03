@@ -2,9 +2,12 @@ package edu.umd.cs.buildServer.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -13,7 +16,7 @@ public class ProcessTree {
     
     Multimap<Integer, Integer> children =  ArrayListMultimap.create();      
     
-    public ProcessTree() throws Exception {
+    public ProcessTree(Logger log) throws Exception {
         String user = System.getProperty("user.name");
 
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "-u", user,
@@ -23,10 +26,25 @@ public class ProcessTree {
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
         while (s.hasNext()) {
-            int pid = s.nextInt();
-            int  ppid = s.nextInt();
-            children.put(ppid, pid);
+            String txt = s.nextLine();
+            try {
+                String fields [] = txt.trim().split(" +");
+                if (fields.length != 2)
+                    throw new IllegalStateException("Got " + Arrays.toString(fields));
+                int pid = Integer.parseInt(fields[0]);
+                int  ppid = Integer.parseInt(fields[1]);
+                children.put(ppid, pid);
+            } catch (Exception e) {
+                log.error("Error while building process treee, parsing " + s, e);
+            }
+           
         }
+        s.close();
+         s = new Scanner(p.getErrorStream());
+         while (s.hasNext()) {
+             log.error(s.nextLine());
+         }
+         s.close();
         p.destroy();
     }
     public static void killProcess(int pid, int signal) throws IOException, InterruptedException {
