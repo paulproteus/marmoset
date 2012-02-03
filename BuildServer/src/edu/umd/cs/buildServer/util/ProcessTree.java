@@ -14,9 +14,11 @@ import com.google.common.collect.Multimap;
 
 public class ProcessTree {
     
-    Multimap<Integer, Integer> children =  ArrayListMultimap.create();      
+    final Multimap<Integer, Integer> children =  ArrayListMultimap.create();  
+    final Logger log;
     
     public ProcessTree(Logger log) throws Exception {
+        this.log = log;
         String user = System.getProperty("user.name");
 
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "-u", user,
@@ -70,6 +72,7 @@ public class ProcessTree {
     }
     public  void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
         Set<Integer> result = findTree(rootPid);
+        log.info("Killing process tree starting at " + rootPid + " which is " + result);
         ArrayList<String> cmd = new ArrayList<String>();
         cmd.add("/bin/kill");
         cmd.add("-"+signal);
