@@ -81,15 +81,13 @@ public class ProcessTree {
         Process p = b.start();
         int exitCode = p.waitFor();
         if (exitCode != 0)
-            throw new IOException("exit code " + exitCode);
+            log.warn("exit code from kill" + exitCode);
         p.destroy();
         Thread.sleep(1000);
         cmd.add(1, "-" + signal);
         b = new ProcessBuilder(cmd );
         p = b.start();
-        exitCode = p.waitFor();
-        if (exitCode != 0)
-            throw new IOException("exit code " + exitCode);
+        p.waitFor();
         p.destroy();
         Thread.sleep(1000);
       
