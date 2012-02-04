@@ -22,7 +22,7 @@ public class ProcessTree {
         String user = System.getProperty("user.name");
 
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "ax", 
-                        "-o", "pid,ppid"});
+                        "-o", "pid,ppid,user,cmd,args"});
         Process p = b.start();
         
         p.getOutputStream().close();
@@ -34,7 +34,7 @@ public class ProcessTree {
             log.debug(txt);
             try {
                 String fields [] = txt.trim().split(" +");
-                if (fields.length != 2)
+                if (fields.length < 2)
                     throw new IllegalStateException("Got " + Arrays.toString(fields));
                 int pid = Integer.parseInt(fields[0]);
                 int  ppid = Integer.parseInt(fields[1]);
@@ -75,7 +75,6 @@ public class ProcessTree {
         log.info("Killing process tree starting at " + rootPid + " which is " + result);
         ArrayList<String> cmd = new ArrayList<String>();
         cmd.add("/bin/kill");
-        cmd.add("-"+signal);
         for(Integer i : result)
             cmd.add(i.toString());
         ProcessBuilder b = new ProcessBuilder(cmd );
@@ -83,6 +82,16 @@ public class ProcessTree {
         int exitCode = p.waitFor();
         if (exitCode != 0)
             throw new IOException("exit code " + exitCode);
+        p.destroy();
+        Thread.sleep(1000);
+        cmd.add(1, "-" + signal);
+        b = new ProcessBuilder(cmd );
+        p = b.start();
+        exitCode = p.waitFor();
+        if (exitCode != 0)
+            throw new IOException("exit code " + exitCode);
+        p.destroy();
+        Thread.sleep(1000);
       
          
     }
