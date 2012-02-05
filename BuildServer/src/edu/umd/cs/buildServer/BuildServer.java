@@ -1044,6 +1044,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 			noWorkCount = MAX_SLEEP;
 		int sleepTime = (1 << noWorkCount) * 1000;
 		log.trace("Sleeping for " + sleepTime + " milliseconds");
+		System.gc();
 		Thread.sleep(sleepTime + random.nextInt(sleepTime));
 
 		++noWorkCount;
