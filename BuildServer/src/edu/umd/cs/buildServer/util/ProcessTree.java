@@ -1,6 +1,9 @@
 package edu.umd.cs.buildServer.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -78,20 +81,55 @@ public class ProcessTree {
         for(Integer i : result)
             cmd.add(i.toString());
         ProcessBuilder b = new ProcessBuilder(cmd );
-        Process p = b.start();
-        int exitCode = p.waitFor();
+        int exitCode = waitFor(b);
         if (exitCode != 0)
             log.warn("exit code from kill" + exitCode);
-        p.destroy();
         Thread.sleep(1000);
         cmd.add(1, "-" + signal);
         b = new ProcessBuilder(cmd );
-        p = b.start();
-        p.waitFor();
-        p.destroy();
+        waitFor(b);
         Thread.sleep(1000);
-      
-         
     }
+    
+    void drainToLog(final InputStream in) {
+        Thread t = new Thread( new Runnable() {
+            public void run() {
+                try {
+                BufferedReader r = new BufferedReader(new InputStreamReader(in));
+
+                while (true) {
+                    String txt = r.readLine();
+                    if (txt == null) return;
+                    log.debug("process generated: " + txt);
+                }
+                } catch (IOException e) {
+                    log.warn("error while draining", e);
+                
+                } finally { 
+                    try {
+                    in.close();
+                    } catch (IOException e) {
+                        assert false;
+                    }
+                }
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+       
+        
+    }
+    private int waitFor(ProcessBuilder b) throws IOException, InterruptedException {
+        b.redirectErrorStream(true);
+        Process p = b.start();
+        p.getOutputStream().close();
+        drainToLog(p.getInputStream());
+        int exitCode = p.waitFor();
+        p.getInputStream().close();
+        p.destroy();
+        return exitCode;
+    }
+        
+   
 
 }
