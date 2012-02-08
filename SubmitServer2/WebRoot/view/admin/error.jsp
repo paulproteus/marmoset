@@ -49,17 +49,26 @@
          <c:url var="userLink" value="/view/instructor/student.jsp">
             <c:param name="studentPK" value="${error.userPK}" />
         </c:url>
-       User: <a href="${userLink}">${error.userPK}</a>
+       <a href="${userLink}">User: ${error.userPK}</a>
        </c:if>
        
         <c:if test="${not empty errorField['student_pk']  && errorField['student_pk'] != 0 && errorField['user_pk'] != errorField['student_pk'] }">
-            <br>Student: ${errorField['student_pk']}
+            <c:url var="studentLink" value="/view/instructor/student.jsp">
+            <c:param name="studentPK" value="${errorField['student_pk']}" />
+        </c:url>
+      <br><a href="${studentLink}">Student: ${errorField['student_pk']}</a>
     </c:if>
     <c:if test="${errorField['project_pk'] != 0}">
-        <br>Project: ${errorField['project_pk']}
+     <c:url var="projectLink" value="/view/instructor/project.jsp">
+            <c:param name="projectPK" value="${errorField['project_pk']}" />
+        </c:url>
+        <br><a href="${projectLink}">Project: ${errorField['project_pk']}</a>
         </c:if>
-        <c:if test="${not empty errorField['submission']}}">
-            <br>Submission: ${errorField['submission']}
+        <c:if test="${not empty errorField['submission_pk']}}">
+         <c:url var="submissionLink" value="/view/instructor/submission.jsp">
+            <c:param name="submissionPK" value="${errorField['submission_pk']}" />
+        </c:url>
+            <br><a href="${submissionLink}">Submission: ${errorField['submission_pk']}</a>
     </c:if>
         <br> Code:
         <c:out value="${errorField['code']}" />
