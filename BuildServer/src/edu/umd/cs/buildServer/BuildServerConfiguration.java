@@ -117,7 +117,7 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 			throws MissingConfigurationPropertyException {
 		setJavaHome(config.getStringProperty("java.home", ""));
 		setBuildServerWorkingDir(config.getStringProperty(BUILD_SERVER_HOME, START_DIRECTORY));
-		setBuildServerRoot(getBuildServerRoot());
+		setBuildServerRoot(getBuildServerRoot(config));
 		this.configuration = config;
 
 		// Semester and course
@@ -177,6 +177,8 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	 * @return Returns the buildServerRoot.
 	 */
 	public File getBuildServerRoot() {
+	    if (buildServerRoot == null)
+            throw new NullPointerException("null build server root");
 		return buildServerRoot;
 	}
 
@@ -185,6 +187,8 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	 *            The buildServerRoot to set.
 	 */
 	public void setBuildServerRoot(File buildServerRoot) {
+	    if (buildServerRoot == null)
+	        throw new NullPointerException("null build server root");
 		this.buildServerRoot = buildServerRoot;
 	}
 
