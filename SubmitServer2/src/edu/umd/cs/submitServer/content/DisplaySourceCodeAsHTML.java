@@ -36,8 +36,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 
@@ -115,8 +117,8 @@ public class DisplaySourceCodeAsHTML {
 	private final TokenScanner scanner;
 	protected PrintWriter out;
 	private int tabWidth = DEFAULT_TAB_WIDTH;
-	private Map<Integer, HighlightRange> highlightStartMap = new HashMap<Integer, HighlightRange>();
-	private Map<Integer, HighlightRange> highlightEndMap = new HashMap<Integer, HighlightRange>();
+	private Map<Integer, HighlightRange> highlightMap = new HashMap<Integer, HighlightRange>();
+	private Set<Integer> anchorLines = new HashSet<Integer>();
 	private Map<TokenType, String> tokenStyleMap = new HashMap<TokenType, String>();
 	private int displayStart, displayEnd;
 
@@ -201,8 +203,9 @@ public class DisplaySourceCodeAsHTML {
 	public void addHighlightRange(int startLine, int numLines, String style) {
 		HighlightRange highlight = new HighlightRange(startLine, style,
 				highlightCount++);
-		highlightStartMap.put(startLine, highlight);
-		highlightEndMap.put(startLine + numLines, highlight);
+		anchorLines.add(startLine);
+		for(int i = startLine; i < startLine + numLines; i++)
+		    highlightMap.put(i, highlight);
 	}
 
 	/**
@@ -381,17 +384,12 @@ public class DisplaySourceCodeAsHTML {
 		inBeginningWhiteSpace = true;
 
 		// New range begins?
-		HighlightRange startRange = highlightStartMap.get(lineNo);
-		if (startRange != null) {
-			currentHighlightRange = startRange;
-			anchoredLine = true;
-		}
+		currentHighlightRange = highlightMap.get(lineNo);
+		anchoredLine = anchorLines.contains(lineNo);
 
 		String style = null;
 		if (currentHighlightRange != null)
 			style = currentHighlightRange.style;
-
-		
 
 		// Callback for adding coverage information to the generated page
 		style = coverageCallback(style);
