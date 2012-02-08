@@ -311,7 +311,7 @@
 						</c:if>
 					</td>
                     <td>
-                        <c:if test="${testSetup.jarfileStatus == 'failed' or testSetup.jarfileStatus != 'pending'}">
+                        <c:if test="${testSetup.jarfileStatus == 'failed' or testSetup.jarfileStatus == 'pending'}">
                         <c:url var="retestLink"
                                         value="/action/instructor/ChangeTestSetupStatus">
                             <c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
