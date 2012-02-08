@@ -686,8 +686,9 @@ public final class Queries {
 	 * @param allowedCourses
 	 * @return
 	 */
-    private static @CheckForNull String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
-        assert !allowedCourses.isEmpty();
+    private static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
+        if (allowedCourses.isEmpty())
+            throw new IllegalArgumentException("no courses");
         String whereClause = null;
         for (Integer coursePK : allowedCourses) {
             if (whereClause == null)
@@ -695,6 +696,8 @@ public final class Queries {
             else
                 whereClause += " OR ( projects.course_pk = " + coursePK + " ) ";
         }
+        if (whereClause == null)
+            throw new AssertionError();
         whereClause += " ) ";
         return whereClause;
 	}
