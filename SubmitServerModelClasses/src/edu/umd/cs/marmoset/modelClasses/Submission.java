@@ -1926,6 +1926,10 @@ public class Submission implements ITestSummary<Submission> {
     /** Returns the set of submission_pk's that have published reviews */
     public static Set<Integer> lookupSubmissionsWithReviews(Project project, StudentRegistration studentRegistration,
             Connection conn) throws SQLException {
+        if (project == null)
+            throw new NullPointerException("no project");
+        if (studentRegistration == null)
+            throw new NullPointerException("no studentRegistration");
         HashSet<Integer> result = new HashSet<Integer>();
         String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
