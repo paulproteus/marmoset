@@ -268,18 +268,23 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 		int responseCode = client.executeMethod(method);
 		if (responseCode != HttpStatus.SC_OK) {
-			if (responseCode == 503) {
+			if (responseCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
 				getLog().trace("Server returned 503 (no work)");
 			} else {
-				getLog().error(
-						"HTTP server returned non-OK response: " + responseCode
-								+ ": " + method.getStatusText());
+			    String msg = "HTTP server returned non-OK response: " + responseCode
+                        + ": " + method.getStatusText();
+				getLog().error(msg);
 				getLog().error(
 						" for URI: " + method.getURI());
 			
 				getLog().error(
 						"Full error message: "
 								+ method.getResponseBodyAsString());
+				if (responseCode == HttpStatus.SC_BAD_REQUEST) {
+				    System.err.println(msg);
+				    System.out.println(msg);
+				    System.exit(1);
+				}
 			}
 			return null;
 		}
