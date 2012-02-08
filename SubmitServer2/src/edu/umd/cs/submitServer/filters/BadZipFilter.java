@@ -59,7 +59,6 @@ public class BadZipFilter extends SubmitServerFilter {
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
 
-		System.out.println("Running bad zip filter");
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		Collection<Submission> badSubmissions = new TreeSet<Submission>();
@@ -72,14 +71,12 @@ public class BadZipFilter extends SubmitServerFilter {
 			conn = getConnection();
 			for(Archive a : Archive.getAll(Submission.SUBMISSION_ARCHIVES, conn)) {
 				if (FixZip.hasProblem(a.getArchive())) {
-					System.out.printf("%d is bad%n", a.getArchivePK());
+				    
+				    getSubmitServerFilterLog().info("Zip " + a.getArchivePK() + " is bad");
 						badSubmissions.addAll(Submission.lookupAllByArchivePK(a.getArchivePK(), conn));
-				} else {
-					System.out.printf("%d is good%n", a.getArchivePK());
-				}
+				} 
 			}
 			
-			System.out.printf("%d bad submissions%n", badSubmissions.size());
 			for(Submission s : badSubmissions) {
 				Project p = Project.getByProjectPK(s.getProjectPK(), conn);
 				StudentRegistration sr = StudentRegistration.lookupByStudentRegistrationPK(
