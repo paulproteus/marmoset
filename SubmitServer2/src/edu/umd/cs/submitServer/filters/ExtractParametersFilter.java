@@ -560,7 +560,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
             }
             
             if (student != null && user.isSuperUser()) {
-                request.setAttribute("studentCourseList", Course.lookupAllByStudentPK(userSession.getStudentPK(), conn));
+                request.setAttribute("studentCourseList", Course.lookupAllByStudentPK(student.getStudentPK(), conn));
             }
 			if (viewOfAnotherStudentsCode
 					&& !isCodeReviewer
