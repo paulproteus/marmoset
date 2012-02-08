@@ -76,6 +76,12 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
     private final @Submission.PK
     int submissionPK;
 
+    
+    @Override
+    public String toString() {
+        return String.format("Thread %d, at line %d of %s",codeReviewThreadPK, line, file);
+        
+    }
     private final Timestamp created;
     private final String file;
     private final int line;
