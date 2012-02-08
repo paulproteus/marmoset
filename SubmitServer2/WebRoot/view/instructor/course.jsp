@@ -108,10 +108,10 @@ tr.reject {background: #f33}
         <c:forEach var="project" items="${projectList}" varStatus="counter">
             <c:choose>
                 <c:when test="${project.visibleToStudents}">
-                    <c:set var="rowKind" value="ir${counter.index % 2}" />
+                    <c:set var="rowKind" value="r${counter.index % 2}" />
                 </c:when>
                 <c:otherwise>
-                    <c:set var="rowKind" value="r${counter.index % 2}" />
+                    <c:set var="rowKind" value="ir${counter.index % 2}" />
                 </c:otherwise>
             </c:choose>
             <tr class="${rowKind}">
