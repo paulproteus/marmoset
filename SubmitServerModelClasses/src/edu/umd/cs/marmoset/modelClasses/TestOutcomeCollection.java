@@ -51,6 +51,7 @@ import org.dom4j.DocumentException;
 
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
@@ -1332,7 +1333,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         return getTestOutcomesCoveringFileAtLine(pair.getFileName(), pair.getLineNumber());
     }
 
-	public TestOutcome getOutcomeByTestTypeAndTestNumber(String testType, String testNumber)
+	public TestOutcome getOutcomeByTestTypeAndTestNumber(@TestType String testType, String testNumber)
 	{
 		for (TestOutcome outcome : testOutcomes) {
 			if (outcome.getTestType().equals(testType) && outcome.getTestNumber().equals(testNumber))

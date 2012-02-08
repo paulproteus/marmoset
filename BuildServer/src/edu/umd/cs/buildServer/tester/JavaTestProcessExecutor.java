@@ -45,6 +45,7 @@ import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
@@ -59,7 +60,7 @@ import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 public class JavaTestProcessExecutor implements ConfigurationKeys {
 	private final JavaTester tester;
 	private final String testClass;
-	private final String testType;
+	private final @TestType String testType;
 	private String outputFilename;
 	private final String classPath;
 	private String testMethod;
@@ -79,7 +80,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	 *            classpath to use when executing the tests
 	 */
 	public JavaTestProcessExecutor(JavaTester tester, String testClass,
-			String testType, String classPath) {
+			@TestType String testType, String classPath) {
 		this.tester = tester;
 		this.testClass = testClass;
 		this.testType = testType;

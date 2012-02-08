@@ -41,6 +41,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
@@ -48,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
+import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment.Kind;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Rubric;
@@ -57,100 +60,110 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
-/**
- * @author jspacco
- *
- */
 public class CreateCodeReviewAssignment extends SubmitServerServlet {
-
     static boolean nullSafeEquals(Object x, Object y) {
         if (x == y)
             return true;
-        if (x == null || y== null)
+        if (x == null || y == null)
             return false;
         return x.equals(y);
     }
+
     static void add(LinkedHashMap<String, Integer> map, String name, @CheckForNull Integer value) {
-        if (value == null) 
+        if (value == null)
             return;
-        map.put(name,value);
+        map.put(name, value);
     }
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		Project project = (Project) request.getAttribute("project");
 
-		Collection<StudentRegistration> students = (Collection<StudentRegistration>) request.getAttribute(JUST_STUDENT_REGISTRATION_SET);
-		Collection<StudentRegistration> studentsWithoutSubmissions = (Collection<StudentRegistration>) request.getAttribute("studentsWithoutSubmissions");
+    List<Integer> getStudentPKs(Collection<StudentRegistration> students) {
+        ArrayList<Integer> codeReviewers = new ArrayList<Integer>();
+        for (StudentRegistration studentRegistration : students)
+            codeReviewers.add(studentRegistration.getStudentPK());
+        return codeReviewers;
+    }
 
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			RequestParser parser = new RequestParser(request,
-					getSubmitServerServletLog(), strictParameterChecking());
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Project project = (Project) request.getAttribute("project");
 
-			String description = parser.getStringParameter("description");
-			Timestamp deadline = parser.getTimestampParameter("deadline");
-			boolean anonymous = parser.getCheckbox("anonymous");
-			boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
+        Collection<StudentRegistration> students = (Collection<StudentRegistration>) request
+                .getAttribute(JUST_STUDENT_REGISTRATION_SET);
+       
 
-			CodeReviewAssignment assignment =
-				new CodeReviewAssignment(conn, project.getProjectPK(), description,
-						deadline, canSeeOthers, anonymous);
-			addRubrics(request, parser, assignment, conn);
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            RequestParser parser = new RequestParser(request, getSubmitServerServletLog(), strictParameterChecking());
 
+            Kind kind = Kind.getByParamValue(parser.getStringParameter("kind"));
+            String description = parser.getStringParameter("description");
+            Timestamp deadline = parser.getTimestampParameter("deadline");
+            boolean anonymous = parser.getCheckbox("anonymous");
+            boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
+            		
+            CodeReviewAssignment assignment = new CodeReviewAssignment(conn, project.getProjectPK(), description, deadline,
+                    canSeeOthers, anonymous, kind);
+            addRubrics(request, parser, assignment, conn);
 
-			String of = parser.getStringParameter("of");
-            int numReviewersPerSubmission = parser.getIntParameter("numReviewers");
-			boolean studenrReviewers = parser.getCheckbox("studentReviewers");
-            ArrayList<Integer> codeReviewers = instructorReviewers(request);
-            HashSet<Integer> instructorsInDeck = new HashSet<Integer>(codeReviewers);
-
-            if (studenrReviewers) {
-                for (StudentRegistration studentRegistration : students)
-                    codeReviewers.add(studentRegistration.getStudentPK());
-            }
-
-            if (of.equals("all")) {
+            switch (kind) {
+            case INSTRUCTIONAL: {
+                ArrayList<Integer> instructorReviewers = instructorReviewers(request);
                 Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
 
-				assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, numReviewersPerSubmission, codeReviewers,
-                        instructorsInDeck, conn);
-			} else {
-				@Submission.PK int ofPK = Submission.asPK(Integer.parseInt(of));
-				Submission submission = Submission.lookupBySubmissionPK(ofPK, conn);
-		        
-				reviewOneSubmission(assignment, submission, students, studentsWithoutSubmissions, studenrReviewers, codeReviewers, conn);
-			}
+                assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, instructorReviewers,
+                        true, conn);
+                break;
+            }
+            case INSTRUCTIONALBYSECTION: {
+                SortedSet<String> sections = (SortedSet<String>) request.getAttribute(SECTIONS);
+                SortedMap<String, SortedSet<StudentRegistration>> sectionMap = (SortedMap<String, SortedSet<StudentRegistration>>) request
+                        .getAttribute(SECTION_MAP);
+                Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
+                for (String section : sections) {
+                    @Student.PK int sectionReviewerPK = 
+                            Student.asPK(parser.getIntParameter("section-reviewer-" + section));
+                    System.out.println("Reviewer for section " + section + " is " + sectionReviewerPK);
+                   assignReviewerOfStudentCode(assignment, lastSubmissionMap, sectionMap.get(section), 
+                           sectionReviewerPK, conn);
+                }
+                break;
+            }
+            case PEER: {
+                int numReviewersPerSubmission = parser.getIntParameter("numReviewers");
+                Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
+                List<Integer> codeReviewers = getStudentPKs(students);
+                assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, numReviewersPerSubmission, codeReviewers,
+                        false, conn);
+                break;
+            }
+            case EXEMPLAR: {
+                String of = parser.getStringParameter("of");
+                @Submission.PK
+                int ofPK = Submission.asPK(Integer.parseInt(of));
+                Submission submission = Submission.lookupBySubmissionPK(ofPK, conn);
+                Collection<StudentRegistration> studentsWithoutSubmissions = (Collection<StudentRegistration>) request
+                        .getAttribute("studentsWithoutSubmissions");
+                students.addAll(studentsWithoutSubmissions);
+                reviewOneSubmission(assignment, submission, students, conn);
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Unknown code review kind: " + kind);
+            }
 
-			String redirectUrl = request.getContextPath()
-					+ "/view/instructor/codeReviewAssignment.jsp?codeReviewAssignmentPK="
-					+ assignment.getCodeReviewAssignmentPK();
-			response.sendRedirect(redirectUrl);
-		} catch (InvalidRequiredParameterException e) {
-			throw new ServletException(e);
-		} catch (SQLException e) {
-			handleSQLException(e);
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
-	}
+            String redirectUrl = request.getContextPath() + "/view/instructor/codeReviewAssignment.jsp?codeReviewAssignmentPK="
+                    + assignment.getCodeReviewAssignmentPK();
+            response.sendRedirect(redirectUrl);
+        } catch (InvalidRequiredParameterException e) {
+            throw new ServletException(e);
+        } catch (SQLException e) {
+            handleSQLException(e);
+            throw new ServletException(e);
+        } finally {
+            releaseConnection(conn);
+        }
+    }
+
     /**
      * @param request
      * @param parser
@@ -163,22 +176,22 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
             throws InvalidRequiredParameterException, SQLException {
         Integer rubricCount = parser.getOptionalInteger("rubric-count");
         if (rubricCount != null)
-            for(int i = 1; i <= rubricCount; i++) {
+            for (int i = 1; i <= rubricCount; i++) {
                 String base = String.format("rubric-%d-", i);
-                String name = request.getParameter(base+"name");
-                String presentation = request.getParameter(base+"presentation");
-                String rubricDescription = request.getParameter(base+"description");
+                String name = request.getParameter(base + "name");
+                String presentation = request.getParameter(base + "presentation");
+                String rubricDescription = request.getParameter(base + "description");
                 String data;
                 if (presentation.equals("NUMERIC")) {
-                    Integer min = parser.getOptionalInteger(base+"min");
-                    Integer max = parser.getOptionalInteger(base+"max");
-                    Integer defaultValue = parser.getOptionalInteger(base+"default");
+                    Integer min = parser.getOptionalInteger(base + "min");
+                    Integer max = parser.getOptionalInteger(base + "max");
+                    Integer defaultValue = parser.getOptionalInteger(base + "default");
                     LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
                     String first;
                     if (defaultValue == null || nullSafeEquals(min, defaultValue)) {
                         add(map, "min", min);
                         add(map, "max", max);
-                    } else if  (nullSafeEquals(max, defaultValue)) {
+                    } else if (nullSafeEquals(max, defaultValue)) {
                         add(map, "max", max);
                         add(map, "min", min);
                     } else {
@@ -186,78 +199,84 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                         add(map, "max", max);
                         add(map, "max", max);
                     }
-                    data = Rubric.serializeMapToData(map);		            
+                    data = Rubric.serializeMapToData(map);
                 } else if (presentation.equals("CHECKBOX")) {
-                    int unchecked = parser.getIntParameter(base+"false");
-                    int checked = parser.getIntParameter(base+"true");
+                    int unchecked = parser.getIntParameter(base + "false");
+                    int checked = parser.getIntParameter(base + "true");
                     data = "false:" + unchecked + ", true:" + checked;
                 } else {
-                    data = request.getParameter(base+"value");
+                    data = request.getParameter(base + "value");
                 }
                 new Rubric(conn, assignment, name, rubricDescription, presentation, data);
-        }
+            }
     }
 
-    public void reviewOneSubmission(CodeReviewAssignment assignment, Submission submission, 
-            Collection<StudentRegistration> students,
-            Collection<StudentRegistration> studentsWithoutSubmissions, 
-            boolean studentReviewers,
-            ArrayList<Integer> codeReviewers, Connection conn) throws SQLException {
-         StudentRegistration author = StudentRegistration.lookupByStudentRegistrationPK(
-        		submission.getStudentRegistrationPK(),
-        		conn);
-        @Student.PK int authorPK = author.getStudentPK();
+    public void reviewOneSubmission(CodeReviewAssignment assignment, Submission submission,
+            Collection<StudentRegistration> students, Connection conn) throws SQLException {
+        StudentRegistration author = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(),
+                conn);
+        @Student.PK
+        int authorPK = author.getStudentPK();
         CodeReviewer.lookupOrInsertAuthor(conn, submission, assignment, "");
 
-        for(@Student.PK int reviewerPK : codeReviewers) {
-        	if ( authorPK != reviewerPK)
-        		CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(),  submission.getSubmissionPK(),
-        				reviewerPK,"",
-        				false, true);
+        if (assignment.isAnonymous()) {
+            List<StudentRegistration> shuffled = new ArrayList<StudentRegistration>(students);
+            Collections.shuffle(shuffled);
+            students = shuffled;
         }
 
-        if (studentReviewers) {
-        	// Add student reviewers
+        int reviewerNumber = 1;
+        for (StudentRegistration studentRegistration : students) {
+            String knownAs = "";
+            if (assignment.isAnonymous())
+                knownAs = "Reviewer " + reviewerNumber++;
+            @Student.PK
+            int reviewerPK = studentRegistration.getStudentPK();
+            if (authorPK != reviewerPK)
+                CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(), submission.getSubmissionPK(),
+                        reviewerPK, knownAs, false, false);
+        }
+        
+    }
 
-        	students.addAll(studentsWithoutSubmissions);
-        	if (assignment.isAnonymous()) {
-        		List<StudentRegistration> shuffled = new ArrayList<StudentRegistration>(students);
-        		Collections.shuffle(shuffled);
-        		students = shuffled;
-        	}
+    public static void assignReviewerOfStudentCode(CodeReviewAssignment assignment, Map<Integer, Submission> submissionMap,
+            Collection<StudentRegistration> students, @Student.PK int reviewerStudentPK, Connection conn) throws SQLException {
 
-        	int reviewerNumber = 1;
-        	for(StudentRegistration studentRegistration : students) {
-        		String knownAs = "";
-        		if (assignment.isAnonymous())
-        			knownAs = "Reviewer " + reviewerNumber++;
-        		@Student.PK int reviewerPK = studentRegistration.getStudentPK();
-        		if ( authorPK != reviewerPK)
-        			CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(),  submission.getSubmissionPK(),
-        					reviewerPK,knownAs,
-        					false, false);
-        	}
+       for (StudentRegistration sr : students) {
+            if (!sr.isNormalStudent())
+                continue;
+            @Student.PK
+            int authorPK = sr.getStudentPK();
+            Submission submission = submissionMap.get(sr.getStudentRegistrationPK());
+            if (submission == null)
+                continue;
 
+            CodeReviewer.lookupOrInsertAuthor(conn, submission, assignment, "");
+
+            CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(), submission.getSubmissionPK(), reviewerStudentPK,
+                    "", false, true);
         }
     }
 
-    public static void assignReviewersOfStudentCode( CodeReviewAssignment assignment, Map<Integer, Submission> submissionMap,
+    public static void assignReviewersOfStudentCode(CodeReviewAssignment assignment, Map<Integer, Submission> submissionMap,
             Collection<StudentRegistration> students, int numReviewersPerSubmission, List<Integer> codeReviewers,
-            Collection<Integer> instructorsInDeck, Connection conn) throws SQLException {
-        // reviewing all student submissions               
+            boolean instructionalReview, Connection conn) throws SQLException {
+        // reviewing all student submissions
 
         if (codeReviewers.size() == 0)
             throw new IllegalArgumentException("no reviewers");
+        
         ArrayList<Integer> roster = new ArrayList<Integer>();
         Random r = new Random();
         ArrayList<StudentRegistration> toReview = new ArrayList<StudentRegistration>(students);
         Collections.shuffle(toReview, r);
 
         int authorNum = 1;
-        for(StudentRegistration sr : toReview) {
+        for (StudentRegistration sr : toReview) {
             if (!sr.isNormalStudent())
                 continue;
-            @Student.PK int authorPK = sr.getStudentPK();
+            @Student.PK
+            int authorPK = sr.getStudentPK();
             Submission submission = submissionMap.get(sr.getStudentRegistrationPK());
             if (submission == null)
                 continue;
@@ -272,12 +291,12 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 continue;
 
             // Ensure we have enough people in the roster
-            while (roster.size()  < numReviewersPerSubmission + 2) {
+            while (roster.size() < numReviewersPerSubmission + 2) {
                 Collections.shuffle(codeReviewers, r);
                 roster.addAll(codeReviewers);
             }
             CodeReviewer.lookupOrInsertAuthor(conn, submission, assignment, authorName);
-            for(int i = 0; i  < numReviewersPerSubmission; i++) {
+            for (int i = 0; i < numReviewersPerSubmission; i++) {
                 while (pos < roster.size() && reviewers.contains(roster.get(pos)))
                     pos++;
                 if (pos >= roster.size()) {
@@ -285,33 +304,32 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     System.out.println("reviewers are: " + reviewers);
                     break;
                 }
-                @Student.PK int reviewerPK = roster.get(pos);
+                @Student.PK
+                int reviewerPK = Student.asPK(roster.get(pos));
                 reviewers.add(reviewerPK);
                 roster.remove(pos);
                 String knownAs = "";
                 if (assignment.isAnonymous())
-                    knownAs = "Reviewer " + (i+1);
+                    knownAs = "Reviewer " + (i + 1);
 
-
-                CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(),  submission.getSubmissionPK(),
-                        reviewerPK, knownAs,
-                        false, instructorsInDeck.contains(reviewerPK));
+                CodeReviewer.updateOrInsert(conn, assignment.getCodeReviewAssignmentPK(), submission.getSubmissionPK(),
+                        reviewerPK, knownAs, false, instructionalReview);
             }
         }
     }
 
+    static ArrayList<Integer> instructorReviewers(HttpServletRequest request) {
+        ArrayList<Integer> deck = new ArrayList<Integer>();
+        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            String p = e.nextElement();
+            if (p.startsWith("reviewer-")) {
+                @Student.PK
+                int studentPK = Integer.parseInt(p.substring(9));
+                deck.add(studentPK);
 
-	static ArrayList<Integer> instructorReviewers(HttpServletRequest request) {
-		ArrayList<Integer> deck = new ArrayList<Integer>();
-		for(Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
-			String p = e.nextElement();
-			if (p.startsWith("reviewer-")) {
-				@Student.PK int studentPK = Integer.parseInt(p.substring(9));
-				deck.add(studentPK);
-				
-			}
-		}
-		return deck;
-	}
+            }
+        }
+        return deck;
+    }
 
 }

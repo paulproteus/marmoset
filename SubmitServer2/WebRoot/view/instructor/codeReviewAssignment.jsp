@@ -42,32 +42,30 @@
 <div class="sectionTitle">
 	<h2> Code Review for project <c:out value="${project.fullTitle}"/></h2>
 	<p> <c:out value="${codeReviewAssignment.description}" />
+    <c:choose>
+    <c:when test="${codeReviewAssignment == 'INSTRUCTIONAL'}">
+    <p>Instructional code review</p></c:when>
+    <c:when test="${codeReviewAssignment == 'INSTRUCTIONALBYSECTION'}">
+    <p>Instructional code review by section</p></c:when>
+    <c:when test="${codeReviewAssignment == 'PEER'}">
+    <p>Peer code review</p></c:when>
+    <c:when test="${codeReviewAssignment == 'EXEMPLAR'}">
+    <p>Exemplar/example code review</p></c:when>
+    <c:otherwise>
+    <p>Code review of unknown type</p>
+    </c:otherwise></c:choose>
+    
 	<p> Due <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" />
 
 </div>
 
-<c:choose>
-<c:when test="${! empty studentCodeReviewersForAssignment }">
-<c:choose>
-<c:when test="${fn:length(submissionsUnderReview) == 1}">
-<p>Student review of single submission
-</p>
-</c:when>
-<c:otherwise>
-<p>Student peer review 
-</p></c:otherwise>
-</c:choose>
 
-
+<c:if test="${codeReviewAssignment == 'PEER' || codeReviewAssignment == 'EXEMPLAR'}">
 <p>Student identities are anonymous: ${codeReviewAssignment.anonymous} 
 <p>Reviewers can see comments from other reviewers: ${codeReviewAssignment.otherReviewsVisible} 
+</p></c:if>
 
-</p>
-</c:when>
-<c:otherwise>
-<p>Review of ${fn:length(submissionsUnderReview)} submission by  ${fn:length(codeReviewersForAssignment)} reviewers
-</c:otherwise>
-</c:choose>
+
 
 
 <c:url var="PrintRubricEvaluationsForDatabase" value="/data/instructor/PrintRubricEvaluationsForDatabase">
@@ -114,10 +112,15 @@
 <h2>Submissions being reviewed</h2>
 
 
+<c:set var="cols" value="2"/>
+<c:if test="${not empty rubrics}">
+<c:set var="cols" value="3"/>
+</c:if>
 <c:set var="evaluations" value=""/>
 <table>
 <tr>
-<th colspan="4">reviews</th>
+<th>Author<th>Reviewer
+<th colspan="${cols}">reviews</th>
 </tr>
 <c:forEach var="submission" items="${submissionsUnderReview}" varStatus="counter">
 
@@ -139,24 +142,35 @@
 	</c:choose>
 
 	<c:set var="studentRegistration"  value="${studentRegistrationMap[submission.studentRegistrationPK]}"/>
+    <c:set var="reviewers" value="${reviewersForSubmission[submission.submissionPK]}"/>
+    <c:set var="author" value="${authorForSubmission[submission.submissionPK]}"/>
 	
 <tr class="r${counter.index % 2}">
-<td colspan="3">
+<td rowspan="${1 + fn:length(reviewers)}"/>
 <a href="${viewCodeReview}" target="codeReview" title="code review">
 <c:out value="${studentRegistration.fullname}"/>
 </a>
+<c:if test="${not empty sections}">
+<br>section: <c:out value="${studentRegistration.section}"/>
+</c:if>
+<br><a href="${submissionLink}" title="test results"><c:out value="${submission.testSummary}"/></a>
 </td>
-
-
-
-<td class="description">
-<a href="${submissionLink}" title="test results"><c:out value="${submission.testSummary}"/></a>
-</td>
-
+<c:choose>
+<c:when test="${author.numComments > 0}">
+<td>responses
+  <td><c:out value="${author.numComments}" /></td>
+  <td><fmt:formatDate value="${author.lastUpdate}" pattern="dd MMM, hh:mm a" /></td>
+   <c:if test="${! empty rubrics}">
+  <td></td>
+  </c:if>
+  </c:when>
+  <c:otherwise>
+  <td colspan="${1+cols}"></td>
+  </c:otherwise>
+  </c:choose>
 </tr>
- <c:forEach var="codeReviewer" items="${codeReviewersForAssignment}" >
- <c:if test="${codeReviewer.submissionPK == submission.submissionPK 
-    &&  ( codeReviewer.numComments > 0 || !codeReviewer.author) }">
+ <c:forEach var="codeReviewer" items="${reviewers}" >
+
   <tr class="r${counter.index % 2}">
   <td>
     <c:out value="${codeReviewer.name}" />
@@ -169,8 +183,9 @@
   <c:when test="${codeReviewer.numComments > 0 || ! empty evaluations}">
   <td><c:out value="${codeReviewer.numComments}" /></td>
   <td><fmt:formatDate value="${codeReviewer.lastUpdate}" pattern="dd MMM, hh:mm a" /></td>
-  <td class="description">
   
+   <c:if test="${! empty rubrics}">
+  <td class="description">
   <c:forEach var="e" items="${evaluations}">
   <c:if test="${e.status == 'LIVE' }">
   <c:set var="r" value="${rubricMap[e.rubricPK]}"/>
@@ -178,14 +193,13 @@
    <c:out value="${e.explanation}"/><br>
    </c:if>
   </c:forEach>
-  
+  </td></c:if>
   </c:when>
   <c:otherwise>
-  <td colspan="3"/>
+  <td colspan="${cols}"/>
   </c:otherwise>
   </c:choose>
   </tr>
-  </c:if>
   </c:forEach>
 
 </c:forEach>

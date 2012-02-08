@@ -52,6 +52,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.common.collect.HashMultimap;
+
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
@@ -252,11 +254,23 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				projectPK = codeReviewAssignment.getProjectPK();
 				submissionsUnderReview = Submission.getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
 				codeReviewersForAssignment = CodeReviewer.lookupByCodeReviewAssignmentPK(codeReviewAssignmentPK, conn);
+				HashMultimap<Integer, CodeReviewer> reviewersForSubmission
+				=  HashMultimap.create();
+				Map<Integer, CodeReviewer> authorForSubmission 
+				= new HashMap<Integer, CodeReviewer>();
 				studentCodeReviewersForAssignment
 				 = new ArrayList<CodeReviewer>();
-				for(CodeReviewer  r : codeReviewersForAssignment) 
+				for(CodeReviewer  r : codeReviewersForAssignment)  {
+				    if (r.isAuthor()) {
+				        authorForSubmission.put(r.getSubmissionPK(), r);
+				    } else
+				        reviewersForSubmission.put(r.getSubmissionPK(), r);
 				    if (!r.isInstructor() && !r.isAuthor())
 				        studentCodeReviewersForAssignment.add(r);
+				}
+				request.setAttribute("reviewersForSubmission", reviewersForSubmission.asMap());
+				request.setAttribute("authorForSubmission", authorForSubmission);
+				
 			}
 
 

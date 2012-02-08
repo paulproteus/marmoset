@@ -160,8 +160,7 @@ most recent at  <fmt:formatDate
 	<c:when test="${!testOutcomeCollection.compileSuccessful}">
 		<h2>Compile/Build unsuccessful</h2>
 		<p>
-		<pre>
-			<c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" />
+		<pre><c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" />
 		</pre>
 	</c:when>
 	<c:otherwise>

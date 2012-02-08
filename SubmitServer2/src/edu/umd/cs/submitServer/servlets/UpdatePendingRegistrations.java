@@ -37,7 +37,7 @@ public class UpdatePendingRegistrations extends SubmitServerServlet {
 			if (!matcher.matches()) {
 				continue;
 			}
-			int studentPK = Integer.parseInt(matcher.group(1));
+			@Student.PK int studentPK = Student.asPK(Integer.parseInt(matcher.group(1)));
 			Preconditions.checkState(entry.getValue().length == 1, "Should get exactly 1 value for each registration request.");
 			String action = entry.getValue()[0];
 			if (action.equals("accept")) {

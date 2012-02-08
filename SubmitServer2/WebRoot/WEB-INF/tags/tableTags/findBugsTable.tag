@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewSourceLink" value="/view"/>
 
 <c:set var="instructor" value="${fn:contains(pageContext.request.servletPath,'instructor')}"/>
 <c:if test="${not empty testOutcomeCollection.findBugsOutcomes}">

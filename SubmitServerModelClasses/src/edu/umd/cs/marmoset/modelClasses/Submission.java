@@ -623,8 +623,6 @@ public class Submission implements ITestSummary<Submission> {
 		  return TextUtilities.scanTextFilesInZip(archive);
 	}
 
-
-
     /**
      * @return Returns the numTestOutcomes.
      */

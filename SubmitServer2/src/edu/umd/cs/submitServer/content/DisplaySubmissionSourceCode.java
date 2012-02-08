@@ -297,7 +297,7 @@ public class DisplaySubmissionSourceCode {
 
             if (description == null)
                 continue;
-            out.printf("<li><a href=\"javascript:open('%s')\">%s</a> (%s) %n", encode(sourceFile), simpleName, description);
+            out.printf("<li><a href=\"javascript:openElement('%s')\">%s</a> (%s) %n", encode(sourceFile), simpleName, description);
 
 
         }
@@ -411,7 +411,7 @@ public class DisplaySubmissionSourceCode {
             String description = diffDescription(changed, sourceFile, contents);
             if (description == null)
                 continue;
-            out.printf("<li><a href=\"javascript:open('%s')\">%s</a> (%s)%n", encode(sourceFile), simpleName, description);
+            out.printf("<li><a href=\"javascript:openElement('%s')\">%s</a> (%s)%n", encode(sourceFile), simpleName, description);
 
 
         }
@@ -579,7 +579,7 @@ public class DisplaySubmissionSourceCode {
         return "<script langauge=\"JavaScript\" type=\"text/javascript\"> "
                 + "function toggle(item) { obj=document.getElementById(item);  if (obj.style.display==\"none\") {" +
                 " obj.style.display=\"block\";  obj.scrollIntoView(); } else { obj.style.display=\"none\"; } } "
-                + "function open(item) { document.getElementById(item).style.display=\"block\"; "
+                + "function openElement(item) { document.getElementById(item).style.display=\"block\"; "
                 + "document.getElementById('__'+item).scrollIntoView();  } "
                 +  "</script>)";
 
@@ -590,7 +590,7 @@ public class DisplaySubmissionSourceCode {
                 + "function toggle(item) { \n"
                 +    " obj=document.getElementById(item);  if (obj.style.display==\"none\") {\n"
                 +    " open(item); } else { obj.style.display=\"none\"; } } \n"
-                + "function open(item) { \n"
+                + "function openElement(item) { \n"
                 +    " document.getElementById(item).style.display=\"block\"; \n"
                 +    " document.getElementById('__'+item).scrollIntoView();  } \n"
                 + "function openAll() { \n"

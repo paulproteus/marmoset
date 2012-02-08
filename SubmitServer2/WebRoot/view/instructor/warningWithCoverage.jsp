@@ -163,8 +163,7 @@
 			<td>${test.shortTestName}</td>
 			<td class="description"><c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
-			<pre>
-				<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+			<pre><c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
 			</pre>
 			</td>
 		</tr>

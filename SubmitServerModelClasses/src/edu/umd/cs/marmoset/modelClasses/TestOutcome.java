@@ -110,16 +110,23 @@ public class TestOutcome implements Serializable {
 	   @Documented
 	    @TypeQualifier(applicableTo = String.class)
 	    @Retention(RetentionPolicy.RUNTIME)
-	    public @interface TestType {}
+	    public @interface TestType {
+	       
+	   }
 
-	public static final @TestType String BUILD_TEST = "build";
-	public static final @TestType String PUBLIC_TEST = "public";
-	public static final @TestType String RELEASE_TEST = "release";
-	public static final @TestType String SECRET_TEST = "secret";
-	public static final @TestType String FINDBUGS_TEST = "findbugs";
-	public static final @TestType String STUDENT_TEST = "student";
-	public static final @TestType String PMD_TEST = "pmd";
-	public static final @TestType String FEATURE = "feature";
+	public static final @TestType String BUILD_TEST =  asTestType("build");
+	public static final @TestType String PUBLIC_TEST = asTestType("public");
+	public static final @TestType String RELEASE_TEST = asTestType("release");
+	public static final @TestType String SECRET_TEST = asTestType("secret");
+	public static final @TestType String FINDBUGS_TEST = asTestType("findbugs");
+	public static final @TestType String STUDENT_TEST = asTestType("student");
+	public static final @TestType String PMD_TEST = asTestType("pmd");
+	public static final @TestType String FEATURE = asTestType("feature");
+	
+	public static @TestType String asTestType(String s) {
+        return s;
+    }
+	
 	// Code features
 	public static final String OPCODE_TEST = "opcode";
 	public static final String CLASS_TEST = "class";
@@ -139,7 +146,7 @@ public class TestOutcome implements Serializable {
 		{ PUBLIC_TEST, RELEASE_TEST, SECRET_TEST, STUDENT_TEST };
 
 	private int testRunPK = 0;
-	private String testType;
+	private @TestType String testType;
 	private String testNumber;
 	private String outcome;
 	private int pointValue;
@@ -718,6 +725,8 @@ public class TestOutcome implements Serializable {
     public static String getExceptionLocation(TestOutcome outcome, String viewSourceLink) {
         return outcome.getExceptionLocation(viewSourceLink);
     }
+    public static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java):\\[line (\\d+)\\]");
+
     public String getExceptionLocation(String viewSourceLink)
     {
         StringBuffer buf=new StringBuffer();
@@ -725,7 +734,7 @@ public class TestOutcome implements Serializable {
             if (longTestResult == null || longTestResult.equals(""))
                 return "";
             BufferedReader reader = null;
-            Pattern pattern = Pattern.compile("\\((\\w+\\.java):(\\d+)\\)");
+            Pattern pattern = FINDBUGS_LOCATION_REGEX;
             try {
                 reader=new BufferedReader(new StringReader(getLongTrimmedTestResult()));
                 while (true) {
@@ -760,6 +769,8 @@ public class TestOutcome implements Serializable {
 
 	private String getFindbugsHotlink(String viewSourceLink)
 	{
+	    if (!testType.equals(FINDBUGS_TEST))
+	        throw new IllegalArgumentException("is type " + testType + ", not findbugs");
 	    if (shortTestResult == null || shortTestResult.equals(""))
 	        return "";
 	    // At ExtractHRefs.java:[line 64]
@@ -911,13 +922,13 @@ public class TestOutcome implements Serializable {
 	/**
 	 * @return Returns the testType.
 	 */
-	public String getTestType() {
+	public @TestType String getTestType() {
 		return testType;
 	}
 	/**
 	 * @param testType The testType to set.
 	 */
-	public void setTestType(String testType) {
+	public void setTestType(@TestType String testType) {
 		this.testType = testType;
 	}
 
@@ -1110,7 +1121,7 @@ public class TestOutcome implements Serializable {
 	public int fetchValues(ResultSet rs, int startingFrom) throws SQLException
 	{
 		setTestRunPK(rs.getInt(startingFrom++));
-		setTestType(rs.getString(startingFrom++));
+		setTestType(asTestType(rs.getString(startingFrom++)));
 		setTestNumber(rs.getString(startingFrom++));
 		setOutcome(rs.getString(startingFrom++));
 		setPointValue(rs.getInt(startingFrom++));

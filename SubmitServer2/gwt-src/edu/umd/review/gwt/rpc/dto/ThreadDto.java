@@ -45,7 +45,7 @@ public class ThreadDto implements Result, Comparable<ThreadDto> {
     this.needsResponse = needsResponse;
   }
 
-  public /* @CodeReviewThread.PK */ int getId() {
+  public  /* @CodeReviewThread.PK */ int getId() {
     return id;
   }
 

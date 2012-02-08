@@ -53,10 +53,7 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
-/**
- * @author jspacco
- *
- */
+
 public class UpdateCodeReviewAssignment extends SubmitServerServlet {
 
     static boolean nullSafeEquals(Object x, Object y) {
@@ -132,7 +129,7 @@ public class UpdateCodeReviewAssignment extends SubmitServerServlet {
 			assignment.update(conn);
 
 			if (addReviews) {
-			    @Student.PK int reviewer = parser.getIntParameter("reviewer");
+			    @Student.PK int reviewer =  Student.asPK(parser.getIntParameter("reviewer"));
 			    Map<Integer, Submission> submissionsThatNeedReview 
 	             =     (Map<Integer, Submission>) request.getAttribute("submissionsThatNeedReview");
 			    for(Submission s : submissionsThatNeedReview.values()) {

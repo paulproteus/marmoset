@@ -247,6 +247,8 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	}
 
 	public void addComments(Connection conn, int num, Timestamp now) throws SQLException {
+	    if (num == 0)
+	        return;
 		String query = "UPDATE  " + TABLE_NAME
 				+ " SET num_comments = num_comments+?, last_update = ? "
 				+ " WHERE code_reviewer_pk = ?";

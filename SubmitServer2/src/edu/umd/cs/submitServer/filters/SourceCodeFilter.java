@@ -107,7 +107,8 @@ public class SourceCodeFilter extends SubmitServerFilter {
 			// Instructors can see code coverage results for any class of tests
 			// Students can only see coverage results for student/public tests
 
-			@TestOutcome.TestType String testType = parser.getOptionalCheckedParameter(TEST_TYPE);
+			@TestOutcome.TestType String testType = TestOutcome.asTestType(
+			        parser.getOptionalCheckedParameter(TEST_TYPE));
 			String testNumber = parser.getOptionalCheckedParameter(TEST_NUMBER);
 			String hybridTestType = parser
 					.getOptionalCheckedParameter(HYBRID_TEST_TYPE);

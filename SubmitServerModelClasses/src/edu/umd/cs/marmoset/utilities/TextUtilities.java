@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -58,7 +60,59 @@ public class TextUtilities {
 		return scanTextFilesInZip(new FileInputStream(f));
 	}
 
+	   public static SortedSet<String> scanTextFileNamesInZip(byte [] bytes) throws IOException {
+	       return scanTextFileNamesInZip(new ByteArrayInputStream(bytes));
+	   }
+	       
+	   public static SortedSet<String> scanTextFileNamesInZip(InputStream in) throws IOException {
+	       SortedSet<String> result = new TreeSet<String>();
+	        ZipInputStream zIn = new ZipInputStream(in);
+	        while (true) { 
+	            try {
+	            ZipEntry z = zIn.getNextEntry();
+	            if (z == null) break;
+	            if (z.isDirectory())
+	                continue;
+	            if (z.getSize() > 100000) {
+	                continue;
+	            }
+	            String name = z.getName();
 
+	            int lastSlash = name.lastIndexOf('/');
+	            String simpleName = name.substring(lastSlash + 1);
+	            if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
+	                continue;
+	            if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
+	                continue;
+	            if (simpleName.endsWith("~"))
+	                continue;
+	            if (name.charAt(0) == '.' || name.contains("/."))
+	                continue;
+
+	            @CheckForNull String mimeType = mimeMap.getContentTypeFor(name);
+
+	            if ("application/octet-stream".equals(mimeType))
+	                continue;
+
+	            if (!"text/plain".equals(mimeType)) {
+	                int lastDot = name.lastIndexOf('.');
+	                if (lastDot > 0) {
+	                    String extension = name.substring(lastDot + 1);
+	                    if (binaryFileExtensions.contains(extension))
+	                        continue;
+	                }
+	            }
+	            result.add(name);
+	            } catch (Exception e) {
+	                String err = dumpException(e);
+	                result.add("** ERROR EXTRACTING ZIP ENTRY **");
+	                break;
+	            }
+	        }
+	        zIn.close();
+	        return result;
+
+	    }
 	public static Map<String, List<String>> scanTextFilesInZip(InputStream in) throws IOException {
 		TreeMap<String, List<String>> result = new TreeMap<String, List<String>>();
 		ZipInputStream zIn = new ZipInputStream(in);

@@ -6,10 +6,7 @@
 <head>
 
 
-<c:set var="title">
-Project <c:out value="${project.projectNumber}" /> submission, written by 
-               <c:out value="${reviewDao.authorName}" />'
-               </c:set>
+<c:set var="title">Project <c:out value="${project.projectNumber}" /> submission, written by  <c:out value="${reviewDao.authorName}" /></c:set>
 <c:choose>
     <c:when test="${not empty nextCodeReview}">
         <c:set var="reviewBacklinkText" value="next" />
@@ -22,7 +19,7 @@ Project <c:out value="${project.projectNumber}" /> submission, written by
 
     <c:when test="${not empty codeReviewAssignment}">
         <c:set var="reviewBacklinkText" value="assignment" />
-        <c:url var="reviewBacklinkUrl" value="/view/codeReviews/">
+        <c:url var="reviewBacklinkUrl" value="/view/codeReviews.jsp">
             <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
             <c:param name="projectPK" value="${project.projectPK}" />
             <c:param name="coursePK" value="${course.coursePK}" />

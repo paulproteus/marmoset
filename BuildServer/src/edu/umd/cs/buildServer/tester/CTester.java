@@ -37,6 +37,7 @@ import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
@@ -122,7 +123,7 @@ public class CTester extends Tester {
 	 * @param testNumber
 	 *            test number (among other tests of the same type)
 	 */
-	private void executeTest(String exeName, String testType, String testNumber)
+	private void executeTest(String exeName, @TestType String testType, String testNumber)
 			throws BuilderException {
 		Process process = null;
 		boolean finished = false;

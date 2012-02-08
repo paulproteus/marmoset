@@ -38,6 +38,7 @@ import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
@@ -184,28 +185,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 		return directoryFinder;
 	}
 
-	/**
-	 * @deprecated Create a special TestOutcome to represent a case where the
-	 *             tests couldn't be run because they timed out, or the
-	 *             TestRunner didn't return a successful exit code.
-	 * 
-	 * @param testType
-	 *            the type of tests
-	 * @param outcome
-	 *            the TestOutcome object to be filled in
-	 */
-	@Deprecated
-	public static void createSpecialFailureTestOutcome(String testType,
-			TestOutcome outcome, String shortTestResult, String longTestResult) {
-		outcome.setTestType(testType);
-		outcome.setTestName("All " + testType + " tests");
-		outcome.setOutcome(TestOutcome.COULD_NOT_RUN);
-		outcome.setShortTestResult(shortTestResult);
-		outcome.setLongTestResult(longTestResult);
-		outcome.setTestNumber("0");
-	}
-
-	public static TestOutcome createCouldNotRunOutcome(String testType,
+	public static TestOutcome createCouldNotRunOutcome(@TestType String testType,
 			String shortTestResult, String longTestresult) {
 		TestOutcome outcome = new TestOutcome();
 		outcome.setTestType(testType);
@@ -217,7 +197,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 		return outcome;
 	}
 
-	public static TestOutcome createUnableToRunOneTestOutcome(String testType,
+	public static TestOutcome createUnableToRunOneTestOutcome(@TestType String testType,
 			String testMethod, String testClass, int testNumber,
 			String outcome, String shortTestResult, String longTestResult) {
 		TestOutcome testOutcome = new TestOutcome();

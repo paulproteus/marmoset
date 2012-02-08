@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `code_review_assignment` (
   `deadline` datetime NOT NULL,
   `other_reviews_visible` tinyint(1) NOT NULL,
   `anonymous` tinyint(1) NOT NULL DEFAULT '0',
+  `kind` varchar(30) NOT NULL DEFAULT 'INSTRUCTIONAL',
   PRIMARY KEY (`code_review_assignment_pk`),
   KEY `project_pk` (`project_pk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -191,7 +192,7 @@ CREATE TABLE `errors` (
   `project_pk` int(11) DEFAULT NULL,
   `submission_pk` int(11) DEFAULT NULL,
   `code` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  `message` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  `message` text COLLATE utf8_bin DEFAULT NULL,
   `type` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `servlet` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `uri` text COLLATE utf8_bin,

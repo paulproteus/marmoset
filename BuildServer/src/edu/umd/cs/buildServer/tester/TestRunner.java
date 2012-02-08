@@ -50,6 +50,7 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import edu.umd.cs.buildServer.BuildServer;
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 
 /**
@@ -77,10 +78,8 @@ public class TestRunner extends BaseTestRunner {
 
 	private static final int DEFAULT_TEST_TIMEOUT_IN_SECONDS = 30;
 
-	// XXX: this field seems to be unused
-	private String submissionPK;
-
-	private String testType;
+	
+	private @TestType String testType;
 	private int testTimeoutInSeconds;
 	private TestOutcomeCollection outcomeCollection;
 	/** If nonnull, the named test method will be the only test case executed. */
@@ -103,15 +102,10 @@ public class TestRunner extends BaseTestRunner {
 
 	/**
 	 * Constructor
-	 *
-	 * @param submissionPK
-	 *            PK of the submission being tested
 	 * @param testType
 	 *            type of test being performed
 	 */
-	public TestRunner(String submissionPK, String testType,
-			int testTimeoutInSeconds) {
-		this.submissionPK = submissionPK;
+	public TestRunner(@TestType String testType, int testTimeoutInSeconds) {
 		this.testType = testType;
 		this.testTimeoutInSeconds = testTimeoutInSeconds;
 		this.outcomeCollection = new TestOutcomeCollection();
@@ -515,8 +509,7 @@ public class TestRunner extends BaseTestRunner {
 		System.setIn(new DevNullInputStream());
 
 		// Execute the tests
-		TestRunner r = new TestRunner(submissionPK, testType,
-				testTimeoutInSeconds);
+		TestRunner r = new TestRunner(testType, testTimeoutInSeconds);
 		if (testMethod != null) {
 			r.setTestMethod(testMethod);
 		}

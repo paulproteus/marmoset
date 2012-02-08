@@ -38,10 +38,18 @@ import java.util.LinkedList;
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
-import edu.umd.cs.marmoset.modelClasses.Rubric.PK;
+import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment.Kind;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 public class CodeReviewAssignment {
+    
+    public enum Kind {
+        INSTRUCTIONAL, INSTRUCTIONALBYSECTION, PEER, EXEMPLAR;
+        public static Kind getByParamValue(String value) {
+            return Kind.valueOf(value.toUpperCase());
+        };
+    }
+        
 	@Documented
 	@TypeQualifier(applicableTo = Integer.class)
 	@Retention(RetentionPolicy.RUNTIME)
@@ -64,7 +72,7 @@ public class CodeReviewAssignment {
             "description",
             "deadline",
             "other_reviews_visible",
-            "anonymous"
+            "anonymous", "kind"
 	};
 
 	/**
@@ -77,9 +85,13 @@ public class CodeReviewAssignment {
 	private final @Project.PK int projectPK;
 	private String description;
 	private Timestamp deadline;
-	private boolean otherReviewsVisible;
-	private boolean anonymous;
+	private  boolean otherReviewsVisible;
+	private  boolean anonymous;
+	private final Kind kind;
 
+	public Kind getKind() {
+	    return kind;
+	}
 	public Timestamp getDeadline() {
 		return deadline;
 	}
@@ -121,7 +133,7 @@ public class CodeReviewAssignment {
     }
 
 	public  CodeReviewAssignment(Connection conn, @Project.PK int projectPK, String description,
-			Timestamp deadline, boolean areOtherReviewsVisible, boolean anonymous)
+			Timestamp deadline, boolean areOtherReviewsVisible, boolean anonymous, Kind kind)
 	throws SQLException
 	{
 	    String insert = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
@@ -131,6 +143,7 @@ public class CodeReviewAssignment {
 	    this.otherReviewsVisible = areOtherReviewsVisible;
 	    this.deadline = deadline;
 	    this.anonymous = anonymous;
+	    this.kind = kind;
 	    PreparedStatement stmt = null;
 	    try {
 	        stmt = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
@@ -154,6 +167,7 @@ public class CodeReviewAssignment {
         stmt.setTimestamp(col++, getDeadline());
         stmt.setBoolean(col++, isOtherReviewsVisible());
         stmt.setBoolean(col++, isAnonymous());
+        stmt.setString(col++, kind.name());
         return col;
     }
 
@@ -167,6 +181,7 @@ public class CodeReviewAssignment {
 		this.deadline = resultSet.getTimestamp(startingFrom++);
 		this.otherReviewsVisible = resultSet.getBoolean(startingFrom++);
 		this.anonymous = resultSet.getBoolean(startingFrom++);
+		this.kind = Kind.valueOf(resultSet.getString(startingFrom++));
 	}
 	
     public void update(Connection conn) throws SQLException {

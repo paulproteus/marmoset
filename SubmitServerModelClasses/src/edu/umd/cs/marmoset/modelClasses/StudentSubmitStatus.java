@@ -441,8 +441,9 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	throws SQLException
 	{
  		// for each student,
- 		for (Integer studentRegistrationPK : studentRegistrationPKs)
+ 		for (Integer srPK : studentRegistrationPKs)
  		{
+ 		    @StudentRegistration.PK int studentRegistrationPK = StudentRegistration.asPK(srPK);
  			StudentSubmitStatus studentSubmitStatus =
  				lookupByStudentRegistrationPKAndProjectPK(
  						studentRegistrationPK, projectPK, conn);

@@ -31,7 +31,6 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.EditDistance;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
-import edu.umd.cs.submitServer.UserSession;
 import edu.umd.review.gwt.rpc.dto.CheckboxEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.CheckboxRubricDto;
 import edu.umd.review.gwt.rpc.dto.CommentDto;
@@ -654,10 +653,12 @@ public class MarmosetDaoService implements ReviewDao {
   public void publishAllDrafts() {
     Connection conn = null;
 
+    Timestamp now = now();
     try {
       conn = getConnection();
-      CodeReviewComment.publishAll(reviewer, now(), conn);
-      RubricEvaluation.publishAll(reviewer, now(), conn);
+      int count = CodeReviewComment.publishAll(reviewer, now, conn);
+      reviewer.addComments(conn, count, now);
+      RubricEvaluation.publishAll(reviewer, now, conn);
       if (codeAuthor == null)  {
         this.codeAuthor = CodeReviewer.lookupOrInsertAuthor(conn, submission,reviewer.getCodeReviewAssignment(), "");
       }

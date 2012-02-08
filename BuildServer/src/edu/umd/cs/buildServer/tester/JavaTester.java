@@ -48,6 +48,7 @@ import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.CoverageLevel;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
@@ -148,7 +149,8 @@ public class JavaTester extends Tester {
 		// etc.)
 		// specified in test.properties.
 		String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-		for (String testType : dynamicTestTypes) {
+		for (String tt : dynamicTestTypes) {
+		    @TestType String testType = TestOutcome.asTestType(tt);
 			String testClassName = getTestProperties().getTestClass(testType);
 			// TODO if classname is empty then return COULD_NOT_RUN
 			if (testClassName != null) {

@@ -34,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
@@ -58,9 +59,10 @@ public class GrantExtension extends SubmitServerServlet {
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerServletLog(), strictParameterChecking());
 
-			@StudentRegistration.PK int studentRegistrationPK = parser
-					.getIntParameter("studentRegistrationPK");
-			int projectPK = parser.getIntParameter("projectPK");
+			@StudentRegistration.PK int studentRegistrationPK = 
+			        StudentRegistration.asPK(parser
+					.getIntParameter("studentRegistrationPK"));
+			@Project.PK int projectPK = Project.asPK(parser.getIntParameter("projectPK"));
 			int extension = parser.getIntParameter("extension");
 
 			// low amount of transaction isolation required here since this

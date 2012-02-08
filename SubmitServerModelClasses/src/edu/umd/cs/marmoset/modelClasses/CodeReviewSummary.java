@@ -16,23 +16,20 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 
-import edu.umd.cs.marmoset.modelClasses.CodeReviewer.Builder;
 import edu.umd.cs.marmoset.utilities.Objects;
+import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 /** Provide a summary of a code review */
 public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	private static final String FINDBUGS_TEST_TYPE = "findbugs";
 
-	private static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java):\\[line (\\d+)\\]");
 
   final @Nonnull Submission submission;
   final @Nonnull  Project project;
@@ -80,9 +77,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
 		this.assignment = reviewer.getCodeReviewAssignment();
 		
-		CodeReviewer findbugsReviewer = createOrGetFindbugsReviewer(conn);
-		if (!hasFindbugsThreads(conn, findbugsReviewer)) {
-			createFindbugsThreads(findbugsReviewer, conn);
+		if (!hasFindbugsReviewer(conn)) {
+			createFindbugsThreads(conn, submission);
 		}
 		
 		for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
@@ -522,75 +518,96 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return rubrics.get(rubricPK);
 	}
 
-	/**
-	 * Tries to look up the FindBugs reviewer entity associated with this code review; creates it if necessary.
-	 * 
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	private CodeReviewer createOrGetFindbugsReviewer(Connection conn) throws SQLException {
-		PreparedStatement st = conn
-				.prepareStatement("SELECT * FROM code_reviewer "
-						+ "WHERE is_automated = 1 AND known_as = ? "
-						+ "AND code_review_assignment_pk = ? "
-						+ "AND submission_pk = ?");
-		int assignmentPk = (assignment == null) ? 0 : assignment.getCodeReviewAssignmentPK();
-		Queries.setStatement(st, "FindBugs", assignmentPk, submission.getSubmissionPK());
-		ResultSet rs = st.executeQuery();
-		if (!rs.next()) {
-			CodeReviewer.Builder builder =  new CodeReviewer.Builder(conn, submission.getSubmissionPK());
-			builder.setAutomated("FindBugs");
-			if (assignment != null) {
-				builder.setAssignment(assignment);
-			}
-			return builder.build();
-		}
-		return new CodeReviewer(rs, 1);
-	}
+
+    private boolean hasFindbugsReviewer(Connection conn) throws SQLException {
+        PreparedStatement st = conn.prepareStatement("SELECT * FROM code_reviewer " + "WHERE is_automated = 1 AND known_as = ? "
+                + "AND submission_pk = ?");
+        try {
+            Queries.setStatement(st, "FindBugs", submission.getSubmissionPK());
+            ResultSet rs = st.executeQuery();
+            return rs.next();
+        } finally {
+            st.close();
+        }
+    }
+
+    private CodeReviewer createFindbugsReviewer(Connection conn) throws SQLException {
+        CodeReviewer.Builder builder = new CodeReviewer.Builder(conn, submission.getSubmissionPK());
+        builder.setAutomated("FindBugs");
+        return builder.build();
+    }
 	
-	private boolean hasFindbugsThreads(Connection conn, CodeReviewer findbugsReviewer) throws SQLException {
-		PreparedStatement st = conn.prepareStatement("SELECT COUNT(*) FROM code_review_thread " +
-				"WHERE created_by = ?");
-		Queries.setStatement(st, findbugsReviewer.getCodeReviewerPK());
-		ResultSet rs = st.executeQuery();
-		Preconditions.checkState(rs.next(), "COUNT must return exactly 1 row.");
-		return rs.getInt(1) >= 1;
-	}
-	
+    public static @CheckForNull String getFullPath(Collection<String> fullPaths, String name) {
+        String result = null;
+        for(String s : fullPaths) {
+            if (s.endsWith(name)) {
+                if (result != null) return null;
+                result = s;
+            }
+        }
+        return result;
+    }
 	/** 
 	 * Create threads for all the FindBugs warnings for the submission.
 	 * 
 	 * @param conn
+	 * @param submission TODO
 	 * @return
 	 * @throws SQLException
 	 */
-	private void createFindbugsThreads(CodeReviewer findbugsReviewer, Connection conn) throws SQLException {
-		PreparedStatement findbugsOutcomes = conn
-				.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
-						+ "JOIN test_runs USING (test_run_pk) "
-						+ "WHERE submission_pk = ? AND test_type = ?");
-		Queries.setStatement(findbugsOutcomes, submission.getSubmissionPK(), FINDBUGS_TEST_TYPE);
-		ResultSet rs = findbugsOutcomes.executeQuery();
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		while (rs.next()) {
-			String location = rs.getString("short_test_result");
-			Preconditions.checkState(!Strings.isNullOrEmpty(location), "Invalid findbugs location");
-			Matcher m = FINDBUGS_LOCATION_REGEX.matcher(location);
-			if (!m.matches() || m.groupCount() <= 1) {
-				continue;
-			}
-			String file = m.group(1);
-			// lines are 0-indexed in thread objects.
-			int line = Integer.parseInt(m.group(2)) - 1;
-			CodeReviewThread thread = new CodeReviewThread(conn,
-					submission.getSubmissionPK(), file, line, now,
-					findbugsReviewer.getCodeReviewerPK());
-			
-			String commentText = rs.getString("long_test_result");
-			new CodeReviewComment(thread, findbugsReviewer, commentText, now, false, conn);
-		}
-	}
+	private void createFindbugsThreads( Connection conn, Submission submission) {
+	    
+        int testRunPK = submission.getCurrentTestRunPK();
+        if (testRunPK == 0)
+            return;
+        PreparedStatement findbugsOutcomes = null;
+        try {
+             findbugsOutcomes
+            = conn.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
+                    + "WHERE test_run_pk = ? AND test_type = ?");
+          
+            Queries.setStatement(findbugsOutcomes, testRunPK, FINDBUGS_TEST_TYPE);
+            ResultSet rs = findbugsOutcomes.executeQuery();
+            if (!rs.next())
+                return;
+            CodeReviewer findbugsReviewer = createFindbugsReviewer(conn);
+            byte [] submissionBytes = submission.downloadArchive(conn);
+            SortedSet<String> filenames 
+              = TextUtilities.scanTextFileNamesInZip(submissionBytes);
+            TestRun run = TestRun.lookupByTestRunPK(testRunPK, conn);
+            Timestamp now = run.getTestTimestamp();
+            int count = 0;
+            do {
+                String location = rs.getString("short_test_result");
+                Preconditions.checkState(!Strings.isNullOrEmpty(location), "Invalid findbugs location");
+                System.out.println(location);
+                Matcher m = TestOutcome.FINDBUGS_LOCATION_REGEX.matcher(location);
+                if (!m.matches()) {
+                    System.out.println("skipping " + location);
+                    continue;
+                }
+                String file = m.group(1);
+                String fullpath = getFullPath(filenames, file);
+                if (fullpath == null)
+                    continue;
+                // lines are 0-indexed in thread objects.
+                int line = m.groupCount() == 1 ? 0 : Integer.parseInt(m.group(2)) - 1;
+                CodeReviewThread thread = new CodeReviewThread(conn, submission.getSubmissionPK(), fullpath, line, now,
+                        findbugsReviewer.getCodeReviewerPK());
+
+                String commentText = rs.getString("long_test_result");
+                CodeReviewComment c = new CodeReviewComment(thread, findbugsReviewer, commentText, now, false, conn);
+                count++;
+                System.out.println("Added comment " + c.getCodeReviewCommentPK());
+            } while (rs.next());
+            findbugsReviewer.addComments(conn, count, now);
+        } catch (Exception e) {
+            assert true;
+        } finally {
+            Queries.closeStatement(findbugsOutcomes);
+        }
+
+    }
 	
 	@Override
 	public int compareTo(CodeReviewSummary that) {

@@ -365,8 +365,9 @@
             >
   <class location="compiledJspClasses"/>
   <class location="WebRoot/WEB-INF/classes"/>
+  <class location="../BuildServer/buildserver.jar"/>
   <class location="WebRoot/WEB-INF/lib/modelClasses.jar"/>
-        <sourcePath path="src/:gwt-src/:../SubmitServerModelClasses/src:compiledJspSrc"/>
+<sourcePath path="src/:gwt-src/:../SubmitServerModelClasses/src:compiledJspSrc:../BuildServer/src"/>
         <auxClasspath refid="base.classpath"/>
 
     </findbugs>

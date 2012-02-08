@@ -137,8 +137,8 @@ public class AddSubmissionsToCodeReviewAssignment extends SubmitServerServlet {
 			conn = getConnection();
 				
 
-            CreateCodeReviewAssignment.assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, numReviewersPerSubmission, codeReviewers,
-                    codeReviewers, conn);
+            CreateCodeReviewAssignment.assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, codeReviewers,
+                    true, conn);
 		
 			String redirectUrl = request.getContextPath()
 					+ "/view/instructor/codeReviewAssignment.jsp?codeReviewAssignmentPK="

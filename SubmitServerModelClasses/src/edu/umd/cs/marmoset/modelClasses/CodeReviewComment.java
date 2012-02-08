@@ -51,6 +51,12 @@ public class CodeReviewComment implements Comparable<CodeReviewComment> {
 	private boolean ack;
 	private Timestamp modified;
 
+	    @Override
+	    public String toString() {
+	        return String.format("Comment %d, in thread %d: %s", codeReviewCommentPK, codeReviewThreadPK,comment);
+	        
+	    }
+	
 	@Override
     public int hashCode() {
         return codeReviewCommentPK;
@@ -222,7 +228,7 @@ public class CodeReviewComment implements Comparable<CodeReviewComment> {
 		}
 	}
 
-	public  static void publishAll(CodeReviewer codeReviewer, Timestamp now, Connection conn) throws SQLException {
+	public  static int publishAll(CodeReviewer codeReviewer, Timestamp now, Connection conn) throws SQLException {
         String query = "UPDATE " + TABLE_NAME  + " , " + CodeReviewThread.TABLE_NAME
             + " SET " + TABLE_NAME + ".draft=?, "
                    + TABLE_NAME +".modified=? "
@@ -235,7 +241,7 @@ public class CodeReviewComment implements Comparable<CodeReviewComment> {
 
         try {
             Queries.setStatement(stmt, false, now,  codeReviewer.getCodeReviewerPK(), codeReviewer.getSubmissionPK(), true);
-            stmt.execute();
+            return stmt.executeUpdate();
         } finally {
             stmt.close();
         }

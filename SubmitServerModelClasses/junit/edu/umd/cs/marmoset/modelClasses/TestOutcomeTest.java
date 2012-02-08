@@ -66,13 +66,7 @@ public class TestOutcomeTest extends TestCase
         DatabaseUtilities.releaseConnection(conn);
     }
     
-    private TestOutcome lookupByTestRunPK(int testRunPK, String testType, int testNumber)
-    throws Exception
-    {
-        TestOutcomeCollection collection=TestOutcomeCollection.lookupByTestRunPK(testRunPK, conn);
-        return collection.getOutcomeByTestTypeAndTestNumber(testType, Integer.toString(testNumber));
-    }
-    
+
     public void testCoversLineOrPreviousThreeLines()
     throws Exception
     {

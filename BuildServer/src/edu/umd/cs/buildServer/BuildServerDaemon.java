@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.security.SecureRandom;
 
@@ -105,6 +106,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		// EARLY is necessary
 		// TODO: Make getter methods in Config for the required params
 		// (build.directory, test.files.directory, etc)
+	    InputStream defaultConfig 
+	        = BuildServerDaemon.class.getResourceAsStream("defaultConfig.properties");
+	    getConfig().load(defaultConfig);
 		getConfig().load(
 				new BufferedInputStream(new FileInputStream(configFile)));
 

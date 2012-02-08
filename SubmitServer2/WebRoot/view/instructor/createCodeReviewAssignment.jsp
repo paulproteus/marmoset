@@ -122,7 +122,7 @@ function updateForm(kind) {
             <thead>
                 <tr>
                     <td class="label">review kind</td>
-                    <td class="input"><select name="reviewKind" onchange="updateForm(this.options[this.selectedIndex].value);">
+                    <td class="input"><select name="kind" onchange="updateForm(this.options[this.selectedIndex].value);">
                             <option value="notSelected">-- choose --</option>
                             <option value="instructional"
                                 title="Select staff members that divy up all student submissions to review">Instructional</option>

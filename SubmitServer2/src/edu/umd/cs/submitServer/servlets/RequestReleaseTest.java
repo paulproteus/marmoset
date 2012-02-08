@@ -52,21 +52,6 @@ import edu.umd.cs.submitServer.UserSession;
  */
 public class RequestReleaseTest extends SubmitServerServlet {
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -84,7 +69,7 @@ public class RequestReleaseTest extends SubmitServerServlet {
 			// fetch submissionPK parameter from request
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerServletLog(), strictParameterChecking());
-			 @Submission.PK int submissionPK = parser.getIntParameter("submissionPK");
+			 @Submission.PK int submissionPK = Submission.asPK(parser.getIntParameter("submissionPK"));
 
 			// XXX CANNOT use SubmissionFilter because I need a transaction
 			// start new transaction
