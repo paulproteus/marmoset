@@ -74,10 +74,16 @@ public class GetTestSetup extends SubmitServerServlet {
 
 			MultipartRequest multipartRequest = (MultipartRequest) request
 					.getAttribute(MULTIPART_REQUEST);
-
+			String hostname = multipartRequest.getOptionalStringParameter("hostname");
+		       
 	        String courses = multipartRequest.getStringParameter("courses");
 	        Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
-            
+	        if (allowedCourses.isEmpty()) {
+                String msg = "host " + hostname + "; no courses match " + courses;
+                getSubmitServerServletLog().warn(msg);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                return;
+            }
 			int testSetupPK = multipartRequest.getIntParameter("testSetupPK");
 			TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK,
 					conn);

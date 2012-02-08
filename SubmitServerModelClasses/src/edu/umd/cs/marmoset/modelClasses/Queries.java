@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.WillClose;
 
@@ -412,6 +413,8 @@ public final class Queries {
 			Submission submission, TestSetup testSetup,
 			Collection<Integer> allowedCourses, int maxBuildDurationInMinutes)
 			throws SQLException {
+	    if (allowedCourses.isEmpty())
+	        throw new IllegalArgumentException();
 		// SQL timestamp of build requests that have,
 		// as of this moment, taken too long.
 		Timestamp buildTimeout = new Timestamp(System.currentTimeMillis()
@@ -671,6 +674,9 @@ public final class Queries {
 				return true;
 			}
 			return false;
+		} catch (SQLException e) {
+		    System.out.println("XXX SQL Error with " + stmt);
+		    throw e;
 		} finally {
 			closeStatement(stmt);
 		}
@@ -680,7 +686,8 @@ public final class Queries {
 	 * @param allowedCourses
 	 * @return
 	 */
-    private static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
+    private static @CheckForNull String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
+        assert !allowedCourses.isEmpty();
         String whereClause = null;
         for (Integer coursePK : allowedCourses) {
             if (whereClause == null)

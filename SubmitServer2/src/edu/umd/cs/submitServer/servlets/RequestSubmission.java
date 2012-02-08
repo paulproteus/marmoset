@@ -132,6 +132,12 @@ public class RequestSubmission extends SubmitServerServlet {
                 conn = getConnection();
                  Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
                
+                 if (allowedCourses.isEmpty()) {
+                     String msg = "host " + hostname + "; no courses match " + courses;
+                     getSubmitServerServletLog().warn(msg);
+                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                     return;
+                 }
 
                 if (submissionPK != null) {
                     submission = Submission.lookupBySubmissionPK(Submission.asPK(Integer.valueOf(submissionPK)), conn);
