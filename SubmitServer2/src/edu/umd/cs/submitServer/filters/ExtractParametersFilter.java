@@ -84,6 +84,13 @@ import edu.umd.cs.submitServer.WebConfigProperties;
 public class ExtractParametersFilter extends SubmitServerFilter {
 	private static final WebConfigProperties webProperties = WebConfigProperties.get();
 
+	
+	public boolean checkCourse(Collection<Course> courses, int coursePK) {
+	    for(Course c : courses)
+	        if (c.getCoursePK() == coursePK)
+	            return true;
+	    return false;
+	}
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -279,6 +286,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				project = Project.getByProjectPK(projectPK, conn);
 
 				coursePK = project.getCoursePK();
+				if (!checkCourse(courseList, coursePK)) 
+				    throw new ServletException(
+                            "You cannot view information about this project");
+				    
 				if (!project.getVisibleToStudents()
 						&& !userSession.hasInstructorCapability(coursePK))
 					throw new ServletException("Project is not visible");
@@ -595,8 +606,12 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (studentRegistration != null)
 				request.setAttribute(STUDENT_REGISTRATION, studentRegistration);
 
-			 if (project != null)
+			 if (project != null) {
+			         if (!checkCourse(courseList, project.getCoursePK())) 
+	                    throw new ServletException(
+	                            "You cannot view information about this project");
 	                request.setAttribute(PROJECT, project);
+			 }
 
 			if (studentSubmitStatus != null)
 				request.setAttribute(STUDENT_SUBMIT_STATUS, studentSubmitStatus);
