@@ -151,7 +151,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			List<Course> courseList;
 			if (user.isSuperUser()) {
 				courseList = Course.lookupAll(conn);
-			} else {
+		    } else {
 				courseList = Course.lookupAllByStudentPK(userSession.getStudentPK(), conn);
 			}
 			request.setAttribute(SubmitServerConstants.COURSE_LIST, courseList);
@@ -559,6 +559,9 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                 request.setAttribute(STUDENT, student);
             }
             
+            if (student != null && user.isSuperUser()) {
+                request.setAttribute("studentCourseList", Course.lookupAllByStudentPK(userSession.getStudentPK(), conn));
+            }
 			if (viewOfAnotherStudentsCode
 					&& !isCodeReviewer
 					&& !userSession.hasInstructorCapability(coursePK)

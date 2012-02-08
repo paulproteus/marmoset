@@ -48,6 +48,20 @@
 <c:when test="${empty studentRegistration}">
 <h1><c:out value="${student.fullname}"/></h1>
 <p><ss:studentEmail/>
+ <c:if test="${user.superUser }">
+ <ul>
+   <c:forEach var="course" items="${studentCourseList}">
+     <c:url var="courseLink" value="/view/instructor/student.jsp">
+                    <c:param name="studentPK" value="${student.studentPK}" />
+                    <c:param name="coursePK" value="${course.coursePK}" />
+                    </c:url>
+                     <li>
+                        <a href="${courseLink}"><c:out value="${course.fullDescription}"/></a>
+                        
+                    </c:forEach>
+                  
+                    </ul>
+                      </c:if>
 </c:when>
 <c:otherwise>
 <h1><c:out value="${studentRegistration.fullname}"/></h1>
