@@ -70,12 +70,12 @@ public class BuildserverWelcome extends SubmitServerServlet {
 
             for (Map.Entry<String, Course> e : allowedCourses.entrySet()) {
                 if (e.getValue() == null) {
-                    response.sendError(403, "no course for course key  " + e.getKey());
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "no course for course key  " + e.getKey());
                     return;
                 }
                 out.printf("Course key %s%n", e.getKey());
                 Course c = e.getValue();
-                out.printf("  %s %s%n", c.getCourseName(), c.getCourseName());
+                out.printf("  %s%n", c.getFullDescription());
             }
 
             out.close();
