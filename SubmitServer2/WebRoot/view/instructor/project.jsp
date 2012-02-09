@@ -40,32 +40,32 @@
 
 
 
-<c:choose>
-<c:when test="${not empty section}">
-<c:url var="allSections">
-    value="/view/instructor/project">
-    <c:param name="projectPK" value="${project.projectPK}" />
-    </c:url>
-<p><a href="${allSections}">All Sections</a>
-</p></c:when>
-<c:when test="${not empty sections && fn:length(sections) > 1}">
-<c:url var="link"
-    value="/view/instructor/project.jsp"/>
-<form method="post" action="${link}"><input
-        type="hidden" name="projectPK" value="${project.projectPK}" />
-        <p>Show just section: 
-        <select name="section">
-        <c:forEach var="s" items="${sections}">
-            <option><c:out value="${s}"></c:out>
-             </c:forEach>
-              </select>
-          
-            <input type="submit" value="go"/>
-        </form>
-</c:when>
-</c:choose>
+    <c:choose>
+        <c:when test="${not empty section}">
+            <c:url var="allSections" value="/view/instructor/project.jsp">
+                <c:param name="projectPK" value="${project.projectPK}" />
+            </c:url>
+            <p>
+                Showing just Section <c:out value="${section}"/>.
+                <a href="${allSections}">Show all Sections</a>
+            </p>
+        </c:when>
+        <c:when test="${not empty sections && fn:length(sections) > 1}">
+            <c:url var="link" value="/view/instructor/project.jsp" />
+            <form method="GET" action="${link}">
+                <input type="hidden" name="projectPK" value="${project.projectPK}" />
+                <p>
+                    Show just section: <select name="section">
+                        <c:forEach var="s" items="${sections}">
+                            <option>
+                                <c:out value="${s}"></c:out>
+                        </c:forEach>
+                    </select> <input type="submit" value="go" />
+            </form>
+        </c:when>
+    </c:choose>
 
-<c:if test="${empty studentRegistrationSet}">
+    <c:if test="${empty studentRegistrationSet}">
 	<c:url var="createDotSubmitFileLink" value="/data/instructor/CreateDotSubmitFile">
 			<c:param name="projectPK" value="${project.projectPK}"/>
 		</c:url>
@@ -186,6 +186,9 @@
 </c:when>
 </c:choose>
 
+<ss:codeReviews title="Code reviews"/>
+
+<h1>Submissions</h1>
 <c:if test="${project.tested}">
 <c:choose>
 <c:when test="${empty testSetup}">
@@ -229,9 +232,9 @@
 	</c:choose>
 </c:if>
 
-<ss:codeReviews title="Code reviews"/>
 
-<h1>Submissions</h1>
+
+
 
 <c:if test="${project.visibleToStudents && not empty studentsWithoutSubmissions}">
 <p><a href="#studentsWithoutSubmissions">${fn:length(studentsWithoutSubmissions)} active students 

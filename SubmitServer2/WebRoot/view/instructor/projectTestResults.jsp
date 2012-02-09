@@ -54,16 +54,18 @@
 <c:choose>
 <c:when test="${not empty section}">
 <c:url var="allSections">
-    value="/view/instructor/project">
+    value="/view/instructor/projectTestResults.jsp">
     <c:param name="projectPK" value="${project.projectPK}" />
     </c:url>
-<p><a href="${allSections}">All Sections</a>
+            <p>
+                Showing just Section <c:out value="${section}"/>.
+                <a href="${allSections}">Show all Sections</a>
 </p></c:when>
 
  <c:when test="${not empty sections && fn:length(sections) > 1}">
 <c:url var="link"
     value="/view/instructor/projectTestResults.jsp"/>
-<form method="post" action="${link}"><input
+<form method="GET" action="${link}"><input
         type="hidden" name="projectPK" value="${project.projectPK}" />
         <p>Show just section:
         <select name="section">
