@@ -51,7 +51,17 @@ public class CodeReviewFilter extends SubmitServerFilter {
             if (reviewer == null) {
                 StudentRegistration commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
                         course.getCoursePK(), conn);
-                if (commenter.isInstructor())
+                if (commenter == null) {
+                    if (!userSession.isSuperUser()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                                "Authentication Error: You are not registrated for this class");
+                                return;
+                    }
+                    reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submission.getSubmissionPK(),
+                            userSession.getStudentPK(), "",
+                            false,
+                            true);
+                } else if (commenter.isInstructor())
                     reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submission.getSubmissionPK(),
                             userSession.getStudentPK(), "",
                             submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK(),
