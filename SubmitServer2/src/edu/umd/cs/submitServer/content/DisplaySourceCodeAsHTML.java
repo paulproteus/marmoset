@@ -388,8 +388,9 @@ public class DisplaySourceCodeAsHTML {
 		anchoredLine = anchorLines.contains(lineNo);
 
 		String style = null;
-		if (currentHighlightRange != null)
+		if (currentHighlightRange != null) {
 			style = currentHighlightRange.style;
+		}
 
 		// Callback for adding coverage information to the generated page
 		style = coverageCallback(style);

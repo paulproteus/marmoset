@@ -64,6 +64,7 @@ public final class MarmosetPatterns {
     private final static Pattern integer = Pattern.compile("[0-9]+");
     private final static Pattern number = Pattern.compile("[0-9.eE+-]+");
     private final static Pattern numberOrEmpty = Pattern.compile("[0-9.eE+-]*");
+    private final static Pattern digits = Pattern.compile("[0-9]*");
     private final static Pattern identifier = Pattern.compile("[$A-Za-z0-9._-]+");
     private final static Pattern identifierOrEmpty = Pattern.compile("[$A-Za-z0-9._-]*");
     private final static Pattern identifierWithSpaces = Pattern.compile("[$A-Za-z0-9. _-]+");
@@ -144,6 +145,7 @@ public final class MarmosetPatterns {
         addPattern("stackTracePolicy", identifier);
         addPattern("term", integer);
         addPattern("testType", identifierOrEmpty);
+        addPattern("section", digits);
     }
 
     public static Pattern getPattern(String key) {

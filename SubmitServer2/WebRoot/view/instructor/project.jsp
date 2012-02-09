@@ -39,6 +39,33 @@
 <ss:projectMenu />
 
 
+<c:if test="${not empty sections && fn:length(sections) > 1}">
+<c:choose>
+<c:when test="${not empty section}">
+<c:url var="allSections">
+    value="/view/instructor/project">
+    <c:param name="projectPK" value="${project.projectPK}" />
+    </c:url>
+<p><a href="${allSections}">All Sections</a>
+</p></c:when>
+<c:otherwise>
+
+<c:url var="link"
+    value="/view/instructor/project.jsp"/>
+<form method="post" action="${link}"><input
+        type="hidden" name="projectPK" value="${project.projectPK}" />
+        <p>Show just section: 
+        <select name="section">
+        <c:forEach var="s" items="${sections}">
+            <option><c:out value="${s}"></c:out>
+             </c:forEach>
+              </select>
+          
+            <input type="submit" value="go"/>
+        </form>
+</c:otherwise>
+</c:choose>
+</c:if>
 
 <c:if test="${empty studentRegistrationSet}">
 	<c:url var="createDotSubmitFileLink" value="/data/instructor/CreateDotSubmitFile">
@@ -209,7 +236,8 @@
 <h1>Submissions</h1>
 
 <c:if test="${project.visibleToStudents && not empty studentsWithoutSubmissions}">
-<p>${fn:length(studentsWithoutSubmissions)} active students without submissions
+<p><a href="#studentsWithoutSubmissions">${fn:length(studentsWithoutSubmissions)} active students 
+without submissions</a>
 </c:if>
 
 <c:url var="sortByTime"
@@ -226,6 +254,14 @@
 	<c:param name="projectPK" value="${project.projectPK}" />
 	<c:param name="sortKey" value="account" />
 </c:url>
+<c:url var="sortBySection"
+    value="${ss:scrub(pageContext.request.pathTranslated)}">
+    <c:param name="projectPK" value="${project.projectPK}" />
+    <c:param name="sortKey" value="section" />
+</c:url>
+
+
+    
 <c:set var="anyOutdated" value="false"/>
 <p>
 <table>
@@ -237,7 +273,7 @@
 		</c:if>
 		<th><a href="${sortByAcct}">Acct</a></th>
         <c:if test="${not empty sections}">
-        <th>Section</th>
+        <th><a href="${sortBySection}">Section</a></th>
         </c:if>
 		<th>#<br>
 		subs</th>

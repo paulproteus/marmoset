@@ -114,10 +114,15 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 
     };
 
-    public static Comparator<StudentRegistration> getComparator(String sortKey) {
+    public static @CheckForNull Comparator<StudentRegistration> getComparator(String sortKey) {
+        if (sortKey == null) return nameComparator;
         if ("account".equals(sortKey)) return classAccountComparator;
-        return nameComparator;
+        if ("section".equals(sortKey))
+            return sectionComparator;
+        if ("name".equals(sortKey))  return nameComparator;
+        return null;
     }
+    
     public static final <T extends Comparable<T>> Comparator<StudentRegistration> getSubmissionViaMappedValuesComparator(final Map<Integer, T> values) {
         return  new Comparator<StudentRegistration>() {
 
@@ -156,8 +161,28 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
         };
 
     };
+    
+    public static final Comparator<StudentRegistration> sectionComparator =  new Comparator<StudentRegistration>() {
+
+        @Override
+        public int compare(StudentRegistration s1, StudentRegistration s2) {
+
+            int result = compareSection(s1,s2);
+            if (result != 0) return result;
+            result = compareInstructorStatus(s1, s2);
+            if (result != 0) return result;
+            result = compareNames(s1, s2);
+            if (result != 0) return result;
+            result = compareAccountNames(s1, s2);
+            return result;
+        }
+        };
+
     private static int compareInstructorStatus(StudentRegistration s1, StudentRegistration s2) {
         return -(s1.getInstructorLevel() - s2.getInstructorLevel());
+    }
+    private static int compareSection(StudentRegistration s1, StudentRegistration s2) {
+        return nullSafeCompare(s1.getSection(), s2.getSection());
     }
     private static int compareNames(StudentRegistration s1, StudentRegistration s2) {
         int result = s1.getLastname().compareTo(s2.getLastname());
@@ -166,6 +191,16 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
     }
     private static int compareAccountNames(StudentRegistration s1, StudentRegistration s2) {
         return s1.getClassAccount().compareTo(s2.getClassAccount());
+    }
+    private static <T extends Comparable<T>> 
+    int nullSafeCompare(T t1, T t2) {
+        if (t1== null) {
+            if (t2 == null) return 0;
+            return 1;
+        }
+        if (t2 == null) return -1;
+        return t1.compareTo(t2);
+            
     }
 	public static final String TABLE_NAME = "student_registration";
     private @StudentRegistration.PK Integer studentRegistrationPK; // non-NULL, autoincrement
@@ -263,6 +298,8 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 		this.classAccount = classAccount;
 	}
     public String getSection() {
+        if (section == null || section.length() == 0)
+            return section;
         if (course != null && course.length() > 0)
             return course + "-" + section;
 		return section;
@@ -554,7 +591,33 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 	}
 
 
+	public static List<StudentRegistration> lookupAllByCoursePKAndSection(int coursePK, String section, Connection conn)
+	        throws SQLException
+	        {
+	            String query =
+	                " SELECT " +ATTRIBUTES+
+	                " FROM student_registration " +
+	                " WHERE course_pk = ? ";
 
+	            PreparedStatement stmt = null;
+	            try {
+	                stmt = conn.prepareStatement(query);
+	                SqlUtilities.setInteger(stmt, 1, coursePK);
+	                ResultSet rs = stmt.executeQuery();
+                    
+                    List<StudentRegistration> collection = new LinkedList<StudentRegistration>();
+                    while (rs.next())
+                    {
+                        StudentRegistration registration = new StudentRegistration();
+                        registration.fetchValues(rs, 1);
+                        if (section.equals(registration.getSection()))
+                          collection.add(registration);
+                    }
+                    return collection;
+	            } finally {
+	                Queries.closeStatement(stmt);
+	            }
+	        }
 
 	public static List<StudentRegistration> lookupAllByCoursePK(int coursePK, Connection conn)
 	throws SQLException

@@ -2,9 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="sectionTitle">
-<h1>Project ${project.projectNumber}: ${project.title}</h1>
-<p class="sectionDescription">${project.description}</p>
-
+<h1>Project <c:out value="${project.projectNumber}"/>: 
+  <c:out value="${project.title}"/></h1>
+<p class="sectionDescription"><c:out value="${project.description}"/></p>
+<c:if test="${not empty section}">
+<p class="sectionDescription">Section: <c:out value="${section}"/></p>
+</c:if>
 <c:if test="${!project.visibleToStudents}">
     <c:url var="makeVisibleLink"
         value="/action/instructor/MakeProjectVisible" />

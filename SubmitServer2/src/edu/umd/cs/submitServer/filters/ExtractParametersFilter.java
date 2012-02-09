@@ -112,7 +112,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		Integer testSetupPK = parser.getIntegerParameter("testSetupPK", null);
 		Integer codeReviewerPK = parser.getIntegerParameter("codeReviewerPK", null);
 		Integer codeReviewAssignmentPK = parser.getIntegerParameter("codeReviewAssignmentPK", null);
-
+		String section = parser.getOptionalCheckedParameter("section");
+        
 		
 		String courseKey = parser.getParameter("courseKey");
 		String projectNumber = parser.getParameter("projectNumber");
@@ -379,8 +380,12 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 							StudentSubmitStatus.lookupAllByProjectPK(projectPK,
 									conn));
 
-					List<StudentRegistration> listOfAllStudents = StudentRegistration
-							.lookupAllByCoursePK(coursePK, conn);
+					List<StudentRegistration> listOfAllStudents;
+					if (section != null)
+					    listOfAllStudents = StudentRegistration
+							.lookupAllByCoursePKAndSection(coursePK, section, conn);
+					else  listOfAllStudents = StudentRegistration
+                            .lookupAllByCoursePK(coursePK, conn);
 					TreeSet<StudentRegistration> studentsWithoutSubmissions = new TreeSet<StudentRegistration>(
 							StudentRegistration.getComparator(sortKey));
 
@@ -389,6 +394,9 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 					allStudents.addAll(listOfAllStudents);
 					request.setAttribute("allStudents",
 							allStudents);
+					if (section != null)
+					    studentRegistrationCollection.retainAll(allStudents);
+					    
 
 					studentsWithoutSubmissions.addAll(listOfAllStudents);
 					studentsWithoutSubmissions
@@ -440,15 +448,15 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				
 				TreeSet<StudentRegistration> noSection = new TreeSet<StudentRegistration>();
 				for(StudentRegistration sr : justStudentRegistrationSet) {
-				    String section = sr.getSection();
-				    if (section == null || section.isEmpty()) {
+				    String sr_section = sr.getSection();
+				    if (sr_section == null || sr_section.isEmpty()) {
 				        noSection.add(sr);
 				        continue;
 				    }
-				    SortedSet<StudentRegistration> inSection = sectionMap.get(section);
+				    SortedSet<StudentRegistration> inSection = sectionMap.get(sr_section);
 				    if (inSection == null) {
 				        inSection = new TreeSet<StudentRegistration>();
-				        sectionMap.put(section, inSection);
+				        sectionMap.put(sr_section, inSection);
 				    }
 				    inSection.add(sr);
 				}
@@ -461,6 +469,11 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				request.setAttribute(SECTION_MAP,
 				        sectionMap);
 				request.setAttribute(SECTIONS, sectionMap.keySet());
+				
+				if (section != null && !sectionMap.containsKey(section))
+				    throw new IllegalArgumentException("Bad section: " + section);
+				request.setAttribute("section", section);
+                
                 
 
 			}

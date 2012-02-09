@@ -32,7 +32,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -79,13 +82,23 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 
 			Set<StudentRegistration> registrationSet = (Set<StudentRegistration>) request
 					.getAttribute(STUDENT_REGISTRATION_SET);
+			
+			
 
 
 			boolean useDefault = false;
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerFilterLog(), strictParameterChecking());
 			useDefault = parser.getBooleanParameter("useDefault", false);
-			String section = parser.getParameter("section");
+			String section = (String) request.getAttribute(SECTION);
+			
+			if (section != null) {
+			    for(Iterator<StudentRegistration> i = registrationSet.iterator(); i.hasNext(); ) {
+			        StudentRegistration sr = i.next();
+			        if (!section.equals(sr.getSection()))
+			            i.remove();
+			    }
+			}
 			ChosenSubmissionPolicy bestSubmissionPolicy = null;
 
 			if (!project.isTested())
@@ -111,14 +124,26 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 
 			Map<Integer, Submission> submissionsThatNeedReview 
 			= new HashMap<Integer, Submission>(lastSubmission);
+
 			if (submissionsUnderReview != null)
-			for(Submission s : submissionsUnderReview) {
-			    @StudentRegistration.PK int author = s.getStudentRegistrationPK();
-			    Submission reviewed = submissionsThatNeedReview.get(author);
-			    if (s.equals(reviewed))
-			      submissionsThatNeedReview.remove(author);
+			    for(Submission s : submissionsUnderReview) {
+			        @StudentRegistration.PK int author = s.getStudentRegistrationPK();
+			        Submission reviewed = submissionsThatNeedReview.get(author);
+			        if (s.equals(reviewed))
+			            submissionsThatNeedReview.remove(author);
+			    }
+
+			if (section != null) {
+			    Set<Integer> registrationPKSet = new HashSet<Integer>();
+			    for(StudentRegistration sr : registrationSet)
+			        registrationPKSet.add(sr.getStudentRegistrationPK());
+			    lastSubmission.keySet().retainAll(registrationPKSet);
+			    lastOnTime.keySet().retainAll(registrationPKSet);
+			    lastLate.keySet().retainAll(registrationPKSet);
+			    lastVeryLate.keySet().retainAll(registrationPKSet);
+			    submissionsThatNeedReview.keySet().retainAll(registrationPKSet);
 			}
-            
+
 			Set<Integer> submissionsWithOutdatedTestResults
 			= Queries.lookupSubmissionsWithOutdatedTestResults(conn, project);
 			request.setAttribute("submissionsWithOutdatedTestResults", 
@@ -134,14 +159,14 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 			request.setAttribute("bestSubmissionMap", bestSubmissionMap);
 
 			String sortKey = parser.getOptionalCheckedParameter("sortKey");
+
 			if ("time".equals(sortKey)) {
 				TreeSet<StudentRegistration> sortedByTime = new TreeSet<StudentRegistration>(
 						StudentRegistration
 								.getSubmissionViaTimestampComparator(lastSubmission));
 				sortedByTime.addAll(registrationSet);
 				request.setAttribute("studentRegistrationSet", sortedByTime);
-			}
-			if ("score".equals(sortKey)) {
+			} else if ("score".equals(sortKey)) {
 				TreeSet<StudentRegistration> sortedByScore = new TreeSet<StudentRegistration>(
 						StudentRegistration
 								.getSubmissionViaMappedValuesComparator(lastSubmission));

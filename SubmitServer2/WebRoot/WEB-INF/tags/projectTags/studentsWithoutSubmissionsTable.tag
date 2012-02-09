@@ -2,7 +2,7 @@
 
 
 <c:if test="${project.visibleToStudents && not empty studentsWithoutSubmissions}">
-<h1>Active students without submissions</h1>
+<h1 id="studentsWithoutSubmissions">Active students without submissions</h1>
 <p>
 <table>
 	<tr>

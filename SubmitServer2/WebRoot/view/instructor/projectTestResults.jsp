@@ -39,6 +39,7 @@
 
 <ss:projectTitle />
 
+
 <c:choose>
 	<c:when test="${!project.tested}">
 		<h1>Upload only project</h1>
@@ -49,6 +50,33 @@
 	<c:otherwise>
 		<ss:projectMenu />
 
+<c:if test="${not empty sections && fn:length(sections) > 1}">
+<c:choose>
+<c:when test="${not empty section}">
+<c:url var="allSections">
+    value="/view/instructor/project">
+    <c:param name="projectPK" value="${project.projectPK}" />
+    </c:url>
+<p><a href="${allSections}">All Sections</a>
+</p></c:when>
+<c:otherwise>
+ 
+<c:url var="link"
+    value="/view/instructor/projectTestResults.jsp"/>
+<form method="post" action="${link}"><input
+        type="hidden" name="projectPK" value="${project.projectPK}" />
+        <p>Show just section:
+        <select name="section">
+        <c:forEach var="s" items="${sections}">
+            <option><c:out value="${s}"></c:out>
+             </c:forEach>
+              </select>
+          
+            <input type="submit" value="go"/>
+        </form>
+</c:otherwise>
+</c:choose>
+</c:if>
 		<ss:projectTestResultsTable />
 		
 		<ss:projectLegend />
