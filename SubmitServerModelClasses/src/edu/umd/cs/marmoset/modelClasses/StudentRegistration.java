@@ -263,6 +263,8 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 		this.classAccount = classAccount;
 	}
     public String getSection() {
+        if (course != null && course.length() > 0)
+            return course + "-" + section;
 		return section;
 	}
 

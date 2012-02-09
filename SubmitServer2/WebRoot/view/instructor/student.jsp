@@ -66,6 +66,9 @@
 </c:when>
 <c:otherwise>
 <h1><c:out value="${studentRegistration.fullname}"/></h1>
+<c:if test="${not empty studentRegistration.section }">
+<p>Section: <c:out value="${studentRegistration.section}"/>
+</p></c:if>
 <p><ss:studentEmail/>
 <c:choose>
 <c:when test="${studentRegistration.dropped}">
