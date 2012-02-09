@@ -51,34 +51,34 @@
 		<ss:projectMenu />
 
 
-<c:choose>
-<c:when test="${not empty section}">
-<c:url var="allSections">
-    value="/view/instructor/projectTestResults.jsp">
-    <c:param name="projectPK" value="${project.projectPK}" />
-    </c:url>
-            <p>
-                Showing just Section <c:out value="${section}"/>.
-                <a href="${allSections}">Show all Sections</a>
-</p></c:when>
+            <c:choose>
+                <c:when test="${not empty section}">
+                    <c:url var="allSections" value="/view/instructor/projectTestResults.jsp">
+                        <c:param name="projectPK" value="${project.projectPK}" />
+                    </c:url>
+                    <p>
+                        Showing just Section
+                        <c:out value="${section}" />
+                        . <a href="${allSections}">Show all Sections</a>
+                    </p>
+                </c:when>
 
- <c:when test="${not empty sections && fn:length(sections) > 1}">
-<c:url var="link"
-    value="/view/instructor/projectTestResults.jsp"/>
-<form method="GET" action="${link}"><input
-        type="hidden" name="projectPK" value="${project.projectPK}" />
-        <p>Show just section:
-        <select name="section">
-        <c:forEach var="s" items="${sections}">
-            <option><c:out value="${s}"></c:out>
-             </c:forEach>
-              </select>
-            <input type="submit" value="go"/>
-        </form>
-</c:when>
-</c:choose>
+                <c:when test="${not empty sections && fn:length(sections) > 1}">
+                    <c:url var="link" value="/view/instructor/projectTestResults.jsp" />
+                    <form method="GET" action="${link}">
+                        <input type="hidden" name="projectPK" value="${project.projectPK}" />
+                        <p>
+                            Show just section: <select name="section">
+                                <c:forEach var="s" items="${sections}">
+                                    <option>
+                                        <c:out value="${s}"></c:out>
+                                </c:forEach>
+                            </select> <input type="submit" value="go" />
+                    </form>
+                </c:when>
+            </c:choose>
 
-		<ss:projectTestResultsTable />
+            <ss:projectTestResultsTable />
 		
 		<ss:projectLegend />
 		
