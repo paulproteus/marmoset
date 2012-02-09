@@ -50,7 +50,7 @@
 	<c:otherwise>
 		<ss:projectMenu />
 
-<c:if test="${not empty sections && fn:length(sections) > 1}">
+
 <c:choose>
 <c:when test="${not empty section}">
 <c:url var="allSections">
@@ -59,8 +59,8 @@
     </c:url>
 <p><a href="${allSections}">All Sections</a>
 </p></c:when>
-<c:otherwise>
- 
+
+ <c:when test="${not empty sections && fn:length(sections) > 1}">
 <c:url var="link"
     value="/view/instructor/projectTestResults.jsp"/>
 <form method="post" action="${link}"><input
@@ -71,12 +71,11 @@
             <option><c:out value="${s}"></c:out>
              </c:forEach>
               </select>
-          
             <input type="submit" value="go"/>
         </form>
-</c:otherwise>
+</c:when>
 </c:choose>
-</c:if>
+
 		<ss:projectTestResultsTable />
 		
 		<ss:projectLegend />

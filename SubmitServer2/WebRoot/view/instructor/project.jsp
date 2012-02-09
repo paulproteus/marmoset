@@ -39,7 +39,7 @@
 <ss:projectMenu />
 
 
-<c:if test="${not empty sections && fn:length(sections) > 1}">
+
 <c:choose>
 <c:when test="${not empty section}">
 <c:url var="allSections">
@@ -48,8 +48,7 @@
     </c:url>
 <p><a href="${allSections}">All Sections</a>
 </p></c:when>
-<c:otherwise>
-
+<c:when test="${not empty sections && fn:length(sections) > 1}">
 <c:url var="link"
     value="/view/instructor/project.jsp"/>
 <form method="post" action="${link}"><input
@@ -63,9 +62,8 @@
           
             <input type="submit" value="go"/>
         </form>
-</c:otherwise>
+</c:when>
 </c:choose>
-</c:if>
 
 <c:if test="${empty studentRegistrationSet}">
 	<c:url var="createDotSubmitFileLink" value="/data/instructor/CreateDotSubmitFile">
