@@ -147,31 +147,31 @@ function changedIsTested(isTested)
 	</tr>
 	<tr>
 		<td class="label"><label for="ontime">on-time deadline</label></td>
-		<td><INPUT TYPE="text" id="ontime-date" NAME="ontime-date" PLACEHOLDER="yyyy-mm-dd" size="12" required>
+		<td class="input"><INPUT TYPE="text" id="ontime-date" NAME="ontime-date" PLACEHOLDER="yyyy-mm-dd" size="12" required>
 		<INPUT TYPE="text" id="ontime-time" NAME="ontime-time" PLACEHOLDER="hh:mm aa" size="12"  ></td>
 	</tr>
 	<tr title="leave both blank for no late deadline">
 		<td class="label"><label for="late">late deadline</label></td>
-		<td><INPUT TYPE="text" id="late-date" NAME="late-date" PLACEHOLDER="yyyy-mm-dd" size="12" >
+		<td class="input"><INPUT TYPE="text" id="late-date" NAME="late-date" PLACEHOLDER="yyyy-mm-dd" size="12" >
         <INPUT TYPE="text" id="late-time" NAME="late-time" PLACEHOLDER="hh:mm aa" size="12" title="blank for one second before midnight"> </td>
 	</tr>
 	<tr>
 		<td class="label">project title</td>
-		<td><INPUT TYPE="text" NAME="title" size="60"></td>
+		<td class="input"><INPUT TYPE="text" NAME="title" size="60" required="required"></td>
 	</tr>
 	<tr>
 		<td class="label" >URL</td>
-		<td><INPUT TYPE="url" NAME="url" size="60"></td>
+		<td class="input"><INPUT TYPE="url" NAME="url" size="60"></td>
 	</tr>
 	<tr>
 		<td class="label">description</td>
-		<td><INPUT TYPE="text" NAME="description" size="90"></td>
+		<td class="input"><INPUT TYPE="text" NAME="description" size="90"></td>
 	</tr>
 <tr 
     title="Submissions from the canoonical account are used to check test setups and to provide baseline/starter snapshots of projects">
     
         <td class="label">canonical account</td>
-        <td><select name="canonicalStudentRegistrationPK">
+        <td class="input"><select name="canonicalStudentRegistrationPK">
             <c:forEach var="studentRegistration" items="${courseInstructors}">
                 <c:choose>
                    <c:when test="${studentRegistration.studentRegistrationPK == studentRegistrationPK}">
@@ -190,7 +190,7 @@ function changedIsTested(isTested)
     <tr title="Student submissions are compared against either the baseline submission for this project, or against the students last submission from another project. The comparison is used to highlight changes text, and elide long sections of unchanged files. ">
     <td class="label">Diff against
         </td>
-        <td>
+        <td class="input">
         <select>
         <option value="0" selected="selected">Baseline submission (if any)</option>
         <c:forEach var="p" items="${projectList}">
@@ -203,13 +203,13 @@ function changedIsTested(isTested)
 	<tr>
 		<td class="label">Pair project
 		</td>
-		<td><INPUT TYPE="CHECKBOX" NAME="pair" ></td>
+		<td class="input"><INPUT TYPE="CHECKBOX" NAME="pair" ></td>
 	</tr>
 
 	<tr>
 		<td class="label">Tested on server<br>
 		</td>
-		<td><INPUT TYPE="CHECKBOX" NAME="tested" CHECKED
+		<td class="input"><INPUT TYPE="CHECKBOX" NAME="tested" CHECKED
 		  ONCHANGE="changedIsTested(this.checked)"
 		></td>
 	</tr>
@@ -228,7 +228,7 @@ function changedIsTested(isTested)
 
 <tbody>	<tr>
 		<td class="label">kind of late penalty:</td>
-		<td><select name="kindOfLatePenalty">
+		<td class="input"><select name="kindOfLatePenalty">
 			<option selected>constant</option>
 			<option>multiplier</option>
 		</select></td>
@@ -239,7 +239,7 @@ function changedIsTested(isTested)
 			from a late submission">
 			Late Constant
 		</td>
-		<td><input type="text" name="lateConstant" value="0" size="5"/></td>
+		<td class="input"><input type="text" name="lateConstant" value="0" size="5"/></td>
 	</tr>
 
 	<tr>
@@ -247,7 +247,7 @@ function changedIsTested(isTested)
 			a late submission">
 			Late Multiplier
 		</td>
-		<td><input type="text" name="lateMultiplier" value="0" size="5"/></td>
+		<td class="input"><input type="text" name="lateMultiplier" value="0" size="5"/></td>
 	</tr>
 
 	<tr title="Set to 'everything' if you want  students to see all outcomes (public, release and secret)  after the deadline passes.">
@@ -263,7 +263,7 @@ function changedIsTested(isTested)
 	<tr title="How much information to reveal for a release test">
 		<td class="label" >release test stack trace policy<br>
 		</td>
-		<td class="left">
+		<td class="input">
 		<input type="radio" name="stackTracePolicy" value="test_name_only" checked="checked">
 		name of test only (default)
 		<br>
@@ -281,7 +281,7 @@ function changedIsTested(isTested)
 	<tr title="which submissions can be release tested">
 		<td class="label">release test policy
 		</td>
-		<td>
+		<td class="input">
 			<select name="releasePolicy">
 			<option value="after_public">submissions that pass all public tests</option>
 			<option value="anytime">any submission</option>
@@ -290,7 +290,7 @@ function changedIsTested(isTested)
 
 	<tr>
 		<td class="label" title="Determines how the submission to be graded is chosen from each category (on-time and late)">best submission policy</td>
-		<td class="left">
+		<td class="input">
 		<input type="radio" name="bestSubmissionPolicy" value="edu.umd.cs.submitServer.policy.ChooseLastSubmissionPolicy" checked="checked">
 		Last compilable submission.
 		<br>
@@ -304,7 +304,7 @@ function changedIsTested(isTested)
 	<tr  title="How many release tests to reveal the students when they use a token">
 		<td class="label"># release tests to reveal<br>
 		</td>
-		<td>
+		<td class="input">
 
 			<select name="numReleaseTestsRevealed">
 			<OPTION>1</OPTION>
@@ -323,7 +323,7 @@ function changedIsTested(isTested)
 	</tr>
 	<tr>
 		<td class="label">number of release tokens</td>
-		<td><input name="releaseTokens"
+		<td class="input"><input name="releaseTokens"
          type="number"
          min="1"
          max="5"
@@ -332,7 +332,7 @@ function changedIsTested(isTested)
 
 	<tr>
 		<td class="label">regeneration time (hours)</td>
-		<td><SELECT NAME="regenerationTime">
+		<td class="input"><SELECT NAME="regenerationTime">
 			<OPTION>12</OPTION>
 			<OPTION SELECTED>24</OPTION>
 			<OPTION>36</OPTION>

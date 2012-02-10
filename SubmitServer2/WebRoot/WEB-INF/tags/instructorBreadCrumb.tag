@@ -11,7 +11,7 @@
  </c:if>
 
 <c:if test="${user.canImportCourses}">
- <a href="<c:url value='/view/manage.jsp'/>">Manage</a> |
+ <a href="<c:url value='/view/manage.jsp'/>" title="create/import courses and build servers">Manage</a> |
 </c:if>
 
 <c:choose>
@@ -54,8 +54,8 @@
 		<c:param name="projectPK" value="${project.projectPK}" />
 	</c:url>
 	| <c:set var="title"><c:out value="Overview of project ${project.projectNumber}"/></c:set>
-    <a href="${projectLink}"
-         title="${title}">c:out value="${project.projectNumber}"/><</a>
+    <a href="${projectLink}"  title="${title}">
+    <c:out value="${project.projectNumber}"/></a>
     
     
 

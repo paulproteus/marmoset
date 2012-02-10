@@ -24,6 +24,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix='fn' uri='http://java.sun.com/jsp/jstl/functions'%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 
@@ -116,7 +117,7 @@ function updateForm(kind) {
 
           <table class="form">
             <colgroup>
-                <COL class="label" width="200" />
+                <COL class="label" width="230" />
                 <COL class="input" />
             </colgroup>
             <thead>
@@ -155,13 +156,13 @@ function updateForm(kind) {
             <tbody id="main">
                 <tr>
                     <td class="label">description</td>
-                    <td class="input"><INPUT TYPE="text" NAME="description" size="60" required></td>
+                    <td class="input"><INPUT TYPE="text" NAME="description" size="60" required="required"></td>
 
                 </tr>
                 <tr>
                     <td class="label">deadline</td>
-                    <td><INPUT TYPE="text" id="deadline-date" NAME="deadline-date" PLACEHOLDER="yyyy-mm-dd"
-                        size="12" required> <INPUT TYPE="text" id="deadline-time" NAME="deadline-time"
+                    <td class="input"><INPUT TYPE="text" id="deadline-date" NAME="deadline-date" PLACEHOLDER="yyyy-mm-dd"
+                        size="12" required="required"> <INPUT TYPE="text" id="deadline-time" NAME="deadline-time"
                         PLACEHOLDER="hh:mm aa" size="12" title="leave time blank for one second before midnight" /></td>
                 </tr>
 
@@ -186,7 +187,7 @@ exemplar
             <tbody id="instructional" style="display: none">
                 <tr>
                     <td class="label">Reviewers<br></td>
-                    <td><c:forEach var="studentRegistration" items="${courseInstructors}"
+                    <td class="input"><c:forEach var="studentRegistration" items="${courseInstructors}"
                             varStatus="counter">
                            <c:if test="${not counter.first}"> <br></c:if>
                             <INPUT TYPE="CHECKBOX" NAME="reviewer-${studentRegistration.studentPK}">
@@ -196,8 +197,8 @@ exemplar
             </tbody>
             <tbody id="instructionalBySection" style="display: none">
                 <tr>
-                    <td>Reviewers for each section
-                    <td><c:forEach var="section" items="${sections}">
+                    <td class="label">Reviewers for each section
+                    <td class="input"><c:forEach var="section" items="${sections}">
                             <c:out value="${section}" />
                             <select name="section-reviewer-${section}">
                             <c:forEach var="studentRegistration" items="${courseInstructors}">
@@ -240,7 +241,12 @@ exemplar
                 </tr>
             </tbody>
             <tbody id="number" style="display: none">
-
+                <c:if test="${fn:length(sections) > 1}">
+                 <tr>
+                    <td class="label">by section</td>
+                    <td class="input"><input type="checkbox" name="peerBySection" checked="checked" value="true" /> (peer reviews done by other students in the same section)</td>
+                </tr>
+                </c:if>
                 <tr>
                     <td class="label"># reviews per submission</td>
                     <td class="input"><select name="numReviewers">
@@ -249,6 +255,7 @@ exemplar
                             <option>3</option>
                     </select></td>
                 </tr>
+
             </tbody>
 
         </table>

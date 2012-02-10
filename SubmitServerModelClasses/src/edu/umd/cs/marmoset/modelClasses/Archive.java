@@ -35,6 +35,8 @@ import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nonnull;
+
 import edu.umd.cs.marmoset.utilities.Checksums;
 import edu.umd.cs.marmoset.utilities.MarmosetPatterns;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
@@ -295,11 +297,13 @@ public class Archive {
 	 * @throws SQLException
 	 */
 
-	static void updateBytesInArchive(String tableName, Integer archivePK,
+	static void updateBytesInArchive(String tableName, @Nonnull Integer archivePK,
 			byte[] cachedArchive, Connection conn) throws SQLException {
 		if (!MarmosetPatterns.isTableName(tableName)) {
 			throw new IllegalArgumentException("tableName is malformed");
 		}
+		if (archivePK == null)
+		    throw new NullPointerException("archivePK is null");
 		String sql = " UPDATE " + tableName + " SET archive = ? "
 				+ " WHERE archive_pk = ? ";
 		PreparedStatement stmt = null;

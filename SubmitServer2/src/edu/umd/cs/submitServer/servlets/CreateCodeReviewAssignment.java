@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
@@ -89,18 +90,21 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
         Collection<StudentRegistration> students = (Collection<StudentRegistration>) request
                 .getAttribute(JUST_STUDENT_REGISTRATION_SET);
        
+        RequestParser parser = new RequestParser(request, getSubmitServerServletLog(), strictParameterChecking());
 
+        Kind kind = Kind.getByParamValue(parser.getStringParameter("kind"));
+        String description = parser.getStringParameter("description");
+        Timestamp deadline = parser.getTimestampParameter("deadline");
+        boolean anonymous = parser.getCheckbox("anonymous");
+        boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
+       
+        if (kind == Kind.PEER && parser.getBooleanParameter("peerBySection", false))
+            kind = Kind.PEERBYSECTION;
+        
         Connection conn = null;
         try {
             conn = getConnection();
-            RequestParser parser = new RequestParser(request, getSubmitServerServletLog(), strictParameterChecking());
-
-            Kind kind = Kind.getByParamValue(parser.getStringParameter("kind"));
-            String description = parser.getStringParameter("description");
-            Timestamp deadline = parser.getTimestampParameter("deadline");
-            boolean anonymous = parser.getCheckbox("anonymous");
-            boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
-            		
+             		
             CodeReviewAssignment assignment = new CodeReviewAssignment(conn, project.getProjectPK(), description, deadline,
                     canSeeOthers, anonymous, kind);
             addRubrics(request, parser, assignment, conn);
@@ -128,6 +132,21 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 }
                 break;
             }
+            case PEERBYSECTION: {
+                
+                int numReviewersPerSubmission = parser.getIntParameter("numReviewers");
+                Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
+                TreeMap<String, SortedSet<StudentRegistration>> sectionMap =
+                       (TreeMap<String, SortedSet<StudentRegistration>>) request.getAttribute(SECTION_MAP);
+                
+                for(SortedSet<StudentRegistration> section : sectionMap.values()) {
+                    List<Integer> codeReviewers = getStudentPKs(section);
+                    assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, numReviewersPerSubmission, codeReviewers,
+                            false, conn);
+                }
+                break;
+            }
+                
             case PEER: {
                 int numReviewersPerSubmission = parser.getIntParameter("numReviewers");
                 Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");

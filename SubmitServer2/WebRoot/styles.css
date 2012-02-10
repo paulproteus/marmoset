@@ -189,6 +189,12 @@ table.form td {
 	vertical-align: top;
 }
 
+table.form td.input {
+    padding-left: 0.5em;
+    vertical-align:middle;
+    background: #fffef4;
+    }
+
 table.form td.label {
 	font-weight: bold;
 	text-align: right;
@@ -198,10 +204,23 @@ table.form td.label {
 	}
 
 
-table.form tr.submit td {
+table.form tr.submit  {
 	background: #ffcc33;
 	text-align: center;
+	vertical-align:middle;
 }
+table.form tr.submit th.label {
+     font-weight: bold;
+    text-align: right;
+    vertical-align:middle;
+    background: #fff9e5;
+    padding-left: 3em;
+    padding-right: 0.5em;
+}
+table.form tr.submit td.input {
+     background: #fffef4;
+}
+
 
 tr.r0 {
 	background: #fff3cc;

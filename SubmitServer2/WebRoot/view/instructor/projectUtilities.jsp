@@ -132,7 +132,7 @@
 							name="submitClientTool" value="web" /> <input type="hidden"
 							name="isCanonicalSubmission" value="true" />
 
-						<table>
+						<table class="form">
 							<tr>
 								<th>#</th>
 								<th># inconsistent<br>background<br>retests</th>
@@ -170,17 +170,15 @@
 
 
 							<tr class="submit">
-								<th colspan=2><a
+								<th class="label" colspan=2><a
 									title="Any instructor can upload a canonical submission through this interface; you do not need to own the canonical account (and have the password) to make a canonical submission through this web interface.">Upload</a>
 								</th>
-								<td class="input" colspan="3"><a
-									title="zip/jar file to upload"><input type="file"
-										name="file" size=40 />
+								<td class="input" colspan="4">
+                                <input type="submit" value="Submit" title="Any instructor can upload a canonical submission through this interface; you do not need to own the canonical account (and have the password) to make a canonical submission through this web interface.">
+                                <input type="file" required="required"
+										name="file" size=40 title="zip/jar file to upload"/>
 								</a>
-								<td><a
-									title="Any instructor can upload a canonical submission through this interface; you do not need to own the canonical account (and have the password) to make a canonical submission through this web interface.">
-										<input type="submit" value="Submit">
-								</a>
+								
 								</td>
 							</tr>
 
@@ -206,9 +204,13 @@
 			</c:choose>
 			<c:if test="${not empty allTestSetups}">
 				<h4>Testing setups</h4>
-
+            <c:url var="uploadTestSetupLink"
+                        value="/action/instructor/UploadTestSetup" />
+            <form name="submitform" action="${uploadTestSetupLink}"
+                        enctype="multipart/form-data" method="POST">
+                        <input type="hidden" name="projectPK" value="${project.projectPK}">
 				<p>
-					<table>
+					<table class="form">
 					<tr>
 				<th>Version</th>
 				<th>Tested</th>
@@ -327,28 +329,25 @@
 				
 						</c:if>
 			</c:forEach>
-			<c:url var="uploadTestSetupLink"
-						value="/action/instructor/UploadTestSetup" />
-			<form name="submitform" action="${uploadTestSetupLink}"
-						enctype="multipart/form-data" method="POST">
-						<input type="hidden" name="projectPK" value="${project.projectPK}">
+
 
 			<tr class="submit">
-
-	<th colspan=2>Upload new test setup</th>
-	<td><a title="Comment"><textarea cols="30" rows="1"
-										name="comment"></textarea>
+	<th colspan=2 class="label">Upload new test setup</th>
+	<td class="input"><a title="Comment"><textarea cols="30" rows="1"
+										name="comment" placeholder="Description/comment on test setup"></textarea>
 							</a>
 	
-							<td colspan="5">
-<a title="zip/jar file to upload"><input type="file" name="file"
-									size=40>
-							</a>
-							<input type="submit" value="Upload">
+							<td class="input" colspan="5" >
+                            <input type="submit" value="Upload"/>
+                    <input type="file" required="required" name="file" title="zip/jar file to upload"
+									size=40/>
+
+							
 </td>
 						</tr>
-					</form>
+				
 		</table>
+            </form>
 	</c:if>
 
 

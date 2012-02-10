@@ -44,7 +44,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 public class CodeReviewAssignment {
     
     public enum Kind {
-        INSTRUCTIONAL, INSTRUCTIONALBYSECTION, PEER, EXEMPLAR;
+        INSTRUCTIONAL, INSTRUCTIONALBYSECTION, PEER, PEERBYSECTION, EXEMPLAR;
         public static Kind getByParamValue(String value) {
             return Kind.valueOf(value.toUpperCase());
         };

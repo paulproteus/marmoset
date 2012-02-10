@@ -943,6 +943,7 @@ public class Project implements Serializable {
     public void updateCachedArchive(byte[] bytes, Connection conn)
     throws SQLException
     {
+        if (archivePK == null) throw new NullPointerException("archivePK not yet");
     	cachedArchive = bytes;
         Archive.updateBytesInArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK, cachedArchive, conn);
     }
