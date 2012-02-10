@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
@@ -128,7 +129,7 @@ public class Submission implements ITestSummary<Submission> {
 	private @StudentRegistration.PK int studentRegistrationPK = 0; 
 	private @Project.PK int projectPK = 0; 
 	private int numTestRuns = 0;
-	private Integer currentTestRunPK; // may be NULL
+	private @CheckForNull Integer currentTestRunPK; // may be NULL
 	private String submissionNumber = "0";
 	private Timestamp submissionTimestamp;
 	private String cvsTagTimestamp;
@@ -638,7 +639,7 @@ public class Submission implements ITestSummary<Submission> {
     /**
      * @return Returns the currentTestRunPK.
      */
-    public Integer getCurrentTestRunPK()
+    public @CheckForNull Integer getCurrentTestRunPK()
     {
         return currentTestRunPK;
     }
