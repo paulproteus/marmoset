@@ -66,12 +66,22 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		this(conn, reviewer.getSubmission(), reviewer.getStudent(), reviewer);
 	}
 	private CodeReviewSummary(Connection conn, Submission submission, Student student, CodeReviewer reviewer) throws SQLException {
-		this.submission = submission;
+	    if (student == null)
+            throw new NullPointerException("No student " + reviewer.getStudentPK() 
+                    + " for code reviewer " + reviewer.getCodeReviewerPK());
+        if (submission == null)
+            throw new NullPointerException("No submission " + reviewer.getSubmissionPK() 
+                    + " for code reviewer " + reviewer.getCodeReviewerPK());
+        
+        this.submission = submission;
 		this.viewerAsStudent = student;
 		this.viewerAsReviewer = reviewer;
-
 		this.project = Project.getByProjectPK(submission.getProjectPK(), conn);
 
+		if (project == null)
+		    throw new NullPointerException("No project " + submission.getProjectPK() 
+                    + " for submission" + submission.getProjectPK());
+		
 		this.author = CodeReviewer.lookupAuthorBySubmission(
 				submission.getSubmissionPK(), conn);
 
@@ -557,8 +567,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	 */
 	private void createFindbugsThreads( Connection conn, Submission submission) {
 	    
-        int testRunPK = submission.getCurrentTestRunPK();
-        if (testRunPK == 0)
+        Integer testRunPK = submission.getCurrentTestRunPK();
+        if (testRunPK == null)
             return;
         PreparedStatement findbugsOutcomes = null;
         try {
