@@ -82,8 +82,6 @@
                         the canonical account for the project.
                     </p>
                     </li>
-
-
                     </ul>
 
 </c:if>
@@ -91,12 +89,22 @@
 <c:if test="${canonicalAccount.studentPK == userSession.studentPK}">
 <c:url var="submitProjectLink"
                     value="/view/submitProject.jsp">
-                    <c:param name="projectPK" value="${project.projectPK}" />
-                    <c:param name="testSetupPK" value="${project.testSetupPK}" />
-                </c:url>
+                    <c:param name="projectPK" value="${project.projectPK}" /></c:url>
+                    
 <p> <a href="${submitProjectLink}"> web submission of canonical submission</a></p>
 </c:if>
 
+<c:if test="${project.archivePK == null  || project.archivePK == 0}">
+<c:url var="projectBaselineLink"
+                    value="/view/instructor/uploadProjectStarterFiles.jsp">
+                    <c:param name="projectPK" value="${project.projectPK}" />
+                </c:url>
+
+<p> There is no baseline submission for this project. Having a baseline submission 
+will show code differences in source views and code reviews, and fix file paths in
+uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
+
+</c:if>
 <c:if test="${project.tested}">
 <div class="projectvitalstats">
 		<c:set var="waitingToBeTested"

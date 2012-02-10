@@ -25,6 +25,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 <!DOCTYPE HTML>
@@ -40,40 +41,66 @@
 <ss:projectTitle />
 <ss:projectMenu />
 
+<c:url  var="updateCourseLink" value="/view/instructor/course.jsp">
+<c:param name="coursePK" value="${course.coursePK}"/>
+</c:url>
+
 <h2>Starter/baseline files for Project <c:out value="${project.projectNumber}"/></h2>
 
-    <p>The baseline is used for two purposes:
-        <ul>
-        <li>Students can download it from the web server as a starting point for their projects.
-        <li>It is used to compute a source diff for projects. Code that is identical to code in the baseline submission is dimmed in source views
-        and code reviews. Also, in summary listing of projects we list the number of lines of changed code in each submission.
-        </ul>
-
-
 <c:choose>
-	<c:when test="${project.archivePK == null  || project.archivePK == 0}">
-		<p>This project doesn't currently have any baseline/starting code.
+    <c:when test="${project.archivePK == null  || project.archivePK == 0}">
+    <c:set var="candidatesListStyle" value="display: block"/>
+        <p>This project doesn't currently have any baseline/starting code.
 
-		<p>A "starter file archive" is a collection of resources students
-		will use to start their project. For makefile-based projects (in C,
-		Ruby, OCaml, etc), starter files usually include a Makefile, public
-		test cases and possibly some partially-written source files that need
-		to be completed.
-		<p>You can select a submission from the canonical account, or
-		directly upload a zip/jar archive of the starter files for the
-		project. 
-	</c:when>
-	<c:otherwise>
-		<p>You can update/replace the starter file by choosing a a
-		submission from the canonical account, or directly upload a zip/jar
-		archive of the starter files for the project.
-	</c:otherwise>
+        <p>A  project baseline is a collection of resources students
+        will use to start their project. For makefile-based projects (in C,
+        Ruby, OCaml, etc), starter files usually include a Makefile, public
+        test cases and possibly some partially-written source files that need
+        to be completed.
+        <p>You can select a submission from the canonical account, or
+        directly upload a zip/jar archive of the starter files for the
+        project. 
+        <p><a href="${updateCourseLink}#update">As a course option</a>, you can choose whether or not students are allowed to download 
+        the entire baseline submission
+        as a zip file. 
+    </c:when>
+    <c:otherwise>
+    <c:set var="candidatesListStyle" value="display: none"/>
+        <p>You can update/replace the project baseline  by choosing a
+        submission from the canonical account, or directly upload a zip/jar
+        archive of the starter files for the project.
+    </c:otherwise>
 </c:choose>
 
 
 
+    <p>The baseline is used for two purposes:
+        <ul>
+        <li>It is used to compute a source diff for projects. Code that is identical to code in the baseline submission is dimmed in source views
+        and code reviews. Also, in summary listing of projects we list the number of lines of changed code in each submission.
+         <li>Students can download it from the web server as a starting point for their projects.
+         <c:choose>
+         <c:when test="${course.allowsBaselineDownload}">
+         This option is <em>enabled</em> for this course. <a href="${updateCourseLink}#update">Change it to disabled</a>.
+         </c:when>
+         <c:otherwise>
+           This option is <em>disabled</em> for this course.
+           <a href="${updateCourseLink}#update">Change it to enabled</a>.
+          </c:otherwise>
+         
+          </c:choose>
+          
+       </ul>
+
+
+<c:if test="${not empty candidateBaselines}">
+<h2 id="candidates">
+<a href="javascript:toggle('candidatesList')">${fn:length(candidateBaselines)}  baseline candidates</a></h2>
+
+   
+   <div id="candidatesList" style="${candidatesListStyle}">
 <table class="form">
-<c:if test="${not empty candidateBaselines }">
+
 <tr><th colspan="6"> candidate baselines </th>
 <tr>
 <th>by<th>#<th>when<th>test results<th>source<th>Use
@@ -136,26 +163,26 @@
 
 
 		</tr>
-
 </c:forEach>
+</table>
+</div>
 </c:if>
 
-		<tr class="submit">
+
 	<form name="submitform" enctype="multipart/form-data"
     action="<c:url value="/action/instructor/UploadProjectStarterFiles"/>"
     method="POST">
     <input type="hidden" name="projectPK"  value="${project.projectPK}" /> 
     <input type="hidden"  name="submitClientTool" value="web" />
-        <td colspan="2">Web-base upload:
-        <td class="input" colspan="2"><input type="file" name="file" size=40 />
-    
+        <p>Upload a new project baseline:
+        <input type="submit"
+            value="Upload">
+            
+        <input type="file" name="file" size=40 />
+    </p></form>
 
-		<td colspan=2"><input type="submit"
-			value="Upload">
-			</td>
-			</form>
-			</tr>
-</table>
+		
+
 
 
 		<c:if test="${project.archivePK != null && project.archivePK  > 0}">

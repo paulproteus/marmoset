@@ -73,9 +73,9 @@
         <div  id="errorList" style="display: none">
         <table>
                 <tr>
-                    <th></th>
-                    <th>When</th>
+                    <th>PK</th>
                     <th>User</th>
+                    <th>When</th>
                     <th>Kind</th>
                     <th>Message</th>
                 </tr>
@@ -151,6 +151,7 @@
         <tr>
             <th rowspan="2">Course</th>
             <th rowspan="2">Project</th>
+            <th rowspan="2">has baseline
             <th colspan="2">Deadlines</th>
             <th colspan="5">build status</th>
         </tr>
@@ -172,6 +173,9 @@
                 <td class="description"><c:url var="projectLink" value="/view/instructor/project.jsp">
                         <c:param name="projectPK" value="${project.projectPK}" />
                     </c:url> <a href="${projectLink}"> <c:out value="${project.fullTitle}"/> </a></td>
+                <td><c:if test="${not empty project.archivePK}">
+                <input type="checkbox" checked="checked"/>
+                </c:if></td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
                 <td>
                 <c:if test="${project.ontime != project.late}">

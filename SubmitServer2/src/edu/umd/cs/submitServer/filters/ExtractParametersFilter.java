@@ -570,12 +570,13 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 	                    && reviewer.getSubmissionPK() == submission.getSubmissionPK();
 
 			if (project != null && submission == null) {
-			    Set<Integer> submissionsWithReviews;
+			    Set<Integer> submissionsWithReviews = null;
 			    if (userSession.hasInstructorCapability(coursePK) && !viewOfAnotherStudentsCode)
 			        submissionsWithReviews = Submission.lookupSubmissionsWithReviews(project, conn);
-			    else
+			    else if (studentRegistration != null)
 			        submissionsWithReviews = Submission.lookupSubmissionsWithReviews(project, studentRegistration, conn);
-			    request.setAttribute("submissionsWithReviews", submissionsWithReviews);
+			    if (submissionsWithReviews != null)
+			        request.setAttribute("submissionsWithReviews", submissionsWithReviews);
 			}
 
             if (student == null && studentPK != null) {

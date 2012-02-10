@@ -13,7 +13,7 @@
 		<tr><td class="label">Directory Password: <td class="input"> <input type="password" name="uidPassword"/>
 		<tr><td class="label">Keep me logged in:<td class="input"><input type="checkbox" name="keepMeLoggedIn" value="checked" title="Do not check on a shared computer/account"/> 
         
-		<tr><td class="label"></td><td class="submit"><input type="submit" value="Login" name="Login"/></td></tr>
+		<tr class="submit"><td colspan="2"><input type="submit" value="Login" name="Login"/></td></tr>
 
 							</table>
 	</form>

@@ -91,7 +91,12 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 						: (UserSession) session.getAttribute(USER_SESSION);
 				if (userSession != null)
 					url += " for student " + userSession.getStudentPK();
-				String msg = duration + " ms required to service " + url;
+				long size = request.getContentLength();
+				String msg;
+				if (size > 0)
+				    msg = duration + " ms, size" + size  + ":" + url;
+				else
+				    msg = duration + " ms: " + url;
 
 				boolean isLong = false;
 				String referer = request.getHeader("referer");
