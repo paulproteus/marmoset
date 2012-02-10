@@ -58,8 +58,7 @@
                     </c:url>
                     <p>
                         Showing just Section
-                        <c:out value="${section}" />
-                        . <a href="${allSections}">Show all Sections</a>
+                        <c:out value="${section}" />. <a href="${allSections}">Show all Sections</a>
                     </p>
                 </c:when>
 
