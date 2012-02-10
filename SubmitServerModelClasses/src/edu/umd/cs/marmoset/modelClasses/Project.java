@@ -698,14 +698,13 @@ public class Project implements Serializable {
 	 * @throws SQLException if the project is not found, throws an exception and also logs
 	 * that the internal database state is corrupt.
 	 */
-	public static Project getByProjectPK(int projectPK, Connection conn)
+	public static @Nonnull Project getByProjectPK(int projectPK, Connection conn)
 	throws SQLException
 	{
 	    Project project = lookupByProjectPK(projectPK, conn);
 	    if (project == null)
 	    {
-	        // TODO Log internal database state corruption
-	        throw new SQLException("Cannot find project with PK: " +projectPK);
+	        throw new IllegalArgumentException("No project with PK: " + projectPK);
 	    }
 	    return project;
 	}
