@@ -14,9 +14,9 @@ public class Clover {
         try {
             cloverInstr = Class.forName("com.cenqua.clover.CloverInstr");
             cloverInstrMainImpl = cloverInstr.getDeclaredMethod("mainImpl", String[].class);
-            Class<?> cloverUtils = Class.forName("com.cenqua.clover.CloverUtils");
+            Class<?> cloverUtils = Class.forName("com.cenqua.clover.util.CloverUtils");
             cloverUtilsScrubCoverageData = cloverUtils.getDeclaredMethod("scrubCoverageData", String.class, Boolean.TYPE);
-            Class<?> xmlReporter = Class.forName("com.cenqua.clover.XMLReporter");
+            Class<?> xmlReporter = Class.forName("com.cenqua.clover.reporters.xml.XMLReporter");
             xmlReporterRunReport = xmlReporter.getDeclaredMethod("runReport", String[].class);
             a = true;
         } catch (Exception e) {
