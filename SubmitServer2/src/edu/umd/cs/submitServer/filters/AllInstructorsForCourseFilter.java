@@ -59,10 +59,13 @@ public class AllInstructorsForCourseFilter extends SubmitServerFilter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		Connection conn = null;
+		Course course = (Course) request.getAttribute(COURSE);
+		if (course == null)
+		    throw new IllegalArgumentException("No course found");
 		try {
 			conn = getConnection();
 
-			Course course = (Course) request.getAttribute(COURSE);
+			
 			List<StudentRegistration> instructors = StudentRegistration
 			.lookupAllInstructorsByCoursePK(course.getCoursePK(), conn);
 
