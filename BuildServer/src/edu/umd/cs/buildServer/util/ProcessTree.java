@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -74,7 +74,7 @@ public class ProcessTree {
             findTree(found, c);
     }
     public Set<Integer> findTree(int rootPid) {
-        TreeSet<Integer> result = new TreeSet<Integer>();
+        Set<Integer> result = new LinkedHashSet<Integer>();
         findTree(result, rootPid);
         return result;
     }
@@ -114,7 +114,8 @@ public class ProcessTree {
                     log.debug("process generated: " + txt);
                 }
                 } catch (IOException e) {
-                    log.warn("error while draining", e);
+                    if (!e.getMessage().equals("Stream closed"))
+                      log.warn("error while draining", e);
                 
                 } finally { 
                     try {
