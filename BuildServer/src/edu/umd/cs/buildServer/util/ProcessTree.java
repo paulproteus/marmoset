@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -19,11 +19,15 @@ public class ProcessTree {
     
     final Multimap<Integer, Integer> children =  ArrayListMultimap.create();  
     final Logger log;
+    final String user;
     
-    public ProcessTree(Logger log) throws Exception {
+    public ProcessTree(Logger log) throws IOException {
         this.log = log;
-        String user = System.getProperty("user.name");
-
+        user = System.getProperty("user.name");
+        computeChildren();
+    }
+    void computeChildren() throws IOException {
+        children.clear();
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "ax", 
                         "-o", "pid,ppid,user,cmd,args"});
         Process p = b.start();
@@ -34,6 +38,7 @@ public class ProcessTree {
         log.trace("ps header: " + header);
         while (s.hasNext()) {
             String txt = s.nextLine();
+            if (!txt.contains(user)) continue;
             log.debug(txt);
             try {
                 String fields [] = txt.trim().split(" +");
@@ -69,7 +74,7 @@ public class ProcessTree {
             findTree(found, c);
     }
     public Set<Integer> findTree(int rootPid) {
-        HashSet<Integer> result = new HashSet<Integer>();
+        TreeSet<Integer> result = new TreeSet<Integer>();
         findTree(result, rootPid);
         return result;
     }
@@ -85,10 +90,16 @@ public class ProcessTree {
         if (exitCode != 0)
             log.warn("exit code from kill" + exitCode);
         Thread.sleep(1000);
+        log.debug("did kill, now doing kill -9");
         cmd.add(1, "-" + signal);
         b = new ProcessBuilder(cmd );
         waitFor(b);
         Thread.sleep(1000);
+        log.debug("tree should now be dead");
+        computeChildren();
+        result.retainAll(children.keySet());
+        if (!result.isEmpty()) 
+            log.error("Undead processes: " + result);
     }
     
     void drainToLog(final InputStream in) {
