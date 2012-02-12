@@ -45,8 +45,8 @@
 <h2><c:out value="${studentRegistration.fullname}"/> </h2>
 <p><ss:studentEmail/>
 
-<c:set var="testCols" value="3" />
-    <c:set var="inconsistentResults"
+<c:set var="testCols" value="2" />
+<c:set var="inconsistentResults"
         value="${fn:length(failedBackgroundRetestSubmissionList)}" />
 
 
@@ -92,9 +92,11 @@ an extension on project
 		<th rowspan="2">release tested</th>
         <c:if test="${inconsistentResults > 0}">
 		<th rowspan="2"># inconsistent<br>background<br>retests</th>
+        <c:set var="testCols" value="${1+testCols}" />
+        
         </c:if>
 		<c:if test="${testProperties.language=='java'}">
-		<c:set var="testCols" value="5" />
+		<c:set var="testCols" value="${2+testCols}" />
 		<th rowspan="2"># FindBugs<br>warnings</th>
 		<th rowspan="2"># Student<br>written<br>tests</th>
 		</c:if>
