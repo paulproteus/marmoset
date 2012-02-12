@@ -986,22 +986,21 @@ public class Project implements Serializable {
     public void exportProject(Connection conn, OutputStream out)
     throws SQLException, IOException
     {
-        TestSetup testSetup=TestSetup.lookupByTestSetupPK(getTestSetupPK(),conn);
-        if (testSetup==null) {
-            throw new SQLException(getProjectNumber() +" does not have an active test-setup");
-        }
-
         ZipOutputStream zipOutputStream=new ZipOutputStream(out);
 
-        // Test-setup
-        zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() +"-test-setup.zip"));
-        zipOutputStream.write(testSetup.downloadArchive(conn));
+        TestSetup testSetup=TestSetup.lookupByTestSetupPK(getTestSetupPK(),conn);
+        if (testSetup != null) {
 
-        // Canonical
-        Submission canonical=Submission.lookupBySubmissionPK(
-            (TestRun.lookupByTestRunPK(testSetup.getTestRunPK(),conn)).getSubmissionPK(),conn);
-        zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() + "-canonical.zip"));
-        zipOutputStream.write(canonical.downloadArchive(conn));
+            // Test-setup
+            zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() + "-test-setup.zip"));
+            zipOutputStream.write(testSetup.downloadArchive(conn));
+
+            // Canonical
+            Submission canonical = Submission.lookupBySubmissionPK(
+                    (TestRun.lookupByTestRunPK(testSetup.getTestRunPK(), conn)).getSubmissionPK(), conn);
+            zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() + "-canonical.zip"));
+            zipOutputStream.write(canonical.downloadArchive(conn));
+        }
 
         // Serialize the project object itself and include it
         zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() +"-project.out"));
