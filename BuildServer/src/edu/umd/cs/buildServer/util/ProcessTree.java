@@ -80,24 +80,44 @@ public class ProcessTree {
         findTree(result, rootPid);
         return result;
     }
-    public  void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
+
+    public void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
         Set<Integer> result = findTree(rootPid);
+        log.info("Halting process tree starting at " + rootPid + " which is " + result);
+        while (true) {
+            killProcesses("-SIGCONT", result);
+            Thread.sleep(100);
+            computeChildren();
+            Set<Integer> r = findTree(rootPid);
+            if (r.equals(result))
+                break;
+            result = r;
+            log.info("process tree starting at " + rootPid + " changed to " + result);
+        }
         log.info("Killing process tree starting at " + rootPid + " which is " + result);
-        
-//        for(Integer pid : result)
-//            killProcess(pid);
-//        
-//        Thread.sleep(1000);
-//        log.debug("did kill, now doing kill -9");
-        for(Integer pid : result)
-            killProcess(pid, 9);
-        
+        killProcesses("-SIGKILL", result);
         Thread.sleep(1000);
         log.debug("tree should now be dead");
         computeChildren();
         result.retainAll(children.keySet());
-        if (!result.isEmpty()) 
+        if (!result.isEmpty())
             log.error("Undead processes: " + result);
+    }
+    /**
+     * @param result
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void killProcesses(String signal, Set<Integer> result) throws IOException, InterruptedException {
+        ArrayList<String> cmd = new ArrayList<String>();
+        cmd.add("/bin/kill");
+        cmd.add(signal);
+        for (Integer i : result)
+            cmd.add(i.toString());
+        ProcessBuilder b = new ProcessBuilder(cmd);
+        int exitCode = execute(b);
+        if (exitCode != 0)
+            log.warn("exit code from kill" + exitCode);
     }
     
     void drainToLog(final InputStream in) {
