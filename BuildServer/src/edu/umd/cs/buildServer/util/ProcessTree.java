@@ -60,12 +60,14 @@ public class ProcessTree {
          s.close();
         p.destroy();
     }
-    public static void killProcess(int pid, int signal) throws IOException, InterruptedException {
+    public  void killProcess(int pid, int signal) throws IOException, InterruptedException {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill", "-"+signal, Integer.toString(pid)} );
-        Process p = b.start();
-        int exitCode = p.waitFor();
-        if (exitCode != 0)
-            throw new IOException("exit code " + exitCode);
+        execute(b);
+
+    }
+    public  void killProcess(int pid) throws IOException, InterruptedException {
+        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill",  Integer.toString(pid)} );
+        execute(b);
     }
     private void findTree(Set<Integer> found, int pid) {
         if (!found.add(pid))
@@ -81,19 +83,15 @@ public class ProcessTree {
     public  void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
         Set<Integer> result = findTree(rootPid);
         log.info("Killing process tree starting at " + rootPid + " which is " + result);
-        ArrayList<String> cmd = new ArrayList<String>();
-        cmd.add("/bin/kill");
-        for(Integer i : result)
-            cmd.add(i.toString());
-        ProcessBuilder b = new ProcessBuilder(cmd );
-        int exitCode = waitFor(b);
-        if (exitCode != 0)
-            log.warn("exit code from kill" + exitCode);
-        Thread.sleep(1000);
-        log.debug("did kill, now doing kill -9");
-        cmd.add(1, "-" + signal);
-        b = new ProcessBuilder(cmd );
-        waitFor(b);
+        
+//        for(Integer pid : result)
+//            killProcess(pid);
+//        
+//        Thread.sleep(1000);
+//        log.debug("did kill, now doing kill -9");
+        for(Integer pid : result)
+            killProcess(pid, 9);
+        
         Thread.sleep(1000);
         log.debug("tree should now be dead");
         computeChildren();
@@ -131,7 +129,7 @@ public class ProcessTree {
        
         
     }
-    private int waitFor(ProcessBuilder b) throws IOException, InterruptedException {
+    private  int execute(ProcessBuilder b) throws IOException, InterruptedException {
         b.redirectErrorStream(true);
         Process p = b.start();
         p.getOutputStream().close();
