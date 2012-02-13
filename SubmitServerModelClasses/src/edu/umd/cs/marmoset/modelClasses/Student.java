@@ -789,8 +789,6 @@ public class Student  implements Comparable<Student> {
   }
 
 
-
-
        /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
@@ -822,70 +820,4 @@ public class Student  implements Comparable<Student> {
         return getFromPreparedStatement(stmt);
     }
 
-   
-
-    // [NAT]
-    /**
-     * Sets the account_type for this student record to 'team'
-     * @param conn The connection to the database.
-     * @throws SQLException
-     */
-    private void makeTeamAccount(Connection conn)
-    throws SQLException
-    {
-        // Make sure that we don't try to change the status of a student record with no
-        // studentPK.  This usually means that we forgot to insert this record into the DB.
-        if (studentPK == null)
-            throw new IllegalStateException("You cannot update a student record with null " +
-                " for a studentPK.  Did you forget to insert this record into the DB?");
-
-        String update =
-            " UPDATE " +TABLE_NAME+
-            " SET account_type = " +TEAM_ACCOUNT+
-            " WHERE student_pk = ? ";
-
-        PreparedStatement stmt=null;
-        try {
-            stmt = conn.prepareStatement(update);
-        } finally {
-            Queries.closeStatement(stmt);
-        }
-    }
-
-    private static SecureRandom rng = new SecureRandom();
-    private static int MAX_PASSWORD_LENGTH = 10;
-  private static String nextRandomPassword() {
-    synchronized (rng) {
-      long l = rng.nextLong();
-      return Long.toHexString(l).substring(0, MAX_PASSWORD_LENGTH);
-    }
-  }
-
-  // [NAT]
-  /**
-   * Create a Team Password given an array of the member studentPKs
-   * @param studentPKs array of studentPKs for team members
-   * @return null if studentPKs is empty or null
-   */
-  public static String createTeamPassword(String... studentPKs) {
-    if (studentPKs == null || studentPKs.length == 0) return null;
-
-    String password = "";
-    for (String s : studentPKs) {
-      password += "_" + s;
-    }
-    return password.substring(1);
-  }
-
-  // [NAT]
-  /**
-   * Parse a Team Password and return the studentPKs that it corresponds to
-   * @param password Team password
-   * @return null if there are no studentPKs, otherwise array of studentPKs in password
-   */
-  public static String [] parseTeamPassword(String password) {
-    if (password == null || password.length() == 0) return null;
-
-    return password.split("_");
-  }
 }
