@@ -249,6 +249,12 @@ public class Course {
     }
 
     public void setSections(String [] sections) {
+        for(String s : sections) {
+            if (s.indexOf('.') >= 0)
+                throw new IllegalArgumentException(s);
+            if (s.indexOf(' ') >= 0)
+                throw new IllegalArgumentException(s);
+        }
         this.sections = Joiner.on(",").join(sections);
     }
 
