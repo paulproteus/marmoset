@@ -1036,6 +1036,16 @@ public class Project implements Serializable {
     }
 
 
+    public @CheckForNull Map<String,List<String>> getBaselineText(Connection conn) throws IOException, SQLException {
+        Integer baselinePK = this.getArchivePK();
+        if (baselinePK == null)
+            return null;
+        Map<String, List<String>> baselineText
+        = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn));
+        return baselineText;
+
+       
+    }
     public  @Nonnull Map<String, BitSet> computeDiff(Connection conn,
     		Submission submission, Map<String, List<String>> current)
 			throws IOException, SQLException {
@@ -1068,6 +1078,7 @@ public class Project implements Serializable {
 	    }
 		return changed;
 	}
+    
     public static List<Project> lookupAllByCoursePK(int coursePK,
     		Connection conn) throws SQLException
     		{
