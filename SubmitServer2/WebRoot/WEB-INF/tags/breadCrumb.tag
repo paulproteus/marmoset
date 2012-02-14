@@ -45,7 +45,7 @@
 	</c:url>
 	| <c:set var="title"><c:out value="Overview of project ${project.projectNumber}"/></c:set>
     <a href="${projectLink}"
-		 title="${title}">c:out value="${project.projectNumber}"/><</a>
+		 title="${title}"><c:out value="${project.projectNumber}"/></a>
 
 	<c:if test="${submission != null}">
 		<c:url var="submissionLink" value="/view/submission.jsp">
