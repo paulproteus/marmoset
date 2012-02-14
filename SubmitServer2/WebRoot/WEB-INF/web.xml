@@ -394,6 +394,10 @@ Deprecated - set these in local.web.properties or web.properties instead.
 		<url-pattern>/view/project.jsp</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
+		<filter-name>SourceTextFilter</filter-name>
+		<url-pattern>/view/project.jsp</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
 		<filter-name>TestPropertiesFilter</filter-name>
 		<url-pattern>/view/instructor/project.jsp</url-pattern>
 	</filter-mapping>
@@ -676,6 +680,16 @@ Deprecated - set these in local.web.properties or web.properties instead.
         <url-pattern>/view/admin/error.jsp</url-pattern>
     </filter-mapping>
 
+
+    <filter>
+        <filter-name>SourceTextFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.SourceTextFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SourceTextFilter</filter-name>
+        <url-pattern>/view/editSourceCode.jsp</url-pattern>
+    </filter-mapping>
+    
 	<filter>
 		<filter-name>SourceCodeFilter</filter-name>
 		<filter-class> edu.umd.cs.submitServer.filters.SourceCodeFilter </filter-class>
@@ -954,9 +968,20 @@ Deprecated - set these in local.web.properties or web.properties instead.
 	</servlet>
 
 	<servlet>
+		<servlet-name>CodeMirrorSubmission</servlet-name>
+		<servlet-class> edu.umd.cs.submitServer.servlets.CodeMirrorSubmission </servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CodeMirrorSubmission</servlet-name>
+		<url-pattern>/action/CodeMirrorSubmission</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>UploadSubmission</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.UploadSubmission </servlet-class>
 	</servlet>
+
+
+
 	<servlet>
 		<servlet-name>RequestReleaseTest</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.RequestReleaseTest </servlet-class>

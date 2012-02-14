@@ -58,7 +58,7 @@ import edu.umd.cs.marmoset.utilities.XSSScrubber;
 /**
  * @author jspacco
  *
- *         XXX only handles <b>ONE</b> file.
+ *        
  */
 @CheckReturnValue
 public class MultipartRequest {

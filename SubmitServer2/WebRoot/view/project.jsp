@@ -25,11 +25,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE HTML>
 <html>
-<ss:head
+<head>
+<ss:headContent
 	title="All submissions for ${course.courseName} project ${project.projectNumber}" />
+      <c:url var="codemirror" value="/codemirror" />
+       <link rel="stylesheet" href="${codemirror}/lib/codemirror.css">
+    </head>
 
 <body>
 <ss:header />
@@ -70,9 +75,13 @@
 <c:if test="${!project.tested}">
 		<p>Project is upload only</p>
 		</c:if>
+
+<c:choose>
+<c:when test="${not empty submissionList}">
 <h2>Submissions</h2>
 <c:set var="testCols" value="0" />
-
+<c:set var="inconsistentResults"
+        value="${fn:length(failedBackgroundRetestSubmissionList)}" />
 <table>
 	<tr>
 		<th rowspan="2">#</th>
@@ -97,9 +106,12 @@
 			<c:set var="testCols" value="${1+testCols}" />
 			</c:if>
 
+            <c:if test="${inconsistentResults > 0}">
 			<th rowspan="2"># inconsistent<br>
 			background<br>
 			retests</th>
+            </c:if>
+            
 		</c:if>
 		<th colspan=2>submission</th>
 		      <c:if test="${project.tested}">
@@ -165,11 +177,16 @@
 					<td><c:if test="${submission.numFindBugsWarnings > 0}">
 							${submission.numFindBugsWarnings}</c:if>
 							</td></c:if>
+                            
+                            
+                     <c:if test="${inconsistentResults > 0}">
+            
 					<td><c:if
 						test="${submission.numFailedBackgroundRetests > 0 && (publicInconsistencies[submission.submissionPK] || releaseInconsistencies[submission.submissionPK]) && !secretInconsistencies[submission.submissionPK]}">
 						<a href="${submissionAllTestsLink}">
 						${submission.numFailedBackgroundRetests} </a>
 					</c:if></td>
+                    </c:if>
 				</c:when>
 
 				<c:when test="${submission.buildStatus == 'PENDING' }">
@@ -203,24 +220,33 @@
 	</c:forEach>
 </table>
 
-    <c:url var="submitProjectLink"
-                    value="/view/submitProject.jsp">
-                    <c:param name="projectPK" value="${project.projectPK}" />
-                </c:url>
 
-    <p>
-        <a href="${submitProjectLink}"> web submission </a>
-    </p>
-    <c:if test="${project.tested}">
+    <c:if test="${project.tested && inconsistentResults > 0}">
         <ss:inconsistentBackgroundRetestDescription />
     </c:if>
+<h2>Making another submission</h2>
+</c:when>
+<c:otherwise>
+<h2>Your first submission</h2>
+</c:otherwise>
+</c:choose>
+<p>You can use automatic submission tools, 
+<c:if test="${not empty sourceFiles}">
+<a href="#editSource">edit and submit code in the browser</a>,</c:if>
+or <a href="#uploadSource">upload source files</a>.
 
 
-    <p>
+ <p>
         <a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">
             Files for automatic submission tools (toggle)</a>
     </p>
-
+    <c:if test="${course.allowsBaselineDownload && project.archivePK != null && project.archivePK > 0}">
+                        <c:url var="downloadStarterFilesLink"
+                            value="/data/DownloadProjectStarterFiles">
+                            <c:param name="projectPK" value="${project.projectPK}" />
+                        </c:url>
+                        <a href="${downloadStarterFilesLink}">download baseline submission</a>
+                    </c:if>
 
     <div id="submitFiles" style="display: none">
         <p>These files are used by tools that submit projects (such as the Eclipse course project manager and the
@@ -245,6 +271,10 @@
         </p>
     </div>
 
+    <ss:editSourceCode/>
+    <ss:submitProject/>
+    
+   
     <ss:footer />
 </body>
 </html>

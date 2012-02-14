@@ -25,6 +25,14 @@
   </tag>
 
 <tag-file>
+    <name>submitProject</name>
+    <path>/WEB-INF/tags/submitProject.tag</path>
+  </tag-file>
+<tag-file>
+    <name>editSourceCode</name>
+    <path>/WEB-INF/tags/editSourceCode.tag</path>
+  </tag-file>
+<tag-file>
     <name>createCourseForm</name>
     <path>/WEB-INF/tags/createCourseForm.tag</path>
   </tag-file>

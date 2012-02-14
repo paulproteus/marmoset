@@ -44,6 +44,9 @@
 <c:url var="viewSubmissionSourceLink" value="/view/allSourceCode.jsp">
 	<c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
+<c:url var="editSourceLink" value="/view/editSourceCode.jsp">
+    <c:param name="submissionPK" value="${submission.submissionPK}" />
+</c:url>
 
 
 <h2><c:out value="${studentRegistration.fullname}"/></h2>
@@ -56,7 +59,9 @@
 	${testSetup.version} of the test setup
 </c:if>
 
-<p><a href="${viewSubmissionSourceLink}">Source</a>
+
+<p><a href="${viewSubmissionSourceLink}">View</a> or
+<a href="${editSourceLink}">Edit</a> source
 <c:if test="${reviewer != null}">
 <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
 <c:param name="submissionPK" value="${submission.submissionPK}"/>

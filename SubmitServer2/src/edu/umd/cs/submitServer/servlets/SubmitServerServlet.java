@@ -188,7 +188,13 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	protected Connection getConnection() throws SQLException {
 		return submitServerDatabaseProperties.getConnection();
 	}
-
+    protected Connection getConnectionOrFail() throws ServletException {
+        try {
+            return submitServerDatabaseProperties.getConnection();
+        } catch (SQLException e) {
+           throw new ServletException(e);
+        }
+    }
 	/**
 	 * Releases a database connection. Swallows (or handles) any SQLExceptions
 	 * that happen since there's nothing the web application can do if a
@@ -198,12 +204,15 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	 *            the connection to release
 	 */
 	protected void releaseConnection(Connection conn) {
-		try {
-			submitServerDatabaseProperties.releaseConnection(conn);
-		} catch (SQLException e) {
-			getSubmitServerServletLog().warn("Unable to close connection", e);
-		}
+		releaseConnection(conn, submitServerDatabaseProperties, getSubmitServerServletLog());
 	}
+	protected static void releaseConnection(Connection conn, SubmitServerDatabaseProperties db,  Logger log) {
+	        try {
+	            db.releaseConnection(conn);
+	        } catch (SQLException e) {
+	            log.warn("Unable to close connection", e);
+	        }
+	    }
 
 	protected void handleSQLException(SQLException e) {
 		// TODO Get rid of this method or make it throw a ServletException
@@ -216,24 +225,28 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 
 	protected void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
 			boolean transactionSuccess, HttpServletRequest req, Connection conn) {
-		try {
-			if (!transactionSuccess && conn != null) {
-				// TODO Log a stack trace as well!
-				String reqStr = req.getRequestURI();
-				if (req.getQueryString() != null) {
-					reqStr += "?" + req.getQueryString();
-				}
-				getSubmitServerServletLog().warn(
-						"Unable to rollback connection: " + reqStr);
-				conn.rollback();
-			}
-		} catch (SQLException ignore) {
-			getSubmitServerServletLog().warn("Unable to rollback connection",
-					ignore);
-			// ignore
-		}
-		releaseConnection(conn);
+	    rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, req, conn, submitServerDatabaseProperties, getSubmitServerServletLog());
 	}
+	protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
+            boolean transactionSuccess, HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
+        try {
+            if (!transactionSuccess && conn != null) {
+                // TODO Log a stack trace as well!
+                String reqStr = req.getRequestURI();
+                if (req.getQueryString() != null) {
+                    reqStr += "?" + req.getQueryString();
+                }
+                log.warn(
+                        "Unable to rollback connection: " + reqStr);
+                conn.rollback();
+            }
+        } catch (SQLException ignore) {
+           log.warn("Unable to rollback connection",
+                    ignore);
+            // ignore
+        }
+        releaseConnection(conn, db, log);
+    }
 
 	private ILDAPAuthenticationService authenticationService;
 

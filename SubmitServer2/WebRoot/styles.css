@@ -506,3 +506,13 @@ acronym { cursor : help; }
 	color: #CC3300;
 	padding-left: 20px;
 }
+
+
+.CodeMirror-gutter {
+    width: 3em;
+    background: white;
+}
+
+.CodeMirror {
+    border: 1px solid #aaa;
+}
