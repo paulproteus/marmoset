@@ -152,6 +152,8 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `allows_baseline_download` tinyint(1) NOT NULL DEFAULT '1',
   `submit_key` varchar(40) NOT NULL,
   `buildserver_key` varchar(40) NOT NULL,
+  `browser_editing` varchar(20) NOT NULL DEFAULT 'discouraged',
+  `sections` text,
   PRIMARY KEY (`course_pk`),
   UNIQUE KEY `submit_key` (`submit_key`),
   UNIQUE KEY `buildserver_key` (`buildserver_key`)
