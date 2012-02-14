@@ -120,20 +120,38 @@
             <form method="POST" action="${registrationAction}">
                 <table id="open-course-table">
                     <tr>
-                        <th><input type="checkbox" id="toggle-all" /></th>
+                        <th>&nbsp;</th>
                         <th>Course Name</th>
                         <th>Description</th>
                     </tr>
                     <c:forEach var="course" items="${openCourses}">
                         <tr>
                             <c:set var="checkboxName" value="course-pk-${course.coursePK}" />
-                            <td><input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" /></td>
+                            <td>
+                            <c:choose>
+                            	<c:when test="${not empty course.sections}">
+                            		<select name="${checkboxName}" id="${checkboxName}-box">
+                            			<option value=""></option>
+                            			<c:forEach var="section" items="${course.section}">
+                            				<option value="${section}">${section}</option>
+                            			</c:forEach>
+                            		</select>
+                            	</c:when>
+                            	<c:otherwise>
+                            		<input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" />
+                            	</c:otherwise>
+                            </c:choose>
+                            </td>
                             <td><label for="${checkboxName}-box"><c:out value="${course.fullname}" /></label></td>
-                            <td><c:out value="${course.description}" /></td>
+                            <td><c:out value="${course.description}" />
+								
+							</td>
                         </tr>
                     </c:forEach>
                     <tr>
-                        <td colspan="3"><input type="submit" value="Request enrollment" /></td>
+                        <td colspan="3">
+                    	<input type="submit" value="Request enrollment" />
+                    	</td>
                     </tr>
                 </table>
             </form>
