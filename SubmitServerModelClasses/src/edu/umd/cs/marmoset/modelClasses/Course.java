@@ -38,6 +38,8 @@ import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 
+import com.google.common.base.Joiner;
+
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -45,6 +47,12 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  *
  */
 public class Course {
+    public enum BrowserEditing {
+        PROHIBITED, DISCOURAGED, ALLOWED;
+        public static BrowserEditing valueOfAnyCase(String name) {
+            return valueOf(name.toUpperCase());
+        }
+    }
 	public static final String TABLE_NAME = "courses";
 	
 	public static String defaultSemester;
@@ -81,7 +89,9 @@ public class Course {
             "course_ids",
             "allows_baseline_download",
             "buildserver_key",
-            "submit_key"
+            "submit_key",
+            "browser_editing",
+            "sections"
 	};
 
 	/**
@@ -99,12 +109,15 @@ public class Course {
 	private String courseIDs;
 	private String buildserverKey;
 	private String submitKey;
+	private String sections;
+	private BrowserEditing browserEditing = BrowserEditing.DISCOURAGED;
 	private boolean allowsBaselineDownload;
 	
 	public Course() {
 		
 	}
 
+	
 	public boolean getAllowsBaselineDownload() {
 		return allowsBaselineDownload;
 	}
@@ -231,7 +244,25 @@ public class Course {
 	public void setCourseIDs(String courseIDs) {
 		this.courseIDs = courseIDs;
 	}
-	public void insert(Connection conn)
+	public String[] getSections() {
+        return sections.split(",");
+    }
+
+    public void setSections(String [] sections) {
+        this.sections = Joiner.on(",").join(sections);
+    }
+
+    public BrowserEditing getBrowserEditing() {
+        return browserEditing;
+    }
+
+
+    public void setBrowserEditing(BrowserEditing browserEditing) {
+        this.browserEditing = browserEditing;
+    }
+
+
+    public void insert(Connection conn)
 	throws SQLException
 	{
 	    if (buildserverKey != null)
@@ -267,6 +298,9 @@ public class Course {
 		stmt.setBoolean(col++, getAllowsBaselineDownload());
 		stmt.setString(col++, getBuildserverKey());
 		stmt.setString(col++, getSubmitKey());
+		stmt.setString(col++, browserEditing.name().toLowerCase());
+		stmt.setString(col++, sections);
+		
 		return col;
 	}
 
@@ -305,6 +339,8 @@ public class Course {
 		setAllowsBaselineDownload(resultSet.getBoolean(startingFrom++));
 		setBuildserverKey(resultSet.getString(startingFrom++));
 		setSubmitKey(resultSet.getString(startingFrom++));
+		setBrowserEditing(BrowserEditing.valueOfAnyCase(resultSet.getString(startingFrom++)));
+		this.sections = resultSet.getString(startingFrom++);
 		return startingFrom;
 	}
 	
