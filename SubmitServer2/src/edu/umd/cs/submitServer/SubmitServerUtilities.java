@@ -117,7 +117,11 @@ public final class SubmitServerUtilities {
 	 * @param selectVal
 	 * @return "selected" if it should be selected, "" (empty string) otherwise
 	 */
+	
 	public static <T> String selected(@CheckForNull T currentVal, T selectVal) {
+	    if (currentVal instanceof Enum<?>
+	            && ((Enum)currentVal).name().equals(selectVal))
+	        return "selected";
 		return currentVal != null && currentVal.equals(selectVal) ? "selected" : "";
 	}
 	/**

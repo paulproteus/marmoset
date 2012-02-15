@@ -14,18 +14,6 @@
  <a href="<c:url value='/view/manage.jsp'/>" title="create/import courses and build servers">Manage</a> |
 </c:if>
 
-<c:choose>
-<c:when test="${true}">
-<!-- docs out of date, disabled -->
-</c:when>
-<c:when test="${user.superUser}">
-	<a href="<c:url value='/docs/MarmosetHelp/'/>" title="Access documentation" target="_blank" >Admin's Guide</a> |
-</c:when>
-<c:otherwise>
-	<a href="<c:url value='/docs/MarmosetHelp/submitserver_usersguide.html'/>" title="Access documentation" target="_blank" >Instructor's Guide</a> |
-</c:otherwise>
-</c:choose>
-
 <c:if test="${!singleCourse}">
  <a href="<c:url value='/view/index.jsp'/>" title="view all courses you are registered for" >All Courses</a> |
 </c:if>

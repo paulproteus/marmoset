@@ -58,7 +58,7 @@
 		<ss:studentPicture/>
 	</c:if>
     
-    <ss:editSourceCode/>
+    <ss:editSourceCode />
     
     <ss:footer />
 	</body>

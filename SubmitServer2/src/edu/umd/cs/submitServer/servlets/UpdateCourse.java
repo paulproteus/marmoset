@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.marmoset.modelClasses.Course.BrowserEditing;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.UserSession;
 
@@ -57,6 +58,8 @@ public class UpdateCourse extends SubmitServerServlet {
 		String section  = parser.getOptionalCheckedParameter("section");
 		String description = parser.getOptionalCheckedParameter("description");
 		String url =  parser.getOptionalCheckedParameter("url");
+		Course.BrowserEditing browserEditing = BrowserEditing.valueOfAnyCase(
+		        parser.getCheckedParameter("browserEditing"));
 		boolean download = parser.getCheckbox("download");
 
 		Connection conn = null;
@@ -69,6 +72,7 @@ public class UpdateCourse extends SubmitServerServlet {
 			if (section != null)
 			    course.setSection(section);
 			course.setAllowsBaselineDownload(download);
+			course.setBrowserEditing(browserEditing);
 			
 			// insert the course
 			course.update(conn);

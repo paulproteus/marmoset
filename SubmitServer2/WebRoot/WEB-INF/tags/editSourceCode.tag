@@ -1,18 +1,24 @@
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 <%@ taglib prefix='fn' uri='http://java.sun.com/jsp/jstl/functions'%>
 
 
-<c:if test="${not empty sourceFiles}">
-<div id="editSource">
+<c:if test="${ not empty sourceFiles || course.browserEditing != 'PROHIBITED' }">
+
+
     <c:url var="submitURL" value="/action/CodeMirrorSubmission" />
     <c:url var="codemirror" value="/codemirror" />
 
     <script src="${codemirror}/lib/codemirror.js"></script>
 
     <script src="${codemirror}/mode/clike/clike.js"></script>
-
+<c:if test="${course.browserEditing == 'DISCOURAGED' }">
+<p>For this course, it is recommend that edit your projects on your computer, using an IDE or editing tools. 
+If you edit code in the browser and later want to continue work on it on your computer, keep in mind that you will have to download
+the changes from the submit server.
+</c:if>
 
     <c:choose>
         <c:when test="${not empty sourceSubmission}">
@@ -32,7 +38,11 @@
     
     <form name="submitform" method="POST" action="${submitURL}">
         <input type="hidden" name="projectPK" value="${project.projectPK}" /> <input type="hidden"
-            name="submitClientTool" value="codemirror" /> <input type="hidden" name="numFiles"
+            name="submitClientTool" value="codemirror" /> 
+            <c:if test="${not empty sourceSubmission}">
+            <input type="hidden" name="studentRegistrationPK" value="${sourceSubmission.studentRegistrationPK}"/>
+        </c:if> 
+            <input type="hidden" name="numFiles"
             value="${fn:length(sourceFiles)}" />
         <input type="submit" value="Submit as new submission">
         
@@ -46,7 +56,7 @@
 
             <input type="hidden" name="n-${counter.index}" value="${filename}" />
 
-            <h3>${filename}</h3>
+            <h4>${filename}</h4>
             <textarea id="${name}" name="${name}" rows="${rows}" cols="80">
                 <c:forEach var="line" items="${contents}">
 <c:out value="${line}" /></c:forEach>
@@ -56,8 +66,6 @@
   lineNumbers: true });
       </script>
         </c:forEach>
-
-
     </form>
-    </div>
-</c:if>
+
+    </c:if>

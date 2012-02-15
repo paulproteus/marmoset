@@ -370,6 +370,16 @@ tr.reject {background: #f33}
                     <td class="input"><input name="download" type="checkbox" ${ss:isChecked(course.allowsBaselineDownload)}  />
                     </td>
                 </tr>
+                  <tr>
+           <td class="label">Editing source code in browser:</td>
+            <td class="input">
+            <select name="browserEditing">
+            <option value="prohibited"  ${ss:selected(course.browserEditing, 'PROHIBITED')}>Prohibited</option>
+            <option value="discouraged"  ${ss:selected(course.browserEditing, 'DISCOURAGED')}>Discouraged</option>
+            <option value="allowed"  ${ss:selected(course.browserEditing, 'ALLOWED')}>Allowed</option>
+            </select>
+            </td>
+        </tr>
                 <tr class="submit">
                     <td colspan="2"><input type="submit" value="Update course"></td>
                 </tr>

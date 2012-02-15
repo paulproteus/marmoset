@@ -91,10 +91,10 @@
 			automated testing.  Many people use the server simply to store submissions.
 		--%>
 		<c:if test="${project.tested}">
-		    <c:set var="testCols" value="1" />
+		    <c:set var="testCols" value="0" />
 			<c:if test="${testSetup.valuePublicTests > 0}">
-				<th rowspan="2" >public tests score
-				<c:set var="testCols" value="2" />
+				<th rowspan="2" >public<br>tests score
+				<c:set var="testCols" value="${1+testCols}" />
 			</c:if>
 
 			<c:if test="${testSetup.valueReleaseTests > 0}">
@@ -102,11 +102,12 @@
 				<c:set var="testCols" value="${2+testCols}" />
 			</c:if>
 			<c:if test="${testProperties.language=='java' or testProperties.language=='Java'}">
-			<th rowspan="2">FindBugs warnings</th>
+			<th rowspan="2">FindBugs<br>warnings</th>
 			<c:set var="testCols" value="${1+testCols}" />
 			</c:if>
 
             <c:if test="${inconsistentResults > 0}">
+            <c:set var="testCols" value="${1+testCols}" />
 			<th rowspan="2"># inconsistent<br>
 			background<br>
 			retests</th>
@@ -230,23 +231,30 @@
 <h2>Your first submission</h2>
 </c:otherwise>
 </c:choose>
-<p>You can use automatic submission tools, 
-<c:if test="${not empty sourceFiles}">
-<a href="#editSource">edit and submit code in the browser</a>,</c:if>
-or <a href="#uploadSource">upload source files</a>.
-
-
- <p>
-        <a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">
-            Files for automatic submission tools (toggle)</a>
-    </p>
+<ul>
     <c:if test="${course.allowsBaselineDownload && project.archivePK != null && project.archivePK > 0}">
                         <c:url var="downloadStarterFilesLink"
                             value="/data/DownloadProjectStarterFiles">
                             <c:param name="projectPK" value="${project.projectPK}" />
                         </c:url>
-                        <a href="${downloadStarterFilesLink}">download baseline submission</a>
+                        <li><a href="${downloadStarterFilesLink}">download the baseline submission,</a>
                     </c:if>
+<li><a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">use automatic submission tools</a>, 
+<c:if test="${not empty sourceFiles and course.browserEditing != 'PROHIBITED'}">
+<c:choose>
+<c:when test="${course.browserEditing == 'DISCOURAGED'}">
+ <c:url var="editSource" value="/view/editSourceCode.jsp">
+ <c:param name="submissionPK" value="${sourceSubmission.submissionPK}"/>
+ </c:url>
+<li><a href="${editSource}">edit and submit code in the browser</a> (discouraged)
+</c:when>
+<c:otherwise>
+<li><a href="#editSource">edit and submit code in the browser</a>,
+</c:otherwise>
+</c:choose>
+</c:if>
+<li> <a href="#uploadSource">upload source files</a>
+</ul>
 
     <div id="submitFiles" style="display: none">
         <p>These files are used by tools that submit projects (such as the Eclipse course project manager and the
@@ -271,7 +279,9 @@ or <a href="#uploadSource">upload source files</a>.
         </p>
     </div>
 
-    <ss:editSourceCode/>
+<c:if test="${not empty sourceFiles and course.browserEditing == 'ALLOWED'}">
+    <ss:editSourceCode />
+    </c:if>
     <ss:submitProject/>
     
    
