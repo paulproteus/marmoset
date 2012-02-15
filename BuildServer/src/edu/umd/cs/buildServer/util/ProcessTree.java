@@ -28,8 +28,8 @@ public class ProcessTree {
     }
     void computeChildren() throws IOException {
         children.clear();
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "ax", 
-                        "-o", "pid,ppid,user,cmd,args"});
+        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "x", 
+                        "-o", "pid,ppid,user,state,pcpu,args"});
         Process p = b.start();
         
         p.getOutputStream().close();
@@ -85,7 +85,7 @@ public class ProcessTree {
         Set<Integer> result = findTree(rootPid);
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
         while (true) {
-            killProcesses("-SIGCONT", result);
+            killProcesses("-CONT", result);
             Thread.sleep(100);
             computeChildren();
             Set<Integer> r = findTree(rootPid);
@@ -95,7 +95,7 @@ public class ProcessTree {
             log.info("process tree starting at " + rootPid + " changed to " + result);
         }
         log.info("Killing process tree starting at " + rootPid + " which is " + result);
-        killProcesses("-SIGKILL", result);
+        killProcesses("-KILL", result);
         Thread.sleep(1000);
         log.debug("tree should now be dead");
         computeChildren();
