@@ -82,7 +82,7 @@ addLoadEvent(function() {
 	<div class="sectionTitle">
 		<h1><c:out value="${project.fullTitle}"/> </h1>
 
-		<p class="sectionDescription">${project.description}</p>
+		<p class="sectionDescription"><c:out value="${project.description}"/></p>
 	</div>
 
     <form class="form" name="inputForm" action="<c:url value="/action/instructor/AssignPoints"/>" method="POST">
@@ -90,7 +90,8 @@ addLoadEvent(function() {
     <ul>
     <li> Testing setup
      tested  <fmt:formatDate value="${testSetup.datePosted}" pattern="E',' dd MMM 'at' hh:mm a"/>
-    <li> Test-setup comment: <input type="text" name="comment" value="${testSetup.comment}" size="30"/>
+     <c:set var="comment">c:out value="${testSetup.comment}"/></c:set>
+    <li> Test-setup comment: <input type="text" name="comment" value="${comment}" size="30"/>
     <li> Solution submitted by 
     <c:out value="${studentRegistration.classAccount}"/>
     at <fmt:formatDate value="${submission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a"/>
@@ -106,14 +107,21 @@ addLoadEvent(function() {
 <p>
 <c:choose>
 <c:when test="${not empty canonicalTestRun}">
-Starting with point totals from test run ${canonicalTestRun.testRunPK}
+<c:url var="testRunLink" value="/view/instructor/submission.jsp">
+<c:param name="testRunPK" value="${canonicalTestRun.testRunPK}"/>
+</c:url>
+
+Starting with point totals from 
+test setup  <c:out value="${canonicalTestSetup.description}"/>.
+posted
+<fmt:formatDate value="${canonicalTestSetup.datePosted}" pattern="E',' dd MMM 'at' hh:mm a"/>
+
 </c:when>
 <c:otherwise>
 No previous activated test setup
 </c:otherwise>
 </c:choose>
     <p>
-
 	<input type="hidden" name="testRunPK" value="${testRun.testRunPK}">
   	<table>
   		<tr>

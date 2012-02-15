@@ -24,9 +24,9 @@
 		<tr class="r${counter.index % 2}">
 
 		<td class="description"><a href="${studentLink}">
-		${studentRegistration.lastname}, ${studentRegistration.firstname}</a>
+		<c:out value="${studentRegistration.fullName}"/></a>
 	        </td>
-		<td class="description">${studentRegistration.classAccount} </td>
+		<td class="description"><c:out value="${studentRegistration.classAccount}"/> </td>
 
 		<td>
 			<c:url var="grantExtensionLink" value="/view/instructor/grantExtension.jsp">

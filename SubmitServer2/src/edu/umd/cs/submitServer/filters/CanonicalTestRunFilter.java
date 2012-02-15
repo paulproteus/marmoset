@@ -79,7 +79,7 @@ public class CanonicalTestRunFilter extends SubmitServerFilter {
 					canonicalTestOutcomeMap.put(testOutcome.getTestName(),
 							testOutcome);
 				}
-				request.setAttribute("canonicalJarfile", testSetup);
+				request.setAttribute("canonicalTestSetup", testSetup);
 				request.setAttribute("canonicalTestRun", canonicalTestRun);
 				request.setAttribute("canonicalTestOutcomeCollection",
 						canonicalTestOutcomeCollection);

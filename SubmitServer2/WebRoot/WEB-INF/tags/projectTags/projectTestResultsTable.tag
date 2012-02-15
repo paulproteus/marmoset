@@ -70,8 +70,9 @@
 				<tr class="r${counter.index % 2}">
 				<td class="number">${1+counter.index}
 					<td class="description"><c:if
-						test="${studentRegistration.instructorLevel > 0}">* </c:if>${studentRegistration.lastname},
-					${studentRegistration.firstname}</td>
+						test="${studentRegistration.instructorLevel > 0}">* </c:if>
+                        <c:out value="${studentRegistration.getFullname}"/>
+					</td>
 					<td class="description"><c:url var="studentProjectLink"
 						value="/view/instructor/studentProject.jsp">
 						<c:param name="projectPK" value="${project.projectPK}" />

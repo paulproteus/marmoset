@@ -132,7 +132,7 @@
                 </c:otherwise>
                 </c:choose>
 
-                <td class="description">${project.title}</td>
+                <td class="description"><c:out value="${project.title}"/></td>
 
             </tr>
             <c:set var="numDisplayed" value="${numDisplayed + 1}" />

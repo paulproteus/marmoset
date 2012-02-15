@@ -2,7 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
                 
  <title><c:out value="${title}"/></title>
- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles.css">
+ <c:url var="css" value="/styles.css"/>
+ <link rel="stylesheet" type="text/css" href="${css}">
  <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
 	type="text/javascript"></script>

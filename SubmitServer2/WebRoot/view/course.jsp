@@ -88,7 +88,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<a href="${projectLink}">${project.projectNumber}</a>
+						<a href="${projectLink}"><c:out value="${project.projectNumber}"/></a>
 					</c:otherwise>
 
 				</c:choose>
@@ -118,7 +118,7 @@
 
 				<td><fmt:formatDate value="${project.ontime}"
 					pattern="dd MMM, hh:mm a" /></td>
-				<td class="description">${project.title}</td>
+				<td class="description"><c:out value="${project.title}"/></td>
 
 			</tr>
 			<c:set var="numDisplayed" value="${numDisplayed + 1}" />

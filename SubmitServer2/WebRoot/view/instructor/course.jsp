@@ -116,7 +116,7 @@ tr.reject {background: #f33}
             </c:choose>
             <tr class="${rowKind}">
 
-                <td>${project.projectNumber}</td>
+                <td><c:out value="${project.projectNumber}"/></td>
 
                 <td><c:url var="projectLink" value="/view/instructor/project.jsp">
                         <c:param name="projectPK" value="${project.projectPK}" />
@@ -146,7 +146,7 @@ tr.reject {background: #f33}
 
                 <td>${project.visibleToStudents}</td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
-                <td class="description">${project.title}</td>
+                <td class="description"><c:out value="${project.title}"/></td>
             </tr>
         </c:forEach>
     </table>
@@ -431,7 +431,7 @@ tr.reject {background: #f33}
                 </c:choose>
                     <tr class="r${counter.index % 2}">
 
-                    <td>${project.projectNumber}</td>
+                    <td><c:out value="${project.projectNumber}"/></td>
 
                     <td><c:url var="projectLink" value="/view/instructor/project.jsp">
                             <c:param name="projectPK" value="${project.projectPK}" />
@@ -444,7 +444,7 @@ tr.reject {background: #f33}
                                 style="color: #003399" />
                         </form></td>
 
-                    <td class="description">${project.title}</td>
+                    <td class="description">><c:out value="${project.title}"/></td>
                 </tr>
             </c:forEach>
         </table>

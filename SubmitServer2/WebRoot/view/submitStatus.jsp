@@ -39,7 +39,8 @@
 
     <div class="sectionTitle">
         <h1>Submission info</h1>
-        <p class="sectionDescription">Submission info for ${studentRegistration.fullname}</p>
+        <p class="sectionDescription">Submission info for 
+        <c:out value="${studentRegistration.fullname}"/></p>
     </div>
 
 <c:set var="code">

@@ -229,6 +229,12 @@ public class TestSetup
         this.archivePK = archivePK;
     }
 
+    
+    public String getDescription() {
+        if (comment == null || comment.isEmpty())
+            return "#" + version;
+        return "#" + version +": " + comment;
+    }
     /**
      * Fetches a TestSetup row from the database using the given ResultSet
      * starting at the given index.
