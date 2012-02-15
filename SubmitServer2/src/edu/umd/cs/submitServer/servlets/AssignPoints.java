@@ -95,10 +95,11 @@ public class AssignPoints extends SubmitServerServlet {
 			for (Enumeration<String> e = parser.getParameterNames(); e
 					.hasMoreElements();) {
 				String pName = e.nextElement();
-				if (testOutcomes.containsKey(pName)) {
-					TestOutcome testOutcome = testOutcomes.get(pName);
-					testOutcome.setPointValue(parser.getIntegerParameter(pName,
-							null));
+				TestOutcome testOutcome = testOutcomes.get(pName);
+				if (testOutcome != null) {
+				    Integer value = parser.getIntegerParameter(pName, null);
+					if (value != null) 
+					    testOutcome.setPointValue(value);
 				}
 			}
 
