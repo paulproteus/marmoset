@@ -85,7 +85,7 @@ public class ProcessTree {
         Set<Integer> result = findTree(rootPid);
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
         while (true) {
-            killProcesses("-CONT", result);
+            killProcesses("-STOP", result);
             Thread.sleep(100);
             computeChildren();
             Set<Integer> r = findTree(rootPid);
