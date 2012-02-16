@@ -240,9 +240,9 @@
                         <li><a href="${downloadStarterFilesLink}">download the baseline submission,</a>
                     </c:if>
 <li><a href="javascript:toggle('submitFiles')" title="Click to toggle display of contents" id="submitFilesSecton">use automatic submission tools</a>, 
-<c:if test="${not empty sourceFiles and course.browserEditing != 'PROHIBITED'}">
+<c:if test="${not empty sourceFiles and project.browserEditing != 'PROHIBITED'}">
 <c:choose>
-<c:when test="${course.browserEditing == 'DISCOURAGED'}">
+<c:when test="${project.browserEditing == 'DISCOURAGED'}">
  <c:url var="editSource" value="/view/editSourceCode.jsp">
  <c:param name="submissionPK" value="${sourceSubmission.submissionPK}"/>
  </c:url>
@@ -279,7 +279,7 @@
         </p>
     </div>
 
-<c:if test="${not empty sourceFiles and course.browserEditing == 'ALLOWED'}">
+<c:if test="${not empty sourceFiles and project.browserEditing == 'ALLOWED'}">
     <ss:editSourceCode />
     </c:if>
     <ss:submitProject/>

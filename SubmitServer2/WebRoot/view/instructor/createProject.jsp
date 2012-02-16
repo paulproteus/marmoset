@@ -47,7 +47,7 @@
 <script type="text/javascript">
 $(function() {
 	 $( "#ontime-date" ).datepicker({
-	        defaultDate: +20,
+	        defaultDate: +10,
 	        minDate: -1,
 	        dateFormat: "yy-mm-dd",
 	        onSelect: function( selectedDate ) {
@@ -61,7 +61,7 @@ $(function() {
 	        }
 	    });
 	   $( "#late-date" ).datepicker({
-           defaultDate: +20,
+           defaultDate: +10,
            minDate: -1,
            dateFormat: "yy-mm-dd",
            onSelect: function( selectedDate ) {
@@ -82,9 +82,9 @@ $(function() {
 function changedIsTested(isTested)
 {
 	if (isTested) {
-		document.getElementById("tested").style.display = "block";
+		showItem("tested");
 	} else {
-		document.getElementById("tested").style.display = "none";
+		hideItem("tested");
 	}
 }
 
@@ -167,6 +167,16 @@ function changedIsTested(isTested)
 		<td class="label">description</td>
 		<td class="input"><INPUT TYPE="text" NAME="description" size="90"></td>
 	</tr>
+    <tr>
+    <td class="label">Submission editing in browser</td>
+    <td class="input">
+         <select name="browserEditing">
+            <option value="prohibited"  ${ss:selected(course.browserEditing, 'PROHIBITED')}>Prohibited</option>
+            <option value="discouraged"  ${ss:selected(course.browserEditing, 'DISCOURAGED')}>Discouraged</option>
+            <option value="allowed"  ${ss:selected(course.browserEditing, 'ALLOWED')}>Allowed</option>
+            </select>
+            </td>
+    </tr>
 <tr 
     title="Submissions from the canoonical account are used to check test setups and to provide baseline/starter snapshots of projects">
     

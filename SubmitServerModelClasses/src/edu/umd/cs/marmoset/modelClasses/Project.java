@@ -109,7 +109,9 @@ public class Project implements Serializable {
     private String releasePolicy;
     private String stackTracePolicy;
     private int numReleaseTestsRevealed;
-    private Integer archivePK; // may be NULL
+    private @CheckForNull Integer archivePK; 
+    private BrowserEditing browserEditing = BrowserEditing.DISCOURAGED;
+    
 
     private transient byte[] cachedArchive;
 
@@ -168,7 +170,8 @@ public class Project implements Serializable {
         "release_policy",
         "stack_trace_policy",
         "num_release_tests_revealed",
-        "archive_pk"
+        "archive_pk",
+        "browser_editing"
 	};
 
 	/**
@@ -541,6 +544,12 @@ public class Project implements Serializable {
         this.archivePK = archivePK;
     }
 
+    public BrowserEditing getBrowserEditing() {
+        return browserEditing;
+    }
+    public void setBrowserEditing(BrowserEditing browserEditing) {
+        this.browserEditing = browserEditing;
+    }
     public String checkOnTime(Timestamp ts)
     {
         if (!ts.after(getOntime()))
@@ -587,6 +596,7 @@ public class Project implements Serializable {
             num=Integer.MAX_VALUE;
         setNumReleaseTestsRevealed(num);
         setArchivePK(SqlUtilities.getInteger(resultSet, startingFrom++));
+        setBrowserEditing(BrowserEditing.valueOfAnyCase(resultSet.getString(startingFrom++)));
 	}
 
 	public void insert(Connection conn)
@@ -648,6 +658,7 @@ public class Project implements Serializable {
         else
             stmt.setInt(index++, getNumReleaseTestsRevealed());
         SqlUtilities.setInteger(stmt, index++, getArchivePK());
+        stmt.setString(index++, browserEditing.name().toLowerCase());
 		return index;
 	}
 	

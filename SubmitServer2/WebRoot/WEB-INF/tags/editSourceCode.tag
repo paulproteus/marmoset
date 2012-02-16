@@ -5,7 +5,7 @@
 <%@ taglib prefix='fn' uri='http://java.sun.com/jsp/jstl/functions'%>
 
 
-<c:if test="${ not empty sourceFiles || course.browserEditing != 'PROHIBITED' }">
+<c:if test="${ not empty sourceFiles || project.browserEditing != 'PROHIBITED' }">
 
 
     <c:url var="submitURL" value="/action/CodeMirrorSubmission" />
@@ -14,8 +14,8 @@
     <script src="${codemirror}/lib/codemirror.js"></script>
 
     <script src="${codemirror}/mode/clike/clike.js"></script>
-<c:if test="${course.browserEditing == 'DISCOURAGED' }">
-<p>For this course, it is recommend that edit your projects on your computer, using an IDE or editing tools. 
+<c:if test="${project.browserEditing == 'DISCOURAGED' }">
+<p>It is recommend that edit this projects on your computer, using an IDE or editing tools. 
 If you edit code in the browser and later want to continue work on it on your computer, keep in mind that you will have to download
 the changes from the submit server.
 </c:if>

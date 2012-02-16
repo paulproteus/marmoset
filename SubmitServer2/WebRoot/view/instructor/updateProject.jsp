@@ -186,6 +186,16 @@ function changedIsTested(isTested)
 		<td class="label"><b>description</B></td>
 		<td class="input"><INPUT TYPE="text" NAME="description" VALUE="${fn:replace(project.description,qChar,qSymb)}" size="60"></td>
 	</tr>
+        <tr>
+    <td class="label">Submission editing in browser</td>
+    <td class="input">
+         <select name="browserEditing">
+            <option value="prohibited"  ${ss:selected(project.browserEditing, 'PROHIBITED')}>Prohibited</option>
+            <option value="discouraged"  ${ss:selected(project.browserEditing, 'DISCOURAGED')}>Discouraged</option>
+            <option value="allowed"  ${ss:selected(project.browserEditing, 'ALLOWED')}>Allowed</option>
+            </select>
+            </td>
+    </tr>
 	<tr 
     title="Submissions from the canoonical account are used to check test setups and to provide baseline/starter snapshots of projects">
     

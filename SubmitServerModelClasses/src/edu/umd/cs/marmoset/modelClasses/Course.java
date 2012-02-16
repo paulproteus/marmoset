@@ -47,13 +47,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  *
  */
 public class Course {
-    public enum BrowserEditing {
-        PROHIBITED, DISCOURAGED, ALLOWED;
-        public static BrowserEditing valueOfAnyCase(String name) {
-            return valueOf(name.toUpperCase());
-        }
-    }
-	public static final String TABLE_NAME = "courses";
+    public static final String TABLE_NAME = "courses";
 	
 	public static String defaultSemester;
 	

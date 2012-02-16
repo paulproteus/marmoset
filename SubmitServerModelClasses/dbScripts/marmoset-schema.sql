@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `allows_baseline_download` tinyint(1) NOT NULL DEFAULT '1',
   `submit_key` varchar(40) NOT NULL,
   `buildserver_key` varchar(40) NOT NULL,
-  `browser_editing` varchar(20) NOT NULL DEFAULT 'discouraged',
+  `browser_editing` varchar(20) NOT NULL DEFAULT 'prohibited',
   `sections` text,
   PRIMARY KEY (`course_pk`),
   UNIQUE KEY `submit_key` (`submit_key`),
@@ -268,6 +268,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `num_release_tests_revealed` smallint(6) NOT NULL DEFAULT '2',
   `archive_pk` mediumint(8) unsigned DEFAULT NULL,
   `diff_against` int(11) NOT NULL DEFAULT '0',
+  `browser_editing` varchar(20) NOT NULL DEFAULT 'prohibited',
   PRIMARY KEY (`project_pk`),
   KEY `course_pk` (`course_pk`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

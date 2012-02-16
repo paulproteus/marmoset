@@ -32,7 +32,7 @@
             </td>
         </tr>
         <tr>
-           <td class="label">Editing source code in browser:</td>
+           <td class="label">Default for editing source code in browser:</td>
             <td class="input">
             <select name="browserEditing">
             <option value="prohibited">Prohibited</option>

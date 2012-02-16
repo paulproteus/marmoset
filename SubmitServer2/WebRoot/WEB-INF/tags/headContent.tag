@@ -12,9 +12,9 @@
      $(document.getElementById(item)).slideToggle("slow");
  }
  function showItem(item) {
-     $(document.getElementById(item)).show("slow");
+     $(document.getElementById(item)).slideDown("slow");
  }
  function hideItem(item) {
-     $(document.getElementById(item)).hide("slow");
+     $(document.getElementById(item)).slideUp("slow");
  }
 </script>

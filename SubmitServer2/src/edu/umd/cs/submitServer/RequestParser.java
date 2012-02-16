@@ -37,9 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.BrowserEditing;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.Course.BrowserEditing;
 import edu.umd.cs.marmoset.utilities.LenientDateParser;
 import edu.umd.cs.marmoset.utilities.MarmosetPatterns;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
