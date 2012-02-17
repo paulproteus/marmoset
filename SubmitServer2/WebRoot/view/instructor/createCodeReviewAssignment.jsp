@@ -283,7 +283,7 @@ exemplar
                 <th>{{=header}}</th>
                 <td>
                     <input type="hidden" name="{{=prefix}}-presentation" value="{{=presentation}}" />
-                    <input type="text" name="{{=prefix}}-name" size="20" placeholder="Name of rubric item"/>
+                    <input type="text" name="{{=prefix}}-name" size="20" required="required" placeholder="Name of rubric item"/>
                 </td>
                 <td>
                     {{=editWidgets!}}

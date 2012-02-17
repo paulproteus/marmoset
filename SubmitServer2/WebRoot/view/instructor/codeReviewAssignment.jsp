@@ -42,16 +42,16 @@
 	<h2> Code Review for project <c:out value="${project.fullTitle}"/></h2>
 	<p> <c:out value="${codeReviewAssignment.description}" />
     <c:choose>
-    <c:when test="${codeReviewAssignment == 'INSTRUCTIONAL'}">
+    <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONAL'}">
     <p>Instructional code review</p></c:when>
-    <c:when test="${codeReviewAssignment == 'INSTRUCTIONALBYSECTION'}">
+    <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONALBYSECTION'}">
     <p>Instructional code review by section</p></c:when>
-    <c:when test="${codeReviewAssignment == 'PEER'}">
+    <c:when test="${codeReviewAssignment.kind == 'PEER'}">
     <p>Peer code review</p></c:when>
-    <c:when test="${codeReviewAssignment == 'EXEMPLAR'}">
+    <c:when test="${codeReviewAssignment.kind == 'EXEMPLAR'}">
     <p>Exemplar/example code review</p></c:when>
     <c:otherwise>
-    <p>Code review of unknown type</p>
+    <p>Code review of type<c:out value="${codeReviewAssignment.kind}"/></p>
     </c:otherwise></c:choose>
     
 	<p> Due <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" />
@@ -94,7 +94,7 @@
 <input type="checkbox" checked="checked"  readonly="readonly">
 </c:when>
  <c:when test="${rubric.presentation == 'DROPDOWN' }">
- <select name="r" disabled="disabled">
+ <select name="r" ">
   <c:forEach var="e" items="${rubric.dataAsMap}" >
   <option> <c:out value="${e}"/></option>
   </c:forEach>
