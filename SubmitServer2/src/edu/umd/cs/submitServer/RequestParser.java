@@ -273,8 +273,12 @@ public class RequestParser {
 		// these two CANNOT be null
 		course.setSemester(getCheckedParameter("semester"));
 		course.setCourseName(getCheckedParameter("courseName"));
-
+		
 		// these can be null
+		String sectionsCsv = request.getParameter("sections");
+		if (sectionsCsv != null) {
+			course.setSections(sectionsCsv.split(","));
+		}
 		course.setDescription(getOptionalCheckedParameter("description"));
 		course.setUrl(getOptionalCheckedParameter("url"));
 		course.setBrowserEditing(BrowserEditing.valueOfAnyCase(

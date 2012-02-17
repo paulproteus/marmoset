@@ -71,6 +71,7 @@
     		var newVal = $my.sectionInput.val();
     		if (!newVal) {
     			alert("Must specify a section name");
+    			return;
     		}
     		if (!newVal.match(/^[a-zA-Z0-9]+$/)) {
     			alert("Invalid section name " + newVal);
