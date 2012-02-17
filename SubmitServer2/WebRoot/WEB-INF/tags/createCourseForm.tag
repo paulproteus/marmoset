@@ -27,9 +27,9 @@
         	<td class="input">
         		<input type="hidden" name="sections" id="hidden-section-list" />
         		<select id="course-section-dropdown"></select>
-        		<input type="text" id="section-name-input" />
-        		<button id="edit-course-sections">add</button>
-        		<button id="clear-course-sections">clear</button>
+        		<input type="text" id="section-name-input" placeholder="Letters and numbers only" size="50" /><br />
+        		<button type="button" id="edit-course-sections">add</button>
+        		<button type="button" id="clear-course-sections">clear</button>
         	</td>
         </tr>
         <tr>
@@ -55,11 +55,51 @@
             <input type="submit" value="Create course">
     </table>
     </form>
+    <ss:script file="jsrender.js" />
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script type="text/javascript">
+   		var $my = {
+   				sectionInput: $("#section-name-input"),
+   				sectionDropdown: $("#course-section-dropdown"),
+   				hiddenInput: $("#hidden-section-list"),
+   				sectionList: []
+   		};
+   		$.template("optionTemplate",
+   				"<option value='{{=Section}}'>{{=Section}}</option>");
+   		
+   		function addSection() {
+    		var newVal = $my.sectionInput.val();
+    		if (!newVal) {
+    			alert("Must specify a section name");
+    		}
+    		if (!newVal.match(/^[a-zA-Z0-9]+$/)) {
+    			alert("Invalid section name " + newVal);
+    			$my.sectionInput.select();
+    			return;
+    		}
+    		if ($my.sectionList.indexOf(newVal) == -1) {
+    			$my.sectionDropdown.append($.render({Section: newVal}, "optionTemplate"));
+    			$my.sectionList.push(newVal);
+    		}
+    		$my.sectionInput.val('');
+    		$my.sectionDropdown.val(newVal);
+    		$my.sectionInput.focus();
+    		$my.hiddenInput.val($my.sectionList.join(','));
+   		}
+   		
     	$("#edit-course-sections").click(function(event) {
-    		event.preventDefault();
+    		addSection();
+    	});
+    	$my.sectionInput.keypress(function(event) {
+    		if (event.which == 13) {
+    			event.preventDefault();
+    			addSection();
+    		}
     	});
     	$("#clear-course-sections").click(function(event){
-    		event.preventDefault();
+    		$my.sectionInput.val('');
+    		$my.sectionDropdown.empty();
+    		$my.hiddenInput.val('');
+    		$my.sectionList = [];
     	});
     </script>
