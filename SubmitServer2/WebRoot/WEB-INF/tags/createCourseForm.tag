@@ -23,6 +23,16 @@
             </td>
         </tr>
         <tr>
+        	<td class="label">Sections (optional):</td>
+        	<td class="input">
+        		<input type="hidden" name="sections" id="hidden-section-list" />
+        		<select id="course-section-dropdown"></select>
+        		<input type="text" id="section-name-input" />
+        		<button id="edit-course-sections">add</button>
+        		<button id="clear-course-sections">clear</button>
+        	</td>
+        </tr>
+        <tr>
             <td class="label">URL:</td>
             <td class="input"><input type="url" name="url" size="60" placeholder="Where people can find out more about the course"></td>
         </tr>
@@ -45,3 +55,11 @@
             <input type="submit" value="Create course">
     </table>
     </form>
+    <script type="text/javascript">
+    	$("#edit-course-sections").click(function(event) {
+    		event.preventDefault();
+    	});
+    	$("#clear-course-sections").click(function(event){
+    		event.preventDefault();
+    	});
+    </script>
