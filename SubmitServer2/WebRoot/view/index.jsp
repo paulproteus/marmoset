@@ -117,7 +117,7 @@
         <div id="open-list">
             <h2>Courses open for enrollment</h2>
             <c:url var="registrationAction" value="/action/RequestRegistration" />
-            <form method="POST" action="${registrationAction}">
+            <form id="request-registration-form" method="POST" action="${registrationAction}">
                 <table id="open-course-table">
                     <tr>
                         <th>&nbsp;</th>
@@ -131,8 +131,8 @@
                             <c:choose>
                             	<c:when test="${not empty course.sections}">
                             		<select name="${checkboxName}" id="${checkboxName}-box">
-                            			<option value=""></option>
-                            			<c:forEach var="section" items="${course.section}">
+                            			<option value="NOT_SELECTED">--section--</option>
+                            			<c:forEach var="section" items="${course.sections}">
                             				<option value="${section}">${section}</option>
                             			</c:forEach>
                             		</select>
@@ -160,20 +160,12 @@
 
     <ss:footer />
 
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script type="text/javascript">
 					window.$marmoset = {
 						toggleAll : $("#toggle-all"),
 						openCourseTable : $("#open-course-table")
 					};
-
-					$marmoset.toggleAll.click(function(event) {
-						var checked = $marmoset.toggleAll.is(":checked");
-						$marmoset.openCourseTable
-								.find('input[type="checkbox"]').each(
-										function(index, box) {
-											box.checked = checked;
-										});
-					});
 				</script>
 </body>
 </html>
