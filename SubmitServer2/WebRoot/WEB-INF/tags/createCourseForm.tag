@@ -8,23 +8,23 @@
         <tr><th colspan=2>Create new course</th></tr>
         <tr>
             <td class="label">Course Name:</td>
-            <td class="input"><input type="text" name="courseName"></td>
+            <td class="input"><input type="text" name="courseName" maxlength=20 size=20 placeholder="e.g., CMSC 132"></td>
         </tr>
         <tr>
             <td class="label">Semester:</td>
             <td class="input">
-                <input type="text" name="semester" value="${ss:webProperty('semester')}"/>
+                <input type="text" name="semester" value="${ss:webProperty('semester')}" maxlength=15 size=15/>
             </td>
         </tr>
         <tr>
-            <td class="label">Description <br>(can be empty): </td>
+            <td class="label">Title (can be empty): </td>
             <td class="input">
-                <textarea cols="40" rows="6" name="description"></textarea>
+                <input type="text" size="40" name="description" placeholder="e.g, Object Oriented Programming II">
             </td>
         </tr>
         <tr>
             <td class="label">URL:</td>
-            <td class="input"><input type="url" name="url" size="60"></td>
+            <td class="input"><input type="url" name="url" size="60" placeholder="Where people can find out more about the course"></td>
         </tr>
         <tr>
             <td class="label">allows baseline/starter code download:</td>

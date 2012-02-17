@@ -158,6 +158,7 @@ public class CTester extends Tester {
 			int testTimeoutInSeconds = getTestProperties()
 					.getTestTimeoutInSeconds();
 			
+			long started = System.currentTimeMillis();
 			process = Untrusted.execute(getDirectoryFinder().getBuildDirectory(), 
 			        "/bin/bash", "-c", execString);
 					
@@ -205,6 +206,7 @@ public class CTester extends Tester {
 				// Add a TestOutcome to the TestOutcomeCollection
 				testOutcome.setOutcome(outcome);
 
+				testOutcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
 				testOutcome.setShortTestResult("Test " + exeName + " "
 						+ testOutcome.getOutcome());
 				// XXX We're storing the output from the streamMonitor in the
@@ -217,6 +219,7 @@ public class CTester extends Tester {
 				getLog().warn("Process timed out!");
 
 				testOutcome.setOutcome(TestOutcome.TIMEOUT);
+				testOutcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
 				testOutcome.setShortTestResult("Test " + exeName
 						+ " did not complete before the timeout of "
 						+ testTimeoutInSeconds

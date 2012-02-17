@@ -31,9 +31,8 @@
 
 <!DOCTYPE HTML>
 <html>
-<head>
+
 <ss:head title="Code review for Project ${project.fullTitle}" />
-</head>
 
 <body>
 <ss:header />

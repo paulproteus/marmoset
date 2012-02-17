@@ -169,7 +169,7 @@
 </c:if>
 
 
-	<form name="submitform" enctype="multipart/form-data"
+	<form id="submitform" enctype="multipart/form-data"
     action="<c:url value="/action/instructor/UploadProjectStarterFiles"/>"
     method="POST">
     <input type="hidden" name="projectPK"  value="${project.projectPK}" /> 

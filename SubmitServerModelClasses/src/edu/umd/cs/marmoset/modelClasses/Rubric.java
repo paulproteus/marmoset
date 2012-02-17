@@ -36,10 +36,13 @@ public class Rubric {
   public static LinkedHashMap<String, Integer> parseDataToMap(String data) {
     LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
     for (String pair : data.split(",")) {
+        System.out.println(pair);
       String[] keyValue = pair.split(":");
       if (keyValue.length == 2)
         map.put(keyValue[0].trim(), Integer.parseInt(keyValue[1].trim()));
     }
+    if (map.isEmpty())
+        throw new IllegalArgumentException("No values found in '" + data + "'");
     return map;
   }
 

@@ -150,6 +150,7 @@ public class TestOutcome implements Serializable {
 	private String testNumber;
 	private String outcome;
 	private int pointValue;
+	private int executionTimeMillis;
 	private String testName;
 	private String shortTestResult;
 	private String longTestResult="";
@@ -183,6 +184,7 @@ public class TestOutcome implements Serializable {
             "coarsest_coverage_level",
             "exception_source_covered_elsewhere",
 			"details",
+			"execution_time_ms"
 	};
 	  static final String[] ATTRIBUTE_NICE_NAME_LIST = {
 			"test_run_pk",
@@ -196,7 +198,8 @@ public class TestOutcome implements Serializable {
 			"exception class name",
             "coarsest coverage level",
             "exception source covered elsewhere",
-			"details"
+			"details",
+	        "execution time ms"
 	};
 
 	 /** Name of this table in the database. */
@@ -1009,7 +1012,17 @@ public class TestOutcome implements Serializable {
     {
         this.details = details;
     }
-	/**
+	public int getExecutionTimeMillis() {
+        return executionTimeMillis;
+    }
+
+    public void setExecutionTimeMillis(long executionTimeMillis) {
+        if (executionTimeMillis > Integer.MAX_VALUE)
+            throw new IllegalArgumentException("Execution time too long: " + executionTimeMillis);
+        this.executionTimeMillis = (int) executionTimeMillis;
+    }
+
+    /**
      * @return Returns the coarsestPublicStudentCoverage.
      */
     public CoverageLevel getCoarsestCoverageLevel() {
@@ -1060,6 +1073,7 @@ public class TestOutcome implements Serializable {
         stmt.setString(index++, (getCoarsestCoverageLevel()!=null)?getCoarsestCoverageLevel().toString():CoverageLevel.NONE.toString());
         stmt.setBoolean(index++, getExceptionSourceCoveredElsewhere());
 	    stmt.setObject(index++, getDetails());
+	    stmt.setInt(index++, getExecutionTimeMillis());
 	    return index;
 	}
 
@@ -1087,6 +1101,7 @@ public class TestOutcome implements Serializable {
             " coarsest_coverage_level = ?," +
             " exception_source_covered_elsewhere = ?, " +
 	        " details = ? " +
+            " execution_time_ms = ? " +
 	        " WHERE test_run_pk = ? " +
 	        " AND test_type = ? " +
 	        " AND test_number = ? ";
@@ -1132,6 +1147,8 @@ public class TestOutcome implements Serializable {
         setCoarsestCoverageLevel(CoverageLevel.fromString(rs.getString(startingFrom++)));
         setExceptionSourceCoveredElsewhere(rs.getBoolean(startingFrom++));
 		setDetails(rs.getObject(startingFrom++));
+		setExecutionTimeMillis(rs.getInt(startingFrom++));
+        
 		limitSizes();
 		return startingFrom++;
 	}

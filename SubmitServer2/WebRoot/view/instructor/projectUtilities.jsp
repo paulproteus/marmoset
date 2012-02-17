@@ -40,6 +40,31 @@
 	<ss:projectMenu/>
 
 
+<script>
+jQuery(document).ready(function ($) {
+        $('#uploadTestSetupForm input:submit').attr('disabled',true);
+        $('#uploadTestSetupForm input:file').change(
+            function(){
+                if ($(this).val()){
+                    $('#uploadTestSetupForm input:submit').removeAttr('disabled'); 
+                }
+                else {
+                    $('#uploadTestSetupForm input:submit').attr('disabled',true);
+                }
+            });
+        $('#submitProjectForm input:submit').attr('disabled',true);
+        $('#submitProjectForm input:file').change(
+            function(){
+                if ($(this).val()){
+                    $('#submitProjectForm input:submit').removeAttr('disabled'); 
+                }
+                else {
+                    $('#submitProjectForm input:submit').attr('disabled',true);
+                }
+            });
+    });
+</script>
+
 <h2>Instructor Utilities for Project 
 <c:out value="${project.fullTitle}"/></h2>
 
@@ -64,13 +89,14 @@
 	<c:if test="${empty allTestSetups}">
 			<p> <c:url
 				var="uploadTestSetupLink" value="/action/instructor/UploadTestSetup" />
-			<form name="submitform" action="${uploadTestSetupLink}"
+			<form id="uploadTestSetupForm" action="${uploadTestSetupLink}"
 				enctype="multipart/form-data" method="POST"><input
 				type="hidden" name="projectPK" value="${project.projectPK}">
 		No test setups for this project. <input type="hidden" name="comment" value=""/>
 		<a title="zip/jar file to upload"><input type="file" name="file"
 				size=40></a> <input type="submit" value="Upload"></form>
-		</c:if>
+
+</c:if>
 
 
 <c:choose>
@@ -118,7 +144,7 @@
 <h4>Canonical Submissions</h4>
 			<c:choose>
 				<c:when test="${not empty  canonicalSubmissions}">
-					<form name="submitform" enctype="multipart/form-data"
+					<form id="submitProjectForm" enctype="multipart/form-data"
 						action="
 	<c:url value="/action/SubmitProjectViaWeb"/>"
 						method="POST">
@@ -206,7 +232,7 @@
 				<h4>Testing setups</h4>
             <c:url var="uploadTestSetupLink"
                         value="/action/instructor/UploadTestSetup" />
-            <form name="submitform" action="${uploadTestSetupLink}"
+            <form id="uploadTestSetupForm" action="${uploadTestSetupLink}"
                         enctype="multipart/form-data" method="POST">
                         <input type="hidden" name="projectPK" value="${project.projectPK}">
 				<p>
@@ -404,7 +430,7 @@ any server based compilation and testing
 	<li><p style="font-weight: bold">Test-Outcome Visibility</p>
 		<c:url var="link" value="/action/instructor/UpdatePostDeadlineOutcomeVisibility" />
 
-		<form name="updatePostDeadlineOutcomeVisibilityForm" action="${link}" method="POST">
+		<form id="updatePostDeadlineOutcomeVisibilityForm" action="${link}" method="POST">
 			<p><span class="statusmessage">Visibility of Test-Outcomes after the Late Deadline is '${project.postDeadlineOutcomeVisibility}'</span></p>
 			<input type="hidden" name="projectPK" value="${project.projectPK}"/>
 			<c:choose>

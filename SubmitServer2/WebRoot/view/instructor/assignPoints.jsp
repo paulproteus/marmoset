@@ -90,7 +90,9 @@ addLoadEvent(function() {
     <ul>
     <li> Testing setup
      tested  <fmt:formatDate value="${testSetup.datePosted}" pattern="E',' dd MMM 'at' hh:mm a"/>
-     <c:set var="comment">c:out value="${testSetup.comment}"/></c:set>
+     <c:set var="comment">
+     <c:out value="${testSetup.comment}" />
+     </c:set>
     <li> Test-setup comment: <input type="text" name="comment" value="${comment}" size="30"/>
     <li> Solution submitted by 
     <c:out value="${studentRegistration.classAccount}"/>
@@ -111,10 +113,11 @@ addLoadEvent(function() {
 <c:param name="testRunPK" value="${canonicalTestRun.testRunPK}"/>
 </c:url>
 
-Starting with point totals from 
+Starting with point totals <a href="$testRunLink}"> from 
 test setup  <c:out value="${canonicalTestSetup.description}"/>.
 posted
 <fmt:formatDate value="${canonicalTestSetup.datePosted}" pattern="E',' dd MMM 'at' hh:mm a"/>
+</a>.
 
 </c:when>
 <c:otherwise>

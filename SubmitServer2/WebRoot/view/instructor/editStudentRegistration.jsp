@@ -49,7 +49,7 @@
 </div>
 
 <p>
-<form name="editStudentRegistrationForm"
+<form id="editStudentRegistrationForm"
 	action="<c:url value="/action/instructor/EditStudentRegistration"/>"
 	method="post">
 <input type="hidden" name="studentRegistrationPK" value="${studentRegistration.studentRegistrationPK}"/>

@@ -78,7 +78,7 @@
 <p>Student is inactive in course (as marked on grade server)
 </c:when>
 </c:choose>
-
+   
 <p>
 <table>
     <tr>
@@ -95,17 +95,16 @@
     <c:set var="numDisplayed" value="0" />
     <c:forEach var="project" items="${projectList}" varStatus="counter">
     <c:set var="submitStatus" value="${projectToStudentSubmitStatusMap[project.projectPK]}"/>
-                
-        <c:if test="${project.visibleToStudents || not empty submitStatus}}">
+        <c:if test="${project.visibleToStudents || not empty submitStatus}">
             <tr class="r${numDisplayed % 2}">
 
                 <td><c:choose>
                     <c:when test="${project.url != null}">
                         <a href="<c:url value="${project.url}"/>">
-                        ${project.projectNumber} </a>
+                        <c:out value="${project.projectNumber}"/> </a>
                     </c:when>
                     <c:otherwise>
-                    ${project.projectNumber}
+                    <c:out value="${project.projectNumber}"/>
                     </c:otherwise>
                 </c:choose></td>
 

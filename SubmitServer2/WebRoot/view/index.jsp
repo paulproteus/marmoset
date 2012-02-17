@@ -115,7 +115,7 @@
 
     <c:if test="${not empty openCourses}">
         <div id="open-list">
-            <h2>Open Courses</h2>
+            <h2>Courses open for enrollment</h2>
             <c:url var="registrationAction" value="/action/RequestRegistration" />
             <form method="POST" action="${registrationAction}">
                 <table id="open-course-table">

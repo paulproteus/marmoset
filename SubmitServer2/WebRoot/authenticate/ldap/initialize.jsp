@@ -37,7 +37,7 @@
 
 
 <c:url var="loginLink" value="/authenticate/InitializeDatabase"/>
-<form name="PerformLogin" method="post" action="${loginLink}" >
+<form id="PerformLogin" method="post" action="${loginLink}" >
 
   <table class="form" width="%30">
     <tr><th colspan=2>Initialize the submit server; provide your Directory ID</th></tr>

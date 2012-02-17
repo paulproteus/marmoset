@@ -56,7 +56,7 @@ submission until the project has been activated by the instructor.
 
 	<p class="sectionDescription">Submit Project 
     <c:out value="${project.fullTitle}"/>
-			for <c:out value="${course.fullName}"/></p>
+			for <c:out value="${course.fullname}"/></p>
 </div>
 
     <c:if test="${course.allowsBaselineDownload && project.archivePK != null && project.archivePK > 0}">

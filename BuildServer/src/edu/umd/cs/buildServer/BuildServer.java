@@ -507,6 +507,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 				downloadProjectJarFile(projectSubmission);
 				// log.warn
 
+				long started = System.currentTimeMillis();
 				// Now we have the project and the testing jarfile.
 				// Build and test it.
 				try {
@@ -517,7 +518,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 					// secret and student
 					// TestOutcomes added.
 					addBuildTestResult(projectSubmission, TestOutcome.PASSED,
-							"");
+							"", started);
 					result = SUCCESS;
 				} catch (BuilderException e) {
 					// XXX Should a BuilderException be allowed here?
@@ -537,7 +538,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 					// Add build test outcome
 					String compilerOutput = e.toString() + "\n";
 					addBuildTestResult(projectSubmission, TestOutcome.FAILED,
-							compilerOutput);
+							compilerOutput, started);
 
 					getLog().warn(
 							"Marking all classes of tests 'could_not_run' for "
@@ -568,7 +569,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 					String compilerOutput = e.toString() + "\n"
 							+ e.getCompilerOutput();
 					addBuildTestResult(projectSubmission, TestOutcome.FAILED,
-							compilerOutput);
+							compilerOutput, started);
 
 					// Add "cannot build submission" test outcomes for
 					// the dynamic test types
@@ -699,9 +700,10 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 *            pass/fail status
 	 * @param longDescription
 	 *            compiler error messages (if any)
+	 * @param started TODO
 	 */
 	private void addBuildTestResult(ProjectSubmission projectSubmission,
-			String passed, String longDescription) {
+			String passed, String longDescription, long started) {
 		TestOutcome outcome = new TestOutcome();
 		outcome.setTestType(TestOutcome.BUILD_TEST);
 		outcome.setTestName("Build Test");
@@ -711,6 +713,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		outcome.setTestNumber("0");
 		outcome.setExceptionClassName("");
 		outcome.setDetails(null);
+		outcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
 
 		projectSubmission.getTestOutcomeCollection().add(outcome);
 	}

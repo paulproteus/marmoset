@@ -3,7 +3,7 @@
 
 
     <c:url var="loginLink" value="/authenticate/ldap/PerformLogin"/>
-	<form name="PerformLogin" method="post" action="${loginLink}" >
+	<form id="PerformLogin" method="post" action="${loginLink}" >
 		<c:if test="${not empty param.target}">
 	    <input type="hidden" name="target" value="${ss:urlEncode(param.target)}">
 	    </c:if>

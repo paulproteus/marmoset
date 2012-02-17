@@ -291,9 +291,7 @@ public class RequestParser {
 		return project;
 	}
 
-	/**
-	 * @return
-	 */
+
 	public void updateProject(Project project) throws InvalidRequiredParameterException {
 		boolean visibleToStudents = getOptionalBooleanParameter("visibleToStudents");
 		project.setVisibleToStudents(visibleToStudents);
@@ -315,6 +313,8 @@ public class RequestParser {
 	    if (diffAgainst != null && diffAgainst.intValue() != 0 && diffAgainst.intValue() == projectPK)
 	        throw new IllegalArgumentException("Can't diff a project against itself");
         project.setDiffAgainst(diffAgainst);
+        project.setBrowserEditing(BrowserEditing.valueOfAnyCase(
+                getCheckedParameter("browserEditing")));
 
 		if (hasParameter("pair"))
             project.setPair(getCheckbox("pair"));

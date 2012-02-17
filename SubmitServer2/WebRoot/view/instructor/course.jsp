@@ -159,7 +159,7 @@ tr.reject {background: #f33}
                 </c:url> <a href="${createProjectLink}"> create new project </a></li>
             <li>Import a project <c:url var="importProjectLink" value="/action/instructor/ImportProject" />
 
-                <form name="importProjectForm" enctype="multipart/form-data" method="post" action="${importProjectLink}">
+                <form id="importProjectForm" enctype="multipart/form-data" method="post" action="${importProjectLink}">
                     Canonical Account: <select name="canonicalStudentRegistrationPK">
                         <c:forEach var="studentRegistration" items="${courseInstructors}">
                             <c:choose>
@@ -175,7 +175,22 @@ tr.reject {background: #f33}
                         </c:forEach>
                     </select> <input type="file" name="file" size="40" /> <input type="submit" value="Import project!">
                     <input type="hidden" name="coursePK" value="${course.coursePK}">
-                </form></li>
+                </form>
+                <script>
+jQuery(document).ready(function ($) {
+        $('#importProjectForm input:submit').attr('disabled',true);
+        $('#importProjectForm input:file').change(
+            function(){
+                if ($(this).val()){
+                    $('#importProjectForm input:submit').removeAttr('disabled'); 
+                }
+                else {
+                    $('#importProjectForm input:submit').attr('disabled',true);
+                }
+            });
+      
+    });
+</script></li>
         </ul>
     </c:if>
 
@@ -189,7 +204,7 @@ tr.reject {background: #f33}
     <c:if test="${ fn:length(courseIds) > 0}">
         <c:url var="syncCourseLink" value="/action/instructor/SyncCourse" />
         <p>
-        <form name="syncCourseForm" method="post" action="${syncCourseLink}">
+        <form id="syncCourseForm" method="post" action="${syncCourseLink}">
             <input type="hidden" name="coursePK" value="${course.coursePK}" /> <input type="submit" name="submit"
                 value="Update students from grade server" />
         </form>

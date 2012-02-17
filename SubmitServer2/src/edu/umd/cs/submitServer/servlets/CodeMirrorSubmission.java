@@ -31,7 +31,6 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -63,13 +62,6 @@ public class CodeMirrorSubmission extends SubmitServerServlet {
         Kind kind = Kind.CODEMIRROR;
         String clientTool = "web";
         String clientVersion = kind.toString();
-        Set entries = request.getParameterMap().entrySet();
-        for(Object o : entries) {
-            Map.Entry e = (Map.Entry)o;
-            String[] v = (String[]) e.getValue();
-            System.out.println(e.getKey());
-            System.out.println("  " + Arrays.toString(v));
-        }
         
         int num = parser.getIntParameter("numFiles");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

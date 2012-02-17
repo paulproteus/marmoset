@@ -26,7 +26,23 @@ files need to be ones in the baseline submission, otherwise we can't recreate th
 structure. 
 </div>
 
-<form name="submitform" enctype="multipart/form-data"
+<script>
+jQuery(document).ready(function ($) {
+        $('#submitForm input:submit').attr('disabled',true);
+        $('#submitForm input:file').change(
+            function(){
+                if ($(this).val()){
+                    $('#submitForm input:submit').removeAttr('disabled'); 
+                }
+                else {
+                    $('#submitForm input:submit').attr('disabled',true);
+                }
+            });
+      
+    });
+</script>
+
+<form id="submitForm" enctype="multipart/form-data"
     action="<c:url value="/action/SubmitProjectViaWeb"/>" method="POST"><input type="hidden"
     name="projectPK" value="${project.projectPK}" /> <input type="hidden"
     name="submitClientTool" value="web" />

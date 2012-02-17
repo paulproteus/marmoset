@@ -36,7 +36,7 @@ the changes from the submit server.
         </c:otherwise>
     </c:choose>
     
-    <form name="submitform" method="POST" action="${submitURL}">
+    <form id="submitform" method="POST" action="${submitURL}">
         <input type="hidden" name="projectPK" value="${project.projectPK}" /> <input type="hidden"
             name="submitClientTool" value="codemirror" /> 
             <c:if test="${not empty sourceSubmission}">

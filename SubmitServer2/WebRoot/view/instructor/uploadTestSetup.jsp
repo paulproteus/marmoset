@@ -42,7 +42,7 @@
 <c:url var="uploadTestSetupLink"
 	value="/action/instructor/UploadTestSetup" />
 
-<form name="submitform" action="${uploadTestSetupLink}"
+<form id="submitform" action="${uploadTestSetupLink}"
 	enctype="multipart/form-data" method="POST"><input type="hidden"
 	name="projectPK" value="${project.projectPK}">
 <p>Comment:<br>

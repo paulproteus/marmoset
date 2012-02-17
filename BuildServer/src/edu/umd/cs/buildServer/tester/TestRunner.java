@@ -90,7 +90,7 @@ public class TestRunner extends BaseTestRunner {
 	// Transient state
 	private Class<?> suiteClass;
 	private TestOutcome currentTestOutcome;
-	private int failCount, passCount;
+	private long currentTestStarted;
 	private static Logger log;
 
 	private static Logger getLog() {
@@ -112,7 +112,6 @@ public class TestRunner extends BaseTestRunner {
 
 		this.nextTestNumber = TestOutcome.FIRST_TEST_NUMBER;
 		this.currentTestOutcome = null;
-		this.failCount = this.passCount = 0;
 	}
 
 	/**
@@ -144,11 +143,6 @@ public class TestRunner extends BaseTestRunner {
 		return outcomeCollection.getAllOutcomes();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.runner.BaseTestRunner#testStarted(java.lang.String)
-	 */
 	@Override
 	public void testStarted(String testName) {
 		// Create a new (incomplete) TestOutcome to represent
@@ -158,17 +152,14 @@ public class TestRunner extends BaseTestRunner {
 		currentTestOutcome.setTestType(testType);
 		currentTestOutcome.setTestName(testName);
 		currentTestOutcome.setTestNumber(Integer.toString(nextTestNumber++));
+		currentTestStarted = System.currentTimeMillis();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.runner.BaseTestRunner#testEnded(java.lang.String)
-	 */
+	
+
 	@Override
 	public void testEnded(String testName) {
 		if (currentTestOutcome.getOutcome() == null) {
-			++passCount;
 
 			// The test didn't fail, so it must have succeeded.
 			currentTestOutcome.setOutcome(TestOutcome.PASSED);
@@ -177,19 +168,13 @@ public class TestRunner extends BaseTestRunner {
 			// since this didn't fail, these can be empty
 			currentTestOutcome.setExceptionClassName("");
 			currentTestOutcome.setDetails(null);
+			currentTestOutcome.setExecutionTimeMillis(System.currentTimeMillis() - currentTestStarted);
 		}
 		outcomeCollection.add(currentTestOutcome);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.runner.BaseTestRunner#testFailed(int, junit.framework.Test,
-	 * java.lang.Throwable)
-	 */
 	@Override
 	public void testFailed(int status, Test test, Throwable t) {
-		++failCount;
 		
 		Throwable original = t;
 		Throwable cause = t.getCause();
@@ -223,6 +208,7 @@ public class TestRunner extends BaseTestRunner {
 		} else {
 			currentTestOutcome.setOutcome(TestOutcome.ERROR);
 		}
+		currentTestOutcome.setExecutionTimeMillis(System.currentTimeMillis() - currentTestStarted);
 		currentTestOutcome.setShortTestResult(t.toString()
 				+ formatShortExceptionMessage(t));
 		currentTestOutcome.setLongTestResult(formatExceptionText(original));
@@ -298,11 +284,6 @@ public class TestRunner extends BaseTestRunner {
 	    return out.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.runner.BaseTestRunner#runFailed(java.lang.String)
-	 */
 	@Override
 	protected void runFailed(String message) {
 		getLog().debug("Run failed: " + message);

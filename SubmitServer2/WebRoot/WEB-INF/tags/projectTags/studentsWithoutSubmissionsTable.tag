@@ -24,7 +24,7 @@
 		<tr class="r${counter.index % 2}">
 
 		<td class="description"><a href="${studentLink}">
-		<c:out value="${studentRegistration.fullName}"/></a>
+		<c:out value="${studentRegistration.fullname}"/></a>
 	        </td>
 		<td class="description"><c:out value="${studentRegistration.classAccount}"/> </td>
 

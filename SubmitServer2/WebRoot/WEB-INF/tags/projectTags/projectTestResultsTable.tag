@@ -71,7 +71,7 @@
 				<td class="number">${1+counter.index}
 					<td class="description"><c:if
 						test="${studentRegistration.instructorLevel > 0}">* </c:if>
-                        <c:out value="${studentRegistration.getFullname}"/>
+                        <c:out value="${studentRegistration.fullname}"/>
 					</td>
 					<td class="description"><c:url var="studentProjectLink"
 						value="/view/instructor/studentProject.jsp">

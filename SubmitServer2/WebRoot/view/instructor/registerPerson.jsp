@@ -58,7 +58,7 @@
     <c:if test="${course != null}">
             
 <div>
-    <form name="registerExistingStudentForm"
+    <form id="registerExistingStudentForm"
         action='<c:url value="/action/instructor/RegisterOneStudent"/>'
         method="post">
         <input type="hidden" name="coursePK" value="${course.coursePK}" />
@@ -112,7 +112,7 @@
             
 <c:if test="${gradesServer}">
 <div>
-	<form name="registerOneStudentForm"
+	<form id="registerOneStudentForm"
 		action='<c:url value="/action/instructor/RegisterOneStudent"/>'
 		method="post">
         <c:if test="${course != null}">
