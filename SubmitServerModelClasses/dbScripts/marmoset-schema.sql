@@ -284,8 +284,8 @@ CREATE TABLE IF NOT EXISTS `registration_requests` (
   `course_pk` int(11) NOT NULL,
   `timestamp` bigint(20) NOT NULL,
   `status` enum('PENDING','APPROVED','DENIED') COLLATE utf8_bin NOT NULL,
-  UNIQUE KEY `student_pk` (`student_pk`),
-  UNIQUE KEY `course_pk` (`course_pk`),
+  KEY `student_pk` (`student_pk`),
+  KEY `course_pk` (`course_pk`),
   UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
