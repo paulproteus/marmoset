@@ -48,7 +48,7 @@
 		<td> error </td>
 		<td class="error"> &nbsp; </td>
 		<td class="description">  The test case failed due to a run-time exception,
-		such as a NullPointerException or a ClassCastException.  Note that if a run-time
+		such as a NullPointerException or a ClassCastException.  If a run-time
 		exception happens in the JUnit test case, this is considered a "failure" rather than
 		an "error".
 		</td>

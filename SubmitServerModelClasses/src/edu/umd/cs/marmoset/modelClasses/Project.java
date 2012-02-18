@@ -59,6 +59,7 @@ import org.apache.commons.io.CopyUtils;
 import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
+import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
@@ -1048,11 +1049,16 @@ public class Project implements Serializable {
 
 
     public @CheckForNull Map<String,List<String>> getBaselineText(Connection conn) throws IOException, SQLException {
+      return getBaselineText(conn, null);
+    }
+    
+    public @CheckForNull Map<String,List<String>> getBaselineText(Connection conn,
+           @CheckForNull DisplayProperties fileProperties) throws IOException, SQLException {
         Integer baselinePK = this.getArchivePK();
         if (baselinePK == null)
             return null;
         Map<String, List<String>> baselineText
-        = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn));
+        = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
         return baselineText;
 
        

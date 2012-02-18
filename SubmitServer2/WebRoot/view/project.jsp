@@ -253,7 +253,7 @@
 </c:otherwise>
 </c:choose>
 </c:if>
-<li> <a href="#uploadSource">upload source files</a>
+<li> <a href="#uploadProject">upload source files</a>
 </ul>
 
     <div id="submitFiles" style="display: none">

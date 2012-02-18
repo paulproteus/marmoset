@@ -38,6 +38,7 @@ import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
@@ -199,7 +200,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 
 	public static TestOutcome createUnableToRunOneTestOutcome(@TestType String testType,
 			String testMethod, String testClass, int testNumber,
-			String outcome, String shortTestResult, String longTestResult) {
+			@OutcomeType String outcome, String shortTestResult, String longTestResult) {
 		TestOutcome testOutcome = new TestOutcome();
 		testOutcome.setTestType(testType);
 		testOutcome.setTestName(testMethod + "(" + testClass + ")");

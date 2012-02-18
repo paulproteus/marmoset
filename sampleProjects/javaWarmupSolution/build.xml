@@ -10,7 +10,7 @@
         	<javac
                         destdir="bin"
                         srcdir="src"
-                        includeantruntime="false"
+                        includeantruntime="true"
                         deprecation="off"
                         debug="on"/>
 

@@ -54,8 +54,8 @@
   <c:if test="${skipAuthentication}">
   	<c:url var="verifyOpenId" value="/authenticate/openid/verify" />
   	<h2>Skip authentication</h2>
-		<p>The submit server is set to skip authentication. Note that
-			making OpenID requests from localhost can have strange semantics, and
+		<p>The submit server is set to skip authentication. Making OpenID requests 
+        from localhost can have strange semantics, and
 			some providers may refuse to authenticate at all.</p>
 		<form action="${verifyOpenId}" method="GET">
   		<input type="hidden" name="marmoset.target" value="${target}" />

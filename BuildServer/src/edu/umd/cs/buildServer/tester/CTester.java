@@ -37,6 +37,7 @@ import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
@@ -198,7 +199,7 @@ public class CTester extends Tester {
 				// Use the process exit code to decide whether the test
 				// passed or failed.
 				boolean passed = exitCode == 0;
-				String outcome = passed ? TestOutcome.PASSED
+				@OutcomeType String outcome = passed ? TestOutcome.PASSED
 						: TestOutcome.FAILED;
 
 				getLog().debug("Process exited with exit code " + exitCode);

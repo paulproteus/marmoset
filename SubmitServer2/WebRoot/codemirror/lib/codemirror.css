@@ -1,6 +1,6 @@
 .CodeMirror {
   line-height: 1em;
-  font-family: monospace;
+  font-family: 'Menlo', 'DejaVu Sans Mono', 'Consolas', 'Ubuntu Mono', monospace;
 }
 
 .CodeMirror-scroll {

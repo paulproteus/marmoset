@@ -94,17 +94,28 @@ public class TestOutcome implements Serializable {
     private static int id(int i) {
     	return i;
     }
+    
+    // Test types
+    @Documented
+     @TypeQualifier(applicableTo = String.class)
+     @Retention(RetentionPolicy.RUNTIME)
+     public @interface OutcomeType {
+        
+    }
+    public static @OutcomeType String asOutcomeType(String s) {
+        return s;
+    }
 	// Outcome types
-    public static final String FAILED = "failed";
-	public static final String PASSED = "passed";
-	public static final String COULD_NOT_RUN = "could_not_run";
-	public static final String STATIC_ANALYSIS = "warning";
-    public static final String NOT_IMPLEMENTED = "not_implemented";
-    public static final String ERROR = "error";
-    public static final String HUH = "huh";
-    public static final String MISSING_COMPONENT = "missing_component";
-    public static final String TIMEOUT = "timeout";
-	public static final String UNCOVERED_METHOD = "uncovered_method";
+    public static final @OutcomeType String FAILED = asOutcomeType("failed");
+	public static final @OutcomeType String PASSED = asOutcomeType("passed");
+	public static final @OutcomeType String COULD_NOT_RUN = asOutcomeType("could_not_run");
+	public static final @OutcomeType String STATIC_ANALYSIS = asOutcomeType("warning");
+    public static final @OutcomeType String NOT_IMPLEMENTED = asOutcomeType("not_implemented");
+    public static final @OutcomeType String ERROR = asOutcomeType("error");
+    public static final @OutcomeType String HUH = asOutcomeType("huh");
+    public static final @OutcomeType String MISSING_COMPONENT = asOutcomeType("missing_component");
+    public static final @OutcomeType String TIMEOUT = asOutcomeType("timeout");
+	public static final @OutcomeType String UNCOVERED_METHOD = asOutcomeType("uncovered_method");
 
 	// Test types
 	   @Documented
@@ -148,7 +159,7 @@ public class TestOutcome implements Serializable {
 	private int testRunPK = 0;
 	private @TestType String testType;
 	private String testNumber;
-	private String outcome;
+	private @OutcomeType String outcome;
 	private int pointValue;
 	private int executionTimeMillis;
 	private String testName;
@@ -554,13 +565,13 @@ public class TestOutcome implements Serializable {
 	/**
 	 * @return Returns the outcome.
 	 */
-	public String getOutcome() {
+	public @OutcomeType String getOutcome() {
 		return outcome;
 	}
 	/**
 	 * @param outcome The outcome to set.
 	 */
-	public void setOutcome(String outcome) {
+	public void setOutcome(@OutcomeType String outcome) {
 		this.outcome = outcome;
 	}
 	/**
@@ -657,11 +668,15 @@ public class TestOutcome implements Serializable {
 	}
 	public static @HTML String getHotlink(
 			TestOutcome outcome, String viewLink) {
+	    if (outcome.getOutcome().equals(NOT_IMPLEMENTED))
+            return XSSScrubber.asHTML("");
+       
 	    String viewSourceLink = viewLink + "/sourceCode.jsp";
-	    String fullResult = outcome.getLongTestResult();
+	    String fullResult  = outcome.getLongTestResult();
+	         
 	    int length = fullResult.length();
 	    
-	    String result =  outcome.getHotlink(viewSourceLink);
+	    @HTML String result =  outcome.getHotlink(viewSourceLink);
 	    if (length > 5000) {
 	        result = String.format(
 	                "<b><a href=\"%s/PrintTestOutcome?testRunPK=%d&testType=%s&testNumber=%s\">full result is %d characters, %d lines long</a></b><br>%s",
@@ -676,7 +691,7 @@ public class TestOutcome implements Serializable {
 	    return XSSScrubber.asHTML(result);
 	}
 
-	private  String getHotlink(String viewSourceLink)
+	private  @HTML String getHotlink(String viewSourceLink)
 	{
 	    if (testType.equals(FINDBUGS_TEST))
 	        return getFindbugsHotlink(viewSourceLink);
@@ -730,7 +745,7 @@ public class TestOutcome implements Serializable {
     }
     public static final Pattern FINDBUGS_LOCATION_REGEX = Pattern.compile("At (\\w+\\.java):\\[line (\\d+)\\]");
 
-    public String getExceptionLocation(String viewSourceLink)
+    public @HTML String getExceptionLocation(String viewSourceLink)
     {
         StringBuffer buf=new StringBuffer();
         if (isError()) {
@@ -756,7 +771,7 @@ public class TestOutcome implements Serializable {
                         buf.append(createSourceCodeLink(viewSourceLink, line, sourceFileName, startHighlight, numToHighlight, numContext));
                         buf.append("<br>");
                         // Return after we find the first hot-link-able stack frame
-                        return buf.toString();
+                        return XSSScrubber.asHTML(buf.toString());
                     } else {
                         buf.append(line + "<br>\n");
                     }
@@ -767,10 +782,10 @@ public class TestOutcome implements Serializable {
                 IOUtils.closeQuietly(reader);
             }
         }
-        return buf.toString();
+        return XSSScrubber.asHTML(buf.toString());
     }
 
-	private String getFindbugsHotlink(String viewSourceLink)
+	private @HTML String getFindbugsHotlink(String viewSourceLink)
 	{
 	    if (!testType.equals(FINDBUGS_TEST))
 	        throw new IllegalArgumentException("is type " + testType + ", not findbugs");
@@ -789,7 +804,7 @@ public class TestOutcome implements Serializable {
             int numContext=0;
             return createSourceCodeLink(viewSourceLink, shortTestResult, sourceFileName, startHighlight, numToHighlight, numContext);
 	    }
-        return shortTestResult;
+        return XSSScrubber.scrubbedStr(shortTestResult);
 	}
 
     public StackTraceElement getExceptionSourceFromLongTestResult()
@@ -822,17 +837,18 @@ public class TestOutcome implements Serializable {
 
 
 
-	private String getStackTraceHotlinks(String viewSourceLink) {
+	private @HTML String getStackTraceHotlinks(String viewSourceLink) {
 	   //  System.out.println("Calling getStackTraceHotlinks!");
-        if (longTestResult == null || longTestResult.equals(""))
+        if (longTestResult == null || longTestResult.equals("") || getOutcome().equals(NOT_IMPLEMENTED))
 	        return "";
+       
 	    StringBuffer buf=new StringBuffer();
-
+	    String txt = getLongTrimmedTestResult();
 	    BufferedReader reader = null;
 
 	    Pattern pattern = Pattern.compile("\\((\\w+\\.java):(\\d+)\\)");
 	    try {
-	        reader=new BufferedReader(new StringReader(getLongTrimmedTestResult()));
+	        reader=new BufferedReader(new StringReader(txt));
 	    	while (true) {
 	    	    String line=reader.readLine();
                 if (line==null) break;
@@ -865,7 +881,7 @@ public class TestOutcome implements Serializable {
 	    } finally {
 	    	IOUtils.closeQuietly(reader);
 	    }
-	    return buf.toString();
+	    return XSSScrubber.asHTML( buf.toString());
 	}
 
 	/**
@@ -877,9 +893,9 @@ public class TestOutcome implements Serializable {
 	 * @param numContext
 	 * @return
      */
-    private String createSourceCodeLink(String viewSourceLink, String line, String sourceFileName, String startHighlight, int numToHighlight, int numContext)
+    private @HTML String createSourceCodeLink(String viewSourceLink, String line, String sourceFileName, String startHighlight, int numToHighlight, int numContext)
     {
-        return "<a href=\"" + viewSourceLink +
+        return XSSScrubber.asHTML("<a href=\"" + viewSourceLink +
         		"?testRunPK=" +testRunPK+
                 "&sourceFileName="+sourceFileName+
                 "&testType="+(testType.equals(TestOutcome.UNCOVERED_METHOD)?"public-student":testType)+
@@ -889,14 +905,14 @@ public class TestOutcome implements Serializable {
                 "&numToHighlight="+numToHighlight+
                 "&numContext="+numContext+
                 "#codehighlight0\"> " +line+
-                "</a>\n";
+                "</a>\n");
     }
 
     /**
 	 * @param viewSourceLink TODO
      * @return Returns the location in the file where the PMD warning occurs.
 	 */
-	private String getPmdLocation(String viewSourceLink) {
+	private @HTML String getPmdLocation(String viewSourceLink) {
 	    String pmdLocation = shortTestResult;
 	    int i = pmdLocation.indexOf(':');
 	    if (i > 0) pmdLocation = pmdLocation.substring(i+1);
@@ -914,7 +930,7 @@ public class TestOutcome implements Serializable {
 	        int numContext=0;
 	        return createSourceCodeLink(viewSourceLink, pmdLocation, sourceFileName, startHighlight, numToHighlight, numContext);
 	    }
-	    return pmdLocation;
+	    return XSSScrubber.scrubbedStr(pmdLocation);
 	}
 	/**
 	 * @param testName The testName to set.
@@ -1138,7 +1154,7 @@ public class TestOutcome implements Serializable {
 		setTestRunPK(rs.getInt(startingFrom++));
 		setTestType(asTestType(rs.getString(startingFrom++)));
 		setTestNumber(rs.getString(startingFrom++));
-		setOutcome(rs.getString(startingFrom++));
+		setOutcome(asOutcomeType(rs.getString(startingFrom++)));
 		setPointValue(rs.getInt(startingFrom++));
 		setTestName(rs.getString(startingFrom++));
 		setShortTestResult(rs.getString(startingFrom++));

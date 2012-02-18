@@ -2,7 +2,7 @@
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 
-<div id="submitProject">
+<div id="uploadProject">
 <h3>Uploading a submission</h3>
 <p>You can submit <a href="javascript:toggle('submittingZip')" title="description">a zip file</a>
  or <a href="javascript:toggle('submittingSource')" title="description">multiple text files</a>.
