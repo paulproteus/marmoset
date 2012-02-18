@@ -284,6 +284,7 @@ CREATE TABLE IF NOT EXISTS `registration_requests` (
   `course_pk` int(11) NOT NULL,
   `timestamp` bigint(20) NOT NULL,
   `status` enum('PENDING','APPROVED','DENIED') COLLATE utf8_bin NOT NULL,
+  `section` text COLLATE utf8_bin,
   KEY `student_pk` (`student_pk`),
   KEY `course_pk` (`course_pk`),
   UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`)
