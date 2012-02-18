@@ -14,6 +14,8 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +48,14 @@ public class TextUtilities {
 
 	}
 
-	public static Map<String, List<String>> scanTextFilesInZip(byte[] in) throws IOException {
+	   public static Map<String, List<String>> scanTextFilesInZip(byte[] in) 
+	           throws IOException {
+	       return scanTextFilesInZip(in, null);
+	   }
+
+	public static Map<String, List<String>> scanTextFilesInZip(byte[] in, DisplayProperties fileProperties) throws IOException {
 		
-		Map<String, List<String>> result = scanTextFilesInZip(new ByteArrayInputStream(in));
+		Map<String, List<String>> result = scanTextFilesInZip(new ByteArrayInputStream(in), fileProperties);
 		if (FixZip.hasProblem(in))
 			result.put(" -- warning --", Arrays.asList(new String[] { "This zip file doesn't match the zip spec.", 
 					"It is likely that the submit server will only show the first entry in the zip file.",
@@ -113,8 +120,18 @@ public class TextUtilities {
 	        return result;
 
 	    }
+	   
 	public static Map<String, List<String>> scanTextFilesInZip(InputStream in) throws IOException {
+	    return scanTextFilesInZip(in, null);
+	}
+	       
+	
+	public static Map<String, List<String>> scanTextFilesInZip(InputStream in, 
+	        @CheckForNull DisplayProperties displayProperties) throws IOException {
+	    if (displayProperties == null)
+	        displayProperties = new DisplayProperties();
 		TreeMap<String, List<String>> result = new TreeMap<String, List<String>>();
+		List<String> submitDisplay = null;
 		ZipInputStream zIn = new ZipInputStream(in);
 		while (true) { 
 			try {
@@ -127,9 +144,12 @@ public class TextUtilities {
 				continue;
 			}
 			String name = z.getName();
-
+			if (name.equals(".submitDisplay")) {
+			    submitDisplay =  getText(zIn);
+			}
 			int lastSlash = name.lastIndexOf('/');
 			String simpleName = name.substring(lastSlash + 1);
+			
 			if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
 				continue;
 			if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
@@ -165,8 +185,22 @@ public class TextUtilities {
 			}
 		}
 		zIn.close();
-		return result;
-
+		if (submitDisplay != null) {
+		    final HashMap<String,Integer> rank = new HashMap<String,Integer>();
+		    int pos = 0;
+		    for(String s : submitDisplay) {
+		        if (s.startsWith("#")) continue;
+		        String [] parts = s.split("[ ]*=[ ]*");
+		        if (parts.length == 0) continue;
+		        rank.put(parts[0], pos++);
+		        if (parts.length == 2)
+		            displayProperties.put(parts[0], parts[1]);
+		        else
+		            displayProperties.put(parts[0]);
+		            
+		    }
+		}
+		return displayProperties.build(result);
 	}
 	
 	public static String dumpException(Throwable t) {

@@ -1,4 +1,5 @@
 SubmitServer2/www-test/
+*.swp
 .svn
 SubmitServer2/umd.properties
 SubmitServer2/WebRoot/WEB-INF/classes

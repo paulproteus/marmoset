@@ -52,7 +52,8 @@
 <h2><c:out value="${studentRegistration.fullname}"/></h2>
 <h2>Submission #${submission.submissionNumber}, submitted at <fmt:formatDate
 	value="${submission.submissionTimestamp}"
-	pattern="E',' dd MMM 'at' hh:mm a" /></h2>
+	pattern="E',' dd MMM 'at' hh:mm a" />
+    </h2>
 <c:if
 	test="${submission.currentTestRunPK != testRun.testRunPK}">
 	<p>Results from previous testing against version
@@ -60,8 +61,15 @@
 </c:if>
 
 
-<p><a href="${viewSubmissionSourceLink}">View</a> or
-<a href="${editSourceLink}">Edit</a> source
+<p><a href="${viewSubmissionSourceLink}">View</a>, 
+<c:if test="${project.browserEditing != 'PROHIBITED'}">
+<a href="${editSourceLink}">Edit</a> 
+</c:if>
+or  <c:url var="downloadLink" value="/data/DownloadSubmission">
+                <c:param name="submissionPK" value="${submission.submissionPK}" />
+            </c:url> <a href="${downloadLink}">Download</a>
+            source</p>
+            
 <c:if test="${reviewer != null}">
 <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
 <c:param name="submissionPK" value="${submission.submissionPK}"/>
@@ -145,7 +153,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 					<td class="description">
 					<c:choose>
 					<c:when test="${testProperties.performCodeCoverage and testProperties.language=='java'}">
-						<c:out value="${ss:hotlink(test, viewSourceLink)}" />
+						<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
 					</c:when>
 					<c:otherwise>
 						<pre><c:out	value="${test.longTestResult}" /></pre>
@@ -279,8 +287,8 @@ not empty testOutcomeCollection.releaseOutcomes}">
 				<c:otherwise>
 					<c:if test="${releaseInformation.afterPublic}">
 						<p>
-						You may not release test at this time.  Note that
-						this project is set to allow release testing only
+						You may not release test at this time.  
+                        This project is set to allow release testing only
 						for submissions that pass all public tests.
 						</p>
 					</c:if>

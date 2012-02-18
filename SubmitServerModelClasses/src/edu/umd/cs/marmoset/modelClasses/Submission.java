@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 import edu.umd.cs.marmoset.utilities.Multiset;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
@@ -619,9 +620,13 @@ public class Submission implements ITestSummary<Submission> {
     }
 
 	public Map<String,List<String>>
-		getText(Connection conn) throws SQLException, IOException {
+    getText(Connection conn) throws SQLException, IOException {
+     return getText(conn, null);
+}
+	public Map<String,List<String>>
+		getText(Connection conn, @CheckForNull DisplayProperties fileProperties) throws SQLException, IOException {
 		  byte[] archive = downloadArchive(conn);
-		  return TextUtilities.scanTextFilesInZip(archive);
+		  return TextUtilities.scanTextFilesInZip(archive, fileProperties);
 	}
 
     /**

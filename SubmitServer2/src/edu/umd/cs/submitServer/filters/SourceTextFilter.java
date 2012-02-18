@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.utilities.DisplayProperties;
 
 /**
  * @author jspacco
@@ -72,18 +73,22 @@ public class SourceTextFilter extends SubmitServerFilter {
             request.setAttribute("sourceSubmission", submission);
         
 		Connection conn = null;
+		if (submission != null || course.getAllowsBaselineDownload())
 		try {
 			conn = getConnection();
 
-			Map<String, List<String>> sourceContents = null;
+			DisplayProperties fileProperties = new DisplayProperties();
+			Map<String, List<String>> sourceContents = project.getBaselineText(conn, fileProperties);
+            
 			if (submission != null)
-			    sourceContents = submission.getText(conn);
-			else if (course.getAllowsBaselineDownload())
-			    sourceContents = project.getBaselineText(conn);
-		
+			    sourceContents = submission.getText(conn, fileProperties);
+			   
 			request.setAttribute("sourceContents", sourceContents);
-			if (sourceContents != null)
+			if (sourceContents != null) {
 			  request.setAttribute("sourceFiles", sourceContents.keySet());
+			  request.setAttribute("sourceProperties", fileProperties.getProperties());
+			}
+			
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {

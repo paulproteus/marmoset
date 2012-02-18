@@ -19,7 +19,7 @@ Whenever we perform a "background retest" of a submission and notice results tha
 we store the conflicting results and mark this situation as an <b><font color=red>inconsistent 
 background retest</font></b>
 <p>
-Note that a submission may have inconsistent background retest results from Release or Secret tests
+A submission may have inconsistent background retest results from Release or Secret tests
 that you can't yet see.
 </p>
 <p>If a submission has inconsistent test results, and instructor may need to investigate to determine whether the problem is in the test case,

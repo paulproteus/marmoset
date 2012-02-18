@@ -305,7 +305,7 @@ function changedIsTested(isTested)
 			${ss:checked(project.bestSubmissionPolicy,'edu.umd.cs.submitServer.policy.ReleaseTestAwareSubmissionPolicy')}>
 				Release Test Aware: Either last compilable submission, or highest scoring release tested submission, whichever is higher.<br>
 			<!--
-			Note that if a project has secret tests, students will not know which
+			If a project has secret tests, students will not know which
 			submission is their "best" one.
 			-->
 		</td>

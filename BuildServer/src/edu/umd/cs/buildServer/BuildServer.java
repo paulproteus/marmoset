@@ -64,6 +64,7 @@ import edu.umd.cs.buildServer.util.LoadAverage;
 import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.MissingRequiredTestPropertyException;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.TestPropertiesExtractor;
@@ -549,7 +550,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 					// the dynamic test types
 					String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
 					for (int i = 0; i < dynamicTestTypes.length; ++i) {
-						String testType = TestOutcome.asTestType(dynamicTestTypes[i]);
+						@TestType String testType = TestOutcome.asTestType(dynamicTestTypes[i]);
 						addSpecialFailureTestOutcome(projectSubmission,
 								testType, "Compiler output:\n" + compilerOutput);
 					}
@@ -703,7 +704,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @param started TODO
 	 */
 	private void addBuildTestResult(ProjectSubmission projectSubmission,
-			String passed, String longDescription, long started) {
+			@OutcomeType String passed, String longDescription, long started) {
 		TestOutcome outcome = new TestOutcome();
 		outcome.setTestType(TestOutcome.BUILD_TEST);
 		outcome.setTestName("Build Test");

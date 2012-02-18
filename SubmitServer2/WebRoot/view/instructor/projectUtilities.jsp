@@ -101,7 +101,7 @@ jQuery(document).ready(function ($) {
 
 <c:choose>
 
-<c:when test="${project.tested}">
+<c:when test="${project.tested and not empty studentRegistrationSet}">
 
 <c:if test="${not empty allTestSetups}">
 

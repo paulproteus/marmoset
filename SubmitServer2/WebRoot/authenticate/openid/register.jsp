@@ -6,7 +6,7 @@
 <head>
 <c:if test="${empty param.uid}">
      <!-- If a UID parameter is not given, this is an invalid registration flow, so redirect to the beginning.
-          Note that this discards any "target" parameter, but that's unlikely to matter.-->
+          This discards any "target" parameter, but that's unlikely to matter.-->
 	<c:redirect url="/authenticate/openid/login.jsp" />
 </c:if>
 <ss:headContent title="OpenID Registration" />
