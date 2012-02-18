@@ -1,3 +1,4 @@
+*.class
 SubmitServer2/www-test/
 *.swp
 .svn
@@ -40,4 +41,6 @@ SubmitServer2/ldap-local.web.properties
 sampleProjects/javaWarmup/*.zip
 sampleProjects/javaWarmup/bin
 sampleProjects/javaWarmupSolution/*.zip
+sampleProjects/javaWarmupSolution/bin
+sampleProjects/javaWarmup/bin
 sampleProjects/javaWarmupSolution/bin
