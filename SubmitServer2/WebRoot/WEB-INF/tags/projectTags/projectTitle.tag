@@ -2,12 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="sectionTitle">
+<c:set var="projectURL" value="${projectLink}"/>
 <c:choose>
 <c:when test="${not empty project.url}">
 <c:set var="projectURL"><c:out value="${project.url}"/></c:set>
 <h1><a href="${projectLink}">
   <c:out value="${project.fullTitle}"/></a></h1>
-<p class="sectionDescription"><a href="${projectLink}"><c:out value="${project.description}"/></a></p>
+<p class="sectionDescription"><a href="${projectURL}"><c:out value="${project.description}"/></a></p>
 </c:when>
 <c:otherwise>
 <h1><c:out value="${project.fullTitle}"/></h1>
