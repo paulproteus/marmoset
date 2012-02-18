@@ -1,4 +1,6 @@
-*.class
+sampleProjects/*/doc/
+sampleProjects/*/bin/**
+**/*.class
 SubmitServer2/www-test/
 *.swp
 .svn

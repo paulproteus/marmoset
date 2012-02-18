@@ -69,6 +69,10 @@ the changes from the submit server.
                  </c:set>
             <c:set var="divName" value="div-${counter.index}" />
             <c:set var="display" value="block"/>
+            <c:set var="readonly" value="false"/>
+            <c:if test="${properties.readonly}">
+            <c:set var="readonly" value="true"/>
+            </c:if>
             <c:if test="${properties.collapsed}">
              <c:set var="display" value="none"/>
              </c:if>
@@ -76,7 +80,7 @@ the changes from the submit server.
             <input type="hidden" name="n-${counter.index}" value="${filename}" />
 
             <h4><a href="javascript:toggleEditor('${divName}')">${filename}</a>
-             <c:if test="${properties.readonly}">
+             <c:if test="${readonly}">
               (Read only)</c:if>
             </h4>
              
@@ -88,7 +92,7 @@ the changes from the submit server.
      </textarea>
             <script>
     var myCodeMirror = CodeMirror.fromTextArea(document.getElementById('${name}'), {
-  lineNumbers: true, indentUnit: 4,  onGutterClick: foldFunc, readOnly: ${properties.readonly} });
+  lineNumbers: true, indentUnit: 4,  onGutterClick: foldFunc, readOnly: ${readonly} });
      editors['${divName}'] = myCodeMirror;
       </script>
       </div>
