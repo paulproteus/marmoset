@@ -42,6 +42,13 @@
 <html>
 <head>
 <ss:headContent title="Submit Server Home Page" />
+<style>
+label.error {
+	display: block;
+	color: red;
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
     <ss:header />
@@ -130,8 +137,8 @@
                             <td>
                             <c:choose>
                             	<c:when test="${not empty course.sections}">
-                            		<select name="${checkboxName}" id="${checkboxName}-box">
-                            			<option value="NOT_SELECTED">--section--</option>
+                            		<select name="${checkboxName}" id="${checkboxName}-box" required="required">
+                            			<option value="">--section--</option>
                             			<c:forEach var="section" items="${course.sections}">
                             				<option value="${section}">${section}</option>
                             			</c:forEach>
@@ -166,6 +173,17 @@
 						toggleAll : $("#toggle-all"),
 						openCourseTable : $("#open-course-table")
 					};
+					$("#request-registration-form").validate({
+						errorPlacement: function(error, element) {
+							error.insertBefore(element);
+						}
+					});
+					$("select", "#request-registration-form").rules("add", {
+						required: true,
+						messages: {
+							required: "Please select a section."
+						}
+					});
 				</script>
 </body>
 </html>
