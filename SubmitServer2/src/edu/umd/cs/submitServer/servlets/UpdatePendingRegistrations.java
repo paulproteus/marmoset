@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
@@ -41,7 +42,12 @@ public class UpdatePendingRegistrations extends SubmitServerServlet {
 			Preconditions.checkState(entry.getValue().length == 1, "Should get exactly 1 value for each registration request.");
 			String action = entry.getValue()[0];
 			if (action.equals("accept")) {
-				dao.acceptRegistration(coursePK, studentPK);
+				String section = req.getParameter("section-" + studentPK);
+				if (!Strings.isNullOrEmpty(section)) {
+					dao.acceptRegistration(coursePK, studentPK, section);
+				} else {
+					dao.acceptRegistration(coursePK, studentPK);
+				}
 			} else if (action.equals("reject")) {
 				dao.denyRegistration(coursePK, studentPK);
 			} else {

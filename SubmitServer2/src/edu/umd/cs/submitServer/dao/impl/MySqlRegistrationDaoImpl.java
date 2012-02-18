@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,6 +14,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Queries;
@@ -178,7 +180,12 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 
 	@Override
-  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK) {
+	  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK) {
+		return acceptRegistration(coursePK, studentPK, null);
+	}
+
+	@Override
+  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK, String section) {
 	  Connection conn = null;
 	  PreparedStatement stmt = null;
 	  try {
@@ -198,6 +205,9 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  	reg.setClassAccount(student.getLoginName());
 	  	reg.setFirstname(student.getFirstname());
 	  	reg.setLastname(student.getLastname());
+	  	if (!Strings.isNullOrEmpty(section)) {
+	  		reg.setSection(section);
+	  	}
 	  	reg.insert(conn);
 	  	
 	  	return true;
@@ -227,4 +237,30 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
     	Queries.close(conn);
     }
   }
+	
+	@Override
+	public Map<Integer, String> getRequestSection(int coursePK) {
+		  Connection conn = null;
+		  PreparedStatement stmt = null;
+		  try {
+		  	conn = props.getConnection();
+		  	Preconditions.checkArgument(isInstructor(conn, coursePK),
+		  	                            "DAO student must be an instructor for course");
+		  	stmt = conn.prepareStatement("SELECT * FROM registration_requests WHERE course_pk = ? AND status = ?");
+		  	Queries.setStatement(stmt, coursePK, RequestStatus.PENDING);
+		  	ResultSet rs = stmt.executeQuery();
+		  	Map<Integer, String> sections = Maps.newTreeMap();
+		  	while (rs.next()) {
+		  		@Student.PK int studentPK = Student.asPK(rs.getInt("student_pk"));
+		  		String section = rs.getString("section");
+		  		sections.put(studentPK, section);
+		  	}
+		  	return sections;
+	    } catch (SQLException e) {
+		    throw new RuntimeException(e);
+	    } finally {
+	    	Queries.closeStatement(stmt);
+	    	Queries.close(conn);
+	    }
+	}
 }

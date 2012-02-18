@@ -1,6 +1,7 @@
 package edu.umd.cs.submitServer.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
@@ -38,6 +39,11 @@ public interface RegistrationDao {
 	 */
 	public List<Student> getPendingRegistrations(int coursePK); 
 	
+	/**
+	 * Return a mapping from student PK to the section the student is requesting. The dao's user must be an instructor for the course.
+	 */
+	public Map<Integer, String> getRequestSection(int coursePK);
+	
 
 	/** Returns a list of all courses a student may register for. */
 	public List<Course> getOpenCourses();
@@ -52,6 +58,15 @@ public interface RegistrationDao {
 	 * @return false if the request was not pending, or if there was no such request. true otherwise.
 	 */
 	public boolean acceptRegistration(int coursePK, @Student.PK int studentPK);
+
+	/**
+	 * Accept a registration request, optionally changing the section. The dao's Student must be an instructor for the course, and the
+	 * request must be pending.
+	 * @param section TODO
+	 * 
+	 * @return false if the request was not pending, or if there was no such request. true otherwise.
+	 */
+	public boolean acceptRegistration(int coursePK, @Student.PK int studentPK, String section);
 
 	/**
 	 * Accept a registration request. The dao's Student must be an instructor for the course, and the

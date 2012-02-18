@@ -26,7 +26,7 @@ public class CourseRegistrationsFilter extends SubmitServerFilter {
 		
 		RegistrationDao dao = new MySqlRegistrationDaoImpl(user, submitServerDatabaseProperties);
 		request.setAttribute("pendingRegistrations", dao.getPendingRegistrations(course.getCoursePK()));
-		
+		request.setAttribute("studentSections", dao.getRequestSection(course.getCoursePK()));
 		chain.doFilter(request, response);
 	}
 }
