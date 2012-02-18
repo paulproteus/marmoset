@@ -14,12 +14,23 @@ public interface RegistrationDao {
 	public Student getStudent();
 	
 	/**
-	 * Request that the dao's Student be registered for a course. Returns true if a request was
-	 * successfully added, or if there is already a pending request. If the request has been denied or
-	 * accepted, returns false.
+	 * Request that the dao's Student be registered for a section of a course.
+	 * Returns true if a request was successfully added, or if there is already
+	 * a pending request. If the request has been denied or accepted, returns
+	 * false.
+	 * 
+	 */
+	public boolean requestRegistration(int coursePK, String section);
+	
+	/**
+	 * Request that the dao's Student be registered for a course with a
+	 * {@code null} section. Returns true if a request was successfully added,
+	 * or if there is already a pending request. If the request has been denied
+	 * or accepted, returns false.
 	 * 
 	 */
 	public boolean requestRegistration(int coursePK);
+	
 	
 	/**
 	 * Return a list of Students waiting for registration in the given course. The dao's user must

@@ -1,24 +1,24 @@
 /**
  * Marmoset: a student project snapshot, submission, testing and code review
  * system developed by the Univ. of Maryland, College Park
- * 
+ *
  * Developed as part of Jaime Spacco's Ph.D. thesis work, continuing effort led
  * by William Pugh. See http://marmoset.cs.umd.edu/
- * 
+ *
  * Copyright 2005 - 2011, Univ. of Maryland
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  */
 
 package edu.umd.cs.marmoset.modelClasses;
@@ -48,27 +48,27 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  */
 public class Course {
     public static final String TABLE_NAME = "courses";
-	
+
 	public static String defaultSemester;
-	
+
 	public static void setDefaultSemester(String defaultSemester) {
 	    if (defaultSemester == null)
 	        return;
 	    if (Course.defaultSemester != null
 	            && !Course.defaultSemester.equals(defaultSemester))
-	        throw new IllegalArgumentException("Bad attempt to change default semester from " 
+	        throw new IllegalArgumentException("Bad attempt to change default semester from "
 	                + Course.defaultSemester + " to " + defaultSemester);
 	    Course.defaultSemester = defaultSemester;
 	}
 
 	private static SecureRandom random = new SecureRandom();
-	
+
 	private static String generateRandomKey() {
 	    String result = Long.toHexString(random.nextLong());
 	    while (result.length() < 16)
 	        result = "0" + result;
 	    return result;
-	    
+
 	}
 	/**
 	 * List of all attributes for courses table.
@@ -106,12 +106,12 @@ public class Course {
 	private String sections;
 	private BrowserEditing browserEditing = BrowserEditing.DISCOURAGED;
 	private boolean allowsBaselineDownload;
-	
+
 	public Course() {
-		
+
 	}
 
-	
+
 	public boolean getAllowsBaselineDownload() {
 		return allowsBaselineDownload;
 	}
@@ -130,7 +130,7 @@ public class Course {
 	        b.append("-");
 	        b.append(section);
 	    }
-	    if (semester != null && semester.length() > 0 
+	    if (semester != null && semester.length() > 0
 	            && !semester.equals(defaultSemester)) {
             b.append(", ");
             b.append(semester);
@@ -239,7 +239,7 @@ public class Course {
 		this.courseIDs = courseIDs;
 	}
 	public String[] getSections() {
-        return sections.split(",");
+        return (sections == null) ? null : sections.split(",");
     }
 
     public void setSections(String [] sections) {
@@ -271,7 +271,7 @@ public class Course {
 	    if (submitKey != null)
 	        throw new IllegalStateException();
 	    submitKey = generateRandomKey();
-	      
+
 	    String insert = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
 
 	    PreparedStatement stmt = null;
@@ -300,7 +300,7 @@ public class Course {
 		stmt.setString(col++, getSubmitKey());
 		stmt.setString(col++, browserEditing.name().toLowerCase());
 		stmt.setString(col++, sections);
-		
+
 		return col;
 	}
 
@@ -326,7 +326,7 @@ public class Course {
 	    }
 	}
 
-	
+
 	public int fetchValues(ResultSet resultSet, int startingFrom) throws SQLException
 	{
 		setCoursePK(resultSet.getInt(startingFrom++));
@@ -343,12 +343,12 @@ public class Course {
 		this.sections = resultSet.getString(startingFrom++);
 		return startingFrom;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("Course %s", getDescription());
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 	  if (!(obj instanceof Course)) {
@@ -360,7 +360,7 @@ public class Course {
 	  }
 	  return this.coursePK.equals(that.coursePK);
 	}
-	
+
 	@Override
 	public int hashCode() {
 	  int hash = 71;
@@ -543,7 +543,7 @@ public class Course {
     throws SQLException
     {
         String k[] = keys.split("[ ,]");
-        
+
         PreparedStatement stmt = queryByBuildserverKey(conn, "course_pk", k);
         ArrayList<Integer> result = new ArrayList<Integer>();
 
@@ -584,7 +584,7 @@ public class Course {
 
         for(String kk : k)
             result.put(kk, null);
-        
+
         try {
 
             for (Course c : getAllFromPreparedStatement(stmt)) {

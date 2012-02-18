@@ -107,11 +107,22 @@ label.error {
             <table>
                 <tr>
                     <th>Course Name</th>
+                    <th>Section</th>
                     <th>Course Description</th>
                 </tr>
                 <c:forEach var="course" items="${pendingRequests}">
                     <tr>
-                        <td><c:out value="${course.fullname}" /></td>
+                    	<td><c:out value="${course.fullname}" /></td>
+                    	<td>
+                    		<c:choose>
+                    		<c:when test="${not empty course.section}" >
+                    		<c:out value="${course.section}" />
+                    		</c:when>
+                    		<c:otherwise>
+                    		N/A
+                    		</c:otherwise>
+                    		</c:choose>
+                    	</td>
                         <td><c:out value="${course.description}" /></td>
                         <!-- TODO(rwsims): Allow students to cancel registration requests? -->
                     </tr>
@@ -137,7 +148,7 @@ label.error {
                             <td>
                             <c:choose>
                             	<c:when test="${not empty course.sections}">
-                            		<select name="${checkboxName}" id="${checkboxName}-box" required="required">
+                            		<select name="${checkboxName}" id="${checkboxName}-box">
                             			<option value="">--section--</option>
                             			<c:forEach var="section" items="${course.sections}">
                             				<option value="${section}">${section}</option>
@@ -145,7 +156,8 @@ label.error {
                             		</select>
                             	</c:when>
                             	<c:otherwise>
-                            		<input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" />
+                            		<input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" value="" />
+                            		<label for="${checkboxName}-box">Register</label>
                             	</c:otherwise>
                             </c:choose>
                             </td>
@@ -176,12 +188,6 @@ label.error {
 					$("#request-registration-form").validate({
 						errorPlacement: function(error, element) {
 							error.insertBefore(element);
-						}
-					});
-					$("select", "#request-registration-form").rules("add", {
-						required: true,
-						messages: {
-							required: "Please select a section."
 						}
 					});
 				</script>
