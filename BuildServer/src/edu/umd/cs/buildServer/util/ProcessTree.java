@@ -116,6 +116,10 @@ public class ProcessTree {
      * @throws InterruptedException
      */
     public void killProcesses(String signal, Set<Integer> result) throws IOException, InterruptedException {
+        if (result.isEmpty()) {
+            log.info("no processes to kill");
+            return;
+        }
         ArrayList<String> cmd = new ArrayList<String>();
         cmd.add("/bin/kill");
         cmd.add(signal);
