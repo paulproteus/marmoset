@@ -84,10 +84,11 @@ public class ProcessExitMonitor extends Thread {
 		if (!exited) {
 			wait(millis);
 		}
+		Untrusted.destroyProcessTree(process, log);
+        
 		if (exited) 
 		    return true;
 		 
-		Untrusted.destroyProcessTree(process, log);
 		return false;
 	}
 
