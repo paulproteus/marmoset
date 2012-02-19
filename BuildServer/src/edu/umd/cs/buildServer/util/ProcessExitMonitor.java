@@ -26,6 +26,8 @@
  */
 package edu.umd.cs.buildServer.util;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 
 
@@ -34,12 +36,13 @@ import org.apache.log4j.Logger;
  * 
  * @author David Hovemeyer
  */
-public class ProcessExitMonitor extends Thread {
+public final class ProcessExitMonitor extends Thread {
     
     private final Logger log;
 	private final Process process;
 	private boolean exited;
 	private volatile int exitCode;
+	private ProcessTree tree;
 
 	/**
 	 * Constructor.
@@ -53,19 +56,25 @@ public class ProcessExitMonitor extends Thread {
 		this.process = process;
 		this.log = logger;
 		this.exited = false;
+		
+		tree = new ProcessTree(logger);
+		this.start();
 	}
 
 
 	@Override
 	public void run() {
 		try {
+		    Thread.sleep(500);
+
+		    tree.computeChildren();
 			this.exitCode = process.waitFor();
 			synchronized (this) {
 				this.exited = true;
 				notifyAll();
 			}
 		} catch (InterruptedException e) {
-			// Interrupted!
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -82,9 +91,11 @@ public class ProcessExitMonitor extends Thread {
 	public synchronized boolean waitForProcessToExit(long millis)
 			throws InterruptedException {
 		if (!exited) {
+		    Thread.sleep(100);
+		    tree.computeChildren();
 			wait(millis);
 		}
-		Untrusted.destroyProcessTree(process, log);
+		Untrusted.destroyProcessTree(process, tree, log);
         
 		if (exited) 
 		    return true;

@@ -167,8 +167,7 @@ public class CBuilder extends Builder implements TestPropertyKeys {
 			monitor.start();
 			
 			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
-            exitMonitor.start();
-
+           
             long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;
 
             if (exitMonitor.waitForProcessToExit(processTimeoutMillis)) {

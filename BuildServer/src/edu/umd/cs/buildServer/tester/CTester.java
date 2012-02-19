@@ -176,8 +176,7 @@ public class CTester extends Tester {
 			// using the former.
 			getLog().trace("Starting exit monitor");
 			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
-			exitMonitor.start();
-
+			
 			// Record a test outcome.
 			TestOutcome testOutcome = new TestOutcome();
 			testOutcome.setTestNumber(testNumber);

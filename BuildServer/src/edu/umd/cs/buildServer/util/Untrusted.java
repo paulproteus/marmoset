@@ -15,14 +15,19 @@ public class Untrusted {
         return builder.start();
     }
    
+    public static void destroyProcessTree(Process process, Logger log)  {
+            
+        destroyProcessTree(process, new ProcessTree(log), log);
+    }
+        
 
-    public static void destroyProcessTree(Process process, Logger log) {
+    public static void destroyProcessTree(Process process, ProcessTree tree,  Logger log) {
         int pid = 0;
         try {
             pid = MarmosetUtilities.getPid(process);
 
             log.info("Killing process tree for " + pid);
-            ProcessTree tree = new ProcessTree(log);
+            tree.computeChildren();
             tree.killProcessTree(pid, 9);
         } catch (Exception e) {
             log.warn("Error trying to kill process tree for " + pid, e);

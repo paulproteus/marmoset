@@ -21,13 +21,12 @@ public class ProcessTree {
     final Logger log;
     final String user;
     
-    public ProcessTree(Logger log) throws IOException {
+    public ProcessTree(Logger log)  {
         this.log = log;
         user = System.getProperty("user.name");
-        computeChildren();
     }
-    void computeChildren() throws IOException {
-        children.clear();
+    void computeChildren()  {
+        try {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "x", 
                         "-o", "pid,ppid,user,state,pcpu,args"});
         Process p = b.start();
@@ -59,6 +58,9 @@ public class ProcessTree {
          }
          s.close();
         p.destroy();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public  void killProcess(int pid, int signal) throws IOException, InterruptedException {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill", "-"+signal, Integer.toString(pid)} );
