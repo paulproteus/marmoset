@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -18,6 +19,7 @@ import com.google.common.collect.Multimap;
 public class ProcessTree {
     
     final Multimap<Integer, Integer> children =  ArrayListMultimap.create();  
+    final Set<Integer> live = new HashSet<Integer>();
     final Logger log;
     final String user;
     
@@ -26,6 +28,7 @@ public class ProcessTree {
         user = System.getProperty("user.name");
     }
     void computeChildren()  {
+        live.clear();
         try {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "x", 
                         "-o", "pid,ppid,user,state,pcpu,args"});
@@ -45,6 +48,7 @@ public class ProcessTree {
                     throw new IllegalStateException("Got " + Arrays.toString(fields));
                 int pid = Integer.parseInt(fields[0]);
                 int  ppid = Integer.parseInt(fields[1]);
+                live.add(pid);
                 children.put(ppid, pid);
             } catch (Exception e) {
                 log.error("Error while building process treee, parsing " + txt, e);
@@ -80,6 +84,7 @@ public class ProcessTree {
     public Set<Integer> findTree(int rootPid) {
         Set<Integer> result = new LinkedHashSet<Integer>();
         findTree(result, rootPid);
+        result.retainAll(live);
         return result;
     }
 
