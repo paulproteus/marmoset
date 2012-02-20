@@ -24,32 +24,54 @@
 
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 <!DOCTYPE HTML>
 <html>
 <ss:head
-	title="Confirm release request for submission ${ss:scrub(param.submissionPK)}" />
+	title="Confirm release request for submission ${submission.submissionNumber}" />
 
 <body>
 <ss:header />
 <ss:breadCrumb />
 
  <ss:releaseTokens/>
+ 
+ <c:choose>
+ <c:when test="${submission.releaseEligible}">
+                   
 
 <h2>Are you sure you want to release test submission
-${ss:scrub(param.submissionPK)}?</h2>
+ ${submission.submissionNumber} for project <c:out value="${project.projectNumber}"/>?</h2>
 
+<p>Submitted at <fmt:formatDate
+    value="${submission.submissionTimestamp}"
+    pattern="E',' dd MMM 'at' hh:mm a" />
+    </h2>
+<c:if
+    test="${submission.currentTestRunPK != testRun.testRunPK}">
+    <p>Warning: we don't have results from the current version of the test setup.
+    If you perform a release test, and upon testing with the current test setup
+    the submission isn't eligible for release testing, you won't be able to see the results
+    of release testing the submission.
+</c:if>
 <p>Click OK to release test this submission or the back button on your
 browser to cancel.</p>
 
 <c:url var="releaseRequestLink" value="/action/RequestReleaseTest" />
 
 <form method="POST" action="${releaseRequestLink}"><input type="hidden"
-	name="submissionPK" value="${ss:scrub(param.submissionPK)}"> 
+	name="submissionPK" value="${submission.submissionPK}"> 
 	<p><input type="submit"	value="OK"></p>
 </form>
 
+</c:when>
+<c:otherwise>
+<p>This submission is not eligible for release testing.
+</p>
+</c:otherwise>
+</c:choose>
 <ss:footer />
 </body>
 </html>

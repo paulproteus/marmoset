@@ -262,7 +262,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 			<%-- end if !release test requested --%>
 
 				<c:when
-					test="${submission.releaseEligible && submission.currentTestRunPK == testRun.testRunPK}">
+					test="${submission.releaseEligible}">
 					<p>This submission is eligible for release testing.
 					<c:choose>
 					<c:when test="${releaseInformation.releaseRequestOK}">
