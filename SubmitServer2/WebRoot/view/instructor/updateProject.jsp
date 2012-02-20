@@ -34,6 +34,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<ss:headContent title="Update project ${project.projectNumber} for ${course.courseName}" />
+
 <c:url var="jsBase" value="/js" />
 
 <link
@@ -96,7 +98,6 @@ function changedIsTested(isTested)
     
   });
 </script>
-<ss:headContent title="Update project ${project.projectNumber} for ${course.courseName}" />
 </head>
 <body>
 <ss:header />
@@ -166,7 +167,7 @@ function changedIsTested(isTested)
      </c:if>
      
     <td>  <INPUT TYPE="text" id="late-date" NAME="late-date" 
-        PLACEHOLDER="yyyy-mm-dd" size="12" required value="${lateDate}" />
+        PLACEHOLDER="yyyy-mm-dd" size="12" value="${lateDate}" />
     <INPUT TYPE="text" id="late-time" NAME="late-time" PLACEHOLDER="hh:mm aa" size="12"
      value="${lateTime}"  title="blank for one second before midnight">
      </td>
