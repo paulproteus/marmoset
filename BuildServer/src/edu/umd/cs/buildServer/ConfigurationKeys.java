@@ -84,11 +84,6 @@ public interface ConfigurationKeys {
 	 */
 	public static final String INSPECTION_TOOLS_PFX = "tools.";
 
-	/**
-	 * Root of instrumented source files to be used in place of "src" for
-	 * compiling.
-	 */
-	public static final String INSTRUMENTED_SRC_DIR = "inst-src";
 
 	/**
 	 * Hostname of build server. Maybe there's some way to get this in Java, but

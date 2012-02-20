@@ -47,6 +47,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.dom4j.DocumentException;
 
+import edu.umd.cs.buildServer.BuildServer;
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ConfigurationKeys;
@@ -294,16 +295,17 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		if (options != null) {
 			args.addAll(Arrays.asList(options));
 		}
+		
+		String commonPrefix = null;
+		
 		// // Compile all source files found in submission
 
 		// XXX Code now MUST be in a "src" directory!
 		if (generateCodeCoverage) {
 			List<String> newSourceFileList = new LinkedList<String>();
-			for (Iterator<String> ii = getSourceFiles().iterator(); ii
-					.hasNext();) {
-				String originalSourceFile = ii.next();
+			for (String originalSourceFile : getSourceFiles()) {
 				String newSourceFile = originalSourceFile.replaceAll("^src",
-						INSTRUMENTED_SRC_DIR);
+						BuildServer.INSTRUMENTED_SOURCE_DIR);
 				newSourceFileList.add(newSourceFile);
 			}
 			args.addAll(newSourceFileList);
