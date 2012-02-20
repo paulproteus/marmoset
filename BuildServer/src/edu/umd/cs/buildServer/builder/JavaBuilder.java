@@ -33,12 +33,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -191,6 +194,35 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		return null;
 	}
 
+	Collection<File> findJavaSourceFiles(File dir) throws IOException {
+	    Collection<File> javaFiles = new TreeSet<File>();
+	    Collection<String> all = new HashSet<String>();
+	    String root = dir.getCanonicalPath();
+	    
+	    findJavaSourceFiles(root, dir, javaFiles, all);
+	    return javaFiles;
+	}
+	    
+	void findJavaSourceFiles(String root, File dir, Collection<File> javaFiles, Collection<String> all) {
+	    for(File f : dir.listFiles()) {
+	        String fullpath;
+	        try {
+	            fullpath = f.getCanonicalPath();
+	        } catch (IOException e) {
+	            continue;
+	        }
+	        if (!all.add(fullpath))
+	            continue;
+	        if (!fullpath.startsWith(root)) 
+	            continue;
+	        
+	        if (f.isDirectory()) 
+	            findJavaSourceFiles(root, f, javaFiles, all);
+	        else if (fullpath.endsWith(".java")) {
+	            javaFiles.add(f);
+	        }
+	    }
+	}
 	/**
 	 * Compile the project.
 	 * @param generateCodeCoverage
@@ -302,13 +334,14 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 
 		// XXX Code now MUST be in a "src" directory!
 		if (generateCodeCoverage) {
-			List<String> newSourceFileList = new LinkedList<String>();
-			for (String originalSourceFile : getSourceFiles()) {
-				String newSourceFile = originalSourceFile.replaceAll("^src",
-						BuildServer.INSTRUMENTED_SOURCE_DIR);
-				newSourceFileList.add(newSourceFile);
-			}
-			args.addAll(newSourceFileList);
+		    try {
+                for(File j : findJavaSourceFiles(getProjectSubmission().getInstSrcDirectory())) {
+                    args.add(j.getPath());
+                }
+            } catch (IOException e) {
+                throw new BuilderException(e);
+            }
+			
 		} else {
 			// TODO rewrite the source files into the appropriate directory
 			// anyway
