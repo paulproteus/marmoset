@@ -85,6 +85,20 @@ public class DisplayProperties {
         }
         return sorted;
     }
+    
+    static int getSuffixStart(String s) {
+        int lastSlash = s.lastIndexOf('/');
+        int lastDot = s.lastIndexOf('.', lastSlash+1);
+        if (lastDot < 0)
+            return s.length();
+        return lastDot;
+    }
+    
+    static int getSuffixRank(String suffix) {
+        if (suffix.startsWith(".h"))
+            return 1;
+        return 2;
+    }
 
     public Comparator<String> fileComparator() {
         return new Comparator<String>() {
@@ -94,6 +108,17 @@ public class DisplayProperties {
                 int result = getRank(arg0) - getRank(arg1);
                 if (result != 0)
                     return result;
+                int i0 = getSuffixStart(arg0);
+                int i1 = getSuffixStart(arg1);
+                result = arg0.substring(0,i0).compareTo(arg1.substring(0,i1));
+                if (result != 0)
+                    return result;
+                String s0 = arg0.substring(i0).toLowerCase();
+                String s1 = arg1.substring(i1).toUpperCase();
+                result = getSuffixRank(s0) - getSuffixRank(s1);
+                if (result != 0)
+                    return result;
+               
                 return arg0.compareTo(arg1);
             }
         };
