@@ -50,6 +50,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Strings;
+
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment.Kind;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
@@ -200,6 +202,8 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 String name = request.getParameter(base + "name");
                 String presentation = request.getParameter(base + "presentation");
                 String rubricDescription = request.getParameter(base + "description");
+                if (Strings.isNullOrEmpty(name) || Strings.isNullOrEmpty(presentation))
+                    continue;
                 String data;
                 if (presentation.equals("NUMERIC")) {
                     Integer min = parser.getOptionalInteger(base + "min");
