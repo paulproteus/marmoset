@@ -66,11 +66,31 @@ tr.reject {background: #f33}
     <table id="pending-table">
         <tr>
             <th>Name</th>
+            <c:if test="${not empty course.sections}">
+            <th>Section</th>
+            </c:if>
             <th>Action</th>
         </tr>
         <c:forEach var="student" items="${pendingRegistrations}">
         <tr>
             <td><c:out value="${student.lastname}" />, <c:out value="${student.firstname}" /></td>
+            <c:if test="${not empty course.sections}">
+            <td>
+	            <select name="section-${student.studentPK}" id="section-${student.studentPK}-dropdown">
+	            	<c:set var="studentSection" value="${studentSections[student.studentPK]}" />
+	            	<c:forEach var="section" items="${course.sections}">
+	            	<c:choose>
+		            	<c:when test="${studentSection == section}">
+		            		<option value="${section}" selected="selected">${section}</option>
+		            	</c:when>
+		            	<c:otherwise>
+		            		<option value="${section}">${section}</option>
+		            	</c:otherwise>
+	            	</c:choose>
+	            	</c:forEach>
+	            </select>
+            </td>
+            </c:if>
             <td>
                 <c:set var="radioName" value="request-pk-${student.studentPK}" />
                 <input type="radio" name="${radioName}" value="accept" id="accept-${radioName}"/>

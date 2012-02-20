@@ -6,12 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Queries;
@@ -42,7 +45,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 
 	@Override
-  public boolean requestRegistration(int coursePK) {
+  public boolean requestRegistration(int coursePK, @Nullable String section) {
 	  Connection conn = null;
 	  PreparedStatement exists = null;
 	  PreparedStatement insert = null;
@@ -59,8 +62,8 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	    
 	    long timestamp = new Date().getTime();
 			insert = conn.prepareStatement("INSERT INTO registration_requests "
-			    + "(student_pk, course_pk, timestamp, status) VALUES (?, ? ,? ,?)");
-			Queries.setStatement(insert, student.getStudentPK(), coursePK, timestamp, RequestStatus.PENDING);
+			    + "(student_pk, course_pk, timestamp, status, section) VALUES (?, ?, ?, ?, ?)");
+			Queries.setStatement(insert, student.getStudentPK(), coursePK, timestamp, RequestStatus.PENDING, section);
 			insert.executeUpdate();
 	    return true;
     } catch (SQLException e) {
@@ -71,6 +74,11 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
     	Queries.close(conn);
     }
   }
+	
+	@Override
+	public boolean requestRegistration(int coursePK) {
+		return requestRegistration(coursePK, null);
+	}
 	
 	private boolean isInstructor(Connection conn, int coursePK) throws SQLException {
 	    if (student.isSuperUser())
@@ -126,8 +134,9 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 			// The following will return a row for every course where the dao's student is neither already
 			// registered nor has a pending/denied request.
 			stmt = conn.prepareStatement("SELECT * FROM courses "
-			    + "NATURAL LEFT JOIN (SELECT * FROM registration_requests WHERE student_pk = ?) AS requests "
-					+ "LEFT JOIN (SELECT * FROM student_registration WHERE student_pk = ?) "
+			    + "LEFT JOIN (SELECT * FROM registration_requests WHERE student_pk = ?) AS requests "
+				+ "ON requests.course_pk  = courses.course_pk "
+			    + "LEFT JOIN (SELECT * FROM student_registration WHERE student_pk = ?) "
 			    + "AS registrations ON registrations.course_pk = courses.course_pk "
 			    + "WHERE requests.student_pk IS NULL AND registrations.student_pk IS NULL");
 	  	Queries.setStatement(stmt, student.getStudentPK(), student.getStudentPK());
@@ -152,12 +161,14 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  PreparedStatement stmt = null;
 	  try {
 	  	conn = props.getConnection();
-	  	stmt = conn.prepareStatement("SELECT course_pk FROM registration_requests WHERE student_pk = ? AND status = ?");
+	  	stmt = conn.prepareStatement("SELECT * FROM registration_requests WHERE student_pk = ? AND status = ?");
 	  	Queries.setStatement(stmt, student.getStudentPK(), RequestStatus.PENDING);
 	  	ResultSet rs = stmt.executeQuery();
 	  	List<Course> courses = Lists.newArrayList();
 	  	while (rs.next()) {
-	  		courses.add(Course.getByCoursePK(rs.getInt(1), conn));
+	  		Course course = Course.getByCoursePK(rs.getInt("course_pk"), conn);
+	  		course.setSection(rs.getString("section"));
+			courses.add(course);
 	  	}
 	  	return courses;
     } catch (SQLException e) {
@@ -169,7 +180,12 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 
 	@Override
-  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK) {
+	  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK) {
+		return acceptRegistration(coursePK, studentPK, null);
+	}
+
+	@Override
+  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK, String section) {
 	  Connection conn = null;
 	  PreparedStatement stmt = null;
 	  try {
@@ -189,6 +205,9 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  	reg.setClassAccount(student.getLoginName());
 	  	reg.setFirstname(student.getFirstname());
 	  	reg.setLastname(student.getLastname());
+	  	if (!Strings.isNullOrEmpty(section)) {
+	  		reg.setSection(section);
+	  	}
 	  	reg.insert(conn);
 	  	
 	  	return true;
@@ -218,4 +237,30 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
     	Queries.close(conn);
     }
   }
+	
+	@Override
+	public Map<Integer, String> getRequestSection(int coursePK) {
+		  Connection conn = null;
+		  PreparedStatement stmt = null;
+		  try {
+		  	conn = props.getConnection();
+		  	Preconditions.checkArgument(isInstructor(conn, coursePK),
+		  	                            "DAO student must be an instructor for course");
+		  	stmt = conn.prepareStatement("SELECT * FROM registration_requests WHERE course_pk = ? AND status = ?");
+		  	Queries.setStatement(stmt, coursePK, RequestStatus.PENDING);
+		  	ResultSet rs = stmt.executeQuery();
+		  	Map<Integer, String> sections = Maps.newTreeMap();
+		  	while (rs.next()) {
+		  		@Student.PK int studentPK = Student.asPK(rs.getInt("student_pk"));
+		  		String section = rs.getString("section");
+		  		sections.put(studentPK, section);
+		  	}
+		  	return sections;
+	    } catch (SQLException e) {
+		    throw new RuntimeException(e);
+	    } finally {
+	    	Queries.closeStatement(stmt);
+	    	Queries.close(conn);
+	    }
+	}
 }

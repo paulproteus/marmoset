@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Strings;
+
 import edu.umd.cs.marmoset.modelClasses.BrowserEditing;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
@@ -273,8 +275,12 @@ public class RequestParser {
 		// these two CANNOT be null
 		course.setSemester(getCheckedParameter("semester"));
 		course.setCourseName(getCheckedParameter("courseName"));
-
+		
 		// these can be null
+		String sectionsCsv = request.getParameter("sections");
+		if (!Strings.isNullOrEmpty(sectionsCsv)) {
+			course.setSections(sectionsCsv.split(","));
+		}
 		course.setDescription(getOptionalCheckedParameter("description"));
 		course.setUrl(getOptionalCheckedParameter("url"));
 		course.setBrowserEditing(BrowserEditing.valueOfAnyCase(

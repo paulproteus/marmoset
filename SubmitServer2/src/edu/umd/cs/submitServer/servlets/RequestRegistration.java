@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.common.base.Strings;
+
+
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
@@ -38,7 +41,12 @@ public class RequestRegistration extends SubmitServerServlet {
 					continue;
 				}
 				int coursePK = Integer.parseInt(matcher.group(1));
-				dao.requestRegistration(coursePK);
+				String section = req.getParameter(name);
+				if (!Strings.isNullOrEmpty(section)) {
+					dao.requestRegistration(coursePK, section);
+				} else {
+					dao.requestRegistration(coursePK);
+				}
 			}
 		} catch (SQLException e) {
 			throw new ServletException(e);

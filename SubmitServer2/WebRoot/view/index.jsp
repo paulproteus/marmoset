@@ -42,6 +42,13 @@
 <html>
 <head>
 <ss:headContent title="Submit Server Home Page" />
+<style>
+label.error {
+	display: block;
+	color: red;
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
     <ss:header />
@@ -100,11 +107,22 @@
             <table>
                 <tr>
                     <th>Course Name</th>
+                    <th>Section</th>
                     <th>Course Description</th>
                 </tr>
                 <c:forEach var="course" items="${pendingRequests}">
                     <tr>
-                        <td><c:out value="${course.fullname}" /></td>
+                    	<td><c:out value="${course.fullname}" /></td>
+                    	<td>
+                    		<c:choose>
+                    		<c:when test="${not empty course.section}" >
+                    		<c:out value="${course.section}" />
+                    		</c:when>
+                    		<c:otherwise>
+                    		N/A
+                    		</c:otherwise>
+                    		</c:choose>
+                    	</td>
                         <td><c:out value="${course.description}" /></td>
                         <!-- TODO(rwsims): Allow students to cancel registration requests? -->
                     </tr>
@@ -117,23 +135,42 @@
         <div id="open-list">
             <h2>Courses open for enrollment</h2>
             <c:url var="registrationAction" value="/action/RequestRegistration" />
-            <form method="POST" action="${registrationAction}">
+            <form id="request-registration-form" method="POST" action="${registrationAction}">
                 <table id="open-course-table">
                     <tr>
-                        <th><input type="checkbox" id="toggle-all" /></th>
+                        <th>&nbsp;</th>
                         <th>Course Name</th>
                         <th>Description</th>
                     </tr>
                     <c:forEach var="course" items="${openCourses}">
                         <tr>
                             <c:set var="checkboxName" value="course-pk-${course.coursePK}" />
-                            <td><input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" /></td>
+                            <td>
+                            <c:choose>
+                            	<c:when test="${not empty course.sections}">
+                            		<select name="${checkboxName}" id="${checkboxName}-box">
+                            			<option value="">--section--</option>
+                            			<c:forEach var="section" items="${course.sections}">
+                            				<option value="${section}">${section}</option>
+                            			</c:forEach>
+                            		</select>
+                            	</c:when>
+                            	<c:otherwise>
+                            		<input type="checkbox" name="${checkboxName}" id="${checkboxName}-box" value="" />
+                            		<label for="${checkboxName}-box">Register</label>
+                            	</c:otherwise>
+                            </c:choose>
+                            </td>
                             <td><label for="${checkboxName}-box"><c:out value="${course.fullname}" /></label></td>
-                            <td><c:out value="${course.description}" /></td>
+                            <td><c:out value="${course.description}" />
+								
+							</td>
                         </tr>
                     </c:forEach>
                     <tr>
-                        <td colspan="3"><input type="submit" value="Request enrollment" /></td>
+                        <td colspan="3">
+                    	<input type="submit" value="Request enrollment" />
+                    	</td>
                     </tr>
                 </table>
             </form>
@@ -142,19 +179,16 @@
 
     <ss:footer />
 
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script type="text/javascript">
 					window.$marmoset = {
 						toggleAll : $("#toggle-all"),
 						openCourseTable : $("#open-course-table")
 					};
-
-					$marmoset.toggleAll.click(function(event) {
-						var checked = $marmoset.toggleAll.is(":checked");
-						$marmoset.openCourseTable
-								.find('input[type="checkbox"]').each(
-										function(index, box) {
-											box.checked = checked;
-										});
+					$("#request-registration-form").validate({
+						errorPlacement: function(error, element) {
+							error.insertBefore(element);
+						}
 					});
 				</script>
 </body>
