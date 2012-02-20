@@ -66,6 +66,8 @@ public class FixZip {
                     String s = map.get(name);
                     if (s != null)
                         return s;
+                    else if (name.endsWith(".java"))
+                        return "src/" + name;
                     return name;
                 }
             };
