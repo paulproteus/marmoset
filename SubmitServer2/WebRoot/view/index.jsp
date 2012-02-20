@@ -131,7 +131,7 @@ label.error {
         </div>
     </c:if>
 
-    <c:if test="${not empty openCourses}">
+    <c:if test="${not empty openCourses && !user.superUser}">
         <div id="open-list">
             <h2>Courses open for enrollment</h2>
             <c:url var="registrationAction" value="/action/RequestRegistration" />
