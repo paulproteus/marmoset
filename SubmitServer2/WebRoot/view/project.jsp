@@ -141,6 +141,11 @@
 			value="/view/submissionAllTests.jsp">
 			<c:param name="submissionPK" value="${submission.submissionPK}" />
 		</c:url>
+        <c:url var="releaseRequestLink"
+                            value="/view/confirmReleaseRequest.jsp">
+                            <c:param name="submissionPK" value="${submission.submissionPK}" />
+                        </c:url>
+                       
 
 		<tr class="r${counter.index % 2}">
 			<td>${submission.submissionNumber}</td>
@@ -170,8 +175,17 @@
 							<td><fmt:formatDate value="${submission.releaseRequest}"
 								pattern="E 'at' hh:mm a" /></td>
 						</c:when>
+                        <c:when test="${submission.releaseEligible && submission.currentTestRunPK == testRun.testRunPK}">
+                        <td colspan="2">
+                        <c:url var="releaseRequestLink"
+                            value="/view/confirmReleaseRequest.jsp">
+                            <c:param name="submissionPK" value="${submission.submissionPK}" />
+                        </c:url>
+                        <a href="${releaseRequestLink}">perform release</a>
+                        </td>
+                        </c:when>
 						<c:otherwise>
-							<td colspan="2">?</td>
+							<td colspan="2">--</td>
 						</c:otherwise>
 					</c:choose>
 					<c:if test="${testProperties.language=='java' or testProperties.language=='Java'}">
