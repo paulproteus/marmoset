@@ -31,8 +31,7 @@ public class Project0 {
          * You need to replace the throw statement with your implementation of
          * the method.
          */
-        return x*x;
-        // throw new UnsupportedOperationException("not implemented yet");
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
 }

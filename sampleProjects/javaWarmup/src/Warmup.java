@@ -1,7 +1,12 @@
 /**
  * A set of static methods you need to implement for this Java warmup.
+ * These method all involve integer parameters, and many require you to perform
+ * operations such as division and reminder. Using bit operations (shifting and
+ * masking) is useful for several, although not strictly needed. 
  * 
- * Do not change the method names or arguments. If you do, the tests will fail.
+ * 
+ * Make your changes in this file. Do not change the method names or arguments. 
+ * If you do, the tests will fail.
  * 
  * In each method, replace the "throw new Unsupported..." statement with your
  * implementation. Those throw statements are there to indicate which functions

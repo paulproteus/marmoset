@@ -5,13 +5,13 @@
 
 
 	<target name="all" depends="submission,test,test.setup"/>
-	<target name="clean">
+	<target name="clean" description="Delete all generated files">
 		<delete dir="bin"/>
 		<mkdir dir="bin"/>
 		<delete file="submission.zip"/>
 		<delete file="test-setup.zip"/>
 		</target>
-	<target name="compile">
+	<target name="compile" description="compile the java source files">
 		<mkdir dir="bin"/>
 		<javac
                         destdir="bin"
@@ -20,7 +20,7 @@
                         deprecation="off"
                         debug="on"/>
 	</target>
-	<target name="test.setup" depends="compile">
+	<target name="test.setup" depends="compile" description="create the test setup file for Marmoset">
 		<delete file="${setup.name}"/>
 		<mkdir dir="bin"/>
 
@@ -31,7 +31,7 @@
 			<fileset dir="." includes="test.properties"/>
 		</zip>
 	</target>
-	<target name="test" depends="compile">
+	<target name="test" depends="compile" description="run the junit tests">
 		<junit>
 			<classpath>
 				<pathelement path="bin"/>
@@ -44,10 +44,10 @@
 
 	</target>
 
-	<target name="submission">
+	<target name="submission" description="build a zip file containing the submission">
 		<delete file="${submission.name}"/>
 		<zip destfile="${submission.name}">
-			<fileset dir="." includes=".submit,.submitUser,src/**"/>
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
 		</zip>
 	</target>
 
