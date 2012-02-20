@@ -102,7 +102,7 @@ public class UpdateCodeReviewAssignment extends SubmitServerServlet {
              =     (Map<Integer, Submission>) request.getAttribute("submissionsThatNeedReview");
 			 for(Submission s :submissionsThatNeedReview.values() ) {
 			 StudentRegistration sr = StudentRegistration.lookupByStudentRegistrationPK(s.getStudentRegistrationPK(), conn);
-			 System.out.printf("Adding review for submission %s by %s : %s at %tc%n",
+			 System.out.printf("Adding review for submission %d by %s : %s at %tc%n",
 			         s.getSubmissionNumber(), sr.getClassAccount(), sr.getFullname(), s.getSubmissionTimestamp());
 			 
 			 }

@@ -127,7 +127,7 @@ public class AddSubmissionsToCodeReviewAssignment extends SubmitServerServlet {
                     out.printf("    no submission found%n");
                     
                 } else
-                    out.printf("    submission %s at %tc%n", s.getSubmissionNumber(), s.getSubmissionTimestamp());
+                    out.printf("    submission %d at %tc%n", s.getSubmissionNumber(), s.getSubmissionTimestamp());
             }
             out.close();
             return;

@@ -131,7 +131,7 @@ public class Submission implements ITestSummary<Submission> {
 	private @Project.PK int projectPK = 0; 
 	private int numTestRuns = 0;
 	private @CheckForNull Integer currentTestRunPK; // may be NULL
-	private String submissionNumber = "0";
+	private int submissionNumber = 0;
 	private Timestamp submissionTimestamp;
 	private String cvsTagTimestamp;
 	private Timestamp buildRequestTimestamp;
@@ -501,15 +501,21 @@ public class Submission implements ITestSummary<Submission> {
 	/**
 	 * @return Returns the submissionNumber.
 	 */
-	public String getSubmissionNumber() {
+	public int getSubmissionNumber() {
 		return submissionNumber;
 	}
 	/**
 	 * @param submissionNumber The submissionNumber to set.
 	 */
 	public void setSubmissionNumber(String submissionNumber) {
-		this.submissionNumber = submissionNumber;
+		this.submissionNumber = Integer.parseInt(submissionNumber);
 	}
+	/**
+     * @param submissionNumber The submissionNumber to set.
+     */
+    public void setSubmissionNumber(int submissionNumber) {
+        this.submissionNumber = submissionNumber;
+    }
 	/**
 	 * @return Returns the submissionPK.
 	 */
@@ -919,7 +925,7 @@ public class Submission implements ITestSummary<Submission> {
 	    stmt.setInt(index++, getProjectPK());
 	    stmt.setInt(index++, getNumTestRuns());
 	    SqlUtilities.setInteger(stmt, index++, getCurrentTestRunPK());
-	    stmt.setString(index++, getSubmissionNumber());
+	    stmt.setString(index++, Integer.toString(getSubmissionNumber()));
 	    stmt.setTimestamp(index++, getSubmissionTimestamp());
 	    stmt.setBoolean(index++, isMostRecent());
 	    stmt.setString(index++, getCvsTagTimestamp());
