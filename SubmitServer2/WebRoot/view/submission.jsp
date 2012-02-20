@@ -272,7 +272,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 						</c:url>
 						<p>
 						<h3>
-						<a href="${releaseRequestLink}"> Click here to release test this
+						<a href="${releaseRequestLink}"> Release test this
 						submission </a>
 						</h3>
 					</c:when>
