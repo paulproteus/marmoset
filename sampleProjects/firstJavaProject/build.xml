@@ -1,0 +1,54 @@
+<project name="Warmup" default="all" basedir=".">
+
+	<property name="setup.name" value="test-setup.zip"/>
+	<property name="submission.name" value="submission.zip"/>
+
+
+	<target name="all" depends="submission,test,test.setup"/>
+	<target name="clean">
+		<delete dir="bin"/>
+		<mkdir dir="bin"/>
+		<delete file="submission.zip"/>
+		<delete file="test-setup.zip"/>
+		</target>
+	<target name="compile">
+		<mkdir dir="bin"/>
+		<javac
+                        destdir="bin"
+                        srcdir="src"
+                        includeantruntime="true"
+                        deprecation="off"
+                        debug="on"/>
+	</target>
+	<target name="test.setup" depends="compile">
+		<delete file="${setup.name}"/>
+		<mkdir dir="bin"/>
+
+		<zip destfile="${setup.name}">
+			<fileset dir="bin"
+				includes="PublicTests.class,ReleaseTests.class"
+				/>
+			<fileset dir="." includes="test.properties"/>
+		</zip>
+	</target>
+	<target name="test" depends="compile">
+		<junit>
+			<classpath>
+				<pathelement path="bin"/>
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<test name="PublicTests"/>
+			<test name="StudentTests"/>
+			<test name="ReleaseTests"/>
+		</junit>
+
+	</target>
+
+	<target name="submission">
+		<delete file="${submission.name}"/>
+		<zip destfile="${submission.name}">
+			<fileset dir="." includes=".submit,.submitUser,src/**"/>
+		</zip>
+	</target>
+
+</project>
