@@ -93,6 +93,10 @@ div.rubric-editing {
 div.rubric-row-controls {
     float: right;
 }
+div.rubric-editing label:first-child {
+    width: 5em;
+    display: inline-block;
+}
 </style>
 
 </head>
@@ -111,13 +115,13 @@ div.rubric-row-controls {
             Fill out the following form to create a new code review for project
             <c:out value="${project.fullTitle}" />
         </p>
-
-
     </div>
 
 
 <c:url value="/action/instructor/CreateCodeReviewAssignment" var="createAssignmentAction" />
 <form action="${createAssignmentAction}" method="POST" id="code-review-creation">
+    <input type="hidden" name="coursePK" value="${course.coursePK}" />
+    <input type="hidden" name="projectPK" value="${project.projectPK}" />
     <fieldset id="basic-review-info">
         <ul class="form-fields">
 	        <li>
@@ -353,11 +357,12 @@ div.rubric-row-controls {
                 <input type="hidden" name="{{=prefix}}-presentation" value="{{=presentation}}" />
                 <div class="rubric-editing">
                 <div>
-                <label for="{{=prefix}}-name">{{=header}}</label>
+                <label for="{{=prefix}}-name">{{=header}}: </label>
                 <input type="text" id="{{=prefix}}-name" name="{{=prefix}}-name" size="20" required="required" placeholder="Name of rubric item"/>
                 <input type="text" name="{{=prefix}}-description" size="50" placeholder="a longer description of this rubric item"/>
                 </div>
                 <div>
+                <label>Edit points:</label>
                 {{=editWidgets!}}
                 </div>
                 </div>

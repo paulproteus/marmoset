@@ -266,9 +266,11 @@ marmoset.RubricManager.prototype._addRubric = function(template, values) {
     var row = this.templates.rubric.render(values);
     var result = $(row).appendTo(this.table);
     var manager = this;
-    $(result).find("#" + values.prefix + "-delete").click(function(event) {
-    	manager._deleteRubric(this.value);
-    });
+    $(result).find("#" + values.prefix + "-delete")
+    	.button()
+    	.click(function(event) {
+    		manager._deleteRubric(this.value);
+    	});
     $(this).trigger('change');
 };
 
