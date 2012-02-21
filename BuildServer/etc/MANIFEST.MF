@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: edu.umd.cs.buildServer.BuildServerDaemon
-Class-Path: lib/modelClasses.jar lib/findbugs.jar lib/clover.jar lib/commons-io.jar lib/commons-httpclient.jar lib/commons-logging.jar lib/junit.jar lib/jaxen.jar lib/bcel.jar lib/log4j.jar lib/dom4j.jar lib/guava-11.0.1.jar 
+Class-Path: lib/modelClasses.jar lib/findbugs.jar lib/clover.jar lib/commons-io.jar lib/commons-httpclient.jar lib/commons-logging.jar lib/junit.jar lib/jaxen.jar lib/bcel.jar lib/log4j.jar lib/dom4j.jar lib/guava-11.0.1.jar lib/commons-cli-1.2.jar

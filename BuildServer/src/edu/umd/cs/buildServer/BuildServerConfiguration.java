@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * BuildServerConfiguration Contains all information passed to the BuildServer
@@ -56,7 +57,6 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	private File buildServerHome;
 	private File buildServerRoot;
 	private String hostname;
-	private String[] supportedCoursesArr;
 	private List<String> supportedCourseList;
 	private String supportedCourses;
 
@@ -85,17 +85,27 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	public BuildServerConfiguration() {
 	}
 	
-	public  File getBuildServerRoot(Configuration config) throws MissingConfigurationPropertyException {
-	    try {
-	    URL location = BuildServerConfiguration.class.getProtectionDomain().getCodeSource().getLocation();
-	    File f = new File(location.toURI());
-	    return f.getParentFile();
-	    } catch (Exception e) {
-	    String root = config
-        .getRequiredProperty(ConfigurationKeys.BUILDSERVER_ROOT);
-	    return new File(root);
-	    }
-	}
+    public static @CheckForNull
+    File getBuildServerRootFromCodeSource() {
+        try {
+            URL location = BuildServerConfiguration.class.getProtectionDomain()
+                    .getCodeSource().getLocation();
+            File f = new File(location.toURI());
+            return f.getParentFile();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public @Nonnull File getBuildServerRoot(Configuration config)
+            throws MissingConfigurationPropertyException {
+        File f = getBuildServerRootFromCodeSource();
+        if (f != null)
+            return f;
+        String root = config
+                .getRequiredProperty(ConfigurationKeys.BUILDSERVER_ROOT);
+        return new File(root);
+    }
 
 	public String getLocalHostName(Configuration config) {
 	    String name = config.getOptionalProperty(ConfigurationKeys.HOSTNAME);

@@ -36,6 +36,12 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.security.SecureRandom;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -106,11 +112,29 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		// EARLY is necessary
 		// TODO: Make getter methods in Config for the required params
 		// (build.directory, test.files.directory, etc)
-	    InputStream defaultConfig 
-	        = BuildServerDaemon.class.getResourceAsStream("defaultConfig.properties");
-	    getConfig().load(defaultConfig);
-		getConfig().load(
-				new BufferedInputStream(new FileInputStream(configFile)));
+        InputStream defaultConfig = BuildServerDaemon.class
+                .getResourceAsStream("defaultConfig.properties");
+        getConfig().load(defaultConfig);
+        if (configFile == null) {
+            File root = BuildServerConfiguration
+                    .getBuildServerRootFromCodeSource();
+
+            if (root == null) {
+                throw new IllegalStateException(
+                        "No config file specified and could not determine buildserver root");
+
+            }
+            File localConfig = new File(root, "config.properties");
+            if (!localConfig.exists() || !localConfig.canRead())
+                throw new IllegalStateException(
+                        "No config file specified and not found at "
+                                + localConfig);
+
+            configFile = localConfig.getAbsolutePath();
+        }
+
+        getConfig().load(
+                new BufferedInputStream(new FileInputStream(configFile)));
 
 		// I'm setting the clover binary database in this method rather than in
 		// the config.properties file because it always goes into /tmp and I
@@ -447,13 +471,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * edu.umd.cs.buildServer.BuildServer#reportTestResults(edu.umd.cs.buildServer
-	 * .ProjectSubmission)
-	 */
+
 	@Override
 	protected void reportTestResults(ProjectSubmission projectSubmission)
 			throws MissingConfigurationPropertyException {
@@ -592,73 +610,85 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	/**
 	 * Command-line interface.
 	 */
-	public static void main(String[] args) {
-		if (args.length < 1 || args.length > 4) {
-			System.err.println("Usage: " + BuildServerDaemon.class.getName()
-					+ " <config properties> [ once | <submissionPK>  [<testPK> [<log4j-level>]]");
-			System.exit(1);
-		}
-
-		Protocol easyhttps = new Protocol("https",
-				new EasySSLProtocolSocketFactory(), 443);
-		Protocol.registerProtocol("easyhttps", easyhttps);
-
-		final String configFile = args[0];
-		BuildServerDaemon buildServer = new BuildServerDaemon();
-		buildServer.setConfigFile(configFile);
-
-		try {
-			buildServer.initConfig();
-			// Setting "once" on the command line forces the BuildServer to
-			// run once and print all output to standard out.
-			// Equivalent to setting "debug.donotloop=true" and
-			// "log.directory=console"
-			// in the config.properties file, without actually having to edit
-			// the file.
-			if (args.length > 1 && args[1].length() > 0) {
-				buildServer.getConfig().setProperty(LOG_DIRECTORY, "console");
-				buildServer.getConfig().setProperty(DEBUG_DO_NOT_LOOP, "true");
-				buildServer.getConfig().setProperty(
-						DEBUG_PRESERVE_SUBMISSION_ZIPFILES, "true");
-				if (args[1].equalsIgnoreCase("once")) {
-				    if (args.length == 3)
-				        buildServer.getConfig().setProperty(
-				                LOG4J_THRESHOLD, args[2]);
-                        
-				} else {
-					try {
-						Integer.parseInt(args[1]);
-						buildServer.getConfig().setProperty(
-								DEBUG_SPECIFIC_SUBMISSION, args[1]);
-						if (args.length >= 3) {
-							Integer.parseInt(args[2]);
-							buildServer.getConfig().setProperty(
-									DEBUG_SPECIFIC_TESTSETUP, args[2]);
-							if (args.length >= 4)
-		                        buildServer.getConfig().setProperty(
-		                                LOG4J_THRESHOLD, args[3]);
-						}
-					} catch (NumberFormatException e) {
-						throw new NumberFormatException("'" + args[1] + "'"
-								+ " isn't a valid submissionPK");
-					}
-				}
-
-			}
-
-			buildServer.executeServerLoop();
-			buildServer.getLog().info("Shutting down");
-			timedSystemExit0();
-		} catch (Exception e) {
-
-			getBuildServerLog()
-					.fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
-							e);
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
 	
+	public static Options getOptions() {
+	    Options options = new Options();
+        Option configFile = OptionBuilder.withArgName( "file" )
+                .hasArg()
+                .withDescription(  "use given config file" )
+                .create( "config");
+        Option submission = OptionBuilder.withArgName( "submissionPK" )
+                .hasArg()
+                .withDescription(  "test the specified submission" )
+                .create( "submission");
+        Option testSetup = OptionBuilder.withArgName( "testSetupPK" )
+                .hasArg()
+                .withDescription(  "use the specified test setup" )
+                .create( "testSetup");
+        Option logLevel = OptionBuilder.withArgName("logLevel")
+                .hasArg().withDescription("Log4j log level")
+                .create("logLevel");
+        Option onceOption = new Option( "once", "quit after handling one request" );
+        options.addOption(configFile);
+        options.addOption(submission);
+        options.addOption(testSetup);
+        options.addOption(onceOption);
+        return options;
+	}
+	public static void main(String[] args) throws Exception {
+	      CommandLineParser parser = new GnuParser();
+	    Options  options = getOptions();
+	    CommandLine line = parser.parse( options, args );
+	    
+	  
+	   Protocol easyhttps = new Protocol("https",
+                new EasySSLProtocolSocketFactory(), 443);
+        Protocol.registerProtocol("easyhttps", easyhttps);
+
+        BuildServerDaemon buildServer = new BuildServerDaemon();
+        if (line.hasOption("config")) {
+            String c = line.getOptionValue("config");
+            buildServer.setConfigFile(c);
+        }
+           
+        boolean once = line.hasOption("once");
+
+        if (line.hasOption("submission")) {
+            once = true;
+            buildServer.getConfig().setProperty(DEBUG_SPECIFIC_SUBMISSION,
+                    line.getOptionValue("submission"));
+            if (line.hasOption("testSetup"))
+                buildServer.getConfig().setProperty(DEBUG_SPECIFIC_TESTSETUP,
+                        line.getOptionValue("testSetup"));
+        } else if (line.hasOption("testSetup")) {
+            throw new IllegalArgumentException(
+                    "You can only specify a specific test setup if you also specify a specific submission");
+        }
+        if (line.hasOption("logLevel"))
+            buildServer.getConfig().setProperty(LOG4J_THRESHOLD,
+                    line.getOptionValue(line.getOptionValue("logLevel")));
+
+        if (once) {
+            buildServer.getConfig().setProperty(LOG_DIRECTORY, "console");
+            buildServer.getConfig().setProperty(DEBUG_DO_NOT_LOOP, "true");
+            buildServer.getConfig().setProperty(
+                    DEBUG_PRESERVE_SUBMISSION_ZIPFILES, "true");
+        }
+        buildServer.initConfig();
+        try {
+            buildServer.executeServerLoop();
+            buildServer.getLog().info("Shutting down");
+            timedSystemExit0();
+        } catch (Exception e) {
+
+            getBuildServerLog()
+                    .fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
+                            e);
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
 	public static void timedSystemExit0() {
 		Thread t = new Thread(new Runnable() {
 			
