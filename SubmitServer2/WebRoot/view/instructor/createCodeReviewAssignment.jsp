@@ -45,24 +45,55 @@
 
 <script type="text/javascript">
 	$(function() {
-		$('#deadline-date').datepicker({
-			minDate : -1,
-			defaultDate : +7,
-			dateFormat : "yy-mm-dd",
-			onSelect : function(selectedDate) {
 
-				$("#deadline-time").focus();
-			}
-		});
-
-		$("#deadline-time").timePicker({
-			show24Hours : false,
-			step : 60,
-			defaultTime : "06:00 PM"
-		});
 	});
 </script>
 
+<style type="text/css">
+form {
+    margin-right: 5em;
+}
+ul.form-fields > li > label {
+    display: block;
+}
+ul.form-fields > li {
+    margin-top: 1em;
+}
+ul.form-fields li:first-child {
+    margin-top: 0px;
+}
+ul.form-fields ul.reviewer-list {
+    margin-left: 2em;
+}
+form ul {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+fieldset {
+    border: 1px solid black;
+    margin-bottom: 1em;
+}
+fieldset:first-child {
+    margin-top: 1em;
+}
+fieldset h3 {
+    margin: 0px;
+}
+ul#rubric-list > li {
+    margin-top: 1em;
+    border: 1px solid black;
+    padding: 0.5em;
+    overflow: auto;
+    width: 90%;
+}
+div.rubric-editing {
+    float: left;
+}
+div.rubric-row-controls {
+    float: right;
+}
+</style>
 
 </head>
 
@@ -84,50 +115,18 @@
 
     </div>
 
-<script type="text/javascript">
-function updateForm(kind) {
-	console.log(kind);
-	switch(kind) {
-	case "none" : hideItem("instructional"); hideItem("instructionalBySection"); 
-	  hideItem("anonymity"); hideItem("exemplar"); hideItem("number");  
-	  break;
-	case "instructional" : showItem("instructional"); hideItem("instructionalBySection"); 
-      hideItem("anonymity"); hideItem("exemplar"); hideItem("number");  
-      break;
-    case "instructionalBySection" : hideItem("instructional"); showItem("instructionalBySection"); 
-      hideItem("anonymity"); hideItem("exemplar"); hideItem("number");  
-      break;
-    case "peer" : hideItem("instructional"); hideItem("instructionalBySection"); 
-      showItem("anonymity"); hideItem("exemplar"); showItem("number");  
-      break;
-    case "exemplar" : hideItem("instructional"); hideItem("instructionalBySection"); 
-      showItem("anonymity"); showItem("exemplar"); hideItem("number");  
-      break;
-    default:
-    	console.log("Unknown kind");
-	}
-	
-}</script>
-    <p>
-    <form class="form" action='<c:url value="/action/instructor/CreateCodeReviewAssignment"/>' method="POST"
-        name="createCodeReviewForm">
 
-        <input type="hidden" name="coursePK" value="${course.coursePK}"> <input type="hidden" name="projectPK"
-            value="${project.projectPK}" />
-
-          <table class="form">
-            <colgroup>
-                <COL class="label" width="230" />
-                <COL class="input" />
-            </colgroup>
-            <thead>
-                <tr>
-                    <td class="label">review kind</td>
-                    <td class="input"><select name="kind" onchange="updateForm(this.options[this.selectedIndex].value);">
-                            <option value="notSelected">-- choose --</option>
+<c:url value="/action/instructor/CreateCodeReviewAssignment" var="createAssignmentAction" />
+<form action="${createAssignmentAction}" method="POST" id="code-review-creation">
+    <fieldset id="basic-review-info">
+        <ul class="form-fields">
+	        <li>
+	           <label for="codereview-kind">Review kind:</label>
+	           <select name="kind" id="codereview-kind" required="required">
                             <option value="instructional"
+                                selected="selected"
                                 title="Select staff members that divy up all student submissions to review">Instructional</option>
-                            <c:if test="${not empty sections}">
+                            <c:if test="${not empty course.sections}">
                                 <option value="instructionalBySection"
                                     title="One staff member does all reviews for each section">Instructional by
                                     section</option>
@@ -136,162 +135,236 @@ function updateForm(kind) {
                             <option value="exemplar"
                                 title="Students are all asked to review a example or exemplar submission by a staff member">Student
                                 review of an example/exemplar submission</option>
-                    </select></td>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr class="submit">
-                    <td colspan="2">Add rubrics:
-                        <button id="add-numeric-button">Add Numeric</button>
-                        <button id="add-dropdown-button">Add Dropdown</button>
-                        <button id="add-checkbox-button">Add Checkbox</button>
-
-                    </td>
-                </tr>
-
-                <tr class="submit">
-                    <td colspan="2"><input type="submit" value="Create Code Review"></td>
-                </tr>
-            </tfoot>
-            <tbody id="main">
-                <tr>
-                    <td class="label">description</td>
-                    <td class="input"><INPUT TYPE="text" NAME="description" size="60" required="required"></td>
-
-                </tr>
-                <tr>
-                    <td class="label">deadline</td>
-                    <td class="input"><INPUT TYPE="text" id="deadline-date" NAME="deadline-date" PLACEHOLDER="yyyy-mm-dd"
-                        size="12" required="required"> <INPUT TYPE="text" id="deadline-time" NAME="deadline-time"
-                        PLACEHOLDER="hh:mm aa" size="12" title="leave time blank for one second before midnight" /></td>
-                </tr>
-
-                <!-- 
-instructional: 
-  review of all student code
-  hide anonymous, code to review, # of reviews, can see comments
-  show reviewers
-instructionalBySection:
-  hide anonymous, code to review, # of reviews, can see comments
-  for each section, select reviewer
-peer
-  show anonymous, can see comments, # of reviews
-  hide code to review
-exemplar
-  studentReviewOptions: show show anonymous, can see comments
-  code to review
-  hide number of reviews
-
--->
-            </tbody>
-            <tbody id="instructional" style="display: none">
-                <tr>
-                    <td class="label">Reviewers<br></td>
-                    <td class="input"><c:forEach var="studentRegistration" items="${courseInstructors}"
-                            varStatus="counter">
-                           <c:if test="${not counter.first}"> <br></c:if>
-                            <INPUT TYPE="CHECKBOX" NAME="reviewer-${studentRegistration.studentPK}">
-                            <c:out value="${studentRegistration.fullname}" />
-                        </c:forEach></td>
-                </tr>
-            </tbody>
-            <tbody id="instructionalBySection" style="display: none">
-                <tr>
-                    <td class="label">Reviewers for each section
-                    <td class="input"><c:forEach var="section" items="${sections}">
+	           </select>
+	        </li>
+	        <li>
+	           <label for="code-review-description">Description:</label>
+	           <input type="text" size="60" required="required" name="description" id="code-review-description" />
+	        </li>
+	        <li>
+	           <label for="codereview-deadline-date">Deadline:</label>
+	           <input type="date" id="codereview-deadline-date" name="deadline-date" placeholder="yyyy-mm-dd" size="12" required="required" />
+	           <input type="time" id="codereview-deadline-time" name="deadline-time" placeholder="hh:mm aa" size="12" title="leave blank for 1 second before midnight" />
+	        </li>
+            <li id="anonymity-info">
+                <label>Anonymous:</label>
+                    <ul>
+                        <li>
+                            <input type="radio" name="anonymous" value="true" id="yes-anonymous"/>
+                            <label for="yes-anonymous">Yes</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="anonymous" value="false" id="no-anonymous" checked="checked"/>
+                            <label for="no-anonymous">No</label>
+                        </li>
+                    </ul>
+            </li>
+            <li id="visibility-info">
+                <label>Other reviewers' comments:</label>
+                     <ul>
+                        <li>
+                            <input type="radio" name="canSeeOthers" value="true" id="can-see-others"/>
+                            <label for="can-see-others">Visible</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="canSeeOthers" value="false" id="cant-see-others" checked="checked"/>
+                            <label for="cant-see-others">Hidden</label>
+                        </li>
+                    </ul>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset id="instructional-review-info">
+    <h3>Instructional Review</h3>
+        <ul class="form-fields">
+            <li>
+                <label>Choose reviewers:</label>
+                <ul class="reviewer-list">
+                    <c:forEach var="studentRegistration" items="${courseInstructors}">
+                    <li>
+                        <input type="checkbox" id="instructional-reviewer-${studentRegistration.studentPK}" name="reviewer-${studentRegistration.studentPK}">
+                        <label for="instructional-reviewer-${studentRegistration.studentPK}"><c:out value="${studentRegistration.fullname}" /></label>
+                    </li>
+                    </c:forEach>
+                </ul>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset id="instructional-by-section-info">
+    <h3>Instructional Review by Section</h3>
+        <ul class="form-fields">
+            <li>
+                <label>Choose a reviewer for each section:</label>
+                <ul class="reviewer-list">
+                    <c:forEach var="section" items="${course.sections}">
+                    <li>
+                        <label for="section-reviewer-${section}">
                             <c:out value="${section}" />
-                            <select name="section-reviewer-${section}">
-                            <c:forEach var="studentRegistration" items="${courseInstructors}">
-                              <c:if test="${empty studentRegistration.section || studentRegistration.section == section }">
-                                <option value="${studentRegistration.studentPK}">
+                        </label>
+                        <select name="section-reviewer-${section}" id="section-reviewer-${section}">
+                            <c:forEach var="studentRegistration" items="${courseInstructors}" >
+                            <c:if test="${empty studentRegistration.section || studentRegistration.section == section }">
+                            <option value="${studentRegistration.studentPK}">
                                 <c:out value="${studentRegistration.fullname}" />
-                                </option>
-                                </c:if>
-                            </c:forEach>
-                            </select>
-                            <br>
-                        </c:forEach></td>
-            </tbody>
-            </tbody>
-            <tbody id="anonymity" style="display: none">
-                <tr>
-                    <td class="label">Anonymous</td>
-                    <td class="input"><input type="checkbox" name="anonymous" value="true" /></td>
-                </tr>
-                <tr>
-                    <td class="label">Can see comments from <br>other reviewers</td>
-                    <td class="input"><input type="checkbox" name="canSeeOthers" value="true" /></td>
-                </tr>
-            </tbody>
-            <tbody id="exemplar" style="display: none">
-                <tr>
-                    <td class="label">review of</td>
-                    <td class="input"><select name="of">
-                            <c:if test="${! empty justStudentSubmissions}">
-                                <option value="all" selected>all student submissions</option>
+                            </option>
                             </c:if>
-                            <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
-                                <option
-                                    value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
-                                    <c:out value="${studentRegistration.fullname}" />
-                                </option>
-
                             </c:forEach>
-                    </select></td>
-                </tr>
-            </tbody>
-            <tbody id="number" style="display: none">
-                <c:if test="${fn:length(sections) > 1}">
-                 <tr>
-                    <td class="label">by section</td>
-                    <td class="input"><input type="checkbox" name="peerBySection" checked="checked" value="true" /> (peer reviews done by other students in the same section)</td>
-                </tr>
-                </c:if>
-                <tr>
-                    <td class="label"># reviews per submission</td>
-                    <td class="input"><select name="numReviewers">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                    </select></td>
-                </tr>
+                        </select>
+                    </li>
+                    </c:forEach>
+                </ul>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset id="exemplar-review-info">
+    <h3>Review of an Exemplar</h3>
+        <ul class="form-fields">
+            <li>
+                <label for="exemplar-submission">Review of:</label>
+                <select name="of" id="exemplar-submission">
+                    <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
+                    <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
+                        <c:out value="${studentRegistration.fullname}" />
+                    </option>
+                    </c:forEach>
+                </select>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset id="review-assignment-info">
+    <h3>Review assignment strategy</h3>
+        <ul class="form-fields">
+            <li>
+                <label>Assign reviews:</label>
+					<ul>
+                        <li>
+                            <input type="radio" name="peerBySection" value="true" id="yes-by-section" checked="checked"/>
+                            <label for="yes-by-section">Only within a section</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="peerBySection" value="false" id="not-by-section"/>
+                            <label for="not-by-section">Across sections</label>
+                        </li>
+                    </ul>
+            </li>
+            <li>
+                <label for="reviews-per-submission">Reviews per submission:</label>
+                <select name="numReviewers" id="reviews-per-submission">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset id="review-rubrics">
+    <h3>Rubrics</h3>
+    <div id="rubric-controls">
+        <button id="add-numeric-rubric" type="button">Add Numeric</button>
+        <button id="add-dropdown-rubric" type="button">Add Dropdown</button>
+        <button id="add-checkbox-rubric" type="button">Add Checkbox</button>
+    </div>
+    <input type="hidden" name="rubric-count" id="rubric-count" value="0" />
+    <ul id="rubric-list">
+    </ul>
+    </fieldset>
+    <div style="text-align: right">
+        <button id="create-code-review">Create Code Review</button>
+    </div>
+</form>
+<script type="text/javascript">
+	function updateForm(kind) {
+		console.log('code review kind: "' + kind + '"');
+		switch (kind) {
+		case "none":
+			hideItem("instructional-review-info");
+			hideItem("instructional-by-section-info");
+			hideItem("anonymity-info");
+	        hideItem("visibility-info");
+			hideItem("exemplar-review-info");
+			hideItem("review-assignment-info");
+			break;
+		case "instructional":
+			showItem("instructional-review-info");
+			hideItem("instructional-by-section-info");
+			hideItem("anonymity-info");
+			hideItem("visibility-info");
+			hideItem("exemplar-review-info");
+			hideItem("review-assignment-info");
+			break;
+		case "instructionalBySection":
+			hideItem("instructional-review-info");
+			showItem("instructional-by-section-info");
+			hideItem("anonymity-info");
+			hideItem("visibility-info");
+			hideItem("exemplar-review-info");
+			hideItem("review-assignment-info");
+			break;
+		case "peer":
+			hideItem("instructional-review-info");
+			hideItem("instructional-by-section-info");
+			showItem("anonymity-info");
+			showItem("visibility-info");
+			hideItem("exemplar-review-info");
+			showItem("review-assignment-info");
+			break;
+		case "exemplar":
+			hideItem("instructional-review-info");
+			hideItem("instructional-by-section-info");
+			showItem("anonymity-info");
+			showItem("visibility-info");
+			showItem("exemplar-review-info");
+			hideItem("review-assignment-info");
+			break;
+		default:
+			console.log("Unknown kind");
+		}
+	}
+	
+	var $kind = $("#codereview-kind");
+	$kind.change(function(event) {
+		updateForm($kind.val());
+	});
 
-            </tbody>
+	$(document).ready(function() {
+		$kind.change();
+		$('#codereview-deadline-date').datepicker({
+			minDate : -1,
+			defaultDate : +7,
+			dateFormat : "yy-mm-dd",
+			onSelect : function(selectedDate) {
+				$("#codereview-deadline-time").focus();
+			}
+		});
 
-        </table>
-
-        <h1>Rubrics</h1>
-        <input type="hidden" name="rubric-count" id="rubric-count" value="0" />
-        <div id="rubricTable" style="display: none">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Kind</th>
-                        <th>Name</th>
-                        <th>Point values</th>
-                        <th>description</th>
-                    </tr>
-                </thead>
-                <tbody id="rubric-table">
-                </tbody>
-            </table>
-        </div>
-    </form>
+		$("#codereview-deadline-time").timePicker({
+			show24Hours : false,
+			step : 60,
+			defaultTime : "06:00 PM"
+		});
+		
+		$("#rubric-controls").buttonset();
+		$("#create-code-review").button();
+	});
+</script>
     <ss:script file="jsrender.js" />
     <script id="rubricTemplate" type="text/x-jquery-tmpl">
-            <tr id="rubric-{{=count}}">
-                <th>{{=header}}</th>
-                <td>
-                    <input type="hidden" name="{{=prefix}}-presentation" value="{{=presentation}}" />
-                    <input type="text" name="{{=prefix}}-name" size="20" required="required" placeholder="Name of rubric item"/>
-                </td>
-                <td>
-                    {{=editWidgets!}}
-                </td>
-                <td>
-                    <input type="text" name="{{=prefix}}-description" size="50" placeholder="a longer description of this rubric item"/>
-                </td>
-            </tr>
+            <li id="rubric-{{=count}}">
+                <input type="hidden" name="{{=prefix}}-presentation" value="{{=presentation}}" />
+                <div class="rubric-editing">
+                <div>
+                <label for="{{=prefix}}-name">{{=header}}</label>
+                <input type="text" id="{{=prefix}}-name" name="{{=prefix}}-name" size="20" required="required" placeholder="Name of rubric item"/>
+                <input type="text" name="{{=prefix}}-description" size="50" placeholder="a longer description of this rubric item"/>
+                </div>
+                <div>
+                {{=editWidgets!}}
+                </div>
+                </div>
+                <div class="rubric-row-controls">
+                   <button type="button" id="{{=prefix}}-delete" value="rubric-{{=count}}">delete</button>
+                </div>
+            </li>
         </script>
 
     <script id="dropdownTemplate" type="text/x-jquery-tmpl">
@@ -335,11 +408,11 @@ exemplar
     <ss:script file="rubrics.js" />
     <script type="text/javascript">
 		var dropdownEditor = new marmoset.DropdownEditor("#edit-dialog");
-		var manager = new marmoset.RubricManager("#rubric-table",
+		var manager = new marmoset.RubricManager("#rubric-list",
 				dropdownEditor);
-		manager.setAddDropdownButton("#add-dropdown-button");
-		manager.setAddNumericButton("#add-numeric-button");
-		manager.setAddCheckboxButton("#add-checkbox-button");
+		manager.setAddDropdownButton("#add-dropdown-rubric");
+		manager.setAddNumericButton("#add-numeric-rubric");
+		manager.setAddCheckboxButton("#add-checkbox-rubric");
 		$(manager).one('change', function(event) {
 			$("#rubricTable").show();
 		});
