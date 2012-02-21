@@ -50,6 +50,8 @@ public interface SubmitServerConstants {
 	public static final String AUTHENTICATION_TYPE = "authentication.type";
 
 	public static final String SKIP_AUTHENTICATION = "authentication.skip";
+	public static final String INITIALIZATION_NEEDED = "initializationNeeded";
+
 
 	// Keys used for setting global properties about the submit server's
 	// environment

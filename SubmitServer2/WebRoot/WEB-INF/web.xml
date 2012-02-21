@@ -1,42 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-<!DOCTYPE web-app SYSTEM "book.dtd"[
-  <!ENTITY custom SYSTEM "custom.xml">
-]>
--->
+
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
 	xmlns:xi="http://www.w3.org/2001/XInclude">
 
-	<!--
-	&custom;
-	<xi:include href="custom.xml" xpointer="xpointer(/web-app/*)"/>
--->
-<!--
-Deprecated - set these in local.web.properties or web.properties instead.
-<context-param>
-        <param-name>perform.background.retesting</param-name>
-        <param-value>true</param-value>
-    </context-param>
 
-	<context-param>
-		<param-name>fileupload.maxsize</param-name>
-		<param-value>15728640</param-value>
-	</context-param>
-	<context-param>
-		<param-name>minimum.course.project.manager.version</param-name>
-		<param-value>0.2.1</param-value>
-	</context-param>
-	<context-param>
-		<param-name>minimum.bluej.to.marmoset.version</param-name>
-		<param-value>0.0.1</param-value>
-	</context-param>
-	<context-param>
-		<param-name>findbugsDescriptionsURL</param-name>
-		<param-value>http://findbugs.sourceforge.net/allBugDescriptions.html</param-value>
-	</context-param>
--->
 
 <listener>
    <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
@@ -65,6 +34,15 @@ Deprecated - set these in local.web.properties or web.properties instead.
 		<filter-name>MonitorSlowTransactionsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+    <filter>
+	   <filter-name>NeedsInitializationFilter</filter-name>
+	   <filter-class>edu.umd.cs.submitServer.filters.NeedsInitializationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>NeedsInitializationFilter</filter-name>
+        <url-pattern>/authenticate/ldap/*</url-pattern>
+    </filter-mapping>
 
 
 	<!--

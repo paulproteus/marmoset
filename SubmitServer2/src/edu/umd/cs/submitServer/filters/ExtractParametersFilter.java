@@ -286,6 +286,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				// Get Project
 				project = Project.getByProjectPK(projectPK, conn);
 
+				if (coursePK != null && coursePK.intValue() != project.getCoursePK())
+				    throw new ServletException(
+                            "Inconsistent course and project PK");
+				
 				coursePK = project.getCoursePK();
 				if (!checkCourse(courseList, coursePK)) 
 				    throw new ServletException(

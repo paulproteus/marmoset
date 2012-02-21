@@ -28,6 +28,13 @@
       <c:set var="target">
         <c:out value="${param.target}" />
     </c:set>
+     <c:set var="serviceURL"><ss:brandingProperty key="branding.service.url" safeHtml="true" /></c:set>
+   
+    <p class="notemessage">Welcome to <a href="${serviceURL}"><ss:brandingProperty key="branding.service.fullname" safeHtml="true" /></a>
+      <p class="notemessage">Authentication is via OpenID, a service that allows you to log-on to many different websites using a single identity. 
+    If you have an account with any of these
+          providers, you can use that account to identify yourself. 
+     Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
     
   <!-- Simple Open ID Selector -->
   <c:url var="initiateUrl" value="/authenticate/openid/initiate" />
@@ -45,9 +52,8 @@
         <input id="openid_submit" type="submit" value="Sign-In"/>
       </div>
       <noscript>
-        <p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-        Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
-      </noscript>
+      You must have Javascript enabled for open-id login to work.
+        </noscript>
     </fieldset>
   </form>
   <!-- /Simple OpenID Selector -->
@@ -68,6 +74,9 @@
         <input type="submit" />
     </form>
   </c:if>
+  
+    <p class="notemessage"><ss:brandingProperty key="branding.login.termsOfUse" safeHtml="true" />
+  
     <ss:footer/>
 </body>
 </html>

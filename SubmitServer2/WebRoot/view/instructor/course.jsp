@@ -319,7 +319,9 @@ jQuery(document).ready(function ($) {
     <c:url var="createBuildserverConfig" value="/action/instructor/CreateBuildserverConfigFile">
                     <c:param name="buildserverCourse">${course.coursePK}</c:param>
                 </c:url>
-    <c:choose>
+    <c:url var="zippedBuildServer" value="/resources/buildserver.zip"/>
+                 
+  <c:choose>
         <c:when test="${empty buildServers}">
             <p>
                 <c:if test="${testedProjects}">
@@ -330,6 +332,8 @@ jQuery(document).ready(function ($) {
             <p>
                 <a href="${createBuildserverConfig}">Generate buildserver config file to run your own buildserver</a>
             </p>
+             <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
+               
         </c:when>
         <c:otherwise>
             <p>
@@ -337,9 +341,10 @@ jQuery(document).ready(function ($) {
                     href="javascript:toggle('buildServers')">details</a>)
                 
             <div id="buildServers" style="display: none">
-                <p>
-                    <a href="${createBuildserverConfig}">Generate buildserver config file to run your own
+                <p><a href="${createBuildserverConfig}">Generate buildserver config file to run your own
                         buildserver</a></p>
+                <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
+                <p>
                 <table>
                     <tr>
                         <th>Host

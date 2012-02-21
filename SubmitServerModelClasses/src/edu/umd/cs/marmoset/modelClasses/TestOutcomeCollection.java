@@ -51,6 +51,7 @@ import org.dom4j.DocumentException;
 
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
@@ -453,7 +454,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      *            the outcome (PASSED or FAILED/ERROR/HUH)
      * @return number of TestOutcomes with given outcome
      */
-    public int countOutcomes(String outcome) {
+    public int countOutcomes(@OutcomeType String outcome) {
         int count = 0;
         for (TestOutcome testOutcome : testOutcomes) {
             if (testOutcome.getOutcome().equals(outcome))
@@ -462,7 +463,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         return count;
     }
 
-    public int countCardinalOutcomes(String outcome) {
+    public int countCardinalOutcomes(@OutcomeType String outcome) {
         int count = 0;
         for (TestOutcome testOutcome : getAllTestOutcomes()) {
             if (testOutcome.getOutcome().equals(outcome))
@@ -477,7 +478,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @param outcomeList the list of testOutcomes
      * @return the count of the number of instances of the given outcome
      */
-    int countOutcomes(String outcome, List<TestOutcome> outcomeList)
+    int countOutcomes(@OutcomeType String outcome, List<TestOutcome> outcomeList)
     {
         int count=0;
         for (Iterator<TestOutcome> i = outcomeList.iterator(); i.hasNext();) {
@@ -513,7 +514,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     }
 
 
-    private int scoreOutcomes(String outcome, List<TestOutcome> list) {
+    private int scoreOutcomes(@OutcomeType String outcome, List<TestOutcome> list) {
         int count = 0;
         for (Iterator<TestOutcome> i = list.iterator(); i.hasNext();) {
             TestOutcome testOutcome = i.next();

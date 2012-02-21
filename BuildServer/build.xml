@@ -43,6 +43,7 @@
 	
 	<path id="buildserver.classpath">
 		<pathelement location="lib/jsr305.jar"/>
+		<pathelement location="lib/commons-cli-1.2.jar"/>
 		<pathelement location="lib/commons-httpclient.jar"/>
 		<pathelement location="lib/commons-lang-2.4.jar"/>
 		<pathelement location="lib/commons-logging.jar"/>
@@ -104,7 +105,7 @@
 	<copy todir="build/BuildServer/findbugs">
 	  <fileset dir="findbugs"/>
         </copy>
-	<zip destfile="build/buildserver.zip" basedir="build" includes="BuildServer/**" />
+	<zip destfile="../SubmitServer2/WebRoot/resources/buildserver.zip" basedir="build" includes="BuildServer/**" />
 	</target>
 
 	<target name="jar" depends="classes">

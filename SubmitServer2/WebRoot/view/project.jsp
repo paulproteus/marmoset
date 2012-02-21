@@ -175,7 +175,7 @@
 							<td><fmt:formatDate value="${submission.releaseRequest}"
 								pattern="E 'at' hh:mm a" /></td>
 						</c:when>
-                        <c:when test="${submission.releaseEligible && submission.currentTestRunPK == testRun.testRunPK}">
+                        <c:when test="${submission.releaseEligible}">
                         <td colspan="2">
                         <c:url var="releaseRequestLink"
                             value="/view/confirmReleaseRequest.jsp">
@@ -185,7 +185,7 @@
                         </td>
                         </c:when>
 						<c:otherwise>
-							<td colspan="2">--</td>
+							<td colspan="2">not eligible</td>
 						</c:otherwise>
 					</c:choose>
 					<c:if test="${testProperties.language=='java' or testProperties.language=='Java'}">
