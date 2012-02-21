@@ -289,16 +289,15 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		}
 
 		if (getSourceFiles().isEmpty())
-			throw new CompileFailureException("Project "
-					+ getProjectSubmission().getZipFile().getPath()
+			throw new CompileFailureException("Submission "
+					+ getProjectSubmission().getSubmissionPK()
 					+ " contains no source files", "");
 
 		// Create compiler output directory
 		File outputDir = getProjectSubmission().getBuildOutputDirectory();
 		if (!outputDir.isDirectory() && !outputDir.mkdir()) {
 			throw new BuilderException(
-					"Could not create compiler output directory "
-							+ outputDir.getPath());
+					"Could not create compiler output directory ");
 		}
 
 		// Determine Java -source value to use.
@@ -378,8 +377,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 			if (exitCode != 0) {
 				setCompilerOutput(monitor.getCombinedOutput());
 
-				throw new CompileFailureException("Compile failed for project "
-						+ getProjectSubmission().getZipFile().getPath(),
+				throw new CompileFailureException("Compile failed",
 						this.getCompilerOutput());
 			}
 
