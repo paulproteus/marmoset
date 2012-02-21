@@ -341,9 +341,6 @@ jQuery(document).ready(function ($) {
                     href="javascript:toggle('buildServers')">details</a>)
                 
             <div id="buildServers" style="display: none">
-                <p><a href="${createBuildserverConfig}">Generate buildserver config file to run your own
-                        buildserver</a></p>
-                <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
                 <p>
                 <table>
                     <tr>
@@ -362,6 +359,10 @@ jQuery(document).ready(function ($) {
                         </tr>
                     </c:forEach>
                 </table>
+                 <p><a href="${createBuildserverConfig}">Generate buildserver config file to run your own
+                        buildserver</a></p>
+                <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
+               
             </div>
         </c:otherwise>
     </c:choose>
