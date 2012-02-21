@@ -28,7 +28,7 @@
     <c:otherwise>
         <!-- ad hoc; should be instructor -->
         <c:set var="reviewBacklinkText" value="submission" />
-        <c:url var="reviewBacklinkUrl" value="/view/instructor/submission">
+        <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
             <c:param name="projectPK" value="${project.projectPK}" />
             <c:param name="coursePK" value="${course.coursePK}" />
