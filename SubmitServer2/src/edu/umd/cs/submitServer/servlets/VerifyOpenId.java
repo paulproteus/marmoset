@@ -114,9 +114,10 @@ public class VerifyOpenId extends SubmitServerServlet {
 		try {
 			verification = consumerManager.verify(receivingUrl.toString(), openIdResp, discovered);
 
-			Identifier verified = Preconditions.checkNotNull(verification.getVerifiedId(),
-			                                                 "OpenID authentication failed");
-
+			Identifier verified = verification.getVerifiedId();
+			if (verified == null)
+			    throw new ServletException("OpenID authentication declined or failed");
+			
 			getSubmitServerServletLog().info("Verified OpenID " + verified.getIdentifier());
 			AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
 			
