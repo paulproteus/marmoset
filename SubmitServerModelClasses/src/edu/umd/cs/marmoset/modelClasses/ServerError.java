@@ -163,7 +163,7 @@ public class ServerError {
 			@Submission.PK Integer submissionPK,
 			String code, String message, String type, String servlet, String uri, 
 			String queryString, String remoteHost, String referer, String userAgent, Throwable t)
-			throws SQLException {
+			{
 		if (conn == null)
 			return -1;
 		if (kind == Kind.UNKNOWN && code.equals("404"))
@@ -175,12 +175,17 @@ public class ServerError {
 
 		String query = Queries.makeInsertStatement(ATTRIBUTE_NAME_LIST,
 				TABLE_NAME);
-		PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		PreparedStatement stmt = null;
 		try {
+		    stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
 			Queries.setStatement(stmt, now, userPK, studentPK, coursePK, projectPK, submissionPK, code, message, type,
 					servlet, uri, queryString, remoteHost, referer, throwableAsString, Queries.serialize(conn, t), kind, userAgent);
 			stmt.executeUpdate();
 			return Queries.getGeneratedPrimaryKey(stmt);
+		} catch (SQLException e) {
+		     e.printStackTrace();
+		    return -1;
 		} finally {
 			Queries.closeStatement(stmt);
 		}
