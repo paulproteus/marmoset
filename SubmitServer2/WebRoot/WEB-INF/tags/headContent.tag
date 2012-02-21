@@ -1,5 +1,6 @@
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
                 
  <title><c:out value="${title}"/></title>
  <c:url var="css" value="/styles.css"/>
@@ -18,3 +19,5 @@
      $(document.getElementById(item)).slideUp("slow");
  }
 </script>
+ <ss:brandingProperty key="branding.analytics" safeHtml="true" />
+

@@ -356,10 +356,8 @@ table.codetable td.linenumber {
 
 
 .notemessage {
-	/*border:1px solid #ddcef2;
-	background-color:#faf5ff;
-	color:#993399;
-	padding:10px;*/
+	padding:5px;
+	max-width: 800px;
 }
 /* Section Title is the div around the title for each section.
  * The contents of this div are:
