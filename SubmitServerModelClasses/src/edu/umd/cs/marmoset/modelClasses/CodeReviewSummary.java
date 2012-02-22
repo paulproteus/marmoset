@@ -290,15 +290,24 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
         for (CodeReviewComment last : comments.descendingSet()) {
             if (last.isDraft())
                 continue;
-            if (last.isAck() || last.isDraft())
+            if (last.isAck())
                 return false;
             if (last.isBy(viewerAsReviewer))
                 return false;
             if (viewerIsAuthor())
                 return true;
-            // a code reviewer; needs response only if from author
-            return last.isBy(author) && t.getCreatedBy() == viewerAsReviewer.getCodeReviewerPK();
-
+            // viewer is code reviewer. Needs to respond if comment is from
+            // author and thread was either started by review or by
+            // author and review is instructor
+            if (last.isBy(author)) {
+                @CodeReviewer.PK
+                int startedBy = t.getCreatedBy();
+                if (startedBy == viewerAsReviewer.getCodeReviewerPK())
+                    return true;
+                if (startedBy == author.getCodeReviewerPK() && viewerAsReviewer.isInstructor())
+                    return true;
+            }
+            return false;
         }
         return false;
     }
