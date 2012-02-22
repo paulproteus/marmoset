@@ -100,7 +100,9 @@
 	<mkdir dir="build/BuildServer/lib"/>
 	<copy file="buildserver.jar" todir="build/BuildServer"/> 
 	<copy todir="build/BuildServer/lib">
-	  <fileset dir="lib"/>
+	  <fileset dir="lib">
+		<exclude name="**/clover.jar"/>
+	</fileset>
         </copy>
 	<copy todir="build/BuildServer/findbugs">
 	  <fileset dir="findbugs"/>
