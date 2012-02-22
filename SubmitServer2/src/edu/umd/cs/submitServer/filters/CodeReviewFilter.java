@@ -57,15 +57,13 @@ public class CodeReviewFilter extends SubmitServerFilter {
                                 "Authentication Error: You are not registrated for this class");
                                 return;
                     }
-                    reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submission.getSubmissionPK(),
+                    // superuser 
+                    reviewer = CodeReviewer.lookupOrAddReviewer(conn, submission.getSubmissionPK(),
                             userSession.getStudentPK(), "",
                             false,
                             true);
-                } else if (commenter.isInstructor())
-                    reviewer = CodeReviewer.lookupOrAddAdhocReviewer(conn, submission.getSubmissionPK(),
-                            userSession.getStudentPK(), "",
-                            submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK(),
-                            commenter.isInstructor());
+                } else if (commenter.isInstructor() ||  submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK())
+                    reviewer = CodeReviewer.lookupOrAddReviewer(conn, submission, commenter);
                 else
                     reviewer = CodeReviewer.lookupBySubmissionAndStudentPK(submission.getSubmissionPK(),
                             userSession.getStudentPK(), conn);

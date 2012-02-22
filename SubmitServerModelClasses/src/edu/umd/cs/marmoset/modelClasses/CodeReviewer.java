@@ -294,7 +294,16 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
         return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor(), false);
 	}
 
-	public static @Nonnull CodeReviewer lookupOrAddAdhocReviewer(Connection conn,  @Submission.PK int submissionPK,
+	public static @Nonnull CodeReviewer lookupOrAddReviewer(Connection conn,  Submission submission,
+           StudentRegistration commenter) throws SQLException {
+	    CodeReviewer reviewer = CodeReviewer.lookupOrAddReviewer(conn, submission.getSubmissionPK(),
+	            commenter.getStudentPK(), "",
+                submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK(),
+                commenter.isInstructor());
+	    return reviewer;
+	    
+	}
+	public static @Nonnull CodeReviewer lookupOrAddReviewer(Connection conn,  @Submission.PK int submissionPK,
 			@Student.PK int studentPK, String knownAs, boolean isAuthor, boolean isInstructor) throws SQLException {
 		CodeReviewer result = lookupBySubmissionAndStudentPK(submissionPK, studentPK, conn);
 		if (result != null) {
