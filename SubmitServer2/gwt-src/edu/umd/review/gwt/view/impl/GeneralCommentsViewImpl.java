@@ -2,11 +2,15 @@ package edu.umd.review.gwt.view.impl;
 
 import java.util.Collection;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,11 +25,20 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   private static ViewBinder uiBinder = GWT.create(ViewBinder.class);
 
   @UiField FlowPanel mainPanel;
+  @UiField FlowPanel threadPanel;
+  
+  @CheckForNull
+  private Presenter presenter;
   
   public GeneralCommentsViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
   }
-
+  
+  @Override
+  public void setPresenter(@Nullable Presenter presenter) {
+    this.presenter = presenter;
+  }
+  
   @Override
   public void setThreads(Collection<ThreadDto> threads) {
     // TODO Auto-generated method stub
@@ -34,12 +47,20 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
 
   @Override
   public ThreadView newThreadView() {
-    // TODO Auto-generated method stub
-    return null;
+    ThreadViewImpl threadView = new ThreadViewImpl();
+    threadPanel.add(threadView);
+    return threadView;
   }
   
   @Override
   public void setVisible(boolean visible) {
     mainPanel.setVisible(visible);
+  }
+  
+  @UiHandler("newThread")
+  void onNewThreadClicked(ClickEvent event) {
+    if (presenter != null) {
+      presenter.createNewThread();
+    }
   }
 }

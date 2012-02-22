@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
@@ -19,6 +21,7 @@ import edu.umd.review.gwt.event.HotkeyHandler;
 import edu.umd.review.gwt.event.SessionExpiryEvent;
 import edu.umd.review.gwt.rpc.dto.FileDto;
 import edu.umd.review.gwt.view.FileView;
+import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.SnapshotView;
 
 /**
@@ -41,16 +44,19 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   private final Map<String, FileView> fileViews = Maps.newTreeMap();
   private final Map<String, FileView.Presenter> filePresenters = Maps.newTreeMap();
   private final Timer heartbeat;
+  private final Provider<GeneralCommentsView.Presenter> generalCommmentsPresenterProvider;
 
   private int idleMinutes;
 
   @Inject
   SnapshotPresenter(@Assisted SnapshotView view, EventBus eventBus,
-      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<FileDto> files) {
+      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<FileDto> files,
+      Provider<GeneralCommentsView.Presenter> generalCommentsPresenterProvider) {
     this.view = view;
     this.files = files;
     this.presenterFactory = presenterFactory;
     this.hotkey = hotkey;
+    this.generalCommmentsPresenterProvider = generalCommentsPresenterProvider;
     this.eventBus = new ResettableEventBus(eventBus);
     heartbeat = new Timer() {
       @Override
@@ -85,6 +91,8 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
     });
     // TODO(rwsims): Adding a keypress handler here to reset the idle time seems to a) not work and
     // b) screw up the hotkey handling. This requires investigation.
+    GeneralCommentsView.Presenter generalCommentsPresenter = generalCommmentsPresenterProvider.get();
+    generalCommentsPresenter.start();
   }
 
   @Override
