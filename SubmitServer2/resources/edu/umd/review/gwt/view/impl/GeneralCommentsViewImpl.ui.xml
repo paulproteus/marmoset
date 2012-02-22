@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	.headerLabel {
+	   font-size: 120%;
+	   font-weight: bold;
+	}
+	</ui:style>
+	<g:FlowPanel>
+	   <g:Label styleName="{style.headerLabel}">General Comments</g:Label>
+	   <g:FlowPanel ui:field="threadPanel">
+	   </g:FlowPanel>
+	   <g:Button ui:field="newThread">New Thread</g:Button>
+	</g:FlowPanel>
+</ui:UiBinder> 

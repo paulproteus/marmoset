@@ -20,6 +20,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import edu.umd.review.gwt.view.FileView;
+import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.ScrollManager;
 import edu.umd.review.gwt.view.SnapshotView;
 
@@ -35,6 +36,7 @@ public class SnapshotViewImpl extends Composite implements SnapshotView {
   private static SnapshotViewImplUiBinder uiBinder = GWT.create(SnapshotViewImplUiBinder.class);
 
   @UiField(provided = true) ScrollPanel scrollPanel;
+  @UiField(provided = true) GeneralCommentsView generalCommentsView;
   @UiField FlowPanel mainPanel;
   @UiField FocusPanel outer;
 
@@ -43,10 +45,11 @@ public class SnapshotViewImpl extends Composite implements SnapshotView {
   private final ScrollManager scrollManager;
 
   @Inject
-  public SnapshotViewImpl(ScrollManager scrollManager, Provider<FileView> fileViewProvider) {
+  public SnapshotViewImpl(ScrollManager scrollManager, Provider<FileView> fileViewProvider, GeneralCommentsView generalCommentsView) {
     this.fileViewProvider = fileViewProvider;
     this.scrollManager = scrollManager;
     this.scrollPanel = scrollManager.getScrollPanel();
+    this.generalCommentsView = generalCommentsView;
     initWidget(uiBinder.createAndBindUi(this));
   }
 
