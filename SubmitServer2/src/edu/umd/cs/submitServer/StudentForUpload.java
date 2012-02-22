@@ -161,12 +161,12 @@ public class StudentForUpload {
 	public static void registerStudent(Course course, StudentForUpload s,
 			@Capability String capability, Connection conn) throws SQLException {
 		Student student = s.lookupOrInsert(conn);
-		registerStudent( course,  student, s.classAccount, capability, conn);
+		registerStudent( course,  student, null, s.classAccount, capability, conn);
 	}
 	
 	public static StudentRegistration registerStudent(Course course, Student student,
-			String classAccount,
-			@Capability String capability, Connection conn) throws SQLException {
+			String section,
+			String classAccount, @Capability String capability, Connection conn) throws SQLException {
 		
 		StudentRegistration registration = StudentRegistration
 				.lookupByStudentPKAndCoursePK(student.getStudentPK(),

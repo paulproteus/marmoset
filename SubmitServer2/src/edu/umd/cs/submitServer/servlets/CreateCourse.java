@@ -76,7 +76,7 @@ public class CreateCourse extends SubmitServerServlet {
 			course.insert(conn);
 			if (!user.isSuperUser()) {
 			    StudentForUpload.registerStudent(course,
-	                    user, user.getLoginName(), StudentRegistration.MODIFY_CAPABILITY, conn);
+	                    user, null, user.getLoginName(), StudentRegistration.MODIFY_CAPABILITY, conn);
 			}
 
 			userSession.addInstructorActionCapability(course.getCoursePK());

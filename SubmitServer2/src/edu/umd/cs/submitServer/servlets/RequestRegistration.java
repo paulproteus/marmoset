@@ -3,6 +3,7 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,11 +15,12 @@ import javax.servlet.http.HttpSession;
 
 import com.google.common.base.Strings;
 
-
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
+import edu.umd.cs.submitServer.dao.impl.MySqlAutoRegistrationDaoImpl;
 import edu.umd.cs.submitServer.dao.impl.MySqlRegistrationDaoImpl;
 
 public class RequestRegistration extends SubmitServerServlet {
@@ -34,13 +36,22 @@ public class RequestRegistration extends SubmitServerServlet {
 		try {
 			conn = getConnection();
 			Student student = Student.getByStudentPK(userSession.getStudentPK(), conn);
-			RegistrationDao dao = new MySqlRegistrationDaoImpl(student, getDatabaseProps());
+			MySqlRegistrationDaoImpl normalDao = new MySqlRegistrationDaoImpl(student, getDatabaseProps());
+			MySqlAutoRegistrationDaoImpl autoDao = new MySqlAutoRegistrationDaoImpl(student, getDatabaseProps());
+            
 			for (String name : (Set<String>) req.getParameterMap().keySet()) {
 				Matcher matcher = checkboxNamePattern.matcher(name);
 				if (!matcher.matches()) {
 					continue;
 				}
 				int coursePK = Integer.parseInt(matcher.group(1));
+				RegistrationDao dao = normalDao;
+				String autoRegistrationCoursePK =  WebConfigProperties.get().getProperty("registration.autoCoursePKs");
+				if (autoRegistrationCoursePK != null && 
+				       Arrays.asList( autoRegistrationCoursePK.trim().split(",")).contains(
+				               Integer.toString(coursePK)))
+				    dao = autoDao;
+				
 				String section = req.getParameter(name);
 				if (!Strings.isNullOrEmpty(section)) {
 					dao.requestRegistration(coursePK, section);

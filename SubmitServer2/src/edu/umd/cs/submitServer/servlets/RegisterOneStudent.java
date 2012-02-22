@@ -72,7 +72,7 @@ public class RegisterOneStudent extends SubmitServerServlet {
 			        capability = null;
 
 			    StudentForUpload.registerStudent(course,
-			            student, classAccount, null, conn);
+			            student, null, classAccount, null, conn);
 			}
 
 			conn.commit();
