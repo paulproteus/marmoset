@@ -41,7 +41,7 @@
 
 				<c:choose>
 
-				<c:when test="${instructorCapability}">
+				<c:when test="${empty instructorCapability}">
 				<c:url var="detailsLink" value="/view/submission.jsp">
 					<c:param name="submissionPK"
 						value="${codeReviewSummary.submissionPK}" />
