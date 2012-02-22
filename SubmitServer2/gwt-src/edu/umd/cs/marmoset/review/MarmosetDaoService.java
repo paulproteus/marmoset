@@ -226,6 +226,9 @@ public class MarmosetDaoService implements ReviewDao {
         FileDto file = new FileDto(0, path, contents);
         file.setModifiedLines(modifiedLines);
         file.setLinesToShow(linesToShow);
+        if (linesToShow == null || linesToShow.length == 0) {
+          continue;
+        }
         files.put(path, file);
       }
 
