@@ -10,10 +10,6 @@
  <a href="<c:url value='/view/admin/index.jsp'/>">SuperUser</a> |
 </c:if>
 
-<c:if test="${user.canImportCourses}">
- <a href="<c:url value='/view/manage.jsp'/>">Manage</a> |
-</c:if>
-
 <c:if test="${!singleCourse}">
  <a href="<c:url value='/view/index.jsp'/>"
  	title="All courses for which you are registered">All Courses</a>

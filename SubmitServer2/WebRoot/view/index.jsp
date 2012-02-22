@@ -177,6 +177,35 @@ label.error {
         </div>
     </c:if>
 
+    <c:if test="${user.canImportCourses}">
+        <div id="admin-functions">
+            <h2>Administrative functions</h2>
+            <ul>
+                <c:if test="${user.superUser}">
+                    <li><a href="admin/">Superuser functions</a></li>
+                </c:if>
+
+                <c:if test="${gradesServer}">
+                    <c:url var="importCourseLink" value="/view/import/importCourse.jsp" />
+                    <li><a href="${importCourseLink}">Import course from grade server</a></li>
+                </c:if>
+                <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
+                <li><a href="${createCourseLink}">Create course via web form</a></li>
+
+                <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
+                <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>
+                <c:if test="${not empty userSession.superuserPK}">
+                    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
+                    <li><form method="POST" action="${authenticateAsLink}">
+                            <input type="hidden" name="studentPK" value="${userSession.superuserPK}" /> <input
+                                type="submit" value="Become superuser" />
+                        </form></li>
+                </c:if>
+            </ul>
+        </div>
+    </c:if>
+
+
     <ss:footer />
 
 	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
