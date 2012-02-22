@@ -11,13 +11,7 @@
   <ss:script file="openid-jquery.js" />
   <ss:script file="openid-en.js" />
   <c:url var="imageBase" value="/images/" />
-  <script type="text/javascript">
-    $(document).ready(function() {
-      openid.img_path = '<c:out value="${imageBase}" />';
-      openid.init('openid_identifier');
-      // openid.setDemoMode(true); //Stops form submission for client javascript-only test purposes
-    });
-  </script>
+
   <!-- /Simple OpenID Selector -->
 </head>
 <body>
@@ -78,5 +72,12 @@
     <p class="notemessage"><ss:brandingProperty key="branding.login.termsOfUse" safeHtml="true" />
   
     <ss:footer/>
+      <script type="text/javascript">
+    $(document).ready(function() {
+      openid.img_path = '<c:out value="${imageBase}" />';
+      openid.init('openid_identifier');
+      // openid.setDemoMode(true); //Stops form submission for client javascript-only test purposes
+    });
+  </script>
 </body>
 </html>

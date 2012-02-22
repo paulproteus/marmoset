@@ -265,8 +265,18 @@ marmoset.RubricManager.prototype._addRubric = function(template, values) {
     values.editWidgets = template.render(values);
     var row = this.templates.rubric.render(values);
     var result = $(row).appendTo(this.table);
+    var manager = this;
+    $(result).find("#" + values.prefix + "-delete")
+    	.button()
+    	.click(function(event) {
+    		manager._deleteRubric(this.value);
+    	});
     $(this).trigger('change');
 };
+
+marmoset.RubricManager.prototype._deleteRubric = function(id) {
+	$("#" + id).remove();
+}
 
 marmoset.RubricManager.prototype._addDropdown = function(event) {
     this._addRubric(this.templates.dropdown, {
