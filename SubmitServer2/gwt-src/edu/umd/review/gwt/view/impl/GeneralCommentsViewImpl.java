@@ -6,7 +6,9 @@ import javax.inject.Singleton;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.umd.review.gwt.rpc.dto.ThreadDto;
@@ -18,6 +20,8 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   interface ViewBinder extends UiBinder<Widget, GeneralCommentsViewImpl> {}
   private static ViewBinder uiBinder = GWT.create(ViewBinder.class);
 
+  @UiField FlowPanel mainPanel;
+  
   public GeneralCommentsViewImpl() {
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -32,5 +36,10 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   public ThreadView newThreadView() {
     // TODO Auto-generated method stub
     return null;
+  }
+  
+  @Override
+  public void setVisible(boolean visible) {
+    mainPanel.setVisible(visible);
   }
 }

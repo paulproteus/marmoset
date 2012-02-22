@@ -7,7 +7,7 @@
 	   font-weight: bold;
 	}
 	</ui:style>
-	<g:FlowPanel>
+	<g:FlowPanel ui:field="mainPanel">
 	   <g:Label styleName="{style.headerLabel}">General Comments</g:Label>
 	   <g:FlowPanel ui:field="threadPanel">
 	   </g:FlowPanel>
