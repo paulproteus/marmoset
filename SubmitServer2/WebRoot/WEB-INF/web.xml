@@ -6,7 +6,6 @@
 	xmlns:xi="http://www.w3.org/2001/XInclude">
 
 
-
 <listener>
    <listener-class>edu.umd.review.server.ReviewServletConfig</listener-class>
 </listener>
@@ -22,6 +21,11 @@
 		</user-data-constraint>
 		-->
 	</security-constraint>
+	
+
+<session-config>
+   <tracking-mode>COOKIE</tracking-mode>
+</session-config>
 
 	<!--
 		log all transactions that take longer than some lower bound

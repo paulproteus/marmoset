@@ -10,7 +10,7 @@
 
   <ss:script file="openid-jquery.js" />
   <ss:script file="openid-en.js" />
-  <c:url var="imageBase" value="/images/" />
+  <c:set var="imageBase" value="${pageContext.request.contextPath}/images/" />
 
   <!-- /Simple OpenID Selector -->
 </head>
@@ -29,6 +29,8 @@
     If you have an account with any of these
           providers, you can use that account to identify yourself. 
      Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+     
+      <p class="notemessage">Cookies must be enabled to use Marmoset.
     
   <!-- Simple Open ID Selector -->
   <c:url var="initiateUrl" value="/authenticate/openid/initiate" />
@@ -46,7 +48,7 @@
         <input id="openid_submit" type="submit" value="Sign-In"/>
       </div>
       <noscript>
-      You must have Javascript enabled for open-id login to work.
+      <p class="notemessage">You must have Javascript enabled for open-id login to work.
         </noscript>
     </fieldset>
   </form>
