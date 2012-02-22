@@ -5,7 +5,6 @@
 <html>
 <head>
 
-
 <c:set var="title">Project <c:out value="${project.projectNumber}" /> submission, written by  <c:out value="${reviewDao.authorName}" /></c:set>
 <c:choose>
     <c:when test="${not empty nextCodeReview}">
@@ -25,18 +24,17 @@
             <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
-    <c:when test="${empty instructorCapability}">
+    <c:when test="${instructorCapability}">
      <c:set var="reviewBacklinkText" value="submission" />
-        <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
+        <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
             <c:param name="projectPK" value="${project.projectPK}" />
             <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
     <c:otherwise>
-         <!-- ad hoc; should be instructor -->
         <c:set var="reviewBacklinkText" value="submission" />
-        <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
+        <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
             <c:param name="projectPK" value="${project.projectPK}" />
             <c:param name="coursePK" value="${course.coursePK}" />
