@@ -17,6 +17,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewComment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
@@ -648,6 +649,17 @@ public class MarmosetDaoService implements ReviewDao {
       }
       if (!threadsWithDrafts.isEmpty())
         result.put(f.getPath(), threadsWithDrafts);
+    }
+    for (ThreadDto thread : getGeneralCommentThreads()) {
+      if (thread.getDraft() == null) {
+        continue;
+      }
+      TreeSet<ThreadDto> ts = result.get("");
+      if (ts == null) {
+        ts = Sets.newTreeSet();
+      }
+      ts.add(thread);
+      result.put("", ts);
     }
     return result;
   }
