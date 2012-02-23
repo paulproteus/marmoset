@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.inject.Provider;
 
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.shared.ResettableEventBus;
@@ -47,6 +48,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   private final Provider<GeneralCommentsView.Presenter> generalCommmentsPresenterProvider;
 
   private int idleMinutes;
+  private GeneralCommentsView.Presenter generalCommentsPresenter;
 
   @Inject
   SnapshotPresenter(@Assisted SnapshotView view, EventBus eventBus,
@@ -91,12 +93,16 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
     });
     // TODO(rwsims): Adding a keypress handler here to reset the idle time seems to a) not work and
     // b) screw up the hotkey handling. This requires investigation.
-    GeneralCommentsView.Presenter generalCommentsPresenter = generalCommmentsPresenterProvider.get();
+    generalCommentsPresenter = generalCommmentsPresenterProvider.get();
     generalCommentsPresenter.start();
   }
 
   @Override
   public void finish() {
+    if (generalCommentsPresenter != null) {
+      generalCommentsPresenter.finish();
+      generalCommentsPresenter = null;
+    }
     Iterator<FileView.Presenter> iter = filePresenters.values().iterator();
     while (iter.hasNext()) {
       FileView.Presenter p = iter.next();

@@ -46,8 +46,7 @@ import edu.umd.review.gwt.view.impl.TrayViewImpl;
  *
  * @author rwsims@umd.edu (Ryan W Sims)
  */
-public class CodeReview extends Composite implements EntryPoint, ValueChangeHandler<String>,
-  PublishEvent.Handler, PublishAllEvent.Handler {
+public class CodeReview extends Composite implements EntryPoint, ValueChangeHandler<String>, PublishAllEvent.Handler {
   /** UiBinder interface. */
   interface CodeReviewBinder extends UiBinder<Widget, CodeReview> { }
   private static final CodeReviewBinder binder = GWT.create(CodeReviewBinder.class);
@@ -94,7 +93,6 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
 
     RootLayoutPanel.get().add(this);
     EventBus eventBus = injector.getEventBus();
-    eventBus.addHandler(PublishEvent.TYPE, this);
     eventBus.addHandler(PublishAllEvent.TYPE, this);
     CodeReviewSummary summary = getSummary();
 
@@ -168,12 +166,7 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
       loadPublish();
     }
   }
-
-  @Override
-  public void onPublish(PublishEvent event) {
-    loadSubmission();
-  }
-
+  
   @Override
   public void onPublishAllEvent(PublishAllEvent event) {
     loadSubmission();

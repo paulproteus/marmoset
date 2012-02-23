@@ -17,6 +17,6 @@ public interface GeneralCommentsView extends IsWidget {
   
   void setPresenter(Presenter presenter);
   void setVisible(boolean visible);
-  void setThreads(Collection<ThreadDto> threads);
+  void clear();
   ThreadView newThreadView();
 }

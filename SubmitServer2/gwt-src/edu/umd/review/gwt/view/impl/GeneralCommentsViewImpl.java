@@ -40,7 +40,8 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   }
   
   @Override
-  public void setThreads(Collection<ThreadDto> threads) {
+  public void clear() {
+    threadPanel.clear();
   }
 
   @Override

@@ -9,6 +9,7 @@ import net.customware.gwt.dispatch.client.DispatchAsync;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import edu.umd.review.common.action.ListGeneralCommentsAction;
@@ -36,6 +37,7 @@ public class GeneralCommentsPresenter implements GeneralCommentsView.Presenter {
   @Override
   public void start() {
     this.view.setPresenter(this);
+    view.clear();
     dispatch.execute(new ListGeneralCommentsAction(), new AsyncCallback<ListGeneralCommentsAction.Response>() {
       @Override
       public void onFailure(Throwable caught) {
@@ -61,6 +63,7 @@ public class GeneralCommentsPresenter implements GeneralCommentsView.Presenter {
   @Override
   public void finish() {
     this.view.setPresenter(null);
+    view.clear();
     for (Iterator<IsPresenter> iter = startedPresenters.iterator(); iter.hasNext();) {
       IsPresenter presenter = iter.next();
       presenter.finish();
