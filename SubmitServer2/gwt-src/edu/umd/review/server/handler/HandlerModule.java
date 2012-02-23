@@ -7,6 +7,7 @@ import edu.umd.review.common.action.DeleteRubricEvaluationAction;
 import edu.umd.review.common.action.GetFilesAction;
 import edu.umd.review.common.action.GetUnscoredRubrics;
 import edu.umd.review.common.action.ListDraftsAction;
+import edu.umd.review.common.action.ListGeneralCommentsAction;
 import edu.umd.review.common.action.NewThreadAction;
 import edu.umd.review.common.action.PublishAction;
 import edu.umd.review.common.action.PublishAllAction;
@@ -27,5 +28,6 @@ public class HandlerModule extends ActionHandlerModule {
     bindHandler(SaveRubricEvaluationAction.class, SaveRubricEvaluationHandler.class);
     bindHandler(DeleteRubricEvaluationAction.class, DeleteRubricEvaluationHandler.class);
     bindHandler(PublishAction.class, PublishHandler.class);
+    bindHandler(ListGeneralCommentsAction.class, ListGeneralCommentsHandler.class);
   }
 }

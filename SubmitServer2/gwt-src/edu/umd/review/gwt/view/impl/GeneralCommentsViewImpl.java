@@ -41,8 +41,6 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   
   @Override
   public void setThreads(Collection<ThreadDto> threads) {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override
