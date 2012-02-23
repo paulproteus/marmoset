@@ -51,6 +51,8 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.annotation.Nonnull;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;

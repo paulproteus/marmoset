@@ -36,11 +36,10 @@ CourseProjectManager/dist/courseProjectManager.jar
 CourseProjectManager/.settings/
 CourseProjectManager/dist/edu.umd.cs.eclipse.courseProjectManager.jar
 CourseProjectManager/local.properties
-SubmitServer2/localhost.web.properties
-SubmitServer2/umd.web.properties
-SubmitServer2/openid-local.web.properties
+SubmitServer2/*.web.properties
+SubmitServer2/*.branding.properties
+SubmitServer2/*.build.properties
 BuildServer/findbugs
-SubmitServer2/ldap-local.web.properties
 sampleProjects/javaWarmup/*.zip
 sampleProjects/javaWarmup/bin
 sampleProjects/javaWarmupSolution/*.zip
