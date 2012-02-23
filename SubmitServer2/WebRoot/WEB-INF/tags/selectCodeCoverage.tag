@@ -15,11 +15,13 @@
 				</c:choose> </b>
 		</p>
 	</c:if>
+    <c:set var="escapedFileName"><c:out value="${sourceFileName}"/></c:set>
 	<p>
 	<form class="form" action="${pageContext.request.requestURL}"
 		method="GET">
 		<input type=hidden name="submissionPK" value="${submission.submissionPK}" />
 		<input type=hidden name="testNumber" value="all" /> 
+        <input type=hidden name="sourceFileName" value="${sourceFileName}"/>
 		Change code coverage:
 	   <select	name="testType" onchange="javascript:this.form.submit();">
 			<option value="none"${ss:selectedOrNull(testType,"none")} } >no
