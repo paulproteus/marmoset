@@ -44,8 +44,11 @@ import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
 
 /**
@@ -64,8 +67,10 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 		UserSession userSession = (UserSession) session
 				.getAttribute(USER_SESSION);
 		Project project = (Project) request.getAttribute(PROJECT);
-		Submission submission = (Submission) request.getAttribute(SUBMISSION);
-		
+		Course course = (Course) request.getAttribute(COURSE);
+        Submission submission = (Submission) request.getAttribute(SUBMISSION);
+        boolean isInstructor = (Boolean) request.getAttribute(
+                SubmitServerConstants.INSTRUCTOR_CAPABILITY);
 		List<Project> myProjects = (List<Project>) request.getAttribute(PROJECT_LIST);
 		HashSet<Integer> myProjectPks = null;
 		if (myProjects != null) {
@@ -78,10 +83,13 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 		Connection conn = null;
 		try {
 			conn = getConnection();
-
+			
+			if (isInstructor) {
+			  Collection<Submission> requestForReview = Submission.lookupAllReviewRequests(course.getCoursePK(), conn);
+			    request.setAttribute("requestForReview", requestForReview);
+		     }
 			Collection<CodeReviewer> myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
 			
-
 			Collection<CodeReviewSummary> reviewsOfMyCode = new TreeSet<CodeReviewSummary>();
 			Collection<CodeReviewSummary> myAssignments = new TreeSet<CodeReviewSummary>();
 			Collection<CodeReviewSummary> adHocReviews = new TreeSet<CodeReviewSummary>();

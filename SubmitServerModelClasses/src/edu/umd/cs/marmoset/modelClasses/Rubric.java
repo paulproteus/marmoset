@@ -56,9 +56,7 @@ public class Rubric {
     return builder.toString();
   }
 
-  /**
-   * List of all attributes for courses table.
-   */
+
   static final String[] ATTRIBUTE_NAME_LIST = {
     "rubric_pk",
     "code_review_assignment_pk",

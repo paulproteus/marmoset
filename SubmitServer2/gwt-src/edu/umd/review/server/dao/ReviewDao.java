@@ -33,6 +33,12 @@ public interface ReviewDao {
    * Get all the files for the current snapshot, loaded with appropriate thread and comment data.
    */
   Collection<FileDto> getFiles();
+  
+  /**
+   * get all of the general comment threads;
+   * @return
+   */
+  public Collection<? extends ThreadDto> getGeneralCommentThreads();
 
   /**
    * Create a new thread (without comments) in the given file at a specific line.

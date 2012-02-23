@@ -152,6 +152,7 @@ public class Submission implements ITestSummary<Submission> {
     private int numFindBugsWarnings;
     private int numChangedLines = -1; // -1 means unknown
 	private Integer archivePK; // may be NULL
+	private boolean reviewRequested;
 	/**
 	 * This is a write-only field.  Users can set a byte array as the cached archive
 	 * for upload, but they can only retrieve the archive via the
@@ -215,7 +216,8 @@ public class Submission implements ITestSummary<Submission> {
 		"num_secret_tests_passed",
 		"num_findbugs_warnings",
 		"num_changed_lines",
-		"archive_pk"
+		"archive_pk",
+		"review_requested"
 	};
 
 	/**
@@ -2066,6 +2068,53 @@ public class Submission implements ITestSummary<Submission> {
 		return first;
 		}
 		
-	
-	
+	  public  boolean markReviewRequest(Connection conn,
+              Project project) {
+          String query = "INSERT IGNORE review_requests SET " 
+                  + " submission_pk = ?, course_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK(),
+                  project.getCoursePK());
+          return stmt.execute();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
+      public  boolean removeReviewRequest(Connection conn) {
+          String query = "DELETE FROM review_requests WHERE " 
+                  + " submission_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          return stmt.execute();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
+      
+	  public static List<Submission> lookupAllReviewRequests(
+	            int coursePK,
+	            Connection conn)
+	    throws SQLException
+	    {
+	        String query = "SELECT " +ATTRIBUTES+ " "+
+	        " FROM " +
+	        " submissions, review_requests " +
+	        " WHERE submission.submission_pk = review_requests.submission_pk" +
+	        " AND review_requests.course_pk = ? " +
+	        " ORDER BY submissions.submission_timestamp ASC ";
+
+	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK);
+
+	        return getListFromPreparedStatement(stmt);
+	    }
 }

@@ -428,7 +428,7 @@ public class DisplaySubmissionSourceCode {
         /** Mqp from CodeReviewerPK to CodeReviewer */
         Map<Integer, CodeReviewer> commenters = new HashMap<Integer, CodeReviewer>();
         for(Map.Entry<String, List<String>> e : text.entrySet()) {
-            String fileName = e.getKey();
+            @Nonnull String fileName = e.getKey();
 
             List<String> txt = e.getValue();
             boolean fileIsChanged = !isUnchanged(fileName, changed);

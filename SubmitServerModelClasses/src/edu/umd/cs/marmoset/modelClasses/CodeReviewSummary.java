@@ -217,15 +217,6 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		}
 		return false;
 	}
-	private Collection<CodeReviewThread> getThreads(String path) {
-		SortedSet<CodeReviewThread> result = new TreeSet<CodeReviewThread>();
-		for(CodeReviewThread t : threads.values()) {
-			assert isVisible(t);
-			if (t.getFile().equals(path))
-				result.add(t);
-		}
-		return result;
-	}
 
 	public Map<Integer,CodeReviewer> getCodeReviewerMap() {
 		return Collections.unmodifiableMap(reviewers);
