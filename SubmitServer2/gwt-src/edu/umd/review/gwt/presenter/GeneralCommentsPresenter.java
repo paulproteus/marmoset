@@ -7,6 +7,8 @@ import javax.inject.Inject;
 
 import net.customware.gwt.dispatch.client.DispatchAsync;
 
+import com.allen_sauer.gwt.dnd.client.PickupDragController;
+import com.allen_sauer.gwt.dnd.client.drop.DropController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
@@ -17,6 +19,7 @@ import edu.umd.review.common.action.ListGeneralCommentsAction.Response;
 import edu.umd.review.common.action.NewThreadAction;
 import edu.umd.review.gwt.GwtUtils;
 import edu.umd.review.gwt.PresenterFactory;
+import edu.umd.review.gwt.rpc.dto.RubricDto;
 import edu.umd.review.gwt.rpc.dto.ThreadDto;
 import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.ThreadView;
@@ -26,12 +29,15 @@ public class GeneralCommentsPresenter implements GeneralCommentsView.Presenter {
   private final DispatchAsync dispatch;
   private final PresenterFactory presenterFactory;
   private final List<IsPresenter> startedPresenters = Lists.newArrayList();
+  private final PickupDragController dragController;
 
   @Inject
-  public GeneralCommentsPresenter(GeneralCommentsView view, DispatchAsync dispatch, PresenterFactory presenterFactory) {
+  public GeneralCommentsPresenter(GeneralCommentsView view, DispatchAsync dispatch, PresenterFactory presenterFactory,
+      PickupDragController dragController) {
     this.view = Preconditions.checkNotNull(view);
     this.dispatch = Preconditions.checkNotNull(dispatch);
     this.presenterFactory = Preconditions.checkNotNull(presenterFactory);
+    this.dragController = Preconditions.checkNotNull(dragController);
   }
   
   @Override
@@ -84,5 +90,30 @@ public class GeneralCommentsPresenter implements GeneralCommentsView.Presenter {
         showThread(thread);
       }
     });
+  }
+  
+  @Override
+  public void newThreadWithRubric(RubricDto rubric) {
+    dispatch.execute(new NewThreadAction(null, 0, rubric), new AsyncCallback<ThreadDto>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        GwtUtils.wrapAndThrow(caught);
+      }
+
+      @Override
+      public void onSuccess(ThreadDto result) {
+        showThread(result);
+      }
+    });
+  }
+  
+  @Override
+  public void registerDropController(DropController controller) {
+    dragController.registerDropController(controller);
+  }
+  
+  @Override
+  public void unregisterDropController(DropController controller) {
+    dragController.unregisterDropController(controller);
   }
 }

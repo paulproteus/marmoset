@@ -20,7 +20,7 @@ import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
  */
 public abstract class RubricEvaluationDto implements IsSerializable, Comparable<RubricEvaluationDto> {
 
-  public enum Status {
+  public enum Status implements IsSerializable {
     NEW,
     DRAFT,
     LIVE,
