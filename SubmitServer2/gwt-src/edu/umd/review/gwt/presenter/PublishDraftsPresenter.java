@@ -86,8 +86,6 @@ public class PublishDraftsPresenter extends AbstractPresenter
       @Override
       public void onSuccess(VoidResult result) {
         History.newItem(ClientConstants.REVIEW_TOKEN);
-        // TODO(rwsims): is this event really necessary?
-        eventBus.fireEvent(new PublishEvent(commentsToPublish));
       }
     });
   }

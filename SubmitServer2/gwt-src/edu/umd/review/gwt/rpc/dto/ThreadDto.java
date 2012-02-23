@@ -3,6 +3,7 @@ package edu.umd.review.gwt.rpc.dto;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
 import net.customware.gwt.dispatch.shared.Result;
@@ -49,6 +50,7 @@ public class ThreadDto implements Result, Comparable<ThreadDto> {
     return id;
   }
 
+  @CheckForNull
   public String getFile() {
     return file;
   }

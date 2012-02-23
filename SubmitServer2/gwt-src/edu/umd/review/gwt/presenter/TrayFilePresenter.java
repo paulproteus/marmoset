@@ -83,7 +83,8 @@ public class TrayFilePresenter extends AbstractPresenter implements TrayFileView
 
     @Override
   public void onNewDraft(NewDraftEvent event) {
-      if (!event.getThread().getFile().equals(file.getPath())) {
+      String eventFile = event.getThread().getFile();
+      if (eventFile != null && !eventFile.equals(file.getPath())) {
           return;
       }
       if (threadViews.containsKey(event.getThread())) {

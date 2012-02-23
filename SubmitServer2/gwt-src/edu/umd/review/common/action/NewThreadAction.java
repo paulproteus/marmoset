@@ -9,8 +9,9 @@ public class NewThreadAction implements Action<ThreadDto> {
   private int line;
   private RubricDto rubric;
 
-  @Deprecated
-  private NewThreadAction() {}
+  public NewThreadAction() {
+    this(null, 0, null);
+  }
 
   public NewThreadAction(String path, int line) {
     this(path, line, null);

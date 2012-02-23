@@ -101,7 +101,9 @@ public class ThreadPresenter extends AbstractPresenter implements ThreadView.Pre
       startNewDraft();
       return;
     }
-
+    if (thread.getDraft() != null) {
+      NewDraftEvent.fire(eventBus, thread, thread.getDraft());
+    }
     view.showReplyLink(!thread.getPublishedComments().isEmpty() || evaluation != null
         && evaluation.getStatus() != Status.DRAFT && evaluation.getStatus() != Status.NEW);
     if (thread.getDraft() != null) {

@@ -101,11 +101,6 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
     draftCount = 0;
     for (FileDto file : files) {
       view.insertAuthors(file);
-      for (ThreadDto thread : file.getThreads()) {
-        if (thread.getDraft() != null) {
-          draftCount += 1;
-        }
-      }
       TrayFileView fileView = view.insertFile(null);
       TrayFileView.Presenter presenter = presenterFactory.makeTrayFilePresenter(fileView, file);
       presenter.start();

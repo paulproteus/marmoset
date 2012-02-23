@@ -1,7 +1,9 @@
 package edu.umd.review.gwt.view.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.allen_sauer.gwt.dnd.client.DragContext;
@@ -87,6 +89,9 @@ public class FileViewImpl extends Composite implements FileView {
     codeGrid.removeAllRows();
     int row = 0;
     int[] linesToShow = file.getLinesToShow();
+    if (linesToShow == null || linesToShow.length == 0) {
+      return;
+    }
     if (linesToShow[0] > 0) {
         // Many lines elided.
         int dist = linesToShow[0];

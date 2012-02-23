@@ -56,7 +56,18 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
   public void start() {
     view.setPresenter(this);
     view.setFileName(file.getPath());
-    showFile();
+    view.setFile(file);
+    scrollManager.registerFile(file.getPath(), view);
+    for (ThreadDto thread : file.getThreads()) {
+      ThreadView threadView = view.getThreadView(thread.getLine(), null);
+      ThreadView.Presenter threadPresenter = presenterFactory.makeThreadPresenter(threadView,
+          thread);
+      threadPresenter.start();
+      ThreadView.Presenter old = threadPresenters.put(thread.getId(), threadPresenter);
+      if (old != null) {
+        old.finish();
+      }
+    }
   }
 
   @Override
@@ -121,20 +132,5 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
     threadPresenter.start();
 
     threadPresenters.put(thread.getId(), threadPresenter);
-  }
-
-  private void showFile() {
-    view.setFile(file);
-    scrollManager.registerFile(file.getPath(), view);
-    for (ThreadDto thread : file.getThreads()) {
-      ThreadView threadView = view.getThreadView(thread.getLine(), null);
-      ThreadView.Presenter threadPresenter = presenterFactory.makeThreadPresenter(threadView,
-          thread);
-      threadPresenter.start();
-      ThreadView.Presenter old = threadPresenters.put(thread.getId(), threadPresenter);
-      if (old != null) {
-        old.finish();
-      }
-    }
   }
 }

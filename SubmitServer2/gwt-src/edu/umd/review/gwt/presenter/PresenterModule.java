@@ -10,6 +10,7 @@ import edu.umd.review.gwt.view.CheckboxRubricEvaluationView;
 import edu.umd.review.gwt.view.DraftView;
 import edu.umd.review.gwt.view.DropdownRubricEvaluationView;
 import edu.umd.review.gwt.view.FileView;
+import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.NumericRubricEvaluationView;
 import edu.umd.review.gwt.view.PublishDraftsView;
 import edu.umd.review.gwt.view.SnapshotView;
@@ -29,6 +30,7 @@ public class PresenterModule extends AbstractGinModule {
   @Override
   protected void configure() {
     bind(EventBus.class).to(SimpleEventBus.class).asEagerSingleton();
+    bind(GeneralCommentsView.Presenter.class).to(GeneralCommentsPresenter.class);
 
     install(new GinFactoryModuleBuilder()
       .implement(TrayView.Presenter.class, TrayPresenter.class)
