@@ -30,9 +30,12 @@
 <!DOCTYPE HTML>
 <html>
 
-<ss:head
+<head>
+<ss:headContent
 	title="Submit project ${project.projectNumber} for ${course.courseName} in ${course.semester}" />
-
+          <c:url var="codemirror" value="/codemirror" />
+       <link rel="stylesheet" href="${codemirror}/lib/codemirror.css">
+</head>
 <body>
   <c:url var="jsBase" value="/js" />
   <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
@@ -52,23 +55,33 @@ submission until the project has been activated by the instructor.
 </c:if>
 
 <div class="sectionTitle">
-	<h1>File Upload for Project Submission</h1>
+	<h1>Web submission for project <c:out value="${project.projectNumber}"/> in <c:out value="${course.fullname}"/></h1>
 
-	<p class="sectionDescription">Submit Project 
-    <c:out value="${project.fullTitle}"/>
-			for <c:out value="${course.fullname}"/></p>
+	<p class="sectionDescription">
+    <c:out value="${project.description}"/>
+			</p>
 </div>
 
+                    
+<ss:submitProject/>
+<c:choose>
+<c:when test="${not empty sourceFiles and project.browserEditing == 'ALLOWED'}">
+    <ss:editSourceCode />
+    </c:when>
+    <c:otherwise>
+    
     <c:if test="${course.allowsBaselineDownload && project.archivePK != null && project.archivePK > 0}">
                         <c:url var="downloadStarterFilesLink"
                             value="/data/DownloadProjectStarterFiles">
                             <c:param name="projectPK" value="${project.projectPK}" />
                         </c:url>
-                        <a href="${downloadStarterFilesLink}">download baseline submission</a>
+                       <h3>Download baseline submission</h3> 
+                       <p>You can <a href="${downloadStarterFilesLink}">download</a> the
+                        baseline submission for this project.
                     </c:if>
-                    
-<ss:submitProject/>
-
+    </c:otherwise>
+    </c:choose>
+    
 <ss:footer />
 </body>
 </html>

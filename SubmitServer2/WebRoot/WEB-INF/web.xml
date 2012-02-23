@@ -380,6 +380,10 @@
 		<url-pattern>/view/project.jsp</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
+        <filter-name>SourceTextFilter</filter-name>
+        <url-pattern>/view/submitProject.jsp</url-pattern>
+    </filter-mapping>
+	<filter-mapping>
 		<filter-name>TestPropertiesFilter</filter-name>
 		<url-pattern>/view/instructor/project.jsp</url-pattern>
 	</filter-mapping>

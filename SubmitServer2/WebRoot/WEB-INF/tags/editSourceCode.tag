@@ -27,7 +27,7 @@ the changes from the submit server.
             </c:url>
             <h3 id="editSource">
             
-               Editing  <a href="${submissionLink}">submission #${sourceSubmission.submissionNumber}, submitted at <fmt:formatDate
+              Edit  <a href="${submissionLink}">submission #${sourceSubmission.submissionNumber}, submitted at <fmt:formatDate
                         value="${sourceSubmission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a" /></a>
                         <c:url var="downloadLink" value="/data/DownloadSubmission">
                 <c:param name="submissionPK" value="${submission.submissionPK}" />
