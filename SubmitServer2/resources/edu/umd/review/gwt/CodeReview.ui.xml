@@ -11,6 +11,7 @@
     <g:north size="100">
       <g:HTMLPanel styleName="{style.header}">
         <h1><g:Label ui:field="titleLabel" /></h1>
+         <g:Label ui:field="subtitleLabel" />
         <g:Anchor ui:field="backAnchor" />
       </g:HTMLPanel>
     </g:north>

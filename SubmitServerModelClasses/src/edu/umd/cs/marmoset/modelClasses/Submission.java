@@ -2083,6 +2083,22 @@ public class Submission implements ITestSummary<Submission> {
              Queries.closeStatement(stmt);
           }
       }
+	  public  boolean isReviewRequested(Connection conn) {
+          String query = "SELECT submission_pk FROM review_requests WHERE " 
+                  + " submission_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          ResultSet rs = stmt.executeQuery();
+          return rs.next();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
       public  boolean removeReviewRequest(Connection conn) {
           String query = "DELETE FROM review_requests WHERE " 
                   + " submission_pk = ?";

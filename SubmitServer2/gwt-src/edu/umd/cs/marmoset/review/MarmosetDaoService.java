@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -126,8 +127,9 @@ public class MarmosetDaoService implements ReviewDao {
       nameOfReviewer = reviewer.getName();
       isAuthor = reviewer.isAuthor();
       CodeReviewSummary summary = getSummary();
+      Set<Integer> reviewers = summary.getCodeReviewerMap().keySet();
       this.requestReviewOnPublish = isAuthor && 
-              !reviewer.isInstructor() && summary.getCodeReviewerMap().keySet().size() == 1;
+              !reviewer.isInstructor() && reviewers.size() == 1;
       this.project = summary.getProject();
 
       this.codeAuthor = summary.getAuthor();
@@ -192,9 +194,13 @@ public class MarmosetDaoService implements ReviewDao {
       this.student = reviewer.getStudent();
       nameOfReviewer = reviewer.getName();
       isAuthor = reviewer.isAuthor();
-      this.project = getSummary().getProject();
+      CodeReviewSummary summary = getSummary();
+      this.project = summary.getProject();
+      Set<Integer> reviewers = summary.getCodeReviewerMap().keySet();
+      this.requestReviewOnPublish = isAuthor && 
+              !reviewer.isInstructor() && reviewers.size() == 1;
       
-      this.codeAuthor = getSummary().getAuthor();
+      this.codeAuthor = summary.getAuthor();
 
 
       if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {

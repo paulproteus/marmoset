@@ -55,10 +55,43 @@ tr.reject {background: #f33}
     </div>
 
     <ss:codeReviews title="Pending Code reviews" />
+    
+    <c:if test="${not empty requestsForReview}">
+    <h2>Review requests</h2>
+    <table>
+    <tr>
+    <th>Who<th>View<th>Accept<th>Sub #<th>Submitted
+    <c:forEach var="submission" items="${requestsForReview}"  varStatus="counter">
+    <c:set var="studentRegistration" value="${studentRegistrationMap[submission.studentRegistrationPK]}" />
+    <c:url var="viewLink" value="/view/instructor/submission.jsp">
+    <c:param name="submissionPK" value="${submission.submissionPK}" />
+    </c:url>
+     <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
+    <c:param name="submissionPK" value="${submission.submissionPK}" />
+    </c:url>
+    <c:choose>
+                <c:when test="${submission.mostRecent}">
+                    <c:set var="rowKind" value="r${counter.index % 2}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="rowKind" value="ir${counter.index % 2}" />
+                </c:otherwise>
+            </c:choose>
+            <tr class="${rowKind}">
+    <td><c:out value="${studentRegistration.fullname}"/>
+    <td><a href="${viewLink}">view</a>
+    <td><a href="${codeReviewLink}">accept</a>
+   <td> ${submission.submissionNumber}
+   <td> <fmt:formatDate value="${submission.submissionTimestamp}"
+                pattern="dd MMM h:mm a" />
+            
+    </c:forEach>
+        </table>
+    
+    </c:if>
 
     <c:if test="${not empty pendingRegistrations}">
-    <h2>
-        <a id="requests">Registration Requests</a>
+    <h2 id="requests">Registration Requests
     </h2>
     <c:url var="updateRegistrations" value="/action/instructor/UpdatePendingRegistrations" />
     <form action="${updateRegistrations}" method="POST">

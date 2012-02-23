@@ -39,7 +39,7 @@
 <ss:projectTitle />
 
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewLink" value="/view"/>
 
 <c:url var="viewSubmissionSourceLink" value="/view/allSourceCode.jsp">
 	<c:param name="submissionPK" value="${submission.submissionPK}" />
@@ -69,14 +69,22 @@ or  <c:url var="downloadLink" value="/data/DownloadSubmission">
                 <c:param name="submissionPK" value="${submission.submissionPK}" />
             </c:url> <a href="${downloadLink}">Download</a>
             source</p>
-            
-<c:if test="${reviewer != null}">
+        
+<c:choose>    
+<c:when test="${reviewer != null}">
 <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
 <c:param name="submissionPK" value="${submission.submissionPK}"/>
 <c:param name="reviewerPK" value="${reviewer.codeReviewerPK}"/>
 </c:url>
 <p><a href="${codeReviewLink}">Go to Code Review</a>
-</c:if>
+</c:when>
+<c:otherwise>
+<c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
+<c:param name="submissionPK" value="${submission.submissionPK}"/>
+</c:url>
+<p><a href="${codeReviewLink}">Request Code Review</a>
+</c:otherwise>
+</c:choose>
 
     <p>
         build status: ${submission.buildStatus}
@@ -153,7 +161,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 					<td class="description">
 					<c:choose>
 					<c:when test="${testProperties.performCodeCoverage and testProperties.language=='java'}">
-						<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+						<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 					</c:when>
 					<c:otherwise>
 						<pre><c:out	value="${test.longTestResult}" /></pre>
@@ -197,16 +205,16 @@ not empty testOutcomeCollection.releaseOutcomes}">
 								<td></td>
 								<c:choose>
 									<c:when test="${project.stackTracePolicy == 'full_stack_trace'}">
-										<td><c:out value="${ss:hotlink(release, viewSourceLink)}" escapeXml="false"/></td>
+										<td><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
 									</c:when>
 									<c:when test="${release.error and project.stackTracePolicy != 'test_name_only'}">
 										<c:if test="${project.stackTracePolicy == 'exception_location'}">
-											<td><c:out value="${ss:exceptionLocation(release, viewSourceLink)}" escapeXml="false"/></td>
+											<td><c:out value="${ss:exceptionLocation(release, viewLink)}" escapeXml="false"/></td>
 										</c:if>
 										<c:if test="${project.stackTracePolicy == 'restricted_exception_location'}">
 											<c:choose>
 												<c:when test="${ss:isApproximatelyCovered(testOutcomeCollection,release)}">
-												<td><c:out value="${ss:exceptionLocation(release, viewSourceLink)}" escapeXml="false"/></td>
+												<td><c:out value="${ss:exceptionLocation(release, viewLink)}" escapeXml="false"/></td>
 										</c:when>
 												<c:otherwise>
 												<td>This test generates an exception in your code,
@@ -219,7 +227,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 										</c:if>
 
 										<c:if test="${project.stackTracePolicy == 'full_stack_trace'}">
-											<td><c:out value="${ss:hotlink(release, viewSourceLink)}" escapeXml="false"/></td>
+											<td><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
 										</c:if>
 									</c:when>
 									<c:otherwise>

@@ -33,7 +33,7 @@
   	<ss:header/>
   		<ss:instructorBreadCrumb/>
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewLink" value="/view"/>
 
 	<h2>FindBugs warning</h2>
 	<p>
@@ -47,7 +47,7 @@
 			<tr class="r${numDisplayed % 2}">
 				<c:set var="numDisplayed" value="${numDisplayed + 1}" />
 				<td class="description">
-					<c:out value="${ss:hotlink(warning, viewSourceLink)}" escapeXml="false"/>
+					<c:out value="${ss:hotlink(warning, viewLink)}" escapeXml="false"/>
 				</td>
 
 				<td class="description">
@@ -109,7 +109,7 @@
 		<c:out value="${test.shortTestResult}" /></td>
 		<td class="description">
 		<%--<pre>--%>
-			<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+			<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 		<%--</pre>--%>
 		</td>
 	</tr>
@@ -146,7 +146,7 @@
 			<td class="description"><c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
 			<%--<pre>--%>
-				<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			<%--</pre>--%>
 			</td>
 		</tr>
@@ -163,7 +163,7 @@
 			<td>${test.shortTestName}</td>
 			<td class="description"><c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
-			<pre><c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+			<pre><c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</pre>
 			</td>
 		</tr>

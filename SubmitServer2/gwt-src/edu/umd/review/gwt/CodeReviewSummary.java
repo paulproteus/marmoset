@@ -14,6 +14,11 @@ public final class CodeReviewSummary extends JavaScriptObject {
   public final native String title() /*-{
     return this.title;
   }-*/;
+  
+  public final native String subtitle() /*-{
+  return this.subtitle;
+}-*/;
+
 
   private final native String backlinkText() /*-{
     return this.backlinkText;

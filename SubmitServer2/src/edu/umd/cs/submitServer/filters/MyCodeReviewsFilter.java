@@ -86,7 +86,7 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 			
 			if (isInstructor) {
 			  Collection<Submission> requestForReview = Submission.lookupAllReviewRequests(course.getCoursePK(), conn);
-			    request.setAttribute("requestForReview", requestForReview);
+			   request.setAttribute("requestsForReview", requestForReview);
 		     }
 			Collection<CodeReviewer> myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
 			

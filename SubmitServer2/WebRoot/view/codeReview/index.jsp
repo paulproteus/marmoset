@@ -8,6 +8,7 @@
 <c:set var="title">Project <c:out value="${project.projectNumber}" /> submission, written by  <c:out value="${reviewDao.authorName}" /></c:set>
 <c:choose>
     <c:when test="${not empty nextCodeReview}">
+        <c:set var="subtitle"><c:out value="${codeReviewAssignment.description}"/></c:set>
         <c:set var="reviewBacklinkText" value="next" />
         <c:url var="reviewBacklinkUrl" value="/view/codeReview/">
             <c:param name="codeReviewerPK">
@@ -17,6 +18,7 @@
     </c:when>
 
     <c:when test="${not empty codeReviewAssignment}">
+     <c:set var="subtitle"><c:out value="${codeReviewAssignment.description}"/></c:set>
         <c:set var="reviewBacklinkText" value="assignment" />
         <c:url var="reviewBacklinkUrl" value="/view/codeReviews.jsp">
             <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
@@ -24,7 +26,8 @@
             <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
-    <c:when test="${instructorCapability}">
+     <c:when test="${instructorCapability and reviewRequested}">
+     <c:set var="subtitle"><c:out value="Response to review request"/></c:set>
      <c:set var="reviewBacklinkText" value="submission" />
         <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
@@ -32,7 +35,27 @@
             <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
+    
+    <c:when test="${instructorCapability}">
+     <c:set var="subtitle"><c:out value="Adhoc review"/></c:set>
+     <c:set var="reviewBacklinkText" value="submission" />
+        <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
+            <c:param name="submissionPK" value="${submission.submissionPK}" />
+            <c:param name="projectPK" value="${project.projectPK}" />
+            <c:param name="coursePK" value="${course.coursePK}" />
+        </c:url>
+    </c:when>
+        <c:when test="${reviewRequested}">
+     <c:set var="subtitle"><c:out value="Publish comments to request review"/></c:set>
+          <c:set var="reviewBacklinkText" value="submission" />
+           <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
+            <c:param name="submissionPK" value="${submission.submissionPK}" />
+            <c:param name="projectPK" value="${project.projectPK}" />
+            <c:param name="coursePK" value="${course.coursePK}" />
+        </c:url>
+    </c:when>
     <c:otherwise>
+    <c:set var="subtitle"><c:out value="Review of your submission"/></c:set>
         <c:set var="reviewBacklinkText" value="submission" />
         <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
@@ -46,6 +69,7 @@
 	var reviewSummary = {
 		"daoKey" : '<c:out value="${reviewDaoKey}"/>',
 		"title" : '${title}',
+		"subtitle" : '${subtitle}',
 		"backlinkText" : '${reviewBacklinkText}',
 		"backlinkUrl" : '${reviewBacklinkUrl}',
 	};

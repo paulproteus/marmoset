@@ -57,6 +57,7 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
   @UiField(provided = true) TrayViewImpl trayView;
   @UiField Anchor backAnchor;
   @UiField Label titleLabel;
+  @UiField Label subtitleLabel;
 
   private PresenterFactory presenterFactory;
   private SnapshotView snapshotView;
@@ -102,6 +103,7 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
 
     Window.setTitle(summary.title());
     titleLabel.setText(summary.title());
+    subtitleLabel.setText(summary.subtitle());
     summary.setBacklink(backAnchor);
     History.addValueChangeHandler(this);
     History.fireCurrentHistoryState();

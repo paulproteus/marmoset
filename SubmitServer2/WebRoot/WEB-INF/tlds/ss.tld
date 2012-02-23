@@ -537,7 +537,7 @@
   <function-class>edu.umd.cs.marmoset.modelClasses.TestOutcome</function-class>
   <function-signature>String getHotlink(edu.umd.cs.marmoset.modelClasses.TestOutcome, java.lang.String)</function-signature>
   <example>
-    Name: ${ss:hotlink(testOutcome, viewSourceLink)}
+    Name: ${ss:hotlink(testOutcome, viewLink)}
   </example>
   </function>
 
