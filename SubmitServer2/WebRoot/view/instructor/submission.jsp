@@ -55,10 +55,18 @@ Submission # ${submission.submissionNumber}, <fmt:formatDate
 	<ss:studentEmail/>
 	&nbsp;|&nbsp;
 	<a href="${viewSourceLink}">Source</a>
-
-&nbsp;|&nbsp;
-<a href="${gwtCodeReviewLink}">code review</a>
-
+    &nbsp;|&nbsp;
+<c:choose>    
+<c:when test="${reviewer != null}">
+<a href="${codeReviewLink}">Continue Code Review</a>
+</c:when>
+<c:when test="${reviewRequested}">
+<a href="${codeReviewLink}">Code Review Requested</a>
+</c:when>
+<c:otherwise>
+<a href="${codeReviewLink}">Start Code Review</a>
+</c:otherwise>
+</c:choose>
 &nbsp;|&nbsp;
 
 	<c:url var="downloadLink" value="/data/DownloadSubmission">

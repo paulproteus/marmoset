@@ -7,9 +7,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -49,7 +49,6 @@ import edu.umd.review.server.dao.ReviewDao;
 
 public class MarmosetDaoService implements ReviewDao {
 
-
   final CodeReviewer reviewer;
 
   final Submission submission;
@@ -63,6 +62,7 @@ public class MarmosetDaoService implements ReviewDao {
   final ReviewerDto reviewerDto;
   final Map<String, List<String>> text;
   final Map<String, FileDto> files = new TreeMap<String, FileDto>();
+  boolean requestReviewOnPublish;
 
   /** Caches some information about code review. Nulled out whenever we get a new database connection */
   @CheckForNull CodeReviewSummary summary;
@@ -126,9 +126,13 @@ public class MarmosetDaoService implements ReviewDao {
       this.student = reviewer.getStudent();
       nameOfReviewer = reviewer.getName();
       isAuthor = reviewer.isAuthor();
-      this.project = getSummary().getProject();
+      CodeReviewSummary summary = getSummary();
+      Set<Integer> reviewers = summary.getCodeReviewerMap().keySet();
+      this.requestReviewOnPublish = isAuthor && 
+              !reviewer.isInstructor() && reviewers.size() == 1;
+      this.project = summary.getProject();
 
-      this.codeAuthor = getSummary().getAuthor();
+      this.codeAuthor = summary.getAuthor();
      
       if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
           StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
@@ -176,6 +180,7 @@ public class MarmosetDaoService implements ReviewDao {
     }
   }
 
+
   private final String authorName;
   public MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer thisReviewer) {
 
@@ -189,9 +194,13 @@ public class MarmosetDaoService implements ReviewDao {
       this.student = reviewer.getStudent();
       nameOfReviewer = reviewer.getName();
       isAuthor = reviewer.isAuthor();
-      this.project = getSummary().getProject();
+      CodeReviewSummary summary = getSummary();
+      this.project = summary.getProject();
+      Set<Integer> reviewers = summary.getCodeReviewerMap().keySet();
+      this.requestReviewOnPublish = isAuthor && 
+              !reviewer.isInstructor() && reviewers.size() == 1;
       
-      this.codeAuthor = getSummary().getAuthor();
+      this.codeAuthor = summary.getAuthor();
 
 
       if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
@@ -262,11 +271,11 @@ public class MarmosetDaoService implements ReviewDao {
    * Return a BitSet with one bit for every line in a file, where a set bit indicates a thread is
    * present on that line.
    */
-  private BitSet getLinesWithThreads(String path, int lines) {
+  private BitSet getLinesWithThreads(@Nonnull String path, int lines) {
     BitSet withThreads = new BitSet(lines);
     CodeReviewSummary summary = getSummary();
     for (CodeReviewThread thread : summary.getThreadMap().values()) {
-      if (thread.getFile().equals(path)) {
+      if (path.equals(thread.getFile())) {
         withThreads.set(thread.getLine());
       }
     }
@@ -319,63 +328,85 @@ public class MarmosetDaoService implements ReviewDao {
   }
 
   @Override
+  public Collection<? extends ThreadDto> getGeneralCommentThreads() {
+      CodeReviewSummary summary = getSummary();
+      TreeSet<ThreadDto> result = new TreeSet<ThreadDto>();
+      for (CodeReviewThread t : summary.getThreadMap().values()) {
+          String path = t.getFile();
+          if (path == null) 
+              result.add(getThreadDto(t));
+      }
+      return result;
+  }
+      
+   private ThreadDto getThreadDto(CodeReviewThread t) {
+      
+        CodeReviewSummary summary = getSummary();
+
+        int id = t.getCodeReviewThreadPK();
+        ThreadDto thread = new ThreadDto(id, t.getFile(), t.getLine(),
+                summary.isNeedsResponse(t));
+        RubricEvaluation e = summary.getRubricForThread(t);
+        if (e != null) {
+            Rubric r = summary.getRubric(e.getRubricPK());
+            if (r == null) {
+                System.out.println("Could not find rubric " + e.getRubricPK()
+                        + " for " + e.getRubricEvaluationPK());
+
+            } else {
+                RubricEvaluationDto tmp = makeRubricEvaluationDto(t, r, e);
+                if (e.getCodeReviewerPK() == reviewer.getCodeReviewerPK()
+                        && !e.getStatus().equals("DEAD")) {
+                    tmp.setEditable(true);
+                }
+                thread.setRubricEvaluation(tmp);
+            }
+       }
+       
+       Map<Integer, CodeReviewer> reviewers = summary.getCodeReviewerMap();
+
+       for (CodeReviewComment c : summary.getComments(t)) {
+         CodeReviewer student = reviewers.get(c.getCodeReviewerPK());
+         String name = student.getName();
+         CommentDto comment = new CommentDto(c.getCodeReviewCommentPK(),
+             id, name);
+         comment.setContents(c.getComment());
+         comment.setAcknowledgement(c.isAck());
+         comment.setTimestamp(c.getModified().getTime());
+         if (!c.isDraft()) {
+           thread.addPublishedComment(comment);
+         } else {
+           assert wroteComment(c);
+           if (thread.getDraft() != null)
+             System.out
+                 .printf(" multiple draft comments by %d on thread %d%n",
+                     c.getCodeReviewerPK(),
+                     c.getCodeReviewThreadPK());
+           comment.setDraft(true);
+           thread.setDraft(comment);
+
+         }
+       }
+       return thread;
+   }
+  @Override
   public Collection<FileDto> getFiles() {
 
-    Map<Integer, ThreadDto> threadMap = new HashMap<Integer, ThreadDto>();
     CodeReviewSummary summary = getSummary();
     for (FileDto f : files.values())
       f.getThreads().clear();
 
-    Map<Integer, CodeReviewer> reviewers = summary.getCodeReviewerMap();
-
-    for (CodeReviewThread t : summary.getThreadMap().values()) {
+     for (CodeReviewThread t : summary.getThreadMap().values()) {
       String path = t.getFile();
+      if (path == null) 
+          continue;
       FileDto file = files.get(path);
       if (file == null) {
         System.out.printf(" Cannot find file %s for thread %d%n", path,
             t.getCodeReviewThreadPK());
         continue;
       }
-
-      int id = t.getCodeReviewThreadPK();
-      ThreadDto thread = new ThreadDto(id, path, t.getLine(),
-          summary.isNeedsResponse(t));
-      threadMap.put(id, thread);
-      RubricEvaluation e = summary.getRubricForThread(t);
-      if (e != null) {
-        Rubric r = summary.getRubric(e.getRubricPK());
-        if (r == null) {
-            System.out.println("Could not find rubric " + e.getRubricPK() + " for " + e.getRubricEvaluationPK());
-            continue;
-        }
-        RubricEvaluationDto tmp = makeRubricEvaluationDto(t, r, e);
-        if (e.getCodeReviewerPK() == reviewer.getCodeReviewerPK() && !e.getStatus().equals("DEAD")) {
-          tmp.setEditable(true);
-        }
-        thread.setRubricEvaluation(tmp);
-      }
-      for (CodeReviewComment c : summary.getComments(t)) {
-        CodeReviewer student = reviewers.get(c.getCodeReviewerPK());
-        String name = student.getName();
-        CommentDto comment = new CommentDto(c.getCodeReviewCommentPK(),
-            id, name);
-        comment.setContents(c.getComment());
-        comment.setAcknowledgement(c.isAck());
-        comment.setTimestamp(c.getModified().getTime());
-        if (!c.isDraft()) {
-          thread.addPublishedComment(comment);
-        } else {
-          assert wroteComment(c);
-          if (thread.getDraft() != null)
-            System.out
-                .printf(" multiple draft comments by %d on thread %d%n",
-                    c.getCodeReviewerPK(),
-                    c.getCodeReviewThreadPK());
-          comment.setDraft(true);
-          thread.setDraft(comment);
-
-        }
-      }
+      ThreadDto thread = getThreadDto(t);
       file.addThread(thread);
     }
 
@@ -388,7 +419,7 @@ public class MarmosetDaoService implements ReviewDao {
 
 
   @Override
-  public ThreadDto createThread(String file, int line) {
+  public ThreadDto createThread(@CheckForNull String file, int line) {
     Connection conn = null;
     try {
       conn = getConnection();
@@ -408,7 +439,7 @@ public class MarmosetDaoService implements ReviewDao {
   }
 
   @Override
-  public ThreadDto createThreadWithRubric(String file, int line, RubricDto rubricDto) {
+  public ThreadDto createThreadWithRubric(@CheckForNull String file, int line, RubricDto rubricDto) {
     Connection conn = null;
     try {
       conn = getConnection();
@@ -640,9 +671,7 @@ public class MarmosetDaoService implements ReviewDao {
       }
 
       reviewer.addComments(conn, commentIds.size(), now);
-      if (codeAuthor == null) {
-        this.codeAuthor = CodeReviewer.lookupOrInsertAuthor(conn, submission, reviewer.getCodeReviewAssignment(), "");
-      }
+      didPublish(conn);
 
     } catch (SQLException e) {
       throw new RuntimeException(e);
@@ -652,6 +681,15 @@ public class MarmosetDaoService implements ReviewDao {
 
   }
 
+  private void didPublish(Connection conn) throws SQLException {
+      if (codeAuthor == null) {
+          this.codeAuthor = CodeReviewer.lookupOrInsertAuthor(conn, submission, reviewer.getCodeReviewAssignment(), "");
+        }
+        if (requestReviewOnPublish) {
+            submission.markReviewRequest(conn, project);
+            requestReviewOnPublish = false;
+        }
+  }
   @Override
   public void publishAllDrafts() {
     Connection conn = null;
@@ -662,9 +700,7 @@ public class MarmosetDaoService implements ReviewDao {
       int count = CodeReviewComment.publishAll(reviewer, now, conn);
       reviewer.addComments(conn, count, now);
       RubricEvaluation.publishAll(reviewer, now, conn);
-      if (codeAuthor == null)  {
-        this.codeAuthor = CodeReviewer.lookupOrInsertAuthor(conn, submission,reviewer.getCodeReviewAssignment(), "");
-      }
+     didPublish(conn);
 
     } catch (SQLException e) {
       throw new RuntimeException(e);

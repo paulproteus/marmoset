@@ -119,6 +119,7 @@ an extension on project
 						value="/view/instructor/submission.jsp">
 						<c:param name="submissionPK" value="${submission.submissionPK}" />
 					</c:url>
+        <c:set var="testOutcomes" value="${testOutcomesMap[submission.submissionPK]}"/>
 		<tr class="r${counter.index % 2}">
 			<td>${submission.submissionNumber}</td>
 
@@ -160,10 +161,10 @@ an extension on project
                         </c:if>
 
 						<c:if test="${testProperties.language=='java'}">
-							<td><c:if test="${testOutcomesMap[submission.submissionPK].numFindBugsWarnings > 0}">
-							${testOutcomesMap[submission.submissionPK].numFindBugsWarnings}</c:if></td>
-							<td><c:if test="testOutcomesMap[submission.submissionPK].numStudentWrittenTests > 0">
-							${testOutcomesMap[submission.submissionPK].numStudentWrittenTests}</c:if></td>
+							<td><c:if test="${testOutcomes.numFindBugsWarnings > 0}">
+							${testOutcomes.numFindBugsWarnings}</c:if></td>
+							<td><c:if test="${testOutcomes.numStudentWrittenTests > 0}">
+							${testOutcomes.numStudentWrittenTests}</c:if></td>
 						</c:if>
 
 					</c:when>

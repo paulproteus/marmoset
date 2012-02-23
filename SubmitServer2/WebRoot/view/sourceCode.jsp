@@ -54,7 +54,7 @@
  	<c:set var="baseURL8" value="${baseURL}tabWidth=8&${qs}"/>
 
 	<p style="margin-left:1em">
-		<b><acronym title="The number of spaces assigned to each tab">Tab Width</acronym>:</b>
+		<b><abbr title="The number of spaces assigned to each tab">Tab Width</abbr>:</b>
 		  <a href="${baseURL3}">3 Columns</a>
 		| <a href="${baseURL4}">4 Columns</a>
 		| <a href="${baseURL8}">8 Columns</a>

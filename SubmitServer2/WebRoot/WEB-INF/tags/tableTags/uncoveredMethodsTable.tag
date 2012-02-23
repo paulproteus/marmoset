@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewLink" value="/view"/>
 
 <c:if test="${not empty testOutcomeCollection.uncoveredMethods}">
 	<h3> These methods are not covered by a Public or student-written test </h3>
@@ -21,7 +21,7 @@
 			<td class="left">${outcome.exceptionClassName}</td>
 			<td class="left">${outcome.htmlTestName}</td>
 			<td class="right">${outcome.pointValue}</td>
-			<td class="left">${ss:hotlink(outcome, viewSourceLink)}</td>
+			<td class="left">${ss:hotlink(outcome, viewLink)}</td>
 		</tr>
 		</c:forEach>
 	</table>

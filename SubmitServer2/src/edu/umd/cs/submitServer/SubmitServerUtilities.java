@@ -120,7 +120,7 @@ public final class SubmitServerUtilities {
 	
 	public static <T> String selected(@CheckForNull T currentVal, T selectVal) {
 	    if (currentVal instanceof Enum<?>
-	            && ((Enum)currentVal).name().equals(selectVal))
+	            && ((Enum<?>)currentVal).name().equals(selectVal))
 	        return "selected";
 		return currentVal != null && currentVal.equals(selectVal) ? "selected" : "";
 	}

@@ -612,6 +612,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						testOutcomeCollection);
 			if (submission != null) {
 				request.setAttribute("submission", submission);
+				boolean isReviewRequested = submission.isReviewRequested(conn);
+				request.setAttribute("reviewRequested", isReviewRequested);
 
 			}
 			if (releaseInformation != null)

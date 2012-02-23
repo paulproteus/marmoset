@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 
-<c:url var="viewSourceLink" value="/view"/>
+<c:url var="viewLink" value="/view"/>
 
 <c:set var="instructor" value="${fn:contains(pageContext.request.servletPath,'instructor')}"/>
 <c:if test="${not empty testOutcomeCollection.findBugsOutcomes}">
@@ -23,7 +23,7 @@
 				<c:set var="numDisplayed" value="${numDisplayed + 1}" />
 
 				<td class="description">
-					<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+					<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 				</td>
 
 				<c:if test="${instructor}">

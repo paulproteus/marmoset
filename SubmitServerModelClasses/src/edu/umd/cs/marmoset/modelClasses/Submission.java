@@ -2066,6 +2066,69 @@ public class Submission implements ITestSummary<Submission> {
 		return first;
 		}
 		
-	
-	
+	  public  boolean markReviewRequest(Connection conn,
+              Project project) {
+          String query = "INSERT IGNORE review_requests SET " 
+                  + " submission_pk = ?, course_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK(),
+                  project.getCoursePK());
+          return stmt.execute();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
+	  public  boolean isReviewRequested(Connection conn) {
+          String query = "SELECT submission_pk FROM review_requests WHERE " 
+                  + " submission_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          ResultSet rs = stmt.executeQuery();
+          return rs.next();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
+      public  boolean removeReviewRequest(Connection conn) {
+          String query = "DELETE FROM review_requests WHERE " 
+                  + " submission_pk = ?";
+          PreparedStatement stmt = null;
+          try {
+          
+          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          return stmt.execute();
+          } catch (SQLException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+             Queries.closeStatement(stmt);
+          }
+      }
+      
+	  public static List<Submission> lookupAllReviewRequests(
+	            int coursePK,
+	            Connection conn)
+	    throws SQLException
+	    {
+	        String query = "SELECT " +ATTRIBUTES+ " "+
+	        " FROM " +
+	        " submissions, review_requests " +
+	        " WHERE submissions.submission_pk = review_requests.submission_pk" +
+	        " AND review_requests.course_pk = ? " +
+	        " ORDER BY submissions.submission_timestamp ASC ";
+
+	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK);
+
+	        return getListFromPreparedStatement(stmt);
+	    }
 }

@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewLink" value="/view"/>
 
 <h2>PMD Warnings</h2>
 	<p>
@@ -19,7 +19,7 @@
 			<c:set var="numDisplayed" value="${numDisplayed + 1}" />
 			<td> ${pmd.testName}</td>
 			<td> ${pmd.longTestResult}</td>
-			<td> <c:out value="${ss:hotlink(pmd, viewSourceLink)}" escapeXml="false"/></td>
+			<td> <c:out value="${ss:hotlink(pmd, viewLink)}" escapeXml="false"/></td>
 			<td> ${pmd.exceptionClassName}</td>
 			</tr>
 		</c:forEach>

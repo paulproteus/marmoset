@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 
-<c:url var="viewSourceLink" value="/view/sourceCode.jsp"/>
+<c:url var="viewLink" value="/view"/>
 
 <c:if test="${not empty testOutcomeCollection.studentOutcomes}">
 <h2>Student-written test results</h2>
@@ -47,7 +47,7 @@
 
 			<c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
-				<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</td>
 			<c:if test="${userSession.superUser}">
 			<td>

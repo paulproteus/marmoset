@@ -4,7 +4,7 @@
 
 <h2>Test results</h2>
 
-<c:url var="viewSourceLink" value="/view/"/>
+<c:url var="viewLink" value="/view"/>
 
 <table class="testResults">
 	<c:set var="numDisplayed" value="${numDisplayed + 1}" />
@@ -47,7 +47,7 @@
 
 			<c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
-			<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+			<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>
@@ -116,7 +116,7 @@
 				<c:out value="${test.shortTestResult}" />
 			</td>
 			<td class="description">
-				<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>
@@ -163,7 +163,7 @@
 				<c:out value="${test.shortTestResult}" />
 			</td>
 			<td class="description">
-				<c:out value="${ss:hotlink(test, viewSourceLink)}" escapeXml="false"/>
+				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>

@@ -482,6 +482,7 @@ CREATE TABLE IF NOT EXISTS `test_outcomes` (
   `coarsest_coverage_level` enum('method','statement','branch','none') DEFAULT NULL,
   `exception_source_covered_elsewhere` tinyint(1) NOT NULL DEFAULT '0',
   `details` mediumblob,
+  `execution_time_ms` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`test_run_pk`,`test_type`,`test_number`,`outcome`),
   KEY `test_type` (`test_type`),
   KEY `test_run_pk` (`test_run_pk`),
@@ -550,6 +551,18 @@ CREATE TABLE IF NOT EXISTS `test_setup_archives` (
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE  `review_request` (
+`review_request_pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`submission_pk` INT NOT NULL ,
+`course_pk` INT NOT NULL ,
+INDEX (  `course_pk` ) ,
+UNIQUE (
+`submission_pk`
+)
+) ENGINE = INNODB;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

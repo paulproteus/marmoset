@@ -35,10 +35,8 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
-import javax.annotation.meta.When;
-
-import edu.umd.cs.marmoset.modelClasses.CodeReviewer.PK;
 
 public class CodeReviewThread implements Comparable<CodeReviewThread> {
 
@@ -72,7 +70,7 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
     public static final String ATTRIBUTES = Queries.getAttributeList(TABLE_NAME, ATTRIBUTE_NAME_LIST);
 
     private final @CodeReviewThread.PK
-    int codeReviewThreadPK;// non-NULL, autoincrement
+    int codeReviewThreadPK;// autoincrement
     private final @Submission.PK
     int submissionPK;
 
@@ -83,7 +81,7 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
         
     }
     private final Timestamp created;
-    private final String file;
+    private final @CheckForNull String file;
     private final int line;
     private final @CodeReviewer.PK
     int createdBy;
@@ -128,7 +126,7 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
 
     }
 
-    public String getFile() {
+    public @CheckForNull String getFile() {
         return file;
     }
 
@@ -148,22 +146,13 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
      * @param when
      * @throws SQLException
      */
-    public CodeReviewThread(Connection conn, @Submission.PK int submissionPK, String file, int line, Timestamp created,
+    public CodeReviewThread(Connection conn, @Submission.PK int submissionPK, @CheckForNull String file, int line, Timestamp created,
             @CodeReviewer.PK int createdBy) throws SQLException {
         this(conn, submissionPK, file, line, created, createdBy, 0);
     }
 
-    /**
-     * @param file
-     * @param line
-     * @param rubricEvaluationPK
-     *            TODO
-     * @param codeReviewerPK
-     * @param comment
-     * @param when
-     * @throws SQLException
-     */
-    public CodeReviewThread(Connection conn, @Submission.PK int submissionPK, String file, int line, Timestamp created,
+
+    public CodeReviewThread(Connection conn, @Submission.PK int submissionPK, @CheckForNull String file, int line, Timestamp created,
             @CodeReviewer.PK int createdBy, @RubricEvaluation.PK int rubricEvaluationPK) throws SQLException {
         this.file = file;
         this.line = line;
@@ -182,15 +171,7 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
         }
     }
 
-    /**
-     * @param codeReviewCommentPK
-     * @param codeReviewerPK
-     * @param file
-     * @param line
-     * @param comment
-     * @param modified
-     * @throws SQLException
-     */
+
     public CodeReviewThread(ResultSet resultSet, int startingFrom) throws SQLException {
         this.codeReviewThreadPK = CodeReviewThread.asPK(resultSet.getInt(startingFrom++));
         this.submissionPK = Submission.asPK(resultSet.getInt(startingFrom++));
@@ -246,9 +227,19 @@ public class CodeReviewThread implements Comparable<CodeReviewThread> {
         }
     }
 
+    static <T extends Comparable<? super T>> int nullSafeCompareTo(T a1, T a2) {
+        if (a1 == a2)
+            return 0;
+        if (a1 == null) 
+            return -1;
+        if (a2 == null)
+            return 1;
+        return a1.compareTo(a2);
+    }
     @Override
     public int compareTo(CodeReviewThread that) {
-        int result = this.file.compareTo(that.file);
+       
+        int result = nullSafeCompareTo(this.file, that.file);
         if (result != 0)
             return result;
         result = this.line - that.line;

@@ -115,6 +115,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		return pk;
 	}
 	
+	
 	public static final String TABLE_NAME = "code_reviewer";
 
 	/**
@@ -165,7 +166,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	private final  @Submission.PK int submissionPK;
 	private final  @Student.PK int studentPK;
 	private final boolean isAuthor;
-	private final @Nonnull String knownAs;
+	private @Nonnull String knownAs;
 	private Timestamp lastUpdate = null;
 	private final boolean isInstructor;
 	private final boolean isAutomated;
@@ -198,6 +199,11 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	public String getKnownAs() {
 		return knownAs;
 	}
+	
+	   
+    public void setKnownAs(String knownAs) {
+        this.knownAs = knownAs;
+    }
 	
 	public String getName() {
 	    if (Student.FAKE_NAMES)
@@ -279,16 +285,30 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		}
 	}	
 
-	public static CodeReviewer lookupOrInsertAuthor(Connection conn, Submission submission, CodeReviewAssignment assignment,
+	public static CodeReviewer lookupOrInsertAuthor(Connection conn, Submission submission, 
+	        @CheckForNull CodeReviewAssignment assignment,
 			String authorKnownAs) throws SQLException {
 		StudentRegistration sr = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
         int submissionPK = submission.getSubmissionPK();
         int studentPK = sr.getStudentPK();
+        int assignmentPK = 0;
+        if (assignment != null)
+            assignmentPK = assignment.getCodeReviewAssignmentPK();
 
 		CodeReviewer result = lookupBySubmissionAndStudentPK(submissionPK, studentPK, conn);
         if (result != null) {
         	if (true != result.isAuthor)
         		throw new IllegalArgumentException("Existing codeReviewer has inconsistent isAuthor value");
+        	if (!authorKnownAs.equals(result.getKnownAs()) || result.getCodeReviewAssignmentPK() != assignmentPK) {
+        	    result.setKnownAs(authorKnownAs);
+        	    result.codeReviewAssignmentPK = assignmentPK;
+        	    String u = "UPDATE  " + TABLE_NAME + " SET code_review_assignment_pk = ?, known_as = ? "
+                        + " WHERE code_reviewer_pk = ?";
+                PreparedStatement update = Queries.setStatement(conn, u, assignmentPK, authorKnownAs,
+                        result.getCodeReviewerPK());
+                update.execute();
+        	}
+        	    
         	return result;
         }
         return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor(), false);
@@ -296,10 +316,13 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 
 	public static @Nonnull CodeReviewer lookupOrAddReviewer(Connection conn,  Submission submission,
            StudentRegistration commenter) throws SQLException {
+	    
 	    CodeReviewer reviewer = CodeReviewer.lookupOrAddReviewer(conn, submission.getSubmissionPK(),
 	            commenter.getStudentPK(), "",
                 submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK(),
                 commenter.isInstructor());
+	    if (commenter.isInstructor())
+            submission.removeReviewRequest(conn);
 	    return reviewer;
 	    
 	}
