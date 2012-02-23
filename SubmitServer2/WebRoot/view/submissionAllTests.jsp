@@ -48,8 +48,8 @@
 	<tr>
 		<th colspan=2>Test Setup
 		<th rowspan="2">Date Ran</th>
-		<th rowspan="2">View Results<br><acronym title="Public Tests">P</acronym> 
-									| <acronym title="Release Tests">R</acronym></th>
+		<th rowspan="2">View Results<br><abbr title="Public Tests">P</abbr> 
+									| <abbr title="Release Tests">R</abbr></th>
 	<tr>
 		<th>Version</th>
 		<th>Test Setup tested</th>

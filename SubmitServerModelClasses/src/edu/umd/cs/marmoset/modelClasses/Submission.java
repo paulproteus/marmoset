@@ -152,7 +152,6 @@ public class Submission implements ITestSummary<Submission> {
     private int numFindBugsWarnings;
     private int numChangedLines = -1; // -1 means unknown
 	private Integer archivePK; // may be NULL
-	private boolean reviewRequested;
 	/**
 	 * This is a write-only field.  Users can set a byte array as the cached archive
 	 * for upload, but they can only retrieve the archive via the
@@ -216,8 +215,7 @@ public class Submission implements ITestSummary<Submission> {
 		"num_secret_tests_passed",
 		"num_findbugs_warnings",
 		"num_changed_lines",
-		"archive_pk",
-		"review_requested"
+		"archive_pk"
 	};
 
 	/**
@@ -2109,7 +2107,7 @@ public class Submission implements ITestSummary<Submission> {
 	        String query = "SELECT " +ATTRIBUTES+ " "+
 	        " FROM " +
 	        " submissions, review_requests " +
-	        " WHERE submission.submission_pk = review_requests.submission_pk" +
+	        " WHERE submissions.submission_pk = review_requests.submission_pk" +
 	        " AND review_requests.course_pk = ? " +
 	        " ORDER BY submissions.submission_timestamp ASC ";
 

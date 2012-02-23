@@ -301,10 +301,10 @@ without submissions</a>
 		<th><a href="${sortByTime}">last submission</a></th>
 		<th># changed <br/>lines</th>
 		<th>on time<br>
-		<acronym title="Public Tests">P</acronym> | <acronym
-			title="Release Tests">R</acronym> | <acronym title="Secret Tests">S</acronym>
+		<abbr title="Public Tests">P</abbr> | <abbr
+			title="Release Tests">R</abbr> | <abbr title="Secret Tests">S</abbr>
 		<c:if test="${testProperties.language=='java'}">
-					 | <acronym title="Findbugs Warnings">F</acronym>
+					 | <abbr title="Findbugs Warnings">F</abbr>
 		</c:if></th>
 		<th>late</th>
 		<th>very late</th>

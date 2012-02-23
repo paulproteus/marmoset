@@ -482,6 +482,7 @@ CREATE TABLE IF NOT EXISTS `test_outcomes` (
   `coarsest_coverage_level` enum('method','statement','branch','none') DEFAULT NULL,
   `exception_source_covered_elsewhere` tinyint(1) NOT NULL DEFAULT '0',
   `details` mediumblob,
+  `execution_time_ms` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`test_run_pk`,`test_type`,`test_number`,`outcome`),
   KEY `test_type` (`test_type`),
   KEY `test_run_pk` (`test_run_pk`),

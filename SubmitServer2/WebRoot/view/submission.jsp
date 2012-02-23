@@ -75,7 +75,7 @@ or  <c:url var="downloadLink" value="/data/DownloadSubmission">
 <c:param name="submissionPK" value="${submission.submissionPK}"/>
 <c:param name="reviewerPK" value="${reviewer.codeReviewerPK}"/>
 </c:url>
-| <a href="${codeReviewLink}">Code Review</a>
+<p><a href="${codeReviewLink}">Go to Code Review</a>
 </c:if>
 
     <p>

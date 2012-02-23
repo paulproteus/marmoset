@@ -383,18 +383,6 @@
 
   <function>
     <description>
-      Generate code review for all files in submission
-    </description>
-    <name>displayCodeReview</name>
-    <function-class>edu.umd.cs.submitServer.content.DisplaySubmissionSourceCode</function-class>
-    <function-signature>java.lang.String displayCodeReview(java.sql.Connection,edu.umd.cs.marmoset.modelClasses.Submission, edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment,  edu.umd.cs.marmoset.modelClasses.Project, java.lang.String)</function-signature>
-    <example>
-      Name: ${ss:displayCodeReview(connection, submission, codeReviewAssignment, project, link)}
-    </example>
-  </function>
-
-  <function>
-    <description>
       Head javascript for displaying source files
     </description>
     <name>displayAllSourceFilesHead</name>
