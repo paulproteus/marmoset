@@ -6,13 +6,19 @@
     padding-left: 20px;
     border-bottom: 2px solid black;
   }
+  .subtitleLabel {
+	margin-right: 1em;
+  }
+  .titleText {
+	margin-bottom: 0px;
+  }
   </ui:style>
   <g:DockLayoutPanel unit="PX">
     <g:north size="100">
       <g:HTMLPanel styleName="{style.header}">
-        <h1><g:Label ui:field="titleLabel" /></h1>
-         <g:Label ui:field="subtitleLabel" />
-        <g:Anchor ui:field="backAnchor" />
+        <h1 class="{style.titleText}"><g:Label ui:field="titleLabel" /></h1>
+        <g:InlineLabel styleName="{style.subtitleLabel}" ui:field="subtitleLabel" />
+        (back to <g:Anchor ui:field="backAnchor" /> view)
       </g:HTMLPanel>
     </g:north>
     <g:center>
