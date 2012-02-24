@@ -7,9 +7,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -62,7 +62,7 @@ public class MarmosetDaoService implements ReviewDao {
   final SubmitServerDatabaseProperties database;
   final ReviewerDto reviewerDto;
   final Map<String, List<String>> text;
-  final Map<String, FileDto> files = new TreeMap<String, FileDto>();
+  final Map<String, FileDto> files = new LinkedHashMap<String, FileDto>();
   boolean requestReviewOnPublish;
 
   /** Caches some information about code review. Nulled out whenever we get a new database connection */
@@ -633,7 +633,7 @@ public class MarmosetDaoService implements ReviewDao {
   @Override
   public Map<String, TreeSet<ThreadDto>> getThreadsWithDrafts() {
     Collection<FileDto> files = getFiles();
-    Map<String, TreeSet<ThreadDto>> result = new TreeMap<String, TreeSet<ThreadDto>>();
+    Map<String, TreeSet<ThreadDto>> result = new LinkedHashMap<String, TreeSet<ThreadDto>>();
     for (FileDto f : files) {
       TreeSet<ThreadDto> threadsWithDrafts = new TreeSet<ThreadDto>();
       for (ThreadDto t : f.getThreads()) {

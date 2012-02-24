@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifier;
 
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
@@ -63,7 +64,7 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 
     @Override
 	public int hashCode() {
-    		if (studentRegistrationPK != null)
+    		if (studentRegistrationPK != 0)
     			return studentRegistrationPK;
     		return getLastname().hashCode() + 31*getFirstname().hashCode();
 	}
@@ -75,12 +76,12 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 		if (!(obj instanceof StudentRegistration))
 			return false;
 		StudentRegistration other = (StudentRegistration) obj;
-		if (studentRegistrationPK == null) {
-			if (other.studentRegistrationPK != null)
+		if (studentRegistrationPK == 0) {
+			if (other.studentRegistrationPK != 0)
 				return false;
 			return getLastname().equals(other.getLastname()) && getFirstname().equals(other.getFirstname());
 		} else
-			return studentRegistrationPK.equals(other.studentRegistrationPK);
+			return studentRegistrationPK == other.studentRegistrationPK;
 	}
 
 	public static final Comparator<StudentRegistration> classAccountComparator = new Comparator<StudentRegistration> () {
@@ -203,17 +204,17 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
             
     }
 	public static final String TABLE_NAME = "student_registration";
-    private @StudentRegistration.PK Integer studentRegistrationPK; // non-NULL, autoincrement
+    private @StudentRegistration.PK int studentRegistrationPK; // autoincrement
 	private int coursePK; 
 	private @Student.PK int studentPK; 
-	private String classAccount;
+	private @Nonnull String classAccount;
 	private @CheckForNull @Capability String instructorCapability;
-    private String firstname;
-    private String lastname;
+    private @Nonnull String firstname;
+    private @Nonnull  String lastname;
     private boolean inactive = false;
     private boolean dropped = false;
-    private String course;
-    private String section;
+    private @Nonnull String course;
+    private @Nonnull String section;
     private int courseID;
 
     @Override
@@ -299,14 +300,17 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 	}
     public String getSection() {
         if (section == null || section.length() == 0)
-            return section;
+            return "";
         if (course != null && course.length() > 0)
             return course + "-" + section;
 		return section;
 	}
 
 	public void setSection(String section) {
-		this.section = section;
+	    if (section == null)
+	        this.section = "";
+	    else
+	        this.section = section;
 	}
 
 	public String getCourse() {
@@ -314,7 +318,10 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 	}
 
 	public void setCourse(String course) {
-		this.course = course;
+	    if (course == null)
+	        this.course = "";
+	    else 
+	        this.course = course;
 	}
 
 	public int getCourseID() {

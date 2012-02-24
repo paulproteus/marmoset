@@ -153,10 +153,46 @@ most recent at  <fmt:formatDate
 	<c:if test="${empty testSetup}">
 	<li>No test setup</li>
 	</c:if>
-	<li> build status: ${submission.buildStatus}
-	   <c:if test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'RETEST'}">
-    (being tested)
-    </c:if>
+    
+    
+<c:url var="submissionStatusLink"  value="/view/submissionStatus.jsp">
+<c:param name="submissionPK" value="${submission.submissionPK}"/>
+</c:url>
+
+    <li>build status: <span id="buildStatus">${submission.buildStatus}</span>
+            <c:if test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'NEW' or submission.buildStatus == 'RETEST'}">
+            (will automatically refresh)
+<script>
+$(document).ready(function() {
+    function update() {
+        $.ajax({url: "${submissionStatusLink}",
+            dataType: "json",
+            success: function(status) {
+                $("#buildStatus").html(status.buildStatus);
+            
+            switch(status.buildStatus) {
+            case 'NEW':
+            case 'PENDING':
+            case 'RETEST':
+                startAJAXcalls();
+                break;
+            default:
+                location.reload();
+            }
+            }});
+
+    }
+    function startAJAXcalls() {
+        setTimeout(function() {
+            update();
+        }, 10000)
+    };
+    startAJAXcalls();
+    
+})
+</script>
+    </c:if> 
+
     <c:if test="${submission.numPendingBuildRequests  > 0}">
     (${submission.numPendingBuildRequests} pending build requests)
     </c:if>

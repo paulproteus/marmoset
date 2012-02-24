@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,36 +42,17 @@ import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 public class StudentAccountForInstructor extends SubmitServerServlet {
 
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		Connection conn = null;
-		Course course = (Course) request.getAttribute(COURSE);
+		@CheckForNull Course course = (Course) request.getAttribute(COURSE);
 		Student user = (Student) request.getAttribute(USER);
 		Student student = (Student) request.getAttribute(STUDENT);
-		StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-		if (instructor.getStudentPK() != user.getStudentPK())
-			throw new IllegalArgumentException();
-		if (!instructor.isInstructorModifiy())
-			throw new IllegalArgumentException();
-		
-
+				
+		if (!student.getCanImportCourses())
+		    throw new IllegalArgumentException();
 		try {
 			conn = getConnection();
 
@@ -80,11 +62,18 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
 			student2.setCampusUID(student.getCampusUID());
 			student2.setLoginName(student.getLoginName()+ "-student");
 			student2 = student2.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
-
+			String redirectUrl = request.getContextPath()
+                    + "/view/index.jsp";
+			if (course != null) {
 			StudentRegistration registration = StudentRegistration
 					.lookupByStudentPKAndCoursePK(student2.getStudentPK(),
 							course.getCoursePK(), conn);
 			if (registration == null) {
+			    StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+		        if (instructor.getStudentPK() != user.getStudentPK())
+		            throw new IllegalArgumentException();
+		        if (!instructor.isInstructorModifiy())
+		            throw new IllegalArgumentException();
 
 				registration = new StudentRegistration();
 				registration.setStudentPK(student2.getStudentPK());
@@ -100,16 +89,18 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
 				registration.setCourseID(-1);
 
 				registration.insert(conn);	
+				redirectUrl = request.getContextPath()
+	                    + "/view/course.jsp?coursePK="
+	                    + course.getCoursePK();
 			}
+			};
+			
 			HttpSession session = request.getSession(false);
 			
 			session.invalidate();
 			session = request.getSession(true);
 		
 			PerformLogin.setUserSession(session, student2, conn);
-			String redirectUrl = request.getContextPath()
-					+ "/view/course.jsp?coursePK="
-					+ course.getCoursePK();
 
 			response.sendRedirect(redirectUrl);
 		} catch (SQLException e) {
@@ -122,6 +113,7 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
 	}
 
 
+	@Deprecated
 	private void importStudents(String term, Course course, int courseID,
 			Connection gradesConn, Connection conn) throws SQLException {
 		String query = "SELECT lastName, firstName, uid, directoryID, email, classAccount, role, course, section"

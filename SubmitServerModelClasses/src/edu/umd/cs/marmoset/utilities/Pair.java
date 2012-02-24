@@ -28,8 +28,8 @@ public class Pair<T1, T2> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Pair) {
-			Pair that = (Pair) obj;
+		if (obj instanceof Pair<?,?>) {
+			Pair<?,?> that = (Pair<?,?>) obj;
 			return Objects.nullSafeEquals(this.v1, that.v1)
 					&& Objects.nullSafeEquals(this.v2, that.v2);
 		}

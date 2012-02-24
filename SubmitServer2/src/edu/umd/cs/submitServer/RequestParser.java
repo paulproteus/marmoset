@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -285,6 +286,7 @@ public class RequestParser {
 		course.setUrl(getOptionalCheckedParameter("url"));
 		course.setBrowserEditing(BrowserEditing.valueOfAnyCase(
                 getCheckedParameter("browserEditing")));
+		course.setAllowsBaselineDownload(getCheckbox("download"));
 		return course;
 	}
 
@@ -597,6 +599,18 @@ public class RequestParser {
 			return getOptionalScrubbedParameter(name);
 		}
 	}
+	   public @Nonnull
+	    String getOptionalCheckedParameter(String name, @Nonnull String defaultValue) {
+	       if (!hasParameter(name))
+	           return defaultValue;
+	        Pattern p = MarmosetPatterns.getPattern(name);
+	        
+	        if (p != null) {
+	            return getOptionalRegexParameter(name, p);
+	        } else {
+	            return getOptionalScrubbedParameter(name);
+	        }
+	    }
 
 	/**
 	 * Returns the parameter bound to key as an Integer. Returns null if no such

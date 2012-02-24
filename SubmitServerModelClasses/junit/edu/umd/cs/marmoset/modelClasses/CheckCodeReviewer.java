@@ -2,11 +2,8 @@ package edu.umd.cs.marmoset.modelClasses;
 
 import java.util.Collection;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
-import edu.umd.cs.marmoset.utilities.DatabaseUtilities;
-
 import junit.framework.TestCase;
+import edu.umd.cs.marmoset.utilities.DatabaseUtilities;
 
 public class CheckCodeReviewer extends TestCase {
     public void testCodeReviewers() throws Exception {

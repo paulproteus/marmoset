@@ -48,7 +48,7 @@
     <c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
 
-
+<c:if test="${!peerReview}">
 <h2><c:out value="${studentRegistration.fullname}"/></h2>
 <h2>Submission #${submission.submissionNumber}, submitted at <fmt:formatDate
 	value="${submission.submissionTimestamp}"
@@ -69,7 +69,7 @@ or  <c:url var="downloadLink" value="/data/DownloadSubmission">
                 <c:param name="submissionPK" value="${submission.submissionPK}" />
             </c:url> <a href="${downloadLink}">Download</a>
             source</p>
-        
+   
 <c:choose>    
 <c:when test="${reviewer != null}">
 <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
@@ -82,18 +82,51 @@ or  <c:url var="downloadLink" value="/data/DownloadSubmission">
 <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
 <c:param name="submissionPK" value="${submission.submissionPK}"/>
 </c:url>
-<p><a href="${codeReviewLink}">Request Code Review</a>
+<p><a href="${codeReviewLink}">Request Help</a>
 </c:otherwise>
 </c:choose>
+</c:if> 
+<c:url var="submissionStatusLink"  value="/view/submissionStatus.jsp">
+<c:param name="submissionPK" value="${submission.submissionPK}"/>
+</c:url>
 
-    <p>
-        build status: ${submission.buildStatus}
-        <c:if test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'RETEST'}">
-    (being tested)
-    </c:if>
+    <p>build status: <span id="buildStatus">${submission.buildStatus}</span>
+    
+            <c:if test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'NEW' or submission.buildStatus == 'RETEST'}">
+    (will automatically refresh)
+<script>
+$(document).ready(function() {
+	function update() {
+		$.ajax({url: "${submissionStatusLink}",
+			dataType: "json",
+			success: function(status) {
+				$("#buildStatus").html(status.buildStatus);
+			switch(status.buildStatus) {
+			case 'NEW':
+			case 'PENDING':
+			case 'RETEST':
+				startAJAXcalls();
+				break;
+			default:
+				location.reload();
+			}
+			}});
+	}
+	function startAJAXcalls() {
+		setTimeout(function() {
+			update();
+		}, 10000)
+	};
+	startAJAXcalls();
+	
+});
+</script>
+    </c:if> 
+    </p>
+
         <c:if test="${submission.numPendingBuildRequests  > 0}">
             <p>
-                Submission has ${submission.numPendingBuildRequests} outstanding build requests, most recent at
+                Submission has <span id="numPendingBuildRequests">${submission.numPendingBuildRequests}</span> outstanding build requests, most recent at
                 <fmt:formatDate value="${submission.buildRequestTimestamp}" pattern="dd MMM, hh:mm a" />
         </c:if>
         <c:if test="${testRun != null && project.testSetupPK != testRun.testSetupPK}">
@@ -374,7 +407,10 @@ not empty testOutcomeCollection.releaseOutcomes}">
 
 	</c:otherwise>
 
-</c:choose> <c:if test="${testRunList != null}">
+</c:choose>
+
+
+ <c:if test="${!peerReview && testRunList != null}">
 	<c:url value="/view/submissionAllTests.jsp"
 		var="submissionAllTestsLink">
 		<c:param name="submissionPK" value="${submission.submissionPK}" />

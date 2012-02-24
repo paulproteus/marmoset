@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.submitServer.ClientRequestException;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.StudentForUpload;
@@ -68,11 +69,16 @@ public class RegisterOneStudent extends SubmitServerServlet {
 			        classAccount = student.getLoginName();
 			    String capability = parser
 			            .getOptionalCheckedParameter("capability");
-			    if ("".equals(capability) || "student".equals("capability"))
+			    String section = "";
+	               
+			    if ("".equals(capability) || "student".equals("capability")) {
 			        capability = null;
+			        section = parser.getOptionalCheckedParameter("section");
+			    }
+			       
 
 			    StudentForUpload.registerStudent(course,
-			            student, null, classAccount, null, conn);
+			            student, section, classAccount,  StudentRegistration.asCapability(capability), conn);
 			}
 
 			conn.commit();

@@ -32,6 +32,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -365,6 +366,22 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 
 			}
 
+			if (coursePK != null) {
+                // Get Course and all of its projects
+                course = Course.lookupByCoursePK(coursePK, conn);
+                projectList = Project.lookupAllByCoursePK(coursePK, conn);
+                Collections.reverse(projectList);
+                request.setAttribute(COURSE, course);
+                request.setAttribute(PROJECT_LIST, projectList);
+                request.setAttribute(
+                        SubmitServerConstants.INSTRUCTOR_CAPABILITY, userSession
+                                        .hasInstructorCapability(coursePK));
+                request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, userSession
+                                .hasInstructorActionCapability(coursePK));
+            } else if (user.getCanImportCourses()) {
+                    request.setAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY, true);
+                    request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, true);
+            }
 
 			if (coursePK != null && !studentSpecifiedByInstructor
 					&& userSession.hasInstructorCapability(coursePK)) {
@@ -476,12 +493,12 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				        sectionMap);
 				request.setAttribute(SECTIONS, sectionMap.keySet());
 				
-				if (section != null && !sectionMap.containsKey(section))
-				    throw new IllegalArgumentException("Bad section: " + section);
+				if (section != null && !sectionMap.containsKey(section)) {
+				    List<String> courseSections = Arrays.asList(course.getSections());
+		            if (!courseSections.contains(section))
+				    throw new IllegalArgumentException("Bad section: " + section + " not in " + sectionMap.keySet() + " or " + courseSections);
+				}
 				request.setAttribute("section", section);
-                
-                
-
 			}
 
 			if (coursePK != null && studentPK != null) {
@@ -524,22 +541,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				}
 			}
 
-			if (coursePK != null) {
-				// Get Course and all of its projects
-				course = Course.lookupByCoursePK(coursePK, conn);
-				projectList = Project.lookupAllByCoursePK(coursePK, conn);
-				Collections.reverse(projectList);
-				request.setAttribute(COURSE, course);
-				request.setAttribute(PROJECT_LIST, projectList);
-				request.setAttribute(
-						SubmitServerConstants.INSTRUCTOR_CAPABILITY, userSession
-										.hasInstructorCapability(coursePK));
-				request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, userSession
-								.hasInstructorActionCapability(coursePK));
-			} else if (user.getCanImportCourses()) {
-			        request.setAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY, true);
-			        request.setAttribute(SubmitServerConstants.INSTRUCTOR_ACTION_CAPABILITY, true);
-			}
+			
 
 
 			 if ( submission != null && reviewer == null) {
@@ -577,10 +579,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			              
 			}
 			
-		     boolean viewOfAnotherStudentsCode = !userSession.getStudentPK()
-	                    .equals(studentPK);
-	            boolean isCodeReviewer = reviewer != null && submission != null
-	                    && reviewer.getSubmissionPK() == submission.getSubmissionPK();
+			boolean viewOfAnotherStudentsCode = !userSession.getStudentPK()
+			        .equals(studentPK);
+			boolean isCodeReviewer = reviewer != null && submission != null
+			        && reviewer.getSubmissionPK() == submission.getSubmissionPK();
 
 			if (project != null && submission == null) {
 			    Set<Integer> submissionsWithReviews = null;
@@ -607,6 +609,22 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 						"Authentication Error");
 				return;
+			}
+			
+			request.setAttribute("anonymousReview", false);
+			request.setAttribute("peerReview", false);
+			if (viewOfAnotherStudentsCode && isCodeReviewer) {
+			    request.setAttribute("peerReview", true);
+			    String uri = request.getRequestURI();
+			    if (!uri.endsWith("/view/submission.jsp")
+			            && !uri.endsWith("view/sourceFiles.jsp")
+			            && !uri.contains("/view/codeReview/")
+			            )
+			        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+	                        "Authentication Error");			        
+			    if (codeReviewAssignment.isAnonymous())
+			        request.setAttribute("anonymousReview", true);
+			    
 			}
 
 			request.setAttribute("instructorViewOfStudent",

@@ -553,7 +553,7 @@ CREATE TABLE IF NOT EXISTS `test_setup_archives` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE  `review_request` (
+CREATE TABLE  `review_requests` (
 `review_request_pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `submission_pk` INT NOT NULL ,
 `course_pk` INT NOT NULL ,

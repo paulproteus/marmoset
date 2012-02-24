@@ -31,6 +31,8 @@ package edu.umd.cs.submitServer;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
@@ -55,7 +57,7 @@ public class StudentForUpload {
 	public final String firstname;
 	public final String lastname;
 	public final String classAccount;
-	public final String section;
+	public final @Nonnull String section;
 	public final boolean inactive;
 	public final boolean dropped;
 
@@ -78,6 +80,8 @@ public class StudentForUpload {
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.classAccount = classAccount;
+		if (section == null)
+		    section = "";
 		this.section = section;
 
 		this.inactive = inactive;
@@ -142,12 +146,11 @@ public class StudentForUpload {
 		campusUID = parser.getCheckedParameter("campusUID");
 		classAccount = parser.getOptionalCheckedParameter("classAccount");
 		loginName = parser.getCheckedParameter("loginName");
-		// XXX section is optional until I get the section integrated into
-		section = parser.getOptionalCheckedParameter("section");
+		section = parser.getOptionalCheckedParameter("section","");
+
 
 		this.inactive  = "on".equals(parser.getParameter("inactive"));
 		this.dropped  = "on".equals(parser.getParameter("dropped"));
-
 	}
 
 	@Override
@@ -161,11 +164,11 @@ public class StudentForUpload {
 	public static void registerStudent(Course course, StudentForUpload s,
 			@Capability String capability, Connection conn) throws SQLException {
 		Student student = s.lookupOrInsert(conn);
-		registerStudent( course,  student, null, s.classAccount, capability, conn);
+		registerStudent( course,  student, "", s.classAccount, capability, conn);
 	}
 	
 	public static StudentRegistration registerStudent(Course course, Student student,
-			String section,
+			@Nonnull String section,
 			String classAccount, @Capability String capability, Connection conn) throws SQLException {
 		
 		StudentRegistration registration = StudentRegistration
@@ -180,6 +183,7 @@ public class StudentForUpload {
 			registration.setInstructorCapability(capability);
 			registration.setFirstname(student.getFirstname());
 			registration.setLastname(student.getLastname());
+			registration.setSection(section);
 			registration.insert(conn);
 		} 
 		return registration;

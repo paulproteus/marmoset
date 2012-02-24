@@ -4,8 +4,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import edu.umd.cs.marmoset.utilities.EditDistance.DistanceMetric;
-
 public class EditDistance<T> {
 
   private final DistanceMetric<T> metric;

@@ -25,19 +25,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
-<!-- Don't redirect when there's only a single course; we need to show the list of courses to register for. -->
-<c:if test="${false}">
-    <c:if test="${singleCourse && instructorCapability}">
-        <c:redirect url="/view/instructor/course.jsp">
-            <c:param name="coursePK" value="${courseList[0].coursePK}" />
-        </c:redirect>
-    </c:if>
-    <c:if test="${singleCourse}">
-        <c:redirect url="/view/course.jsp">
-            <c:param name="coursePK" value="${courseList[0].coursePK}" />
-        </c:redirect>
-    </c:if>
-</c:if>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -200,7 +187,12 @@ label.error {
                             <input type="hidden" name="studentPK" value="${userSession.superuserPK}" /> <input
                                 type="submit" value="Become superuser" />
                         </form></li>
-                </c:if>
+
+                 <li><c:url var="studentAccountForInstructorLink" value="/action/instructor/StudentAccountForInstructor" />
+                <form action="${studentAccountForInstructorLink}" method="post" name="studentAccountForInstructorForm">
+                    <input type="submit" value="Become pseudo-student">
+                </form></li>
+                                </c:if>
             </ul>
         </div>
     </c:if>

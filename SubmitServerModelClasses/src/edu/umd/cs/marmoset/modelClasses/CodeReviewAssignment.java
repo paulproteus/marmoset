@@ -38,7 +38,6 @@ import java.util.LinkedList;
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
-import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment.Kind;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 public class CodeReviewAssignment {

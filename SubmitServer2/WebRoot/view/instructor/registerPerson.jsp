@@ -86,9 +86,23 @@
             <tr>
                 <td class="label">Class account</td>
                 <td class="input"><input name="classAccount" type="text"
-                    value="" autocorrect="off" autocapitalize="off"/>
+                    value="" autocorrect="off" autocapitalize="off"
+                    placeholder="leave blank to use login name" size="30"/>
                 </td>
             </tr>
+            <c:if test="${not empty course.sections}">
+            <tr>
+            <td class="label">Section</td>
+                  <td class="input">
+                  <select name="section">
+                   <c:forEach var="s" items="${course.sections}">
+                            <option>
+                                <c:out value="${s}"></c:out>
+                        </c:forEach>
+                  </select>
+              
+            </tr>
+            </c:if>
              <tr>
                 <td class="label">Capability</td>
                 <td class="input">

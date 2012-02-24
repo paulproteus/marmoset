@@ -111,7 +111,7 @@ public class RegisterStudentsFilter extends SubmitServerFilter {
                     StudentForUpload s = new StudentForUpload(line, delimiter);
 
                     Student student = s.lookupOrInsert(conn);
-                    StudentRegistration sr = StudentForUpload.registerStudent(course, student, null, s.classAccount, null, conn);
+                    StudentRegistration sr = StudentForUpload.registerStudent(course, student, s.section, s.classAccount, null, conn);
                     registeredStudents.add(sr);
 
                 } catch (IllegalStateException e) {
