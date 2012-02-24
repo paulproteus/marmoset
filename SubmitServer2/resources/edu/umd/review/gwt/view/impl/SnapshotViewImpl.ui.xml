@@ -17,7 +17,6 @@
     <v:GeneralCommentsView ui:field="generalCommentsView" />
     <g:FocusPanel ui:field="outer">
     <g:FlowPanel>
-          <g:Label styleName="{style.header}">Files</g:Label>
       <g:FlowPanel ui:field="mainPanel" />
 
       </g:FlowPanel>

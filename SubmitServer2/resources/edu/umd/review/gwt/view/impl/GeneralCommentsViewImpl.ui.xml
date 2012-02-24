@@ -1,19 +1,22 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style type="edu.umd.review.gwt.view.impl.GeneralCommentsViewImpl.Style">
-	.headerLabel {
-	   font-size: 120%;
-	   font-weight: bold;
-	}
-	.hovering {
-	   background-color: #ff9;
-	}
+	<ui:with type="edu.umd.review.gwt.CodeReviewStyle" field="codeReviewStyle" />
+	<ui:style field="localstyle">
+		.newThreadLink {
+			margin-left: 1em;
+		}
+		.mainPanel {
+	        margin-bottom: 1.5em;
+	    }
 	</ui:style>
-	<g:FlowPanel ui:field="mainPanel">
-	   <g:Label styleName="{style.headerLabel}">General Comments</g:Label>
-	   <g:FlowPanel ui:field="threadPanel">
-	   </g:FlowPanel>
-	   <g:Button ui:field="newThread">New Thread</g:Button>
+	<g:FlowPanel ui:field="mainPanel" styleName="{localstyle.mainPanel}">
+		<g:InlineLabel styleName="{codeReviewStyle.sectionHeader}">General Comments</g:InlineLabel>
+		<g:Anchor styleName="{codeReviewStyle.actionLink}"
+			addStyleNames="{localstyle.newThreadLink}" ui:field="newThreadLink">
+			Start new thread
+		</g:Anchor>
+		<g:FlowPanel ui:field="threadPanel">
+		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder> 

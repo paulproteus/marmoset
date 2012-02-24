@@ -1,15 +1,11 @@
 package edu.umd.review.gwt.view.impl;
 
-import java.util.Collection;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
 
 import com.allen_sauer.gwt.dnd.client.DragContext;
-import com.allen_sauer.gwt.dnd.client.VetoDragException;
 import com.allen_sauer.gwt.dnd.client.drop.AbstractDropController;
-import com.allen_sauer.gwt.dnd.client.drop.DropController;
 import com.google.common.base.Preconditions;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,8 +16,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
-import edu.umd.review.gwt.rpc.dto.ThreadDto;
+import edu.umd.review.gwt.CodeReviewResources;
+import edu.umd.review.gwt.CodeReviewStyle;
 import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.ThreadView;
 import edu.umd.review.gwt.widget.RubricDragger;
@@ -35,7 +33,7 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
     String hovering();
   }
   
-  @UiField Style style;
+  @UiField(provided=true) CodeReviewStyle codeReviewStyle;
   @UiField FlowPanel mainPanel;
   @UiField FlowPanel threadPanel;
   
@@ -43,7 +41,9 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
   private Presenter presenter;
   private ViewDropController controller;
   
-  public GeneralCommentsViewImpl() {
+  @Inject
+  public GeneralCommentsViewImpl(CodeReviewStyle style) {
+	this.codeReviewStyle = style;
     initWidget(uiBinder.createAndBindUi(this));
     controller = new ViewDropController(mainPanel);
   }
@@ -76,7 +76,7 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
     mainPanel.setVisible(visible);
   }
   
-  @UiHandler("newThread")
+  @UiHandler("newThreadLink")
   void onNewThreadClicked(ClickEvent event) {
     if (presenter != null) {
       presenter.createNewThread();
@@ -94,13 +94,13 @@ public class GeneralCommentsViewImpl extends Composite implements GeneralComment
     @Override
     public void onEnter(DragContext context) {
       super.onEnter(context);
-      panel.addStyleName(style.hovering());
+      panel.addStyleName(codeReviewStyle.rubricDropTargetHover());
     }
     
     @Override
     public void onLeave(DragContext context) {
       super.onLeave(context);
-      panel.removeStyleName(style.hovering());
+      panel.removeStyleName(codeReviewStyle.rubricDropTargetHover());
     }
     
     @Override

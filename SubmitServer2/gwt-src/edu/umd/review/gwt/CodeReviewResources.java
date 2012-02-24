@@ -15,4 +15,7 @@ public interface CodeReviewResources extends ClientBundle {
 
   @Source("rubrics.css")
   RubricStyle rubricStyle();
+  
+  @Source("CodeReviewStyle.css")
+  CodeReviewStyle codeReviewStyle();
 }
