@@ -45,7 +45,7 @@
             <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
-        <c:when test="${reviewRequested}">
+        <c:when test="${codeReviewSummary.requestReviewOnPublish}">
      <c:set var="subtitle"><c:out value="Publish comments to request review"/></c:set>
           <c:set var="reviewBacklinkText" value="submission" />
            <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">

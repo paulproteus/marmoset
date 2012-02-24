@@ -201,6 +201,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return anyUnpublishedDrafts;
 	}
 
+	public boolean isRequestReviewOnPublish() {
+	    Set<Integer> reviewers = getCodeReviewerMap().keySet();
+	    return isReviewerIsTheAuthor() && !viewerAsReviewer.isInstructor()
+	          && reviewers.size() == 1;
+	     
+	}
 	public boolean isTimely() {
 	    if (viewerAsStudent == null)
 	        return false;

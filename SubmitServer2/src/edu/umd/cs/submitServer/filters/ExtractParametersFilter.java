@@ -55,6 +55,7 @@ import javax.servlet.http.HttpSession;
 import com.google.common.collect.HashMultimap;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
+import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
@@ -192,6 +193,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                 }
                 submissionPK = reviewer.getSubmissionPK();
                 codeReviewAssignmentPK = reviewer.getCodeReviewAssignmentPK();
+                
             }
 
             if (submissionPK != null) {
@@ -554,9 +556,16 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						codeReviewAssignment = reviewer.getCodeReviewAssignment();
 				}
 
-				request.setAttribute(REVIEWER, reviewer);
+			
 			}
 			
+            if (reviewer != null) {
+                request.setAttribute(REVIEWER, reviewer);
+                CodeReviewSummary summary = new CodeReviewSummary(conn,
+                        reviewer);
+                req.setAttribute("codeReviewSummary", summary);
+            }
+
 			if (codeReviewAssignment != null) {
 			    Collection<Rubric> rubrics = Rubric.lookupByAssignment(
 			            codeReviewAssignment.getCodeReviewAssignmentPK(), conn);
