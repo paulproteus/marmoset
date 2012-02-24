@@ -143,7 +143,7 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 
                 for(SortedSet<StudentRegistration> section : sectionMap.values()) {
                     List<Integer> codeReviewers = getStudentPKs(section);
-                    assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, numReviewersPerSubmission, codeReviewers,
+                    assignReviewersOfStudentCode(assignment, lastSubmissionMap, section, numReviewersPerSubmission, codeReviewers,
                             false, conn);
                 }
                 break;
