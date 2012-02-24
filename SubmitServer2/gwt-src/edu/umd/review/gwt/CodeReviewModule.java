@@ -22,4 +22,10 @@ public class CodeReviewModule extends AbstractGinModule {
     return controller;
   }
 
+  @Provides @Singleton
+  CodeReviewStyle getCodeReviewStyle(CodeReviewResources resources) {
+	  CodeReviewStyle style = resources.codeReviewStyle();
+	  style.ensureInjected();
+	  return style;
+  }
 }

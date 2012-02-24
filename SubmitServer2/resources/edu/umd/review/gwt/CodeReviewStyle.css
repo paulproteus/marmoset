@@ -1,0 +1,14 @@
+.actionLink {
+	font-family: 'Menlo', 'DejaVu Sans Mono', 'Consolas', 'Ubuntu Mono', monospace;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.rubricDropTargetHover {
+	background-color: #ff9;
+}
+
+.sectionHeader {
+	font-size: 120%;
+	font-weight: bold;
+}
