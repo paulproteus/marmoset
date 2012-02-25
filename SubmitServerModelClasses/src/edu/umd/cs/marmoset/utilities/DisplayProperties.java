@@ -74,13 +74,11 @@ public class DisplayProperties {
             String filename = e.getKey();
             FileProperties p = properties.get(filename);
             if (p == null) {
-                System.out.println("Didn't find " + filename + " in " + properties.keySet());
-                sorted.put(filename, e.getValue());
-                continue;
             }
-            if (!p.isHidden())
+            if (p == null || !p.isHidden())
                 sorted.put(filename, e.getValue());
         }
+        
         return sorted;
     }
     

@@ -852,6 +852,10 @@ public class TestOutcome implements Serializable {
 	    	while (true) {
 	    	    String line=reader.readLine();
                 if (line==null) break;
+                /** skip stacktracelements resulting from Clover */
+                if (line.contains(".__CLR3_0_")
+                        && line.trim().startsWith("at "))
+                    continue;
                 line=line.replaceAll("&","&amp;");
                 line=line.replaceAll("<","&lt;");
                 line=line.replaceAll(">","&gt;");
