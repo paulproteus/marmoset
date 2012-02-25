@@ -165,8 +165,8 @@ label.error {
     </c:if>
 
     <c:if test="${user.canImportCourses}">
-        <div id="admin-functions">
-            <h2>Administrative functions</h2>
+        <div id="instructor-functions">
+            <h2>Instructor functions</h2>
             <ul>
                 <c:if test="${user.superUser}">
                     <li><a href="admin/">Superuser functions</a></li>
