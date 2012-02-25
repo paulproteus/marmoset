@@ -55,7 +55,7 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
     RubricDiscardEvent.Handler, ThreadDiscardEvent.Handler, NewRubricEvaluationEvent.Handler,
     EvaluationSavedEvent.Handler, SessionExpiryEvent.Handler {
   private static final Logger logger = Logger.getLogger(TrayPresenter.class.getName());
-  private final Collection<FileDto> files;
+  private final Collection<? extends FileDto> files;
   private final TrayView view;
   private final PresenterFactory presenterFactory;
   private final EventBus eventBus;
@@ -76,7 +76,7 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
                        PickupDragController dragController,
                        PresenterFactory presenterFactory,
                        EventBus eventBus,
-                       @Assisted Collection<FileDto> files) {
+                       @Assisted Collection<? extends FileDto> files) {
     this.files = files;
     this.view = trayView;
     this.presenterFactory = presenterFactory;

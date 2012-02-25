@@ -38,7 +38,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   private static final int timeoutMinutes = 5;
 
   private final SnapshotView view;
-  private final Collection<FileDto> files;
+  private final Collection<? extends FileDto> files;
   private final ResettableEventBus eventBus;
   private final PresenterFactory presenterFactory;
   private final HotkeyHandler hotkey;
@@ -52,7 +52,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
 
   @Inject
   SnapshotPresenter(@Assisted SnapshotView view, EventBus eventBus,
-      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<FileDto> files,
+      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<? extends FileDto> files,
       Provider<GeneralCommentsView.Presenter> generalCommentsPresenterProvider) {
     this.view = view;
     this.files = files;
