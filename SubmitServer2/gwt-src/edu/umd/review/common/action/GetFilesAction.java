@@ -1,7 +1,7 @@
 package edu.umd.review.common.action;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 
 import net.customware.gwt.dispatch.shared.Action;
 import edu.umd.review.gwt.rpc.dto.FileDto;
@@ -9,7 +9,7 @@ import edu.umd.review.gwt.rpc.dto.FileDto;
 public class GetFilesAction implements Action<GetFilesAction.Result> {
 
   public static class Result implements ActionResult {
-    private TreeSet<FileDto> files = new TreeSet<FileDto>();
+    private ArrayList<FileDto> files = new ArrayList<FileDto>();
 
     /** @deprecated GWT-only. */
     @Deprecated
@@ -19,7 +19,7 @@ public class GetFilesAction implements Action<GetFilesAction.Result> {
       this.files.addAll(files);
     }
 
-    public TreeSet<FileDto> getFiles() {
+    public Collection<? extends FileDto> getFiles() {
       return files;
     }
   }
