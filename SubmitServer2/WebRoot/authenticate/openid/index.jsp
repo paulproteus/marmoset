@@ -58,12 +58,17 @@
   	<h2>Skip authentication</h2>
 		<p>The submit server is set to skip authentication. Making OpenID requests 
         from localhost can have strange semantics, and
-			some providers may refuse to authenticate at all.</p>
+			some providers may refuse to authenticate at all. Authentication this way
+            allows you to avoid this issue, and to easily create fake identities for
+            testing purposes</p>
+            <p>Enter Open id identity:
+            
 		<form action="${verifyOpenId}" method="GET">
   		<input type="hidden" name="marmoset.target" value="${target}" />
-  		<input type="text" name="uid" placeholder="Enter a fake OpenID identity" />
+  		<input type="text" name="uid" placeholder="Enter a fake OpenID identity" size="30"/>
   		<input type="submit" />
   	</form>
+    <p>Enter login_name:
     <form action="${verifyOpenId}" method="GET">
         <input type="hidden" name="marmoset.target" value="${target}" />
         <input type="text" name="login_name" placeholder="Enter existing username" />
