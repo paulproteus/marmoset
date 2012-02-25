@@ -29,7 +29,7 @@
 <c:url var="viewSourceLink" value="../allSourceCode.jsp">
 	<c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
-    <c:url var="gwtCodeReviewLink" value="/view/codeReview/index.jsp">
+    <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
 	<c:param name="submissionPK" value="${submission.submissionPK}" />
    </c:url>
 
