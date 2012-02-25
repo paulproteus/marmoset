@@ -52,28 +52,8 @@ function change()
 	}
 	document.inputForm.total.value = num;
 }
-
-/*
-// In theory it would be nice to compute the totals after the page loads
-// But this requires more complicated javascript than I have time or patience for right now...
-function addLoadEvent(func) {
-  var oldonload = window.onload;
-  if (typeof window.onload != 'function') {
-    window.onload = func;
-  } else {
-    window.onload = function() {
-      oldonload();
-      func();
-    }
-  }
-}
-addLoadEvent(change);
-
-addLoadEvent(function() {
-});
-*/
+$(document).ready(change);
 </SCRIPT>
-
 
   <body>
   	<ss:header/>
