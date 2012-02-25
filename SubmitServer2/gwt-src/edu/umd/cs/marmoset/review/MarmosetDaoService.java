@@ -29,6 +29,7 @@ import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
@@ -88,98 +89,6 @@ public class MarmosetDaoService implements ReviewDao {
         return submission.getProjectPK();
     }
 
-  public static class Builder {
-    private final SubmitServerDatabaseProperties database;
-
-    public Builder(SubmitServerDatabaseProperties database) {
-      this.database = database;
-    }
-
-    public MarmosetDaoService buildAssigned(@CodeReviewer.PK int reviewerPK) {
-      Connection conn = null;
-      try {
-        conn = database.getConnection();
-        CodeReviewer reviewer = CodeReviewer.lookupByPK(reviewerPK, conn);
-        return new MarmosetDaoService(database, reviewer, reviewer.getSubmission());
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      } finally {
-        release(conn);
-      }
-    }
-
-    private void release(Connection conn) {
-      try {
-        database.releaseConnection(conn);
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  private MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer reviewer, Submission submission) {
-    this.database = database;
-    this.reviewer = reviewer;
-    this.submission = submission;
-    Connection conn = null;
-    try {
-      conn = getConnection();
-      this.student = reviewer.getStudent();
-      nameOfReviewer = reviewer.getName();
-      isAuthor = reviewer.isAuthor();
-      CodeReviewSummary summary = getSummary();
-      this.requestReviewOnPublish = summary.isRequestReviewOnPublish();
-      this.project = summary.getProject();
-
-      this.codeAuthor = summary.getAuthor();
-     
-      if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
-          StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
-          authorName=  authorAsStudent.getFullname();
-      } else
-          authorName =  codeAuthor.getName();    
-
-      byte[] archive = submission.downloadArchive(conn);
-      text = TextUtilities.scanTextFilesInZip(archive);
-      Map<String, BitSet> changed = project.computeDiff(conn, submission, text);
-      for (Map.Entry<String, List<String>> e : text.entrySet()) {
-        String path = e.getKey();
-        List<String> contents = e.getValue();
-        int[] bitsSet;
-        if (changed == null)
-          bitsSet = bitsSet(null, contents);
-        else {
-          BitSet bitSet = changed.get(path);
-          if (bitSet != null && bitSet.cardinality() == 0 && !path.endsWith("StudentTests.java"))
-            continue;
-          bitsSet = bitsSet(bitSet, contents);
-        }
-        FileDto file = new FileDto(0, path, contents);
-        file.setModifiedLines(bitsSet);
-        files.put(path, file);
-      }
-
-      reviewerDto = new ReviewerDto(this.nameOfReviewer,
-                                    reviewer.getCodeReviewerPK(),
-                                    reviewer.getSubmissionPK(),
-                                    "review-dao-" + reviewer.getCodeReviewerPK());
-      reviewerDto.setAuthor(isAuthor);
-
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      throw e;
-    } catch (SQLException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    } finally {
-      release(conn);
-    }
-  }
-
-
   private final String authorName;
   public MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer thisReviewer) {
 
@@ -206,11 +115,13 @@ public class MarmosetDaoService implements ReviewDao {
       } else
           authorName =  codeAuthor.getName();
 
-
-      byte[] archive = submission.downloadArchive(conn);
-      text = TextUtilities
-              .scanTextFilesInZip(archive);
-      Map<String, BitSet> changed = project.computeDiff(conn, submission, text);
+      DisplayProperties fileProperties = new DisplayProperties();
+      
+      /** just doing this to get fileProperties */
+      Map<String, List<String>> baselineText = project.getBaselineText(conn, fileProperties);
+    
+      text = submission.getText(conn, fileProperties);
+      Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baselineText);
       for (Map.Entry<String, List<String>> e : text.entrySet()) {
         String path = e.getKey();
         List<String> contents = e.getValue();

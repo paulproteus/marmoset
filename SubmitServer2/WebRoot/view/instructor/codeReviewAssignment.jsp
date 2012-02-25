@@ -48,10 +48,12 @@
     <p>Instructional code review by section</p></c:when>
     <c:when test="${codeReviewAssignment.kind == 'PEER'}">
     <p>Peer code review</p></c:when>
+    <c:when test="${codeReviewAssignment.kind == 'PEERBYSECTION'}">
+    <p>Peer code review by section</p></c:when>
     <c:when test="${codeReviewAssignment.kind == 'EXEMPLAR'}">
     <p>Exemplar/example code review</p></c:when>
     <c:otherwise>
-    <p>Code review of type<c:out value="${codeReviewAssignment.kind}"/></p>
+    <p>Code review of type <c:out value="${codeReviewAssignment.kind}"/></p>
     </c:otherwise></c:choose>
     
 	<p> Due <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" />

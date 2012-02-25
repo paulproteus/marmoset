@@ -200,7 +200,7 @@ public class DisplaySubmissionSourceCode {
         byte[] archive = submission.downloadArchive(conn);
         Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive);
 
-        Map<String, BitSet> changed = project.computeDiff(conn, submission, text);
+        Map<String, BitSet> changed = project.computeDiff(conn, submission, text, null);
 
         return displayArchive(text, tabWidth, codeCoverageResults, changed);
     }
@@ -215,7 +215,7 @@ public class DisplaySubmissionSourceCode {
     	 byte[] archive = submission.downloadArchive(conn);
          Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive);
 
-         Map<String, BitSet> changed = project.computeDiff(conn, submission, text);
+         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, null);
          int count = 0;
          for(Map.Entry<String, List<String>> e : text.entrySet()) {
         	 	BitSet b = changed.get(e.getKey());
