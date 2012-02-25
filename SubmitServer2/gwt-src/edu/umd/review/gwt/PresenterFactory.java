@@ -30,10 +30,10 @@ import edu.umd.review.gwt.view.TrayView;
  *
  */
 public interface PresenterFactory {
-  TrayView.Presenter makeTrayPresenter(TrayView view, Collection<FileDto> files);
+  TrayView.Presenter makeTrayPresenter(TrayView view, Collection<? extends FileDto> files);
   DraftView.Presenter makeDraftPresenter(DraftView view, ThreadDto thread, CommentDto draft);
   ThreadView.Presenter makeThreadPresenter(ThreadView view, ThreadDto thread);
-  SnapshotView.Presenter makeSnapshotPresenter(SnapshotView view, Collection<FileDto> files);
+  SnapshotView.Presenter makeSnapshotPresenter(SnapshotView view, Collection<? extends FileDto> collection);
   FileView.Presenter makeFilePresenter(FileView view, FileDto file);
   TrayFileView.Presenter makeTrayFilePresenter(TrayFileView view, FileDto file);
   TrayThreadView.Presenter makeTrayThreadPresenter(TrayThreadView view, ThreadDto thread);
