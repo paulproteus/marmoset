@@ -1,0 +1,22 @@
+<project name="diffOutputStream" default="jarFile" basedir=".">
+	
+	<property name="jar.name" value="diffOutputStream.jar"/>
+		
+	<target name="jarFile">
+		 <delete file="${jar.name}"/>
+		 <delete file="bin"/>
+		<mkdir dir="bin"/>
+        	<javac
+                        destdir="bin"
+                        srcdir="src"
+                        includeantruntime="false"
+                        deprecation="off"
+                        debug="on"/>
+
+		<jar destfile="${jar.name}">
+			<fileset dir="bin" />
+		</jar>
+	</target>
+	
+	
+</project>
