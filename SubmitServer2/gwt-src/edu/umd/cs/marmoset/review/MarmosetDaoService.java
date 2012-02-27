@@ -214,7 +214,7 @@ public class MarmosetDaoService implements ReviewDao {
     return unassignedRubrics;
   }
 
-  private @Nonnull CodeReviewSummary getSummary() {
+  public @Nonnull CodeReviewSummary getSummary() {
     if (summary != null)
       return summary;
     Connection conn = null;
