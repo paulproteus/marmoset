@@ -1,4 +1,4 @@
-<project name="javaWarmupSolution" default="all" basedir=".">
+<project name="FizzBuzz" default="submission" basedir=".">
 	
 	<property name="setup.name" value="test-setup.zip"/>
 	<property name="submission.name" value="submission.zip"/>
@@ -25,15 +25,21 @@
 	<target name="submission">
 		 <delete file="${submission.name}"/>
 		<zip destfile="${submission.name}">
-			<fileset dir="." includes=".submit,.submitUser,src/**"/>
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
 		</zip>
 	</target>
 
        <target name="clean" description="Delete all generated files">
                 <delete dir="bin"/>
+                <delete dir="doc"/>
                 <mkdir dir="bin"/>
                 <delete file="submission.zip"/>
                 <delete file="test-setup.zip"/>
                 </target>
+
+
 	
+    <target name="javadoc">
+        <javadoc access="public" author="false" destdir="doc" doctitle="FizzBuzz project" nodeprecated="true" nodeprecatedlist="true" noindex="true" nonavbar="true" notree="true" source="1.6" sourcefiles="src/FizzBuzz.java" sourcepath="src" splitindex="false" use="false" version="false"/>
+    </target>
 </project>

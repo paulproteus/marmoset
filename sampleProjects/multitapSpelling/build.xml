@@ -1,4 +1,4 @@
-<project name="javaWarmupSolution" default="all" basedir=".">
+<project name="MultiTapTextEntry" default="submission" basedir=".">
 	
 	<property name="setup.name" value="test-setup.zip"/>
 	<property name="submission.name" value="submission.zip"/>
@@ -12,20 +12,26 @@
                         srcdir="src"
                         includeantruntime="true"
                         deprecation="off"
-                        debug="on"/>
+                        debug="on">
+	    <classpath>
+	     <pathelement path="lib/diffOutputStream.jar"/>
+	    </classpath>
+	    </javac>
 
 		<zip destfile="${setup.name}">
 			<fileset dir="bin"
 				includes="PublicTests.class,ReleaseTests.class"
 				/>
 			<fileset dir="." includes="test.properties"/>
+ 			<zipfileset src="lib/diffOutputStream.jar"/>
+
 		</zip>
 	</target>
 	
 	<target name="submission">
 		 <delete file="${submission.name}"/>
 		<zip destfile="${submission.name}">
-			<fileset dir="." includes=".submit,.submitUser,src/**"/>
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
 		</zip>
 	</target>
 

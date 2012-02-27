@@ -1,0 +1,28 @@
+<project name="sampleProjects" default="all" basedir=".">
+
+
+
+	<target name="all" >
+<ant dir="FizzBuzz" />
+<ant dir="FizzBuzzSolution" />
+<ant dir="creatingJavaProjectTutorial" />
+<ant dir="firstJavaProject" />
+<ant dir="firstJavaProjectSolution" />
+<ant dir="javaWarmup" />
+<ant dir="javaWarmupSolution" />
+<ant dir="multitapSpelling" />
+<ant dir="multitapSpellingSolution" />
+</target>
+
+	<target name="clean" >
+<ant dir="FizzBuzz" target="clean"/>
+<ant dir="FizzBuzzSolution" target="clean"/>
+<ant dir="creatingJavaProjectTutorial" target="clean"/>
+<ant dir="firstJavaProject" target="clean"/>
+<ant dir="firstJavaProjectSolution" target="clean"/>
+<ant dir="javaWarmup" target="clean"/>
+<ant dir="javaWarmupSolution" target="clean"/>
+<ant dir="multitapSpelling" target="clean"/>
+<ant dir="multitapSpellingSolution" target="clean"/>
+</target>
+</project>

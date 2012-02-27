@@ -1,4 +1,4 @@
-<project name="Warmup" default="all" basedir=".">
+<project name="javaWarmup" default="submission" basedir=".">
 	
 	<property name="setup.name" value="test-setup.zip"/>
 	<property name="submission.name" value="submission.zip"/>
@@ -10,7 +10,7 @@
         	<javac
                         destdir="bin"
                         srcdir="src"
-                        includeantruntime="false"
+                        includeantruntime="true"
                         deprecation="off"
                         debug="on"/>
 
@@ -28,5 +28,12 @@
 			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
 		</zip>
 	</target>
+
+       <target name="clean" description="Delete all generated files">
+                <delete dir="bin"/>
+                <mkdir dir="bin"/>
+                <delete file="submission.zip"/>
+                <delete file="test-setup.zip"/>
+                </target>
 	
 </project>

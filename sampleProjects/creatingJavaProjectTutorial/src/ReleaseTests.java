@@ -24,22 +24,18 @@ public class ReleaseTests extends TestCase {
     public void testNegativeTwo() {
         assertEquals(4, Project0.square(-2));
     }
-   
-    private void test(int x) {
-        assertEquals("Checking " + x, x*x, Project0.square(x));
-    }
-    public void testUpToOneThousand() {
-        for(int x = 0; x <= 1000; x++)
-            test(x);
-    }
-    public void testDownToToNegativeOneThousand() {
-        for(int x = 0; x >= -1000; x--)
-            test(x);
-    }
-    public void testExtremeValues() {
-        test(0x1000000);
-        test(Integer.MIN_VALUE);
-        test(Integer.MAX_VALUE);
+
+    /**
+     * An exhaustive test; this would seem to be prohibitive, but it runs in
+     * less than a minute.
+     */
+    public void testExhaustive() {
+        for (int i = Integer.MIN_VALUE;; i++) {
+            assertEquals(i * i, Project0.square(i));
+            if (i == Integer.MAX_VALUE)
+                break;
+        }
+
     }
 
 }

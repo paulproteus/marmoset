@@ -1,4 +1,4 @@
-<project name="firstJavaProject" default="submission" basedir=".">
+<project name="firstJavaProjectSolution" default="all" basedir=".">
 
 	<property name="setup.name" value="test-setup.zip"/>
 	<property name="submission.name" value="submission.zip"/>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="FizzBuzzBaseline/src"/>
-	<classpathentry kind="src" path="FizzBuzzSolution/src"/>
-	<classpathentry kind="src" path="javaWarmup/src"/>
-	<classpathentry kind="src" path="javaWarmupSolution/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="javaWarmup/bin"/>
-</classpath>
