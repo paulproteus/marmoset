@@ -1,39 +1,33 @@
 <project name="javaWarmup" default="submission" basedir=".">
-	
-	<property name="setup.name" value="test-setup.zip"/>
-	<property name="submission.name" value="submission.zip"/>
-		
-	<target name="all" depends="submission,test.setup"/>
+
+	<property name="setup.name" value="test-setup.zip" />
+	<property name="submission.name" value="submission.zip" />
+
+	<target name="all" depends="submission,test.setup" />
 	<target name="test.setup">
-		 <delete file="${setup.name}"/>
-		<mkdir dir="bin"/>
-        	<javac
-                        destdir="bin"
-                        srcdir="src"
-                        includeantruntime="true"
-                        deprecation="off"
-                        debug="on"/>
+		<delete file="${setup.name}" />
+		<mkdir dir="bin" />
+		<javac destdir="bin" srcdir="src" includeantruntime="true"
+			deprecation="off" debug="on" />
 
 		<zip destfile="${setup.name}">
-			<fileset dir="bin"
-				includes="PublicTests.class,ReleaseTests.class"
-				/>
-			<fileset dir="." includes="test.properties"/>
-		</zip>
-	</target>
-	
-	<target name="submission">
-		 <delete file="${submission.name}"/>
-		<zip destfile="${submission.name}">
-			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
+			<fileset dir="bin" includes="PublicTests.class,ReleaseTests.class" />
+			<fileset dir="." includes="test.properties" />
 		</zip>
 	</target>
 
-       <target name="clean" description="Delete all generated files">
-                <delete dir="bin"/>
-                <mkdir dir="bin"/>
-                <delete file="submission.zip"/>
-                <delete file="test-setup.zip"/>
-                </target>
-	
+	<target name="submission">
+		<delete file="${submission.name}" />
+		<zip destfile="${submission.name}">
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**" />
+		</zip>
+	</target>
+
+	<target name="clean" description="Delete all generated files">
+		<delete dir="bin" />
+		<mkdir dir="bin" />
+		<delete file="submission.zip" />
+		<delete file="test-setup.zip" />
+	</target>
+
 </project>

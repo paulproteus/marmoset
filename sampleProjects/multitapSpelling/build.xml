@@ -1,45 +1,46 @@
 <project name="MultiTapTextEntry" default="submission" basedir=".">
-	
-	<property name="setup.name" value="test-setup.zip"/>
-	<property name="submission.name" value="submission.zip"/>
-		
-	<target name="all" depends="submission,test.setup"/>
+
+	<property name="setup.name" value="test-setup.zip" />
+	<property name="submission.name" value="submission.zip" />
+
+	<target name="all" depends="submission,test.setup" />
 	<target name="test.setup">
-		 <delete file="${setup.name}"/>
-		<mkdir dir="bin"/>
-        	<javac
-                        destdir="bin"
-                        srcdir="src"
-                        includeantruntime="true"
-                        deprecation="off"
-                        debug="on">
-	    <classpath>
-	     <pathelement path="lib/diffOutputStream.jar"/>
-	    </classpath>
-	    </javac>
+		<delete file="${setup.name}" />
+		<mkdir dir="bin" />
+		<javac destdir="bin" srcdir="src" includeantruntime="true"
+			deprecation="off" debug="on">
+			<classpath>
+				<pathelement path="lib/diffOutputStream.jar" />
+			</classpath>
+		</javac>
 
 		<zip destfile="${setup.name}">
-			<fileset dir="bin"
-				includes="PublicTests.class,ReleaseTests.class"
-				/>
-			<fileset dir="." includes="test.properties"/>
- 			<zipfileset src="lib/diffOutputStream.jar"/>
+			<fileset dir="bin" includes="PublicTests.class,ReleaseTests.class" />
+			<fileset dir="." includes="test.properties" />
+			<zipfileset src="lib/diffOutputStream.jar" />
 
 		</zip>
 	</target>
-	
+
 	<target name="submission">
-		 <delete file="${submission.name}"/>
+		<delete file="${submission.name}" />
 		<zip destfile="${submission.name}">
-			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**"/>
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,src/**" />
 		</zip>
 	</target>
 
-       <target name="clean" description="Delete all generated files">
-                <delete dir="bin"/>
-                <mkdir dir="bin"/>
-                <delete file="submission.zip"/>
-                <delete file="test-setup.zip"/>
-                </target>
-	
+	<target name="clean" description="Delete all generated files">
+		<delete dir="bin" />
+		<mkdir dir="bin" />
+		<delete file="submission.zip" />
+		<delete file="test-setup.zip" />
+	</target>
+
+	<target name="javadoc">
+		<javadoc access="public" author="false" destdir="doc"
+			doctitle="Multi-tap spelling project" nodeprecated="true"
+			nodeprecatedlist="true" noindex="true" nonavbar="true" notree="true"
+			source="1.6" sourcefiles="src/MultiTapTextEntry.java" sourcepath="src"
+			splitindex="false" use="false" version="false" />
+	</target>
 </project>
