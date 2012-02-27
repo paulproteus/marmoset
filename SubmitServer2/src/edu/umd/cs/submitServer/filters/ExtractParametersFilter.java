@@ -613,7 +613,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			
 			request.setAttribute("anonymousReview", false);
 			request.setAttribute("peerReview", false);
-			if (viewOfAnotherStudentsCode && isCodeReviewer) {
+			if (viewOfAnotherStudentsCode && isCodeReviewer && !userSession.hasInstructorCapability(coursePK)) {
 			    request.setAttribute("peerReview", true);
 			    String uri = request.getRequestURI();
 			    if (!uri.endsWith("/view/submission.jsp")
@@ -622,7 +622,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			            )
 			        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 	                        "Authentication Error");			        
-			    if (codeReviewAssignment.isAnonymous())
+			    if (codeReviewAssignment != null && codeReviewAssignment.isAnonymous())
 			        request.setAttribute("anonymousReview", true);
 			    
 			}

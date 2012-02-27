@@ -89,9 +89,12 @@
              <c:when test="${reviewer == null && instructorCapability}">
                  <p><a href="${codeReviewLink}">Start Code Review</a></p>
             </c:when>
-             <c:when test="${reviewer == null && instructorCapability}">
+             <c:when test="${reviewer != null}">
                  <p><a href="${codeReviewLink}">Go to Code Review</a></p>
             </c:when>
+            <c:otherwise> 
+            <!-- No code review -->
+            </c:otherwise>
         </c:choose>
     </c:if>
     <c:url var="submissionStatusLink" value="/view/submissionStatus.jsp">

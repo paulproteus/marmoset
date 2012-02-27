@@ -2069,7 +2069,7 @@ public class Submission implements ITestSummary<Submission> {
 	  public  boolean markHelpRequested(Connection conn,
               Project project) {
           String query = "INSERT IGNORE help_requests SET " 
-                  + " submission_pk = ?, course_pk = ?, when = ?";
+                  + " submission_pk = ?, course_pk = ?, `when` = ?";
           PreparedStatement stmt = null;
           try {
           
@@ -2120,7 +2120,7 @@ public class Submission implements ITestSummary<Submission> {
 	            Connection conn)
 	    throws SQLException
 	    {
-	        String query = "SELECT help_requests.when, " +ATTRIBUTES+ " "+
+	        String query = "SELECT help_requests.`when`, " +ATTRIBUTES+ " "+
 	        " FROM " +
 	        " submissions, help_requests " +
 	        " WHERE submissions.submission_pk = help_requests.submission_pk" +
@@ -2129,6 +2129,7 @@ public class Submission implements ITestSummary<Submission> {
 	        " ORDER BY submissions.submission_timestamp ASC ";
 
 	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK, false);
+	        System.out.println(stmt);
 	        Map<Submission,Timestamp> submissions = new HashMap<Submission,Timestamp>();
 	        try {
             	ResultSet rs = stmt.executeQuery();

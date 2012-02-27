@@ -207,12 +207,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	public boolean getAnyUnpublishedDraftsByViewer() {
 		return anyUnpublishedDrafts;
 	}
-
 	public boolean isNeedsPublishToRequestHelp() {
-	    return !viewerAsReviewer.isInstructor()
+	    boolean result = !viewerAsReviewer.isInstructor()
 	            && viewerIsAuthor()
 	            && !isActive()
 	            && !isRequestForHelp();
+        return result;
     }
 	public boolean isActive() {
 	    Set<Integer> reviewers = getCodeReviewerMap().keySet();
