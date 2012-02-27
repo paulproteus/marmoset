@@ -57,7 +57,7 @@ tr.reject {background: #f33}
     <ss:codeReviews title="Pending Code reviews" />
     
     <c:if test="${not empty requestsForHelp}">
-    <h2>Review requests</h2>
+    <h2>Help requests</h2>
     <table>
     <tr>
     <th>Who<th>View<th>Accept<th>Sub #<th>requested
