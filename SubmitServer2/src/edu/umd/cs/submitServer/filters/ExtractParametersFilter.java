@@ -639,8 +639,10 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 						testOutcomeCollection);
 			if (submission != null) {
 				request.setAttribute("submission", submission);
-				boolean isReviewRequested = submission.isReviewRequested(conn);
+				boolean isReviewRequested = submission.isHelpRequested(conn);
 				request.setAttribute("reviewRequested", isReviewRequested);
+				request.setAttribute("authorIsViewer", submission.getStudentRegistrationPK() == studentRegistration.getStudentRegistrationPK()
+				        && studentRegistration.getStudentPK() == user.getStudentPK());
 
 			}
 			if (releaseInformation != null)

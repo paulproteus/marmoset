@@ -56,12 +56,12 @@ tr.reject {background: #f33}
 
     <ss:codeReviews title="Pending Code reviews" />
     
-    <c:if test="${not empty requestsForReview}">
+    <c:if test="${not empty requestsForHelp}">
     <h2>Review requests</h2>
     <table>
     <tr>
-    <th>Who<th>View<th>Accept<th>Sub #<th>Submitted
-    <c:forEach var="submission" items="${requestsForReview}"  varStatus="counter">
+    <th>Who<th>View<th>Accept<th>Sub #<th>requested
+    <c:forEach var="submission" items="${requestsForHelp}"  varStatus="counter">
     <c:set var="studentRegistration" value="${studentRegistrationMap[submission.studentRegistrationPK]}" />
     <c:url var="viewLink" value="/view/instructor/submission.jsp">
     <c:param name="submissionPK" value="${submission.submissionPK}" />
@@ -82,7 +82,7 @@ tr.reject {background: #f33}
     <td><a href="${viewLink}">view</a>
     <td><a href="${codeReviewLink}">accept</a>
    <td> ${submission.submissionNumber}
-   <td> <fmt:formatDate value="${submission.submissionTimestamp}"
+   <td> <fmt:formatDate value="${requestsForHelpWhen[submission]}"
                 pattern="dd MMM h:mm a" />
             
     </c:forEach>

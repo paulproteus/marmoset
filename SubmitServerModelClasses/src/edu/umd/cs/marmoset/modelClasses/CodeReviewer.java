@@ -322,7 +322,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
                 submission.getStudentRegistrationPK() == commenter.getStudentRegistrationPK(),
                 commenter.isInstructor());
 	    if (commenter.isInstructor())
-            submission.removeReviewRequest(conn);
+            submission.acceptHelpRequest(conn);
 	    return reviewer;
 	    
 	}

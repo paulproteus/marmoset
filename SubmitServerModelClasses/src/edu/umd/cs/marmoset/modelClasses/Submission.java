@@ -2066,15 +2066,15 @@ public class Submission implements ITestSummary<Submission> {
 		return first;
 		}
 		
-	  public  boolean markReviewRequest(Connection conn,
+	  public  boolean markHelpRequested(Connection conn,
               Project project) {
-          String query = "INSERT IGNORE review_requests SET " 
-                  + " submission_pk = ?, course_pk = ?";
+          String query = "INSERT IGNORE help_requests SET " 
+                  + " submission_pk = ?, course_pk = ?, when = ?";
           PreparedStatement stmt = null;
           try {
           
           stmt = Queries.setStatement(conn, query, getSubmissionPK(),
-                  project.getCoursePK());
+                  project.getCoursePK(), new Timestamp(System.currentTimeMillis()));
           return stmt.execute();
           } catch (SQLException e) {
               e.printStackTrace();
@@ -2083,12 +2083,11 @@ public class Submission implements ITestSummary<Submission> {
              Queries.closeStatement(stmt);
           }
       }
-	  public  boolean isReviewRequested(Connection conn) {
-          String query = "SELECT submission_pk FROM review_requests WHERE " 
+	  public  boolean isHelpRequested(Connection conn) {
+          String query = "SELECT submission_pk FROM help_requests WHERE " 
                   + " submission_pk = ?";
           PreparedStatement stmt = null;
           try {
-          
           stmt = Queries.setStatement(conn, query, getSubmissionPK());
           ResultSet rs = stmt.executeQuery();
           return rs.next();
@@ -2099,13 +2098,14 @@ public class Submission implements ITestSummary<Submission> {
              Queries.closeStatement(stmt);
           }
       }
-      public  boolean removeReviewRequest(Connection conn) {
-          String query = "DELETE FROM review_requests WHERE " 
+	  
+      public  boolean acceptHelpRequest(Connection conn) {
+          String query = "UPDATE help_requests SET accepted = ? WHERE " 
                   + " submission_pk = ?";
           PreparedStatement stmt = null;
           try {
           
-          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          stmt = Queries.setStatement(conn, query, true, getSubmissionPK());
           return stmt.execute();
           } catch (SQLException e) {
               e.printStackTrace();
@@ -2115,20 +2115,33 @@ public class Submission implements ITestSummary<Submission> {
           }
       }
       
-	  public static List<Submission> lookupAllReviewRequests(
+	  public static Map<Submission,Timestamp> lookupAllActiveHelpRequests(
 	            int coursePK,
 	            Connection conn)
 	    throws SQLException
 	    {
-	        String query = "SELECT " +ATTRIBUTES+ " "+
+	        String query = "SELECT help_requests.when, " +ATTRIBUTES+ " "+
 	        " FROM " +
-	        " submissions, review_requests " +
-	        " WHERE submissions.submission_pk = review_requests.submission_pk" +
-	        " AND review_requests.course_pk = ? " +
+	        " submissions, help_requests " +
+	        " WHERE submissions.submission_pk = help_requests.submission_pk" +
+	        " AND help_requests.course_pk = ? " +
+	        " AND help_requests.accepted = ? " +
 	        " ORDER BY submissions.submission_timestamp ASC ";
 
-	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK);
-
-	        return getListFromPreparedStatement(stmt);
+	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK, false);
+	        Map<Submission,Timestamp> submissions = new HashMap<Submission,Timestamp>();
+	        try {
+            	ResultSet rs = stmt.executeQuery();
+            
+            	while (rs.next())
+            	{
+            	    Timestamp when = rs.getTimestamp(1);
+            		Submission submission = new Submission(rs, 2);
+            		submissions.put(submission, when);
+            	}
+            	return submissions;
+            } finally {
+            	Queries.closeStatement(stmt);
+            }
 	    }
 }

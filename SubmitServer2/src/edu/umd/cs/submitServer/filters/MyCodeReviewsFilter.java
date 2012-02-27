@@ -29,9 +29,11 @@ package edu.umd.cs.submitServer.filters;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import javax.servlet.FilterChain;
@@ -46,7 +48,6 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
@@ -85,8 +86,9 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 			conn = getConnection();
 			
 			if (isInstructor) {
-			  Collection<Submission> requestForReview = Submission.lookupAllReviewRequests(course.getCoursePK(), conn);
-			   request.setAttribute("requestsForReview", requestForReview);
+			  Map<Submission, Timestamp> requestsForHelp = Submission.lookupAllActiveHelpRequests(course.getCoursePK(), conn);
+			  request.setAttribute("requestsForHelp", requestsForHelp.keySet());
+			  request.setAttribute("requestsForHelpTimestamp", requestsForHelp.keySet());
 		     }
 			Collection<CodeReviewer> myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
 			

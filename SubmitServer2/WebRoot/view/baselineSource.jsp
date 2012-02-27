@@ -36,7 +36,7 @@
 	<ss:header />
 
 	<c:choose>
-	<c:when test="${instructorCapability == 'true'}">
+	<c:when test="${instructorCapability}">
 		<ss:instructorBreadCrumb />
 	</c:when>
 	<c:otherwise>

@@ -9,7 +9,7 @@
 <c:choose>
     <c:when test="${not empty nextCodeReview}">
         <c:set var="subtitle"><c:out value="${codeReviewAssignment.description}"/></c:set>
-        <c:set var="reviewBacklinkText" value="next" />
+        <c:set var="reviewBacklinkText" value="next review" />
         <c:url var="reviewBacklinkUrl" value="/view/codeReview/">
             <c:param name="codeReviewerPK">
                 <c:out value="${nextCodeReview}" />
@@ -31,8 +31,6 @@
      <c:set var="reviewBacklinkText" value="submission" />
         <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
-            <c:param name="projectPK" value="${project.projectPK}" />
-            <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
     
@@ -41,17 +39,13 @@
      <c:set var="reviewBacklinkText" value="submission" />
         <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
-            <c:param name="projectPK" value="${project.projectPK}" />
-            <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
-        <c:when test="${codeReviewSummary.requestReviewOnPublish}">
+        <c:when test="${codeReviewSummary.needsPublishToRequestHelp}">
      <c:set var="subtitle"><c:out value="Publish comments to request help with this submission"/></c:set>
           <c:set var="reviewBacklinkText" value="submission" />
-           <c:url var="reviewBacklinkUrl" value="/view/instructor/submission.jsp">
+           <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
-            <c:param name="projectPK" value="${project.projectPK}" />
-            <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:when>
     <c:otherwise>
@@ -59,8 +53,6 @@
         <c:set var="reviewBacklinkText" value="submission" />
         <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
-            <c:param name="projectPK" value="${project.projectPK}" />
-            <c:param name="coursePK" value="${course.coursePK}" />
         </c:url>
     </c:otherwise>
 </c:choose>

@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `code_review_comment` (
 
 CREATE TABLE IF NOT EXISTS `code_review_thread` (
   `code_review_thread_pk` int(11) NOT NULL AUTO_INCREMENT,
-  `file` varchar(120) NOT NULL,
+  `file` varchar(120) NULL,
   `line` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
   `created_by` int(11) NOT NULL,
@@ -553,15 +553,16 @@ CREATE TABLE IF NOT EXISTS `test_setup_archives` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE  `review_requests` (
-`review_request_pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`submission_pk` INT NOT NULL ,
-`course_pk` INT NOT NULL ,
-INDEX (  `course_pk` ) ,
-UNIQUE (
-`submission_pk`
-)
-) ENGINE = INNODB;
+CREATE TABLE `help_requests` (
+  `review_request_pk` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_pk` int(11) NOT NULL,
+  `course_pk` int(11) NOT NULL,
+  `when` datetime NOT NULL,
+  `accepted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`review_request_pk`),
+  UNIQUE KEY `submission_pk` (`submission_pk`),
+  KEY `course_pk` (`course_pk`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

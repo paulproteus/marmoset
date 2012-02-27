@@ -48,47 +48,55 @@
     <c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
 
-<c:if test="${!peerReview}">
-<h2><c:out value="${studentRegistration.fullname}"/></h2>
-<h2>Submission #${submission.submissionNumber}, submitted at <fmt:formatDate
-	value="${submission.submissionTimestamp}"
-	pattern="E',' dd MMM 'at' hh:mm a" />
-    </h2>
-<c:if
-	test="${submission.currentTestRunPK != testRun.testRunPK}">
-	<p>Results from previous testing against version
-	${testSetup.version} of the test setup
-</c:if>
+    <c:if test="${!peerReview }">
+        <h2>
+            <c:out value="${studentRegistration.fullname}" />
+        </h2>
+        <h2>
+            Submission #${submission.submissionNumber}, submitted at
+            <fmt:formatDate value="${submission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a" />
+        </h2>
+ 
+        <c:if test="${submission.currentTestRunPK != testRun.testRunPK}">
+            <p>Results from previous testing against version ${testSetup.version} of the test setup
+        </c:if>
 
-
-<p><a href="${viewSubmissionSourceLink}">View</a>, 
-<c:if test="${project.browserEditing != 'PROHIBITED'}">
-<a href="${editSourceLink}">Edit</a> 
-</c:if>
-or  <c:url var="downloadLink" value="/data/DownloadSubmission">
+        <p>
+            <a href="${viewSubmissionSourceLink}">View</a>,
+            <c:if test="${project.browserEditing != 'PROHIBITED'}">
+                <a href="${editSourceLink}">Edit</a>
+            </c:if>
+            or
+            <c:url var="downloadLink" value="/data/DownloadSubmission">
                 <c:param name="submissionPK" value="${submission.submissionPK}" />
-            </c:url> <a href="${downloadLink}">Download</a>
-            source</p>
-   
-<c:choose>    
-<c:when test="${reviewer != null}">
-<c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
-<c:param name="submissionPK" value="${submission.submissionPK}"/>
-<c:param name="reviewerPK" value="${reviewer.codeReviewerPK}"/>
-</c:url>
-<p><a href="${codeReviewLink}">Go to Code Review</a>
-</c:when>
-<c:otherwise>
-<c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
-<c:param name="submissionPK" value="${submission.submissionPK}"/>
-</c:url>
-<p><a href="${codeReviewLink}">Request Help</a>
-</c:otherwise>
-</c:choose>
-</c:if> 
-<c:url var="submissionStatusLink"  value="/view/submissionStatus.jsp">
-<c:param name="submissionPK" value="${submission.submissionPK}"/>
-</c:url>
+            </c:url>
+            <a href="${downloadLink}">Download</a> source
+        </p>
+
+        <c:url var="codeReviewLink" value="/view/codeReview/index.jsp">
+            <c:param name="submissionPK" value="${submission.submissionPK}" />
+        </c:url>
+        <c:choose>
+            <c:when test="${reviewer == null && authorIsViewer}">
+                <p><a href="${codeReviewLink}">Request Help</a></p>
+            </c:when>
+            <c:when test="${codeReviewSummary != null && codeReviewSummary.requestForHelp}">
+                <p><a href="${codeReviewLink}">Help requested</a></p>
+            </c:when>
+           <c:when test="${codeReviewSummary != null && codeReviewSummary.needsPublishToRequestHelp}">
+                <p><a href="${codeReviewLink}">Publish comments to request help</a></p>
+            </c:when>
+             <c:when test="${reviewer == null && instructorCapability}">
+                 <p><a href="${codeReviewLink}">Start Code Review</a></p>
+            </c:when>
+             <c:when test="${reviewer == null && instructorCapability}">
+                 <p><a href="${codeReviewLink}">Go to Code Review</a></p>
+            </c:when>
+        </c:choose>
+    </c:if>
+    <c:url var="submissionStatusLink" value="/view/submissionStatus.jsp">
+        <c:param name="submissionPK" value="${submission.submissionPK}" />
+    </c:url>
 
     <p>build status: <span id="buildStatus">${submission.buildStatus}</span>
     

@@ -55,6 +55,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
 	final Set<CodeReviewComment> allComments = new TreeSet<CodeReviewComment>();
 	boolean anyUnpublishedDrafts;
+	boolean anyPublishedDraftsByViewer;
+	final boolean isRequestForHelp;
 
 	/** map from rubricPK to Rubric */
 	Map<Integer,Rubric> rubrics = new HashMap<Integer,Rubric>();
@@ -86,6 +88,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				submission.getSubmissionPK(), conn);
 
 		this.assignment = reviewer.getCodeReviewAssignment();
+		this.isRequestForHelp = submission.isHelpRequested(conn);
 		
 		if (!hasFindbugsReviewer(conn)) {
 			createFindbugsThreads(conn, submission);
@@ -110,8 +113,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			}
 			cs.add(c);
 			allComments.add(c);
-			if (c.isDraft() && isAuthor(c))
+			if (isAuthor(c)) {
+			if (c.isDraft())
 				anyUnpublishedDrafts = true;
+			else
+			    anyPublishedDraftsByViewer = true;
+			}
 		}
 		Set<Integer> threadsWithContent = new HashSet<Integer>(comments.keySet());
 
@@ -201,11 +208,20 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return anyUnpublishedDrafts;
 	}
 
-	public boolean isRequestReviewOnPublish() {
+	public boolean isNeedsPublishToRequestHelp() {
+	    return !viewerAsReviewer.isInstructor()
+	            && viewerIsAuthor()
+	            && !isActive()
+	            && !isRequestForHelp();
+    }
+	public boolean isActive() {
 	    Set<Integer> reviewers = getCodeReviewerMap().keySet();
-	    return isReviewerIsTheAuthor() && !viewerAsReviewer.isInstructor()
-	          && reviewers.size() == 1;
-	     
+	    return isReviewerIsTheAuthor() && anyPublishedDraftsByViewer
+	            ||
+	          reviewers.size() > 1;
+	}
+	public boolean isRequestForHelp() {
+	    return isRequestForHelp;
 	}
 	public boolean isTimely() {
 	    if (viewerAsStudent == null)

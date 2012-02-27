@@ -152,7 +152,7 @@ an extension on project
                      
                         <c:if test="${inconsistentResults > 0}">
 						<td>
-                        <c:if test="${submission.numFailedBackgroundRetests}">
+                        <c:if test="${submission.numFailedBackgroundRetests > 0}">
                         <c:url var="submissionAllTestsLink"
 							value="/view/instructor/submissionAllTests.jsp">
 							<c:param name="submissionPK" value="${submission.submissionPK}" />

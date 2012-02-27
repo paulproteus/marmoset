@@ -26,13 +26,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
- <c:if test="${false}">      
-    <c:if test="${singleCourse && !instructorCapability && empty pendingRequests && empty openCourses}">       
-        <c:redirect url="/view/instructor/course.jsp">      
-            <c:param name="coursePK" value="${courseList[0].coursePK}" />       
-        </c:redirect>       
-    </c:if>          
-   </c:if>
+<c:if test="${singleCourse && !instructorCapability && empty pendingRequests && empty openCourses}">       
+    <jsp:forward page="/view/course.jsp">      
+        <jsp:param name="coursePK" value="${courseList[0].coursePK}" />       
+    </jsp:forward>       
+</c:if>          
 
 <!DOCTYPE HTML>
 <html>
@@ -49,7 +47,7 @@ label.error {
 <body>
     <ss:header />
     <ss:breadCrumb />
-
+ 
     <div class="sectionTitle">
         <h1>Home</h1>
         <ss:hello/>

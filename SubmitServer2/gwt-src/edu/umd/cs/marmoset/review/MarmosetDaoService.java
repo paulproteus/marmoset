@@ -104,7 +104,7 @@ public class MarmosetDaoService implements ReviewDao {
       isAuthor = reviewer.isAuthor();
       CodeReviewSummary summary = getSummary();
       this.project = summary.getProject();
-      this.requestReviewOnPublish = summary.isRequestReviewOnPublish();
+      this.requestReviewOnPublish = summary.isNeedsPublishToRequestHelp();
       
       this.codeAuthor = summary.getAuthor();
 
@@ -605,7 +605,7 @@ public class MarmosetDaoService implements ReviewDao {
           this.codeAuthor = CodeReviewer.lookupOrInsertAuthor(conn, submission, reviewer.getCodeReviewAssignment(), "");
         }
         if (requestReviewOnPublish) {
-            submission.markReviewRequest(conn, project);
+            submission.markHelpRequested(conn, project);
             requestReviewOnPublish = false;
         }
   }
