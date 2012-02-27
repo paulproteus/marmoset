@@ -78,7 +78,6 @@
         </c:url>
         <c:choose>
             <c:when test="${reviewer == null && authorIsViewer}">
-            
             <c:if test="${course.allowsHelpRequests}">
                <p> <a href="javascript:toggle('requestHelp')" title="Click to display information about requesting help" > 
                    Requesting Help</a></p>
