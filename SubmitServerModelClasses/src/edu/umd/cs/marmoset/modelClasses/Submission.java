@@ -2129,7 +2129,6 @@ public class Submission implements ITestSummary<Submission> {
 	        " ORDER BY submissions.submission_timestamp ASC ";
 
 	        PreparedStatement stmt =  Queries.setStatement(conn, query, coursePK, false);
-	        System.out.println(stmt);
 	        Map<Submission,Timestamp> submissions = new HashMap<Submission,Timestamp>();
 	        try {
             	ResultSet rs = stmt.executeQuery();

@@ -41,6 +41,11 @@
             <td class="input"><input name="download" type="checkbox" checked  />
             </td>
         </tr>
+         <tr>
+            <td class="label">allows help requests:</td>
+            <td class="input"><input name="helpRequests" type="checkbox" checked  />
+            </td>
+        </tr>
         <tr>
            <td class="label">Default for editing source code in browser:</td>
             <td class="input">

@@ -36,7 +36,7 @@ the changes from the submit server.
 
         </c:when>
         <c:otherwise>
-            <h3>Editing baseline source for project</h3>
+            <h3>Edit baseline source for project</h3>
         </c:otherwise>
     </c:choose>
     

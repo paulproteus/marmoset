@@ -42,12 +42,20 @@
         </c:url>
     </c:when>
         <c:when test="${codeReviewSummary.needsPublishToRequestHelp}">
-     <c:set var="subtitle"><c:out value="Publish comments to request help with this submission"/></c:set>
+     <c:set var="subtitle"><c:out value="Make/Publish comments to request help with this submission"/></c:set>
           <c:set var="reviewBacklinkText" value="submission" />
            <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
             <c:param name="submissionPK" value="${submission.submissionPK}" />
         </c:url>
     </c:when>
+           <c:when test="${codeReviewSummary.requestForHelp}">
+     <c:set var="subtitle"><c:out value="Help requested"/></c:set>
+          <c:set var="reviewBacklinkText" value="submission" />
+           <c:url var="reviewBacklinkUrl" value="/view/submission.jsp">
+            <c:param name="submissionPK" value="${submission.submissionPK}" />
+        </c:url>
+    </c:when>
+ 
     <c:otherwise>
     <c:set var="subtitle"><c:out value="Review of your submission"/></c:set>
         <c:set var="reviewBacklinkText" value="submission" />

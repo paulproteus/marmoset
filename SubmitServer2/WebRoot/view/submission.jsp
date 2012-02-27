@@ -78,7 +78,22 @@
         </c:url>
         <c:choose>
             <c:when test="${reviewer == null && authorIsViewer}">
-                <p><a href="${codeReviewLink}">Request Help</a></p>
+            
+            <c:if test="${course.allowsHelpRequests}">
+               <p> <a href="javascript:toggle('requestHelp')" title="Click to display information about requesting help" > 
+                   Requesting Help</a></p>
+                <div id="requestHelp"  style="display: none">
+                <blockquote>
+                <p>If you need help with this submission, rather than sending email
+                to a TA or instructor, you can do so here. You request help by starting 
+                a code review of your own code; click on a line of code and enter a comment
+                explaining your problem. If your question or problem isn't associated
+                with a particular part of the code, you can create a general comment. 
+                <p>When you publish your comments, your request for help will be seen by the 
+                instructional staff, and they will respond by replying to your comments in the code review.
+                <p>  <a href="${codeReviewLink}">Request Help</a></p>
+                </blockquote> </div>
+                </c:if>
             </c:when>
             <c:when test="${codeReviewSummary != null && codeReviewSummary.requestForHelp}">
                 <p><a href="${codeReviewLink}">Help requested</a></p>

@@ -287,6 +287,7 @@ public class RequestParser {
 		course.setBrowserEditing(BrowserEditing.valueOfAnyCase(
                 getCheckedParameter("browserEditing")));
 		course.setAllowsBaselineDownload(getCheckbox("download"));
+		course.setAllowsHelpRequests(getCheckbox("helpRequests"));
 		return course;
 	}
 

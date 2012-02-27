@@ -88,7 +88,7 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 			if (isInstructor) {
 			  Map<Submission, Timestamp> requestsForHelp = Submission.lookupAllActiveHelpRequests(course.getCoursePK(), conn);
 			  request.setAttribute("requestsForHelp", requestsForHelp.keySet());
-			  request.setAttribute("requestsForHelpTimestamp", requestsForHelp.keySet());
+			  request.setAttribute("requestsForHelpTimestamp", requestsForHelp);
 		     }
 			Collection<CodeReviewer> myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
 			

@@ -10,16 +10,21 @@
 		<h3>Reviews of my code</h3>
 		<table>
 			<tr>
-				<th rowspan="2">view</th>
+                <c:if test="${empty project}">
+                    <th rowspan="2">project</th>
+                </c:if>
+				<th colspan="2">Submission</th>
+                <th rowspan="2">view</th>
 				<th rowspan="2">tests</th>
-				<c:if test="${empty project}">
-					<th rowspan="2">project</th>
-				</c:if>
+			
+                
 				<th colspan="4">your comments</th>
 				<th colspan="4">other comments</th>
 
 			</tr>
 			<tr>
+                <th>#</th>
+                <th>at</th>
 				<th>#</th>
 				<th>last</th>
 				<th>needs res</th>
@@ -62,12 +67,16 @@
 				</c:choose>
 
 				<tr class="r${counter.index % 2}" title="${codeReviewSummary.description}">
-					<td><a href="${gwtCodeReviewLink}" target="codeReview">View</a>
-					<td><a href="${detailsLink}">Tests</a>
-					<c:if test="${empty project}">
-						<td><c:out value="${codeReviewSummary.project.projectNumber}" /></td>
-					</c:if>
-
+                <c:set var="submission" value="${codeReviewSummary.submission}" />
+                <c:if test="${empty project}">
+                        <td><c:out value="${codeReviewSummary.project.projectNumber}" /></td>
+                    </c:if>
+					 <td><c:out value="${submission.submissionNumber}"/></td>
+                    <td><fmt:formatDate value="${submission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a" /></td>
+                    <td><a href="${gwtCodeReviewLink}" target="codeReview">View</a></td>
+					<td><a href="${detailsLink}">Tests</a></td>
+					
+                   
 					<c:choose>
 						<c:when test="${codeReviewSummary.numCommentsByViewer > 0 || codeReviewSummary.anyUnpublishedDraftsByViewer}">
 							<td><c:out value="${codeReviewSummary.numCommentsByViewer}" /></td>

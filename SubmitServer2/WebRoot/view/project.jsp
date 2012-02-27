@@ -242,7 +242,8 @@
 <h2>Making another submission</h2>
 </c:when>
 <c:otherwise>
-<h2>Your first submission</h2>
+<h2>Making your first submission</h2>
+<p>You don't have any submissions yet. You can:</p>
 </c:otherwise>
 </c:choose>
 <ul>

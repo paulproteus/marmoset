@@ -85,7 +85,9 @@ public class Course {
             "buildserver_key",
             "submit_key",
             "browser_editing",
-            "sections"
+            "sections",
+            "help_requests_allowed"
+            
 	};
 
 	/**
@@ -106,6 +108,7 @@ public class Course {
 	private String sections;
 	private BrowserEditing browserEditing = BrowserEditing.DISCOURAGED;
 	private boolean allowsBaselineDownload;
+	private boolean allowsHelpRequests;
 
 	public Course() {
 
@@ -262,6 +265,16 @@ public class Course {
     }
 
 
+    public boolean isAllowsHelpRequests() {
+        return allowsHelpRequests;
+    }
+
+
+    public void setAllowsHelpRequests(boolean allowsHelpRequests) {
+        this.allowsHelpRequests = allowsHelpRequests;
+    }
+
+
     public void insert(Connection conn)
 	throws SQLException
 	{
@@ -300,7 +313,7 @@ public class Course {
 		stmt.setString(col++, getSubmitKey());
 		stmt.setString(col++, browserEditing.name().toLowerCase());
 		stmt.setString(col++, sections);
-
+		stmt.setBoolean(col++, isAllowsHelpRequests());
 		return col;
 	}
 
@@ -341,6 +354,7 @@ public class Course {
 		setSubmitKey(resultSet.getString(startingFrom++));
 		setBrowserEditing(BrowserEditing.valueOfAnyCase(resultSet.getString(startingFrom++)));
 		this.sections = resultSet.getString(startingFrom++);
+		setAllowsHelpRequests(resultSet.getBoolean(startingFrom++));
 		return startingFrom;
 	}
 

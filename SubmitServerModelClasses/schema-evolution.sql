@@ -20,3 +20,5 @@ ADD  `accepted` TINYINT( 1 ) NOT NULL DEFAULT  '0';
 RENAME TABLE  `submitserver`.`review_requests` TO  `submitserver`.`help_requests` ;
 
 ALTER TABLE  `code_review_thread` CHANGE  `file`  `file` VARCHAR( 120 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
+
+ALTER TABLE  `courses` ADD  `help_requests_allowed` TINYINT( 1 ) NOT NULL DEFAULT  '0'

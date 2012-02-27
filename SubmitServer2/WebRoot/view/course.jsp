@@ -74,17 +74,19 @@
 	<c:set var="numDisplayed" value="0" />
 	<c:forEach var="project" items="${projectList}" varStatus="counter">
 
+    
 		<c:if test="${project.visibleToStudents || instructorActionCapability || instructorCapability}">
 		<c:url var="projectLink" value="/view/project.jsp">
 					<c:param name="projectPK" value="${project.projectPK}" />
 				</c:url>
+                
+        <c:set var="projectURL"><c:out value="${project.url}"/></c:set>
 			<tr class="r${numDisplayed % 2}">
 
 				<td><c:choose>
 
-					<c:when test="${project.url != null}">
-						<a href="<c:url value="${project.url}"/>">
-						${project.projectNumber} </a>
+					<c:when test="${not empty projectURL}">
+						<a href="${projectURL}"><c:out value="${project.projectNumber}"/> </a>
 					</c:when>
 
 					<c:otherwise>
@@ -118,7 +120,16 @@
 
 				<td><fmt:formatDate value="${project.ontime}"
 					pattern="dd MMM, hh:mm a" /></td>
-				<td class="description"><c:out value="${project.title}"/></td>
+				<td class="description">
+                <c:choose>
+                <c:when test="${not empty projectURL}">
+                        <a href="${projectURL}"><c:out value="${project.title}"/> </a>
+                    </c:when>
+
+                    <c:otherwise>
+                        <a href="${projectLink}"> <c:out value="${project.title}"/></a>
+                    </c:otherwise>
+                   </c:choose>
 
 			</tr>
 			<c:set var="numDisplayed" value="${numDisplayed + 1}" />

@@ -154,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `buildserver_key` varchar(40) NOT NULL,
   `browser_editing` varchar(20) NOT NULL DEFAULT 'prohibited',
   `sections` text,
+  `help_requests_allowed` TINYINT( 1 ) NOT NULL DEFAULT  '0'
   PRIMARY KEY (`course_pk`),
   UNIQUE KEY `submit_key` (`submit_key`),
   UNIQUE KEY `buildserver_key` (`buildserver_key`)

@@ -61,6 +61,7 @@ public class UpdateCourse extends SubmitServerServlet {
 		BrowserEditing browserEditing = BrowserEditing.valueOfAnyCase(
 		        parser.getCheckedParameter("browserEditing"));
 		boolean download = parser.getCheckbox("download");
+		boolean helpRequests = parser.getCheckbox("helpRequests");
 
 		Connection conn = null;
 		try {
@@ -73,6 +74,7 @@ public class UpdateCourse extends SubmitServerServlet {
 			    course.setSection(section);
 			course.setAllowsBaselineDownload(download);
 			course.setBrowserEditing(browserEditing);
+			course.setAllowsHelpRequests(helpRequests);
 			
 			// insert the course
 			course.update(conn);

@@ -79,12 +79,13 @@ public class CodeReviewFilter extends SubmitServerFilter {
                     request.setAttribute(NEXT_CODE_REVIEW, next);
             }
 
-            ReviewDao dao = new MarmosetDaoService(submitServerDatabaseProperties, reviewer);
+            MarmosetDaoService dao = new MarmosetDaoService(submitServerDatabaseProperties, reviewer);
             ReviewerDto reviewerDto = dao.getReviewer();
             session.setAttribute(reviewerDto.getKey(), dao);
             request.setAttribute("reviewDaoKey", reviewerDto.getKey());
             request.setAttribute("reviewerDto", reviewerDto);
             request.setAttribute("reviewDao", dao);
+            request.setAttribute("codeReviewSummary", dao.getSummary());
   
 
         } catch (SQLException e) {

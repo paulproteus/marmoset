@@ -82,7 +82,7 @@ tr.reject {background: #f33}
     <td><a href="${viewLink}">view</a>
     <td><a href="${codeReviewLink}">accept</a>
    <td> ${submission.submissionNumber}
-   <td> <fmt:formatDate value="${requestsForHelpWhen[submission]}"
+   <td> <fmt:formatDate value="${requestsForHelpTimestamp[submission]}"
                 pattern="dd MMM h:mm a" />
             
     </c:forEach>
@@ -442,6 +442,11 @@ jQuery(document).ready(function ($) {
                 <tr>
                     <td class="label">allows baseline/starter code download:</td>
                     <td class="input"><input name="download" type="checkbox" ${ss:isChecked(course.allowsBaselineDownload)}  />
+                    </td>
+                </tr>
+                 <tr>
+                    <td class="label">allows help requests:</td>
+                    <td class="input"><input name="helpRequests" type="checkbox" ${ss:isChecked(course.allowsHelpRequests)}  />
                     </td>
                 </tr>
                   <tr>
