@@ -2085,10 +2085,10 @@ public class Submission implements ITestSummary<Submission> {
       }
 	  public  boolean isHelpRequested(Connection conn) {
           String query = "SELECT submission_pk FROM help_requests WHERE " 
-                  + " submission_pk = ?";
+                  + " submission_pk = ? AND accepted = ?";
           PreparedStatement stmt = null;
           try {
-          stmt = Queries.setStatement(conn, query, getSubmissionPK());
+          stmt = Queries.setStatement(conn, query, getSubmissionPK(), false);
           ResultSet rs = stmt.executeQuery();
           return rs.next();
           } catch (SQLException e) {
