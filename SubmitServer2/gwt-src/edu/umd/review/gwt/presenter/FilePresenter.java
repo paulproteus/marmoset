@@ -74,6 +74,11 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
   public void registerDropController(DropController controller) {
     dragController.registerDropController(controller);
   }
+  
+  @Override
+  public void unregisterDropController(DropController controller) {
+    dragController.unregisterDropController(controller);
+  }
 
   @Override
   public void onNewThreadAction(final int line) {
@@ -111,6 +116,7 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
 
   @Override
   public void finish() {
+    view.setPresenter(null);
     Iterator<Map.Entry<Integer, ThreadView.Presenter>> iter = threadPresenters.entrySet()
         .iterator();
     while (iter.hasNext()) {
@@ -118,11 +124,6 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
       iter.remove();
       entry.getValue().finish();
     }
-  }
-
-  @Override
-  public DragController getDragController() {
-    return dragController;
   }
 
   private void displayNewThread(final int line, ThreadDto thread) {

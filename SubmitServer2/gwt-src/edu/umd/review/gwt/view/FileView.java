@@ -54,7 +54,6 @@ public interface FileView extends IsWidget {
      * thread.
      */
     void registerDropController(DropController controller);
-
-    DragController getDragController();
+    void unregisterDropController(DropController controller);
   }
 }
