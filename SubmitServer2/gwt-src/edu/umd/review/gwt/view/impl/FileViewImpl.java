@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
+
 import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.drop.AbstractDropController;
 import com.google.common.base.Preconditions;
@@ -47,6 +49,7 @@ public class FileViewImpl extends Composite implements FileView {
   @UiField Label fileLabel;
   @UiField FlexTable codeGrid;
 
+  @CheckForNull
   private Presenter presenter;
   private final Provider<ThreadView> threadViewProvider;
   private final Map<Integer, FlowPanel> codePanels = Maps.newTreeMap();
@@ -54,10 +57,13 @@ public class FileViewImpl extends Composite implements FileView {
   private final BiMap<Integer, Integer> linesToRows = HashBiMap.create();
   private final Map<Integer, Integer> rowsToLines = linesToRows.inverse();
 
+  private FileDropController controller;
+
   @Inject
   public FileViewImpl(Provider<ThreadView> threadViewProvider) {
     initWidget(uiBinder.createAndBindUi(this));
     this.threadViewProvider = threadViewProvider;
+    controller = new FileDropController();
   }
 
   private void setLineNumber(int row, int line) {
@@ -150,15 +156,22 @@ public class FileViewImpl extends Composite implements FileView {
     return new DoubleClickHandler() {
       @Override
       public void onDoubleClick(DoubleClickEvent event) {
-        presenter.onNewThreadAction(line);
+        if (presenter != null) {
+          presenter.onNewThreadAction(line);
+        }
       }
     };
   }
 
   @Override
   public void setPresenter(Presenter presenter) {
+    if (presenter == null && this.presenter != null) {
+      this.presenter.unregisterDropController(controller);
+    }
     this.presenter = presenter;
-    presenter.registerDropController(new FileDropController());
+    if (this.presenter != null) {
+      this.presenter.registerDropController(controller);
+    }
   }
 
   @Override
@@ -247,8 +260,10 @@ public class FileViewImpl extends Composite implements FileView {
     @Override
     public void onDrop(DragContext context) {
       super.onDrop(context);
-      presenter.newThreadWithRubric(rowsToLines.get(currentRow),
-          ((RubricDragger) context.draggable).getRubric());
+      if (presenter != null) {
+        presenter.newThreadWithRubric(rowsToLines.get(currentRow),
+                                      ((RubricDragger) context.draggable).getRubric());
+      }
     }
   }
 }
