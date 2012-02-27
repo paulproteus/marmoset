@@ -171,7 +171,7 @@ public class ThreadPresenter extends AbstractPresenter implements ThreadView.Pre
 
   @Override
   public void acknowledge() {
-    dispatch.execute(createDraftAction(true), new AsyncCallback<CommentDto>() {
+    dispatch.execute(createDraftAction(false), new AsyncCallback<CommentDto>() {
       @Override
       public void onFailure(Throwable caught) {
         GwtUtils.wrapAndThrow(caught);
@@ -182,6 +182,8 @@ public class ThreadPresenter extends AbstractPresenter implements ThreadView.Pre
         eventBus.fireEvent(new NewDraftEvent(draft, thread));
         logger.info("Starting new ack draft " + draft);
         draft.setContents("Acknowledged.");
+        logger.info("ack was " + draft.isAcknowledgement() + "/" +  draft.isJustAcknowledgement());
+        draft.setAcknowledgement(true);
         saveDraft(draft);
       }
     });
