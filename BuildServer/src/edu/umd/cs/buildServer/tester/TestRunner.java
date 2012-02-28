@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -143,18 +144,17 @@ public class TestRunner extends BaseTestRunner {
 		return outcomeCollection.getAllOutcomes();
 	}
 
-	@Override
-	public void testStarted(String testName) {
-		// Create a new (incomplete) TestOutcome to represent
-		// the outcome of this test.
+    @Override
+    public void testStarted(String testName) {
+        // Create a new (incomplete) TestOutcome to represent
+        // the outcome of this test.
 
-		currentTestOutcome = new TestOutcome();
-		currentTestOutcome.setTestType(testType);
-		currentTestOutcome.setTestName(testName);
-		currentTestOutcome.setTestNumber(Integer.toString(nextTestNumber++));
-		currentTestStarted = System.currentTimeMillis();
-	}
-
+        currentTestOutcome = new TestOutcome();
+        currentTestOutcome.setTestType(testType);
+        currentTestOutcome.setTestName(testName);
+        currentTestOutcome.setTestNumber(Integer.toString(nextTestNumber++));
+        currentTestStarted = System.currentTimeMillis();
+    }
 	
 
 	@Override
@@ -316,10 +316,20 @@ public class TestRunner extends BaseTestRunner {
 			getBuildServerLog().fatal("Could not load test " + testClassName);
 			throw new BuilderException("Could not load test " + testClassName);
 		}
-		TestResult result = new TestResult();
-		result.addListener(this);
-		suite.run(result);
-	}
+        TestResult result = new TestResult();
+        result.addListener(this);
+
+        InputStream sysIn = System.in;
+        PrintStream sysOut = System.out;
+        PrintStream sysErr = System.err;
+        try {
+            suite.run(result);
+        } finally {
+            System.setIn(sysIn);
+            System.setOut(sysOut);
+            System.setErr(sysErr);
+        }
+    }
 
 	/**
 	 * Get a single test derived from combination of testClassName and
