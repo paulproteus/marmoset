@@ -325,6 +325,8 @@ public class TestRunner extends BaseTestRunner {
         try {
             suite.run(result);
         } finally {
+            System.out.flush();
+            System.err.flush();
             System.setIn(sysIn);
             System.setOut(sysOut);
             System.setErr(sysErr);
