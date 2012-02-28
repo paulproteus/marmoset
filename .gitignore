@@ -1,6 +1,10 @@
 SubmitServer2/WebRoot/resources/buildserver.zip
+sampleProjects/*/submission.zip
+sampleProjects/*/test-setup.zip
 sampleProjects/*/doc/
 sampleProjects/*/bin/**
+DiffOutputStream/bin/
+DiffOutputStream/diffOutputStream.jar
 **/*.class
 SubmitServer2/www-test/
 *.swp
