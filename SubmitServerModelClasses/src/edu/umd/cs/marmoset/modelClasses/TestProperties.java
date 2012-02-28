@@ -147,7 +147,7 @@ public class TestProperties implements TestPropertyKeys {
         setPerformCodeCoverage(getOptionalBooleanProperty(PERFORM_CODE_COVERAGE, false));
         setMaxDrainOutputInBytes(getOptionalIntegerProperty(MAX_DRAIN_OUTPUT_IN_BYTES, DEFAULT_MAX_DRAIN_OUTPUT_IN_BYTES));
         setJavaSourceVersion(getOptionalStringProperty(SOURCE_VERSION, DEFAULT_JAVA_SOURCE_VERSION));
-        setTestRunnerInTestfileDir(getOptionalBooleanProperty(RUN_IN_TESTFILES_DIR, false));
+        setTestRunnerInTestfileDir(getOptionalBooleanProperty(RUN_IN_TESTFILES_DIR, true));
         setLdLibraryPath(getOptionalStringProperty(LD_LIBRARY_PATH));
         setVmArgs(getOptionalStringProperty(VM_ARGS));
 
