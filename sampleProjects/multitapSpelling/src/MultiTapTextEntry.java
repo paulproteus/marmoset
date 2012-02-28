@@ -5,30 +5,30 @@ import java.util.Scanner;
 
 /**
  * 
- * From Google code jam 2010 qualification round, South Africa {@link http
- * ://code.google.com/codejam/contest/351101/dashboard#s=p2}
+ * From <a href="http://code.google.com/codejam/contest/351101/dashboard#s=p2">
+ * Google code jam 2010 qualification round, South Africa</a>. The release tests
+ * for this example are the small and large practice inputs from the code jam.
  * 
- * Even before phones with keyboards and touch screens, you could send text on
- * mobile phones. One of the methods used was multi-tap text entry. {@link http
- * ://en.wikipedia.org/wiki/Multi-tap}
+ * <p>Even before phones with keyboards and touch screens, you could send text on
+ * mobile phones. One of the methods used was 
+ * <a href="http://en.wikipedia.org/wiki/Multi-tap">multi-tap text entry.</a>
  * 
- * The 2 key is labeled with abc; the 3 key with def; each key 2-9 is labeled
+ * <p>The 2 key is labeled with abc; the 3 key with def; each key 2-9 is labeled
  * with 3 letters, except 7 which is labeled pqrs and 9 which is labeled wxyz.
  * 
- * See the image at {@link http
- * ://en.wikipedia.org/wiki/File:Telephone-keypad.svg}
+ * <p><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Telephone-keypad.svg/275px-Telephone-keypad.svg.png"/>
  * 
- * To insert the character E for instance, the program would press 33 (the digit
+ * <p>To insert the character E for instance, the program would press 33 (the digit
  * 3 since e appears on the 3 key; twice since it is the second letter listed
  * for 3). In order to insert two characters in sequence from the same key, the
  * user must pause before pressing the key a second time. The space character
  * ' ' should be printed to indicate a pause. For example, 2 2 indicates AA
  * whereas 22 indicates B.
  * 
- * Each message will consist of only lowercase characters a-z and space
+ * <p>Each message will consist of only lowercase characters a-z and space
  * characters ' '. Pressing zero emits a space.
  * 
- * Note that the Google code jam problem incorrectly describes this as T9 text
+ * <p>Note that the Google code jam problem incorrectly describes this as T9 text
  * entry.
  * 
  */

@@ -1,3 +1,5 @@
-src/Warmup.java
+src/MultiTapTextEntry.java
 src/StudentTests.java
-src/PublicTests.java=readonly,collapsed
+src/PublicTests.java=readonly
+C-tiny-practice.in.txt=readonly
+C-tiny-practice.expected.txt=readonly

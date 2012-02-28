@@ -1,9 +1,10 @@
-import edu.umd.cs.diffText.TextDiff;
 import junit.framework.TestCase;
+import edu.umd.cs.diffText.TextDiff;
 
 /**
- * This includes the tests cases provided in the problem description
- * {@link http://code.google.com/codejam/contest/351101/dashboard}
+ * This includes the tests cases provided in the 
+ * <a href="http://code.google.com/codejam/contest/351101/dashboard#s=p2">
+ * problem description</a>
  * 
  * The problems are provides both as individual unit tests, and as a test using
  * the diffOutputStream framework for comparing the output of the main method.

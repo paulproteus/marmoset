@@ -4,11 +4,10 @@
  * operations such as division and reminder. Using bit operations (shifting and
  * masking) is useful for several, although not strictly needed. 
  * 
- * 
- * Make your changes in this file. Do not change the method names or arguments. 
+ * <p>Make your changes in this file. Do not change the method names or arguments. 
  * If you do, the tests will fail.
  * 
- * In each method, replace the "throw new Unsupported..." statement with your
+ * <p>In each method, replace the "throw new Unsupported..." statement with your
  * implementation. Those throw statements are there to indicate which functions
  * you haven't gotten around to implementing yet.
  * 

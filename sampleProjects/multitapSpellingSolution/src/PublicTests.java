@@ -20,7 +20,7 @@ public class PublicTests extends TestCase {
 
     public void testCase3() {
         assertEquals("333666 6660 022 2777",
-                MultiTapTextEntry.getMultitapSpelling("foo bar"));
+                MultiTapTextEntry.getMultitapSpelling("foo  bar"));
     }
 
     public void testCase4() {

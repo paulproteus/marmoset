@@ -6,9 +6,9 @@
 public class Project0 {
 
     /**
-     * return the square of x.
+     * Return the square of x.
      * 
-     * You can just use "return x;" to see what happens when a submission passes
+     * <p>You can just use "return x;" to see what happens when a submission passes
      * some test cases but not others
      */
 

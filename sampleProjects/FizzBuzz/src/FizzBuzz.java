@@ -2,7 +2,7 @@
  * FizzBuzz - an interview question which is said to weed out many weak
  * programmers.
  *
- * See <a href="http://c2.com/cgi/wiki?FizzBuzzTest">Fizz Buzz Test</a> and
+ *<p> See <a href="http://c2.com/cgi/wiki?FizzBuzzTest">Fizz Buzz Test</a> and
  * <a href="http://imranontech.com/2007/01/24/using-fizzbuzz-to-find-developers-who-grok-coding/">
  * Using FizzBuzz to Find Developers who Grok Coding</a>
  *
@@ -16,7 +16,7 @@ public class FizzBuzz {
      * return "Buzz". For numbers which are multiples of both three and five
      * return "FizzBuzz".
      * 
-     * Replace the throw statement with your implementation.
+     * <p>Replace the throw statement with your implementation.
      */
     public static String fizzBuzz(int i) {
        throw new UnsupportedOperationException("You must implement this");
@@ -28,7 +28,7 @@ public class FizzBuzz {
      * print "Buzz". For numbers which are multiples of both three and five print
      * "FizzBuzz".
      * 
-     * You do not need to change this method.
+     * <p>You do not need to change this method.
      */
     public static void main(String args[]) {
         for(int i = 1; i <= 100; i++)
