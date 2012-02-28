@@ -437,21 +437,11 @@ public class DisplaySubmissionSourceCode {
         }
     }
 
-    public static String headJavascript0() {
-        return "<script langauge=\"JavaScript\" type=\"text/javascript\"> "
-                + "function toggle(item) { obj=document.getElementById(item);  if (obj.style.display==\"none\") {" +
-                " obj.style.display=\"block\";  obj.scrollIntoView(); } else { obj.style.display=\"none\"; } } "
-                + "function openElement(item) { document.getElementById(item).style.display=\"block\"; "
-                + "document.getElementById('__'+item).scrollIntoView();  } "
-                +  "</script>)";
-
-            }
-
     public static String headJavascript() {
         return "<script langauge=\"JavaScript\" type=\"text/javascript\"> \n"
-                + "function toggle(item) { \n"
+                + "function sourceToggle(item) { \n"
                 +    " obj=document.getElementById(item);  if (obj.style.display==\"none\") {\n"
-                +    " open(item); } else { obj.style.display=\"none\"; } } \n"
+                +    " openElement(item); } else { obj.style.display=\"none\"; } } \n"
                 + "function openElement(item) { \n"
                 +    " document.getElementById(item).style.display=\"block\"; \n"
                 +    " document.getElementById('__'+item).scrollIntoView();  } \n"
@@ -496,7 +486,7 @@ public class DisplaySubmissionSourceCode {
             src2html.setTabWidth(tabWidth);
 
         src2html.setIsChanged(isChanged, txt.size());
-        out.printf("<h4><a id=\"%s\" href=\"javascript:toggle('%s')\">%s</a> %s</h4>%n", "__" + encoding, encoding, sourceFile, description);
+        out.printf("<h4><a id=\"%s\" href=\"javascript:sourceToggle('%s')\">%s</a> %s</h4>%n", "__" + encoding, encoding, sourceFile, description);
 
         out.printf("  <div id=\"%s\" class=\"sourceCode\" style=\"display:%s\">%n", encoding, initiallyOpen ? "block" : "none");
         src2html.setOutputStream(out);
