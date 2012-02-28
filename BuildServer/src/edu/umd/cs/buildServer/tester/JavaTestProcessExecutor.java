@@ -146,7 +146,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	 * @throws BuilderException
 	 */
 	public TestOutcome executeTests()
-	// throws InternalBuildServerException//, IOException
+
 	{
 	    try {
 		String buildServerTestFilesDir = getDirectoryFinder()
@@ -251,13 +251,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		int exitCode;
 		Alarm alarm = tester.getTestProcessAlarm();
 		CombinedStreamMonitor monitor = null;
-
-            if (false) {
-                System.out.println("java args: ");
-                for (String s : javaArgs)
-                    System.out.println("  " + s);
-
-            }
 		
 		Process testRunner = null;
 		boolean isRunning = false;
