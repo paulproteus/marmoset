@@ -30,7 +30,8 @@ public class PublicTests extends TestCase {
     }
 
     public void testTiny() throws Throwable {
-        TextDiff.check(MultiTapTextEntry.class, "C-tiny-practice.in.txt",
+        new TextDiff.Builder().trim().ignoreCase().check
+        (MultiTapTextEntry.class, "C-tiny-practice.in.txt",
                 "C-tiny-practice.expected.txt");
     }
 
