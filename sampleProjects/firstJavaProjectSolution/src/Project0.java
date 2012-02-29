@@ -14,7 +14,7 @@ public class Project0 {
 
     public static int square(int x) {
 
-        return 0;
+        return x*x;
     }
 
 }
