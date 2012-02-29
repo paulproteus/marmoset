@@ -80,7 +80,7 @@
             <c:when test="${reviewer == null && authorIsViewer}">
             <c:if test="${course.allowsHelpRequests}">
                <p> <a href="javascript:toggle('requestHelp')" title="Click to display information about requesting help" > 
-                   Requesting Help</a></p>
+                   How to request help with this submission</a></p>
                 <div id="requestHelp"  style="display: none">
                 <blockquote>
                 <p>If you need help with this submission, rather than sending email
