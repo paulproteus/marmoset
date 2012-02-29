@@ -17,7 +17,6 @@
 		<zip destfile="${setup.name}">
 			<fileset dir="bin" includes="PublicTests.class,ReleaseTests.class" />
 			<fileset dir="." includes="test.properties,*.txt" />
-			<zipfileset src="lib/diffOutputStream.jar" />
 
 		</zip>
 	</target>
