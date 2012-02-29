@@ -74,7 +74,6 @@
 	<c:set var="numDisplayed" value="0" />
 	<c:forEach var="project" items="${projectList}" varStatus="counter">
 
-    
 		<c:if test="${project.visibleToStudents || instructorActionCapability || instructorCapability}">
 		<c:url var="projectLink" value="/view/project.jsp">
 					<c:param name="projectPK" value="${project.projectPK}" />
@@ -86,11 +85,11 @@
 				<td><c:choose>
 
 					<c:when test="${not empty projectURL}">
-						<a href="${projectURL}"><c:out value="${project.projectNumber}"/> </a>
+						<a href="${projectURL}" title="Project description" ><c:out value="${project.projectNumber}"/></a>
 					</c:when>
 
 					<c:otherwise>
-						<a href="${projectLink}"><c:out value="${project.projectNumber}"/></a>
+						<a href="${projectLink}" title="Project page"><c:out value="${project.projectNumber}"/></a>
 					</c:otherwise>
 
 				</c:choose>
@@ -98,23 +97,22 @@
 				(invisible to students)</c:if>
 				</td>
 
-				<td><a href="${projectLink}"> view </a></td>
-
-				<td><c:url var="submitProjectLink"
+				<td  title="Project page"><a href="${projectLink}"> view </a></td>
+				<td title="Make submission for the project"><c:url var="submitProjectLink"
 					value="/view/submitProject.jsp">
 					<c:param name="projectPK" value="${project.projectPK}" />
 					<c:param name="testSetupPK" value="${project.testSetupPK}" />
-				</c:url> <a href="${submitProjectLink}"> submit </a></td>
+				</c:url> <a href="${submitProjectLink}" > submit </a></td>
 
 				<c:if test="${anyDownload > 0}">
 
-					<td><c:if
+					<td title="Download starter files for project"><c:if
 						test="${project.archivePK != null && project.archivePK > 0}">
 						<c:url var="downloadStarterFilesLink"
 							value="/data/DownloadProjectStarterFiles">
 							<c:param name="projectPK" value="${project.projectPK}" />
 						</c:url>
-						<a href="${downloadStarterFilesLink}"> download </a>
+						<a href="${downloadStarterFilesLink}" > download </a>
 					</c:if></td>
 				</c:if>
 
@@ -123,11 +121,11 @@
 				<td class="description">
                 <c:choose>
                 <c:when test="${not empty projectURL}">
-                        <a href="${projectURL}"><c:out value="${project.title}"/> </a>
+                        <a href="${projectURL}"  title="Project description"><c:out value="${project.title}"/> </a>
                     </c:when>
 
                     <c:otherwise>
-                        <a href="${projectLink}"> <c:out value="${project.title}"/></a>
+                        <a href="${projectLink}" title="Project page"> <c:out value="${project.title}"/></a>
                     </c:otherwise>
                    </c:choose>
 

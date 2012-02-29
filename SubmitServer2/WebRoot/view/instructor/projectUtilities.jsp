@@ -300,7 +300,7 @@ jQuery(document).ready(function ($) {
 							</c:url>
 							<a href="${assignPointsLink}">assign points</a>
 						</c:when>
-						<c:when test="${testSetup.jarfileStatus == 'active'}">
+						<c:when test="${testSetup.jarfileStatus == 'active' && instructorActionCapability}">
 							<c:url var="deactivateLink"
 											value="/action/instructor/ChangeTestSetupStatus">
 								<c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
@@ -357,6 +357,7 @@ jQuery(document).ready(function ($) {
 			</c:forEach>
 
 
+<c:if test="${instructorActionCapability }">
 			<tr class="submit">
 	<th colspan=2 class="label">Upload new test setup</th>
 	<td class="input"><a title="Comment"><textarea cols="30" rows="1"
@@ -371,6 +372,7 @@ jQuery(document).ready(function ($) {
 							
 </td>
 						</tr>
+                        </c:if>
 				
 		</table>
             </form>
@@ -461,11 +463,13 @@ any server based compilation and testing
 	</li>
 	</c:if>
 
+<c:if test="${instructorActionCapability}">
 	<li><p>
 		<c:url var="updateProjectLink" value="/view/instructor/updateProject.jsp">
 			<c:param name="projectPK" value="${project.projectPK}"/>
 		</c:url>
 		<a href="${updateProjectLink}"> Update this project </a></p></li>
+</c:if>
 
 	<li><p>
 		<c:url var="exportProjectLink" value="/data/instructor/ExportProject">

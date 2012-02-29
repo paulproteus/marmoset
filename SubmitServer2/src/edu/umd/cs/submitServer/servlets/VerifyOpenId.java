@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -55,17 +56,26 @@ public class VerifyOpenId extends SubmitServerServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 		boolean skipAuthentication = "true".equals(webProperties.getProperty("authentication.skip"));
-		String uid = null;
-		String loginName = null;
-		Map<String, String> openidAx = Maps.newTreeMap();
-		if (skipAuthentication) {
-			uid = req.getParameter("uid");
-			loginName = req.getParameter("login_name");
-		}
-	    if (uid == null && loginName == null) {
-	        uid = verifyIdentity(req, openidAx);
-	    }
-		Connection conn = null;
+		  
+		String uid =  req.getParameter("uid");
+        String loginName = req.getParameter("login_name");
+        Map<String, String> openidAx = Maps.newTreeMap();
+        if (loginName != null && !skipAuthentication) {
+            String demoAccounts = webProperties
+                    .getProperty("authentication.demoAccounts");
+            if (Strings.isNullOrEmpty(demoAccounts)
+                    || !Arrays.asList(demoAccounts.trim().split(",")).contains(
+                            loginName))
+                loginName = null;
+        }
+        if (uid != null && !skipAuthentication) {
+            uid = null;
+        }
+
+        if (uid == null && loginName == null) {
+            uid = verifyIdentity(req, openidAx);
+        }
+        Connection conn = null;
 		try {
 	    conn = getConnection();
 	    Student student;

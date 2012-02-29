@@ -34,7 +34,7 @@ form li.required label {font-weight: bold;}
 					remote: "${checkRegistrationUrl}",
 					maxlength: 20,
 					minlength: 2,
-					regex: "^[a-zA-Z][a-zA-Z0-9]+$"
+					regex: "^[a-zA-Z][a-zA-Z0-9_-]+$"
 				},
 				email: {
 					required: true,

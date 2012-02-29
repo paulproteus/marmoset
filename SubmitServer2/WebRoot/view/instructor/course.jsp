@@ -43,7 +43,15 @@ tr.reject {background: #f33}
     <div class="sectionTitle">
         <h1>
             <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
-            (Instructor View)
+            <c:choose>
+            <c:when test="${instructorActionCapability}">
+             (Instructor View)
+             </c:when>
+             <c:otherwise>
+             (Grader View)
+             </c:otherwise>
+            </c:choose>
+           
         </h1>
 
         <p class="sectionDescription"><ss:hello/></p>
@@ -51,7 +59,8 @@ tr.reject {background: #f33}
 
     <div class="projectMenu">
         <a href="#projects">Projects</a> &nbsp;|&nbsp; <a href="#students">Students</a> &nbsp;|&nbsp; <a href="#staff">Staff</a>
-        &nbsp;|&nbsp; <a href="#status">Status</a> &nbsp;|&nbsp; <a href="#update">Update</a>
+        &nbsp;|&nbsp; <a href="#status">Status</a>
+        <c:if test="${instructorActionCapability}"> &nbsp;|&nbsp; <a href="#update">Update</a></c:if>
     </div>
 
     <ss:codeReviews title="Pending Code reviews" />
@@ -159,6 +168,12 @@ tr.reject {background: #f33}
         </tr>
 
         <c:forEach var="project" items="${projectList}" varStatus="counter">
+        <c:url var="projectLink" value="/view/project.jsp">
+                    <c:param name="projectPK" value="${project.projectPK}" />
+                </c:url>
+                
+        <c:set var="projectURL"><c:out value="${project.url}"/></c:set>
+        
             <c:choose>
                 <c:when test="${project.visibleToStudents}">
                     <c:set var="rowKind" value="r${counter.index % 2}" />
@@ -169,11 +184,17 @@ tr.reject {background: #f33}
             </c:choose>
             <tr class="${rowKind}">
 
-                <td><c:out value="${project.projectNumber}"/></td>
+                <td><c:choose>
+                    <c:when test="${not empty projectURL}">
+                        <a href="${projectURL}"  title="Project description"><c:out value="${project.projectNumber}"/> </a>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="${projectLink}" title="Project page"><c:out value="${project.projectNumber}"/></a>
+                    </c:otherwise>
+                    </c:choose>
+                </td>
 
-                <td><c:url var="projectLink" value="/view/instructor/project.jsp">
-                        <c:param name="projectPK" value="${project.projectPK}" />
-                    </c:url> <a href="${projectLink}"> view </a></td>
+                <td  title="Project page"><a href="${projectLink}"> view </a></td>
 
                 <c:choose>
                     <c:when test="${project.tested}">
@@ -199,7 +220,17 @@ tr.reject {background: #f33}
 
                 <td>${project.visibleToStudents}</td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
-                <td class="description"><c:out value="${project.title}"/></td>
+                <td class="description">
+                 <c:choose>
+                <c:when test="${not empty projectURL}">
+                        <a href="${projectURL}"  title="Project description"><c:out value="${project.title}"/> </a>
+                    </c:when>
+
+                    <c:otherwise>
+                        <a href="${projectLink}" title="Project page"> <c:out value="${project.title}"/></a>
+                    </c:otherwise>
+                   </c:choose>
+                </td>
             </tr>
         </c:forEach>
     </table>
@@ -479,9 +510,11 @@ jQuery(document).ready(function ($) {
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url> <a href="${registerStudentsLink}"> Register students for this course by uploading a text file </a></li>
                 </c:if>
+                <c:if test="${instructorActionCapability}">
             <li><c:url var="registerPersonLink" value="/view/instructor/registerPerson.jsp">
                     <c:param name="coursePK" value="${course.coursePK}" />
                 </c:url> <a href="${registerPersonLink}"> Register one person course using a web interface</a></li>
+                </c:if>
         </ul>
     </c:if>
 

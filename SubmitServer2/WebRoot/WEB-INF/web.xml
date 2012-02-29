@@ -47,6 +47,15 @@
         <filter-name>NeedsInitializationFilter</filter-name>
         <url-pattern>/authenticate/ldap/*</url-pattern>
     </filter-mapping>
+    
+  <filter>
+       <filter-name>DemoAccountsFilter</filter-name>
+       <filter-class>edu.umd.cs.submitServer.filters.DemoAccountsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>DemoAccountsFilter</filter-name>
+        <url-pattern>/authenticate/openid/index.jsp</url-pattern>
+    </filter-mapping>
 
 
 	<!--

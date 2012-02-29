@@ -1,9 +1,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
+
+<c:set var="serviceName">
+<ss:brandingProperty key="branding.service.fullname" safeHtml="true" />
+</c:set>
+
 <!DOCTYPE html>
 <html>
 <head>
-  <ss:headContent title="OpenID Login" />
+  <ss:headContent title="OpenID Login to ${serviceName}" />
   <!-- Simple OpenID Selector -->
   <c:url var="openIdStyle" value="/openid.css" />
   <link type="text/css" rel="stylesheet" href="${openIdStyle}" />
@@ -18,20 +23,48 @@
   <ss:header/>
   <ss:loginBreadCrumb/>
   <ss:loginTitle/>
+    <c:url var="verifyOpenId" value="/authenticate/openid/verify" />
   
       <c:set var="target">
         <c:out value="${param.target}" />
     </c:set>
      <c:set var="serviceURL"><ss:brandingProperty key="branding.service.url" safeHtml="true" /></c:set>
    
-    <p class="notemessage">Welcome to <a href="${serviceURL}"><ss:brandingProperty key="branding.service.fullname" safeHtml="true" /></a>
+    <p class="notemessage">Welcome to <a href="${serviceURL}">${serviceName}</a>. Cookies must be enabled to use Marmoset.
+    
+    <c:if test="${not empty demoAccounts}">
+    <h2>Demonstration accounts</h2>
+     <p class="notemessage">This is a demonstration server, and has been configured with several demo accounts. 
+    These demo accounts have already been setup with submissions, test results and code reviews, so you can see what those look like.
+   <p class="notemessage">Other visitors will use the same demo accounts, so will see any changes or new submissions made by those before you.
+    The demo accounts may be reset from time to time if previous changes by others leave them too cluttered or confusing.
+    
+       
+      <form action="${verifyOpenId}" method="GET">
+      <input type="hidden" name="marmoset.target" value="${target}" />
+        
+       <table class="form">
+    
+        <c:forEach var="student" items="${demoAccounts}">
+        <c:set var="loginName"><c:out value="${student.loginName}"/></c:set>
+        <tr><td class="input"><input type="radio" name="login_name" value="${loginName}" />
+        <c:out value="${student.fullname}"/>
+      </td></tr> 
+        </c:forEach>
+        
+        <tr class="submit"><td>
+        <input type="submit"  value="Log in as"/>
+        </table>
+    </form>
+
+<h2>Normal authentication via Open-ID</h2>
+    </c:if>
       <p class="notemessage">Authentication is via OpenID, a service that allows you to log-on to many different websites using a single identity. 
     If you have an account with any of these
           providers, you can use that account to identify yourself. 
      Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
      
-      <p class="notemessage">Cookies must be enabled to use Marmoset.
-    
+   
   <!-- Simple Open ID Selector -->
   <c:url var="initiateUrl" value="/authenticate/openid/initiate" />
   <form method="POST" id="openid_form" action="${initiateUrl}">
@@ -54,7 +87,6 @@
   </form>
   <!-- /Simple OpenID Selector -->
   <c:if test="${skipAuthentication}">
-  	<c:url var="verifyOpenId" value="/authenticate/openid/verify" />
   	<h2>Skip authentication</h2>
 		<p>The submit server is set to skip authentication. Making OpenID requests 
         from localhost can have strange semantics, and

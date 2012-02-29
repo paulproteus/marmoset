@@ -155,11 +155,11 @@ uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
 
 <c:when test="${empty studentRegistrationSet}">
 </c:when>
-<c:when test="${empty reviewAssignmentsForProject && project.afterLateDeadline}">
+<c:when test="${empty reviewAssignmentsForProject && project.afterLateDeadline && instructorActionCapability}">
 <p> <a href="${codeReviewAssignmentLink}">Create code review assignment</a>
 </c:when>
 
-<c:when test="${empty reviewAssignmentsForProject && !project.afterLateDeadline}">
+<c:when test="${empty reviewAssignmentsForProject && !project.afterLateDeadline && instructorActionCapability}">
 <p> <a href="${codeReviewAssignmentLink}">Create early code review assignment</a>
 </c:when>
 
@@ -179,7 +179,7 @@ uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
 			</a></li>
 		</c:forEach>
 
-        <c:if test="${project.afterLateDeadline}">
+        <c:if test="${project.afterLateDeadline && instructorActionCapability}">
 		<c:url var="createCodeReviewAssignmentLink"
 				value="/view/instructor/createCodeReviewAssignment.jsp">
 				<c:param name="projectPK"
@@ -219,9 +219,10 @@ uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
 			<form id="submitform" action="${uploadTestSetupLink}"
 				enctype="multipart/form-data" method="POST"><input
 				type="hidden" name="projectPK" value="${project.projectPK}">
-		No test setups for this project. <input type="hidden" name="comment" value=""/>
+		No test setups for this project.
+        <c:if test="${instructorActionCapability}"> <input type="hidden" name="comment" value=""/>
 		<a title="zip/jar file to upload"><input type="file" name="file"
-				size=40></a> <input type="submit" value="Upload"></form>
+				size=40></a> <input type="submit" value="Upload"></c:if></form>
 		</c:when>
 		<c:when test="${testSetup != null && testSetup.jarfileStatus == 'active'}">
 			<c:url var="canonicalRunLink" value="/view/instructor/submission.jsp">
