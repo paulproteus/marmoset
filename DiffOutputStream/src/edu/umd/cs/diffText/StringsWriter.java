@@ -6,10 +6,10 @@ public abstract class StringsWriter extends OutputStream {
 
     abstract protected void got(int line, String s);
 
-    StringBuilder buf = new StringBuilder();
-    boolean skipLF;
+    private StringBuilder buf = new StringBuilder();
+    private boolean skipLF;
 
-    int line = 1;
+    private int line = 1;
     @Override
     public void write(int b) throws IOException {
         if (b >= 0x80)
