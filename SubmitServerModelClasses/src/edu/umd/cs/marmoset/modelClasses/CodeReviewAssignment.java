@@ -48,6 +48,10 @@ public class CodeReviewAssignment {
         INSTRUCTIONAL, INSTRUCTIONAL_BY_SECTION, PEER, PEER_BY_SECTION, EXEMPLAR,
         INSTRUCTIONAL_PROTOTYPE, PEER_PROTOTYPE;
         
+        public boolean isPrototype() {
+            return this == INSTRUCTIONAL_PROTOTYPE || this == PEER_PROTOTYPE;
+        }
+        
         static Map<String, Kind> normalize = new HashMap<String,Kind>();
         static {
             for(Kind k : values()) {
@@ -105,10 +109,17 @@ public class CodeReviewAssignment {
 	private Timestamp deadline;
 	private  boolean otherReviewsVisible;
 	private  boolean anonymous;
-	private final Kind kind;
+	private  Kind kind;
 
 	public Kind getKind() {
 	    return kind;
+	}
+	public void setKind(Kind kind) {
+        this.kind = kind;
+    }
+	
+	public boolean isPrototype() {
+	    return kind.isPrototype();
 	}
 	public Timestamp getDeadline() {
 		return deadline;

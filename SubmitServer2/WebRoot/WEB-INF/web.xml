@@ -548,7 +548,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllStudentsSummaryFilter</filter-name>
-		<url-pattern>/action/instructor/UpdateCodeReviewAssignment</url-pattern>
+		<url-pattern>/action/instructor/AssignCodeReviews</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllStudentsSummaryFilter</filter-name>
@@ -954,8 +954,8 @@
 
 
 	<servlet>
-		<servlet-name>UpdateCodeReviewAssignment</servlet-name>
-		<servlet-class>edu.umd.cs.submitServer.servlets.UpdateCodeReviewAssignment</servlet-class>
+		<servlet-name>AssignCodeReviews</servlet-name>
+		<servlet-class>edu.umd.cs.submitServer.servlets.AssignCodeReviews</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>SubmitProjectViaWeb</servlet-name>
@@ -1273,8 +1273,8 @@
 		<url-pattern>/action/instructor/AddSubmissionsToCodeReviewAssignment</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>UpdateCodeReviewAssignment</servlet-name>
-		<url-pattern>/action/instructor/UpdateCodeReviewAssignment</url-pattern>
+		<servlet-name>AssignCodeReviews</servlet-name>
+		<url-pattern>/action/instructor/AssignCodeReviews</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>SubmitProjectViaWeb</servlet-name>
