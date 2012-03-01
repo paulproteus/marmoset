@@ -50,3 +50,6 @@ sampleProjects/javaWarmupSolution/*.zip
 sampleProjects/javaWarmupSolution/bin
 sampleProjects/javaWarmup/bin
 sampleProjects/javaWarmupSolution/bin
+SubmitServer2/extras/
+SubmitServerModelClasses/.settings/
+SubmitServerModelClasses/src/META-INF/

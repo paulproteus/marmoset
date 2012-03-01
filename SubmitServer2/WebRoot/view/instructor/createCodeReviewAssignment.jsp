@@ -123,30 +123,32 @@ div.rubric-editing label:first-child {
     <input type="hidden" name="coursePK" value="${course.coursePK}" />
     <input type="hidden" name="projectPK" value="${project.projectPK}" />
     <fieldset id="basic-review-info">
+    <h3>Review Information</h3>
         <ul class="form-fields">
-	        <li>
-	           <label for="codereview-kind">Review kind:</label>
-	           <select name="kind" id="codereview-kind" required="required">
-                         <option value="instructionalPrototype"
-                                selected="selected"
-                                >Prototype of an instructional review</option>                    
-                            <option value="instructional"
-                                title="Select staff members that divy up all student submissions to review">Instructional</option>
-                            <c:if test="${not empty course.sections}">
-                                <option value="instructionalBySection"
-                                    title="One staff member does all reviews for each section">Instructional by
-                                    section</option>
-                            </c:if>
-                            <option value="peer" title="Students review each other's code">Student peer review</option>
-                             <option value="peerPrototype">Prototype of an peer review</option>                    
-                       <option value="exemplar"
-                                title="Students are all asked to review a example or exemplar submission by a staff member">Student
-                                review of an example/exemplar submission</option>
-	           </select>
-	        </li>
+        <c:if test="${empty codeReviewAssignment}">
+            <li>
+                <label>Review kind:</label>
+                <ul>
+                    <li>
+                        <input type="radio" name="kind" id="instructional-kind" value="instructionalPrototype"
+                        ${ss:checkedOrNull(codeReviewAssignment.type, "instructionalPrototype") } />
+                        <label for="instructional-kind">Instructional</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="kind" id="peer-kind" value="peerPrototype" 
+                        ${ss:checked(codeReviewAssignment.type, "peerPrototype") }/>
+                        <label for="peer-kind">Peer</label>
+                    </li>
+                </ul>
+            </li>
+	    </c:if>
 	        <li>
 	           <label for="code-review-description">Description:</label>
-	           <input type="text" size="60" required="required" name="description" id="code-review-description" />
+	           <c:set var="assignmentDescription">
+	               <c:out value="${codeReviewAssignment.description}" />
+	           </c:set>
+	           <input type="text" size="60" required="required" name="description" id="code-review-description" 
+	           value="${codeReviewAssignment.description}"/>
 	        </li>
 	        <li>
 	           <label for="codereview-deadline-date">Deadline:</label>
@@ -181,53 +183,12 @@ div.rubric-editing label:first-child {
             </li>
         </ul>
     </fieldset>
-    <fieldset id="instructional-review-info">
-    <h3>Instructional Review</h3>
+    <c:if test="${empty codeReviewAssignment}">
+    <fieldset>
+    <h3>Code to Review</h3>
         <ul class="form-fields">
             <li>
-                <label>Choose reviewers:</label>
-                <ul class="reviewer-list">
-                    <c:forEach var="studentRegistration" items="${courseInstructors}">
-                    <li>
-                        <input type="checkbox" id="instructional-reviewer-${studentRegistration.studentPK}" name="reviewer-${studentRegistration.studentPK}">
-                        <label for="instructional-reviewer-${studentRegistration.studentPK}"><c:out value="${studentRegistration.fullname}" /></label>
-                    </li>
-                    </c:forEach>
-                </ul>
-            </li>
-        </ul>
-    </fieldset>
-    <fieldset id="instructional-by-section-info">
-    <h3>Instructional Review by Section</h3>
-        <ul class="form-fields">
-            <li>
-                <label>Choose a reviewer for each section:</label>
-                <ul class="reviewer-list">
-                    <c:forEach var="section" items="${course.sections}">
-                    <li>
-                        <label for="section-reviewer-${section}">
-                            <c:out value="${section}" />
-                        </label>
-                        <select name="section-reviewer-${section}" id="section-reviewer-${section}">
-                            <c:forEach var="studentRegistration" items="${courseInstructors}" >
-                            <c:if test="${empty studentRegistration.section || studentRegistration.section == section }">
-                            <option value="${studentRegistration.studentPK}">
-                                <c:out value="${studentRegistration.fullname}" />
-                            </option>
-                            </c:if>
-                            </c:forEach>
-                        </select>
-                    </li>
-                    </c:forEach>
-                </ul>
-            </li>
-        </ul>
-    </fieldset>
-    <fieldset id="exemplar-review-info">
-    <h3>Review of an Exemplar</h3>
-        <ul class="form-fields">
-            <li>
-                <label for="exemplar-submission">Review of:</label>
+                <label for="exemplar-submission">Code for prototype review:</label>
                 <select name="of" id="exemplar-submission">
                     <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
                     <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
@@ -235,35 +196,13 @@ div.rubric-editing label:first-child {
                     </option>
                     </c:forEach>
                 </select>
+                <p>
+                This will be used for the prototype review only.
+                </p>
             </li>
         </ul>
     </fieldset>
-    <fieldset id="review-assignment-info">
-    <h3>Review assignment strategy</h3>
-        <ul class="form-fields">
-            <li>
-                <label>Assign reviews:</label>
-					<ul>
-                        <li>
-                            <input type="radio" name="peerBySection" value="true" id="yes-by-section" checked="checked"/>
-                            <label for="yes-by-section">Only within a section</label>
-                        </li>
-                        <li>
-                            <input type="radio" name="peerBySection" value="false" id="not-by-section"/>
-                            <label for="not-by-section">Across sections</label>
-                        </li>
-                    </ul>
-            </li>
-            <li>
-                <label for="reviews-per-submission">Reviews per submission:</label>
-                <select name="numReviewers" id="reviews-per-submission">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                </select>
-            </li>
-        </ul>
-    </fieldset>
+    </c:if>
     <fieldset id="review-rubrics">
     <h3>Rubrics</h3>
     <div id="rubric-controls">
@@ -276,81 +215,39 @@ div.rubric-editing label:first-child {
     </ul>
     </fieldset>
     <div style="text-align: right">
-        <button id="create-code-review">Create Code Review</button>
+        <c:choose>
+        <c:when test="${empty codeReviewAssignment}" >
+        <button id="create-code-review">Create Prototype</button>
+        </c:when>
+        <c:otherwise>
+        <button id="create-code-review">Update Prototype</button>
+        </c:otherwise>
+        </c:choose>
     </div>
 </form>
 <script type="text/javascript">
 	function updateForm(kind) {
 		console.log('code review kind: "' + kind + '"');
 		switch (kind) {
-		case "none":
-			hideItem("instructional-review-info");
-			hideItem("instructional-by-section-info");
-			hideItem("anonymity-info");
-	        hideItem("visibility-info");
-			hideItem("exemplar-review-info");
-			hideItem("review-assignment-info");
-			break;
-		case "instructional":
-			showItem("instructional-review-info");
-			hideItem("instructional-by-section-info");
-			hideItem("anonymity-info");
-			hideItem("visibility-info");
-			hideItem("exemplar-review-info");
-			hideItem("review-assignment-info");
-			break;
 		case "instructionalPrototype":
-			hideItem("instructional-review-info");
-            hideItem("instructional-by-section-info");
-            hideItem("anonymity-info");
-            hideItem("visibility-info");
-            showItem("exemplar-review-info");
-            hideItem("review-assignment-info");
-            break;
-        case "instructionalBySection":
-			hideItem("instructional-review-info");
-			showItem("instructional-by-section-info");
 			hideItem("anonymity-info");
 			hideItem("visibility-info");
-			hideItem("exemplar-review-info");
-			hideItem("review-assignment-info");
-			break;
-		case "peer":
-			hideItem("instructional-review-info");
-			hideItem("instructional-by-section-info");
-			showItem("anonymity-info");
-			showItem("visibility-info");
-			hideItem("exemplar-review-info");
-			showItem("review-assignment-info");
-			break;
-		case "peerPrototype":
-            hideItem("instructional-review-info");
-            hideItem("instructional-by-section-info");
-            showItem("anonymity-info");
-            showItem("visibility-info");
-            showItem("exemplar-review-info");
-            hideItem("review-assignment-info");
             break;
-        case "exemplar":
-			hideItem("instructional-review-info");
-			hideItem("instructional-by-section-info");
+		case "peerPrototype":
 			showItem("anonymity-info");
 			showItem("visibility-info");
-			showItem("exemplar-review-info");
-			hideItem("review-assignment-info");
-			break;
+            break;
 		default:
 			console.log("Unknown kind");
 		}
 	}
 	
-	var $kind = $("#codereview-kind");
-	$kind.change(function(event) {
-		updateForm($kind.val());
+	var $kind = $("input:radio[name=kind]");
+	$kind.click(function(event) {
+		updateForm(this.value);
 	});
 
 	$(document).ready(function() {
-		$kind.change();
 		$('#codereview-deadline-date').datepicker({
 			minDate : -1,
 			defaultDate : +7,
@@ -368,6 +265,7 @@ div.rubric-editing label:first-child {
 		
 		$("#rubric-controls").buttonset();
 		$("#create-code-review").button();
+		updateForm($kind.filter(":checked").val());
 	});
 </script>
     <ss:script file="jsrender.js" />
