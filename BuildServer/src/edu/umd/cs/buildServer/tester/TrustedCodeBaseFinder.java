@@ -55,13 +55,10 @@ final class TrustedCodeBaseFinder {
 	    File junit = JavaBuilder.getCodeBase(TestCase.class);
 	    tester.getLog().debug("junit at: " + junit);
 	    addTrustedCodeBase("buildserver.junit.jar.file", junit.getAbsolutePath());
-	    File buildserver = JavaBuilder.getCodeBase(Tester.class);
-        tester.getLog().debug("buildserver at: " + buildserver);
-        addTrustedCodeBase("buildserver.tester.codebase", buildserver.getAbsolutePath());
-        File root = tester.getDirectoryFinder().getBuildServerRoot();
-        File lib = new File(root, "lib");
-        addTrustedCodeBase("buildserver.lib.codebase", lib.getAbsolutePath() +"/*");
-	}
+	    File buildserverRoot =tester.getDirectoryFinder().getBuildServerRoot();
+        tester.getLog().debug("buildserver at: " + buildserverRoot);
+        addTrustedCodeBase("buildserver.tester.codebase", buildserverRoot.getAbsolutePath());
+    	}
 
 	/**
 	 * Get collection of trusted codebase objects.
