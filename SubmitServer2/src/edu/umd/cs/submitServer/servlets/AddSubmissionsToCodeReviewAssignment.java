@@ -115,7 +115,7 @@ public class AddSubmissionsToCodeReviewAssignment extends SubmitServerServlet {
                 getSubmitServerServletLog(), strictParameterChecking());
 
         int numReviewersPerSubmission = parser.getIntParameter("numReviewers",1);
-        ArrayList<Integer> codeReviewers = CreateCodeReviewAssignment.instructorReviewers(request);
+        ArrayList<Integer> codeReviewers = AssignCodeReviews.instructorReviewers(request);
     
         if (!post) {
             out.printf("add reviews for %d/%d students%n", withoutReview, totalStudents);
@@ -137,7 +137,7 @@ public class AddSubmissionsToCodeReviewAssignment extends SubmitServerServlet {
 			conn = getConnection();
 				
 
-            CreateCodeReviewAssignment.assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, codeReviewers,
+			AssignCodeReviews.assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, codeReviewers,
                     true, conn);
 		
 			String redirectUrl = request.getContextPath()

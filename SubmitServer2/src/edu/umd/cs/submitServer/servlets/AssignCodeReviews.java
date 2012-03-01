@@ -240,7 +240,7 @@ public class AssignCodeReviews extends SubmitServerServlet {
         }
     }
 
-    private static void assignReviewersOfStudentCode(
+    static void assignReviewersOfStudentCode(
             CodeReviewAssignment assignment,
             Map<Integer, Submission> submissionMap,
             Collection<StudentRegistration> students,
@@ -311,7 +311,7 @@ public class AssignCodeReviews extends SubmitServerServlet {
         }
     }
 
-    private static ArrayList<Integer> instructorReviewers(
+    static ArrayList<Integer> instructorReviewers(
             HttpServletRequest request) {
         ArrayList<Integer> deck = new ArrayList<Integer>();
         for (Enumeration<String> e = request.getParameterNames(); e
