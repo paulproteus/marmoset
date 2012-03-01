@@ -76,12 +76,16 @@
         <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
         </c:url>    
 
-<c:url var="updateAssignment" value="/view/instructor/updateCodeReviewAssignment.jsp">
-        <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-        </c:url>
+<c:url var="assignReviews" value="/view/instructor/assignCodeReviews.jsp">
+    <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+    <c:param name="projectPK" value="${codeReviewAssignment.projectPK}" />
+    <c:param name="coursePK" value="${course.coursePK}" />
+</c:url>
 <p><a href="${PrintRubricsForDatabase}">List rubrics in CSV format for upload to grades server</a>
 <p><a href="${PrintRubricEvaluationsForDatabase}">List rubric evaluations in CSV format for upload to grades server</a>
-<p><a href="${updateAssignment}">Update code review assignment</a>
+<c:if test="${codeReviewAssignment.prototype}">
+<p><a href="${assignReviews}">Assign reviews</a></p>
+</c:if>
 
 <c:if test="${! empty rubrics }">
 <h2>Rubrics</h2>

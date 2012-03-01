@@ -540,7 +540,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllStudentsSummaryFilter</filter-name>
-		<url-pattern>/view/instructor/updateCodeReviewAssignment.jsp</url-pattern>
+		<url-pattern>/view/instructor/assignCodeReviews.jsp</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllStudentsSummaryFilter</filter-name>
@@ -796,11 +796,11 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>AllInstructorsForCourseFilter</filter-name>
-		<url-pattern>/view/instructor/createCodeReviewAssignment.jsp</url-pattern>
+		<url-pattern>/view/instructor/assignCodeReviewsAssignment.jsp</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllInstructorsForCourseFilter</filter-name>
-		<url-pattern>/view/instructor/updateCodeReviewAssignment.jsp</url-pattern>
+		<url-pattern>/view/instructor/assignCodeReviews.jsp</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>AllInstructorsForCourseFilter</filter-name>
