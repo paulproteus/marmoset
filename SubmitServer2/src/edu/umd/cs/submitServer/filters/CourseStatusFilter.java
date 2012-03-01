@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -52,7 +54,8 @@ public class CourseStatusFilter extends SubmitServerFilter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		Course course = (Course) request.getAttribute("course");
-		
+		Map<Project,Map<String,Integer>> buildStatusCount = new HashMap<Project,Map<String,Integer>>();
+        List<Project> projectList = (List<Project>) request.getAttribute(PROJECT_LIST);
 		Connection conn = null;
 		try {
 			conn = getConnection();
@@ -62,6 +65,12 @@ public class CourseStatusFilter extends SubmitServerFilter {
 			request.setAttribute("systemLoad", SystemInfo.getSystemLoad());
 			List<Project> hiddenProjects = Project.lookupAllByCoursePK(course.getCoursePK(), true, conn);
 			request.setAttribute("hiddenProjects", hiddenProjects);
+			for(Project p : projectList) {
+                buildStatusCount.put(p, p.getBuildStatusCount(conn));
+            }
+			request.setAttribute(PROJECT_BUILD_STATUS_COUNT, buildStatusCount);
+            
+			
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
