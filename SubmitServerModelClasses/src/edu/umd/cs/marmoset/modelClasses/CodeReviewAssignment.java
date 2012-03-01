@@ -33,7 +33,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
@@ -43,9 +45,26 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 public class CodeReviewAssignment {
     
     public enum Kind {
-        INSTRUCTIONAL, INSTRUCTIONALBYSECTION, PEER, PEERBYSECTION, EXEMPLAR;
+        INSTRUCTIONAL, INSTRUCTIONAL_BY_SECTION, PEER, PEER_BY_SECTION, EXEMPLAR,
+        INSTRUCTIONAL_PROTOTYPE, PEER_PROTOTYPE;
+        
+        static Map<String, Kind> normalize = new HashMap<String,Kind>();
+        static {
+            for(Kind k : values()) {
+                String name = k.name();
+                normalize.put(name, k);
+                if (name.contains("_"))
+                    normalize.put(name.replaceAll("_", ""), k);
+            }
+        }
+        
         public static Kind getByParamValue(String value) {
-            return Kind.valueOf(value.toUpperCase());
+            value = value.toUpperCase();
+            Kind k = normalize.get(value);
+            if (k == null)
+                throw new IllegalArgumentException("No kind type " + value);
+            return k;
+           
         };
     }
         

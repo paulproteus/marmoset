@@ -127,8 +127,10 @@ div.rubric-editing label:first-child {
 	        <li>
 	           <label for="codereview-kind">Review kind:</label>
 	           <select name="kind" id="codereview-kind" required="required">
-                            <option value="instructional"
+                         <option value="instructionalPrototype"
                                 selected="selected"
+                                >Prototype of an instructional review</option>                    
+                            <option value="instructional"
                                 title="Select staff members that divy up all student submissions to review">Instructional</option>
                             <c:if test="${not empty course.sections}">
                                 <option value="instructionalBySection"
@@ -136,7 +138,8 @@ div.rubric-editing label:first-child {
                                     section</option>
                             </c:if>
                             <option value="peer" title="Students review each other's code">Student peer review</option>
-                            <option value="exemplar"
+                             <option value="peerPrototype">Prototype of an peer review</option>                    
+                       <option value="exemplar"
                                 title="Students are all asked to review a example or exemplar submission by a staff member">Student
                                 review of an example/exemplar submission</option>
 	           </select>
@@ -296,7 +299,15 @@ div.rubric-editing label:first-child {
 			hideItem("exemplar-review-info");
 			hideItem("review-assignment-info");
 			break;
-		case "instructionalBySection":
+		case "instructionalPrototype":
+			hideItem("instructional-review-info");
+            hideItem("instructional-by-section-info");
+            hideItem("anonymity-info");
+            hideItem("visibility-info");
+            showItem("exemplar-review-info");
+            hideItem("review-assignment-info");
+            break;
+        case "instructionalBySection":
 			hideItem("instructional-review-info");
 			showItem("instructional-by-section-info");
 			hideItem("anonymity-info");
@@ -312,7 +323,15 @@ div.rubric-editing label:first-child {
 			hideItem("exemplar-review-info");
 			showItem("review-assignment-info");
 			break;
-		case "exemplar":
+		case "peerPrototype":
+            hideItem("instructional-review-info");
+            hideItem("instructional-by-section-info");
+            showItem("anonymity-info");
+            showItem("visibility-info");
+            showItem("exemplar-review-info");
+            hideItem("review-assignment-info");
+            break;
+        case "exemplar":
 			hideItem("instructional-review-info");
 			hideItem("instructional-by-section-info");
 			showItem("anonymity-info");

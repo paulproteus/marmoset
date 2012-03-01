@@ -101,7 +101,7 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
         boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
        
         if (kind == Kind.PEER && parser.getBooleanParameter("peerBySection", false))
-            kind = Kind.PEERBYSECTION;
+            kind = Kind.PEER_BY_SECTION;
         
         Connection conn = null;
         try {
@@ -120,7 +120,15 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                         true, conn);
                 break;
             }
-            case INSTRUCTIONALBYSECTION: {
+            case INSTRUCTIONAL_PROTOTYPE: {
+                ArrayList<Integer> instructorReviewers = instructorReviewers(request);
+                Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
+
+                assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, instructorReviewers,
+                        true, conn);
+                break;
+            }
+            case INSTRUCTIONAL_BY_SECTION: {
                 SortedSet<String> sections = (SortedSet<String>) request.getAttribute(SECTIONS);
                 SortedMap<String, SortedSet<StudentRegistration>> sectionMap = (SortedMap<String, SortedSet<StudentRegistration>>) request
                         .getAttribute(SECTION_MAP);
@@ -134,7 +142,7 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 }
                 break;
             }
-            case PEERBYSECTION: {
+            case PEER_BY_SECTION: {
                 
                 int numReviewersPerSubmission = parser.getIntParameter("numReviewers");
                 Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request.getAttribute("lastSubmission");
