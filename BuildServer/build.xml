@@ -52,6 +52,7 @@
 		<pathelement location="lib/dom4j.jar"/>
 		<pathelement location="lib/guava-11.0.1.jar"/>
 		<pathelement location="lib/log4j.jar"/>
+		<pathelement location="lib/diffOutputStream.jar"/>
 		<pathelement location="lib/findbugs.jar"/>
 		<pathelement location="lib/bcel.jar"/>
 		<pathelement location="lib/modelClasses.jar"/>
