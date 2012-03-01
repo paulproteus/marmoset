@@ -91,11 +91,14 @@
 			automated testing.  Many people use the server simply to store submissions.
 		--%>
 		<c:if test="${project.tested}">
-		    <c:set var="testCols" value="0" />
-			<c:if test="${testSetup.valuePublicTests > 0}">
-				<th rowspan="2" >public<br>tests score
-				<c:set var="testCols" value="${1+testCols}" />
-			</c:if>
+		    <c:set var="testCols" value="1" />
+            <c:choose>
+			<c:when test="${testSetup.valuePublicTests > 0}">
+            <th rowspan="2" >public<br>tests
+			</c:when>
+            <c:otherwise><th rowspan="2" >build<br>result
+            </c:otherwise>
+            </c:choose>
 
 			<c:if test="${testSetup.valueReleaseTests > 0}">
 				<th colspan="2">release tests</th>
@@ -130,6 +133,7 @@
 	 ${ss:formattedTestHeader(canonicalTestOutcomeCollection, false)}
 	 </c:if>
 	</tr>
+    
 
 	<c:forEach var="submission" items="${submissionList}"
 		varStatus="counter">
@@ -160,9 +164,13 @@
 				<c:when
 					test="${submission.buildStatus == 'COMPLETE' && submission.compileSuccessful}">
 
-					<c:if test="${testSetup.valuePublicTests > 0}">
-				<td>${submission.valuePublicTestsPassed} / ${testSetup.valuePublicTests}</td>
-				</c:if>
+                   <td> <c:choose>
+					<c:when test="${testSetup.valuePublicTests > 0}">
+				${submission.valuePublicTestsPassed} / ${testSetup.valuePublicTests}
+				</c:when>
+                <c:otherwise>compiled</c:otherwise>
+                </c:choose>
+                </td>
 
 					<c:choose>
 						<c:when test="${testSetup.valueReleaseTests == 0}">

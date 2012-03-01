@@ -168,7 +168,7 @@ tr.reject {background: #f33}
         </tr>
 
         <c:forEach var="project" items="${projectList}" varStatus="counter">
-        <c:url var="projectLink" value="/view/project.jsp">
+        <c:url var="projectLink" value="/view/instructor/project.jsp">
                     <c:param name="projectPK" value="${project.projectPK}" />
                 </c:url>
                 
