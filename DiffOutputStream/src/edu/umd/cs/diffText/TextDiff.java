@@ -1,17 +1,20 @@
 package edu.umd.cs.diffText;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,18 +28,19 @@ public class TextDiff extends StringsWriter {
     public static void invokeMain(Class<?> c, InputStream input,
             OutputStream out, String... args) throws Exception {
         PrintStream oStream = new PrintStream(out);
-        Method main;
-        InputStream oldIn = null;
-        PrintStream oldOut = null;
+        InputStream oldIn = System.in;
+        PrintStream oldOut = System.out;
         try {
+            Method main;
+            
             try {
                 main = c.getMethod("main", String[].class);
-                oldIn = System.in;
-                oldOut = System.out;
-                System.setIn(input);
-                System.setOut(oStream);
+
+                setSystemInAndOut(input, oStream);
+
             } catch (Throwable t) {
-                // If an exception happens before we execute student code, throw a TestInfrastructureException
+                // If an exception happens before we execute student code, throw
+                // a TestInfrastructureException
                 throw new TestInfrastructureException(t);
             }
 
@@ -51,37 +55,47 @@ public class TextDiff extends StringsWriter {
                 throw (Error) t;
             throw e;
         } finally {
-            if (oldIn != null)
-                System.setIn(oldIn);
-            if (oldOut != null)
-                System.setOut(oldOut);
+            setSystemInAndOut(oldIn, oldOut);
+
         }
     }
-    
+
+    private static void setSystemInAndOut(final InputStream input,
+            final PrintStream oStream) {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                System.setIn(input);
+                System.setOut(oStream);
+                return null;
+            };
+        });
+    }
+
     public static Builder withOptions() {
         return new Builder();
     }
- 
+
     public static class Builder implements Cloneable {
         boolean ignoresCase;
         boolean trim;
         final ArrayDeque<Object> expect = new ArrayDeque<Object>();
 
         Builder() {
-            
+
         }
-        
+
         protected Builder clone() {
             try {
                 return (Builder) super.clone();
             } catch (CloneNotSupportedException e) {
-               throw new AssertionError(e);
+                throw new AssertionError(e);
             }
         }
+
         public Builder copy() {
             return this.clone();
         }
-        
+
         public Builder trim() {
             trim = true;
             return this;
@@ -188,6 +202,7 @@ public class TextDiff extends StringsWriter {
         TestInfrastructureException(Throwable t) {
             super(t);
         }
+
         TestInfrastructureException(String msg) {
             super(msg);
         }
@@ -242,7 +257,7 @@ public class TextDiff extends StringsWriter {
                 }
             }
         } catch (Throwable t) {
-           throw new TestInfrastructureException(t);
+            throw new TestInfrastructureException(t);
         }
 
     }
