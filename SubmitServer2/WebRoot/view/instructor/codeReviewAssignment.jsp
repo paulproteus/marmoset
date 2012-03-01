@@ -42,15 +42,15 @@
 	<h2> Code Review for project <c:out value="${project.fullTitle}"/></h2>
 	<p> <c:out value="${codeReviewAssignment.description}" />
     <c:choose>
-    <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONAL'}">
+    <c:when test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL'}">
     <p>Instructional code review</p></c:when>
-    <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONALBYSECTION'}">
+    <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONAL_BY_SECTION'}">
     <p>Instructional code review by section</p></c:when>
-    <c:when test="${codeReviewAssignment.kind == 'PEER'}">
+    <c:when test="${codeReviewAssignment.kind eq 'PEER'}">
     <p>Peer code review</p></c:when>
-    <c:when test="${codeReviewAssignment.kind == 'PEERBYSECTION'}">
+    <c:when test="${codeReviewAssignment.kind eq 'PEER_BY_SECTION'}">
     <p>Peer code review by section</p></c:when>
-    <c:when test="${codeReviewAssignment.kind == 'EXEMPLAR'}">
+    <c:when test="${codeReviewAssignment.kind eq 'EXEMPLAR'}">
     <p>Exemplar/example code review</p></c:when>
     <c:otherwise>
     <p>Code review of type <c:out value="${codeReviewAssignment.kind}"/></p>
