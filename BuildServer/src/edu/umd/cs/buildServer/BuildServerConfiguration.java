@@ -91,7 +91,15 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
             URL location = BuildServerConfiguration.class.getProtectionDomain()
                     .getCodeSource().getLocation();
             File f = new File(location.toURI());
-            return f.getParentFile();
+           f =  f.getParentFile();
+           File lib = new File(f, "lib");
+           if (lib.exists()) return f;
+           f = f.getParentFile();
+           lib = new File(f, "lib");
+           if (lib.exists()) return f;
+           return null;
+           
+           
         } catch (Exception e) {
             return null;
         }

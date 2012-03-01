@@ -25,8 +25,10 @@ package edu.umd.cs.buildServer.tester;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import edu.umd.cs.buildServer.builder.JavaBuilder;
@@ -43,6 +45,7 @@ final class TrustedCodeBaseFinder {
 		this.tester = tester;
 	}
 
+	private Set<String> defined = new HashSet<String>();
 	private List<TrustedCodeBase> trustedCodeBaseList = new LinkedList<TrustedCodeBase>();
 
 	/**
@@ -55,6 +58,9 @@ final class TrustedCodeBaseFinder {
 	    File buildserver = JavaBuilder.getCodeBase(Tester.class);
         tester.getLog().debug("buildserver at: " + buildserver);
         addTrustedCodeBase("buildserver.tester.codebase", buildserver.getAbsolutePath());
+        File root = tester.getDirectoryFinder().getBuildServerRoot();
+        File lib = new File(root, "lib");
+        addTrustedCodeBase("buildserver.lib.codebase", lib.getAbsolutePath() +"/*");
 	}
 
 	/**
@@ -67,6 +73,8 @@ final class TrustedCodeBaseFinder {
 	}
 
 	private void addTrustedCodeBase(String property, String value) {
+	    if (defined.contains(property))
+	        throw new IllegalArgumentException("already defined " + property);
 		this.tester.getLog().debug(
 				"Trusted code base: " + property + "=" + value);
 		trustedCodeBaseList.add(new TrustedCodeBase(property, value));

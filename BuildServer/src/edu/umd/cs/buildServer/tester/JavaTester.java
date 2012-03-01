@@ -349,6 +349,7 @@ public class JavaTester extends Tester {
 		cp.append(getProjectSubmission().getTestSetup().getAbsolutePath());
 		JavaBuilder.appendBuildServerToClasspath(cp);
 		JavaBuilder.appendJUnitToClassPath(cp);
+		JavaBuilder.appendLibrariesToClassPath(cp);
 		if (getProjectSubmission().isPerformCodeCoverage())
 			JavaBuilder.appendCloverToClassPath(cp);
 		cp.append(File.pathSeparator);

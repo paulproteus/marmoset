@@ -34,6 +34,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collection;
 
 import junit.framework.AssertionFailedError;
@@ -327,12 +329,21 @@ public class TestRunner extends BaseTestRunner {
         } finally {
             System.out.flush();
             System.err.flush();
-            System.setIn(sysIn);
-            System.setOut(sysOut);
-            System.setErr(sysErr);
+            setSystemInOutAndErr(sysIn, sysOut, sysErr);
         }
     }
 
+	  private static void setSystemInOutAndErr(final InputStream input,
+	            final PrintStream oStream, final PrintStream err) {
+	        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+	            public Void run() {
+	                System.setIn(input);
+	                System.setOut(oStream);
+	                System.setErr(err);
+	                return null;
+	            };
+	        });
+	    }
 	/**
 	 * Get a single test derived from combination of testClassName and
 	 * {@link #testMethod}. If the test class extends TestCase, then this is

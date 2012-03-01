@@ -47,6 +47,6 @@ grant codeBase "file:${buildserver.tester.codebase}/-" {
 };
 
 // Permissions granted to the build server and test harness
-grant codeBase "file:${buildserver.tester.codebase}" {
+grant codeBase "file:${buildserver.lib.codebase}" {
     permission java.security.AllPermission;
 };

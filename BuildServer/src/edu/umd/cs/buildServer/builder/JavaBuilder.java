@@ -50,7 +50,8 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.dom4j.DocumentException;
 
-import edu.umd.cs.buildServer.BuildServer;
+import com.google.common.base.Strings;
+
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ConfigurationKeys;
@@ -61,6 +62,7 @@ import edu.umd.cs.buildServer.tester.TestRunner;
 import edu.umd.cs.buildServer.util.BuildServerUtilities;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
@@ -307,6 +309,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		StringBuffer cp = new StringBuffer();
 		cp.append(getProjectSubmission().getTestSetup().getAbsolutePath());
 		appendJUnitToClassPath(cp);
+		appendLibrariesToClassPath(cp);
 		if (generateCodeCoverage)
 			appendCloverToClassPath(cp);
 
@@ -421,6 +424,12 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		addFileToClasspath(buf, f);
 	}
 
+	public static void appendLibrariesToClassPath(StringBuffer buf) {
+        addFileToClasspath(buf, getGuavaJar());
+        addFileToClasspath(buf, getTextDiffJar());
+    }
+
+
 	private static void addFileToClasspath(StringBuffer buf, File f) {
 		if (f == null) return;
 		buf.append(File.pathSeparatorChar);
@@ -439,6 +448,12 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 	public static File getJUnitJar() {
 		return getCodeBase(TestCase.class);
 	}
+	public static File getGuavaJar() {
+        return getCodeBase(Strings.class);
+    }
+	public static File getTextDiffJar() {
+        return getCodeBase(TextDiff.class);
+    }
 	public static File getBuildServerJar() {
 		return getCodeBase(TestRunner.class);
 	}
