@@ -101,9 +101,9 @@ jQuery(document).ready(function ($) {
 
 <c:choose>
 
-<c:when test="${project.tested and not empty studentRegistrationSet}">
+<c:when test="${project.tested}">
 
-<c:if test="${not empty allTestSetups}">
+<c:if test="${not empty allTestSetups and not empty studentRegistrationSet}">
 
 <h3>Test Stats</h3>
 
@@ -143,7 +143,7 @@ jQuery(document).ready(function ($) {
 
 <h4>Canonical Submissions</h4>
 			<c:choose>
-				<c:when test="${not empty  canonicalSubmissions}">
+				<c:when test="${not empty canonicalSubmissions}">
 					<form id="submitProjectForm" enctype="multipart/form-data"
 						action="
 	<c:url value="/action/SubmitProjectViaWeb"/>"
@@ -245,7 +245,7 @@ jQuery(document).ready(function ($) {
 
 				<th>activate/<br>inactivate</th>
 
-				<th title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup broken.</a>
+				<th title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup<br> broken.</a>
                 <th>Retest</a>
 
 
@@ -377,8 +377,6 @@ jQuery(document).ready(function ($) {
 		</table>
             </form>
 	</c:if>
-
-
 
 </c:when>
 <c:otherwise>

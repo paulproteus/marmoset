@@ -117,7 +117,11 @@ label.error {
                     		</c:otherwise>
                     		</c:choose>
                     	</td>
-                        <td><c:out value="${course.description}" /></td>
+                        <td><c:url var="courseLink" value="${courseURL}">
+                            <c:param name="coursePK" value="${course.coursePK}" />
+                        </c:url>
+                        <a href="${courseLink}"> <c:out value="${course.description}" /> 
+                        </a></td>
                         <!-- TODO(rwsims): Allow students to cancel registration requests? -->
                     </tr>
                 </c:forEach>
@@ -156,7 +160,11 @@ label.error {
                             </c:choose>
                             </td>
                             <td><label for="${checkboxName}-box"><c:out value="${course.fullname}" /></label></td>
-                            <td><c:out value="${course.description}" />
+                            <td><c:url var="courseLink" value="${courseURL}">
+                            <c:param name="coursePK" value="${course.coursePK}" />
+                        </c:url>
+                        <a href="${courseLink}"> <c:out value="${course.description}" /> 
+                        </a>
 								
 							</td>
                         </tr>

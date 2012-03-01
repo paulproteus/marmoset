@@ -6,7 +6,7 @@
 <c:choose>
 <c:when test="${not empty project.url}">
 <c:set var="projectURL"><c:out value="${project.url}"/></c:set>
-<h1><a href="${projectLink}">
+<h1><a href="${projectURL}">
   <c:out value="${project.fullTitle}"/></a></h1>
 <p class="sectionDescription"><a href="${projectURL}"><c:out value="${project.description}"/></a></p>
 </c:when>

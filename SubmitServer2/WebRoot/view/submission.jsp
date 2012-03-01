@@ -427,27 +427,11 @@ not empty testOutcomeCollection.releaseOutcomes}">
 	</table>
 </c:if>
 
-
-
-
-
-
 	</c:otherwise>
-
 </c:choose>
-
-
- <c:if test="${!peerReview && testRunList != null}">
-	<c:url value="/view/submissionAllTests.jsp"
-		var="submissionAllTestsLink">
-		<c:param name="submissionPK" value="${submission.submissionPK}" />
-	</c:url>
-	<p><a href="${submissionAllTestsLink}"> See all test results for this
-	submission </a>
 
 <ss:submissionDetails />
 
-</c:if>
 <ss:footer />
 </body>
 </html>

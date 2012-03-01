@@ -156,15 +156,20 @@ tr.reject {background: #f33}
     <p></p>
     <table>
         <tr>
-            <th>Project</th>
-            <th>Overview</th>
-            <th>testing<br> setup
-            </th>
-            <th># to test</th>
-            <th># retesting</th>
-            <th>Visible</th>
-            <th>Due</th>
-            <th class="description">Title</th>
+            <th rowspan="2">Project</th>
+            <th rowspan="2">Overview</th>
+            <th rowspan="2">testing<br> setup</th>
+            <th colspan="5">build status</th>
+            <th rowspan="2">Visible</th>
+            <th rowspan="2">Due</th>
+            <th  rowspan="2" class="description">Title</th>
+        </tr>
+           <tr>
+            <th>new</th>
+            <th>pending</th>
+            <th>complete</th>
+            <th>retest</th>
+            <th>broken</th>
         </tr>
 
         <c:forEach var="project" items="${projectList}" varStatus="counter">
@@ -209,12 +214,15 @@ tr.reject {background: #f33}
                                 </c:otherwise>
                             </c:choose></td>
 
-                        <td>${ss:numToTest(project.projectPK, connection)}</td>
 
-                        <td>${ss:numForRetest(project.projectPK, connection)}</td>
+                        <td><c:out value="${buildStatusCount[project]['new']}" /></td>
+                        <td><c:out value="${buildStatusCount[project]['pending']}" /></td>
+                        <td><c:out value="${buildStatusCount[project]['complete']}" /></td>
+                        <td><c:out value="${buildStatusCount[project]['retest']}" /></td>
+                        <td><c:out value="${buildStatusCount[project]['broken']}" /></td>
                     </c:when>
-                    <c:otherwise>
-                        <td colspan="3" />
+                         <c:otherwise>
+                        <td colspan="6"><c:out value="${buildStatusCount[project]['accepted']}" /> accepted</td>
                     </c:otherwise>
                 </c:choose>
 
