@@ -136,7 +136,6 @@ public class AddSubmissionsToCodeReviewAssignment extends SubmitServerServlet {
 		try {
 			conn = getConnection();
 				
-
 			AssignCodeReviews.assignReviewersOfStudentCode(assignment, lastSubmissionMap, students, 1, codeReviewers,
                     true, conn);
 		

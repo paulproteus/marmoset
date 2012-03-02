@@ -60,15 +60,16 @@
 
 </div>
 
-
-<c:if test="${codeReviewAssignment == 'PEER' || codeReviewAssignment == 'EXEMPLAR'}">
+<c:if test="${codeReviewAssignment.byStudents}">
 <p>Student identities are anonymous: ${codeReviewAssignment.anonymous} 
 <p>Reviewers can see comments from other reviewers: ${codeReviewAssignment.otherReviewsVisible} 
 </p></c:if>
 
-
-
-
+<c:choose>
+<c:when test="${codeReviewAssignment.prototype}">
+<p><a href="${assignReviews}">Assign reviews</a></p>
+</c:when>
+<c:otherwise>
 <c:url var="PrintRubricEvaluationsForDatabase" value="/data/instructor/PrintRubricEvaluationsForDatabase">
         <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
         </c:url>
@@ -83,9 +84,7 @@
 </c:url>
 <p><a href="${PrintRubricsForDatabase}">List rubrics in CSV format for upload to grades server</a>
 <p><a href="${PrintRubricEvaluationsForDatabase}">List rubric evaluations in CSV format for upload to grades server</a>
-<c:if test="${codeReviewAssignment.prototype}">
-<p><a href="${assignReviews}">Assign reviews</a></p>
-</c:if>
+</p></c:otherwise></c:choose>
 
 <c:if test="${! empty rubrics }">
 <h2>Rubrics</h2>
@@ -113,9 +112,7 @@
 </ul>
 </c:if>
 
-
 <h2>Submissions being reviewed</h2>
-
 
 <c:set var="cols" value="2"/>
 <c:if test="${not empty rubrics}">

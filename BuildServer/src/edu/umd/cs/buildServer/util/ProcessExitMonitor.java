@@ -26,8 +26,6 @@
  */
 package edu.umd.cs.buildServer.util;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 
 
@@ -40,9 +38,9 @@ public final class ProcessExitMonitor extends Thread {
     
     private final Logger log;
 	private final Process process;
-	private boolean exited;
+	private volatile boolean exited;
 	private volatile int exitCode;
-	private ProcessTree tree;
+	private final ProcessTree tree;
 
 	/**
 	 * Constructor.
@@ -88,25 +86,28 @@ public final class ProcessExitMonitor extends Thread {
 	 *         otherwise
 	 * @throws InterruptedException
 	 */
-	public synchronized boolean waitForProcessToExit(long millis)
+	public boolean waitForProcessToExit(long millis)
 			throws InterruptedException {
-		if (!exited) {
-		    Thread.sleep(100);
-		    tree.computeChildren();
-			wait(millis);
+        if (!exited) {
+            Thread.sleep(100);
+            synchronized (this) {
+                tree.computeChildren();
+                wait(millis);
+            }
+        }
+        synchronized (this) {
+            Untrusted.destroyProcessTree(process, tree, log);
 		}
-		Untrusted.destroyProcessTree(process, tree, log);
         
-		if (exited) 
-		    return true;
-		 
-		return false;
+        return exited;
 	}
 
 	/**
 	 * @return Returns the exitCode.
 	 */
 	public int getExitCode() {
+	    if (!exited)
+	        throw new IllegalStateException();
 		return exitCode;
 	}
 }

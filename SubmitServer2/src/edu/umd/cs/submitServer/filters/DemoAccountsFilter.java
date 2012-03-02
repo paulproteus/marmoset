@@ -21,34 +21,35 @@ import edu.umd.cs.submitServer.WebConfigProperties;
 public class DemoAccountsFilter extends SubmitServerFilter {
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp,
+            FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
-        
-        String demoAccounts = WebConfigProperties.get().getProperty("authentication.demoAccounts");
 
-       
+        String demoAccounts = WebConfigProperties.get().getProperty(
+                "authentication.demoAccounts");
+
         if (!Strings.isNullOrEmpty(demoAccounts)) {
-            System.out.println("DemoAccounts: " + demoAccounts);
-        Connection conn = null;
-        try {
-            conn = getConnection();
-            
-            String [] accts = demoAccounts.trim().split(",");
-            List<Student> demoStudents = new ArrayList<Student>(accts.length);
-            for(String loginName : accts) {
-                Student s = Student.lookupByLoginName(loginName, conn);
-                if (s != null)
-                    demoStudents.add(s);
-                
-            }
-            request.setAttribute("demoAccounts", demoStudents);
+            Connection conn = null;
+            try {
+                conn = getConnection();
 
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        } finally {
-            releaseConnection(conn);
-        }
+                String[] accts = demoAccounts.trim().split(",");
+                List<Student> demoStudents = new ArrayList<Student>(
+                        accts.length);
+                for (String loginName : accts) {
+                    Student s = Student.lookupByLoginName(loginName, conn);
+                    if (s != null)
+                        demoStudents.add(s);
+
+                }
+                request.setAttribute("demoAccounts", demoStudents);
+
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            } finally {
+                releaseConnection(conn);
+            }
         }
 
         chain.doFilter(request, response);

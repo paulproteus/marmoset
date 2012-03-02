@@ -52,6 +52,10 @@ public class CodeReviewAssignment {
             return this == INSTRUCTIONAL_PROTOTYPE || this == PEER_PROTOTYPE;
         }
         
+        public boolean isByStudents() {
+            return this == PEER || this == PEER_BY_SECTION || this == EXEMPLAR || this == PEER_PROTOTYPE;
+        }
+        
         static Map<String, Kind> normalize = new HashMap<String,Kind>();
         static {
             for(Kind k : values()) {
@@ -121,6 +125,9 @@ public class CodeReviewAssignment {
 	public boolean isPrototype() {
 	    return kind.isPrototype();
 	}
+	public boolean isByStudents() {
+        return kind.isByStudents();
+    }
 	public Timestamp getDeadline() {
 		return deadline;
 	}
