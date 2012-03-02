@@ -215,7 +215,7 @@ public class FileViewImpl extends Composite implements FileView {
     private int currentRow = 0;
 
     public FileDropController() {
-      super(FileViewImpl.this);
+      super(FileViewImpl.this.codeGrid);
     }
 
     private void setCurrent(int y) {
@@ -251,8 +251,9 @@ public class FileViewImpl extends Composite implements FileView {
 
     @Override
     public void onLeave(DragContext context) {
-      if (current != null)
+      if (current != null) {
         current.removeStyleDependentName("engaged");
+      }
       current = null;
       currentRow = 0;
     }
