@@ -309,6 +309,11 @@
     </filter-mapping>
      <filter-mapping>
         <filter-name>MyCourseOverviewFilter</filter-name>
+        <url-pattern>/view/instructor/student.jsp</url-pattern>
+    </filter-mapping>
+  
+     <filter-mapping>
+        <filter-name>MyCourseOverviewFilter</filter-name>
         <url-pattern>/view/index.jsp</url-pattern>
     </filter-mapping>
   
