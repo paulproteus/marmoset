@@ -30,6 +30,7 @@
 	<!--
 		log all transactions that take longer than some lower bound
 	-->
+	
 	<filter>
 		<filter-name>MonitorSlowTransactionsFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter</filter-class>
@@ -297,6 +298,20 @@
 		<url-pattern>/admin/Fixup</url-pattern>
 	</filter-mapping>
 
+
+  <filter>
+       <filter-name>MyCourseOverviewFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.MyCourseOverviewFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>MyCourseOverviewFilter</filter-name>
+        <url-pattern>/view/course.jsp</url-pattern>
+    </filter-mapping>
+     <filter-mapping>
+        <filter-name>MyCourseOverviewFilter</filter-name>
+        <url-pattern>/view/index.jsp</url-pattern>
+    </filter-mapping>
+  
     <filter>
        <filter-name>CodeReviewFilter</filter-name>
         <filter-class> edu.umd.cs.submitServer.filters.CodeReviewFilter </filter-class>
@@ -722,10 +737,7 @@
 		<filter-name>ConnectionFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.ConnectionFilter</filter-class>
 	</filter>
-	<filter-mapping>
-		<filter-name>ConnectionFilter</filter-name>
-		<url-pattern>/view/instructor/course.jsp</url-pattern>
-	</filter-mapping>
+
 	<filter-mapping>
 		<filter-name>ConnectionFilter</filter-name>
 		<url-pattern>/view/sourceCode.jsp</url-pattern>

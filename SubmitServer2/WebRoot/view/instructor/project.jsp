@@ -105,37 +105,8 @@ will show code differences in source views and code reviews, and fix file paths 
 uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
 
 </c:if>
-<c:if test="${project.tested}">
-<div class="projectvitalstats">
-		<c:set var="waitingToBeTested"
-		value="${ss:numToTest(project.projectPK, connection)}" />
-	<c:if test="${waitingToBeTested > 0}">
-		<p>${waitingToBeTested} submissions waiting to be tested
-		</p>
-	</c:if>
 
-	<c:set var="waitingToBeRetested"
-		value="${ss:numForRetest(project.projectPK, connection)}" />
-	<c:if test="${waitingToBeRetested > 0}">
-		<p>${waitingToBeRetested} submissions requiring retest (because of a new test
-		setup activation) </p>
-	</c:if>
-
-	<c:set var="inconsistentResults"
-		value="${fn:length(failedBackgroundRetestSubmissionList)}" />
-	<c:if test="${inconsistentResults > 0}">
-		<c:url var="smallfailedBackgroundRetestLink"
-			value="/view/instructor/failedBackgroundRetests.jsp">
-			<c:param name="projectPK" value="${project.projectPK}" />
-		</c:url>
-
-		<p><a href="${smallfailedBackgroundRetestLink}"> ${inconsistentResults} submissions with inconsistent
-		results (from a background test)
-		 </a></p>
-	</c:if>
-
-</div>
-</c:if>
+<ss:projectStats/>
 
 <c:if test="${!project.visibleToStudents}">
     <c:url var="makeVisibleLink"
