@@ -340,13 +340,16 @@ public class Submission implements ITestSummary<Submission> {
 
 
 	public String getTestSummary() {
-	    if (getBuildStatus() == BuildStatus.COMPLETE)
+	    if (getBuildStatus() != BuildStatus.COMPLETE) 
+	        return getBuildStatus().toString().toLowerCase();
+	    if (isCompileSuccessful())
 	        return String.format("%d | %d | %d | %d",
 	                getValuePublicTestsPassed(),
 	                getValueReleaseTestsPassed(),
 	                getValueSecretTestsPassed(),
 	                getNumFindBugsWarnings());
-	    return getBuildStatus().toString().toLowerCase();
+	    return "did not compile";
+	    
 	}
 	/**
 	 * @return Returns the releaseRequest.
