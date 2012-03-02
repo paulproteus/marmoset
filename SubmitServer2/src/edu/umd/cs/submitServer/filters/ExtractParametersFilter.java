@@ -167,6 +167,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (courseList.size() == 1) {
 				request.setAttribute("singleCourse", Boolean.TRUE);
 				Course onlyCourse = courseList.get(0);
+				request.setAttribute("onlyCourse", onlyCourse);
+                
 				coursePK = onlyCourse.getCoursePK();
 				userSession.setOnlyCoursePK(coursePK);
 			} else

@@ -99,48 +99,6 @@ jQuery(document).ready(function ($) {
 </c:if>
 
 
-<c:choose>
-
-<c:when test="${project.tested}">
-
-<c:if test="${not empty allTestSetups and not empty studentRegistrationSet}">
-
-<h3>Test Stats</h3>
-
-<div class="projectvitalstats">
-		<c:set var="waitingToBeTested"
-		value="${ss:numToTest(project.projectPK, connection)}" />
-	<c:if test="${waitingToBeTested > 0}">
-		<p>${waitingToBeTested} submissions waiting to be tested
-		</p>
-	</c:if>
-
-	<c:set var="waitingToBeRetested"
-		value="${ss:numForRetest(project.projectPK, connection)}" />
-	<c:if test="${waitingToBeRetested > 0}">
-		<p>${waitingToBeRetested} submissions requiring retest (because of a new test
-		setup activation) </p>
-	</c:if>
-
-	<c:set var="inconsistentResults"
-		value="${fn:length(failedBackgroundRetestSubmissionList)}" />
-	<c:if test="${inconsistentResults > 0}">
-		<c:url var="smallfailedBackgroundRetestLink"
-			value="/view/instructor/failedBackgroundRetests.jsp">
-			<c:param name="projectPK" value="${project.projectPK}" />
-		</c:url>
-
-		<p><a href="${smallfailedBackgroundRetestLink}"> ${inconsistentResults} submissions with inconsistent
-		results (from a background test)
-		 </a></p>
-	</c:if>
-
-</div>
-	<c:if test="${waitingToBeTested == 0 &&  waitingToBeRetested == 0 && inconsistentResults == 0}">
-	<p>All submissions tested; results consistent.</p>
-	</c:if>
-</c:if>
-
 <h4>Canonical Submissions</h4>
 			<c:choose>
 				<c:when test="${not empty canonicalSubmissions}">
@@ -377,6 +335,12 @@ jQuery(document).ready(function ($) {
 		</table>
             </form>
 	</c:if>
+
+<c:choose>
+
+<c:when test="${project.tested}">
+
+<ss:projectStats/>
 
 </c:when>
 <c:otherwise>

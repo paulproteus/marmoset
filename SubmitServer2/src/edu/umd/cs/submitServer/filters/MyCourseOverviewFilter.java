@@ -21,81 +21,62 @@
  * 
  */
 
-/**
- * Created on Dec 5, 2005
- *
- * @author jspacco
+/*
+ * Created on Apr 8, 2005
  */
 package edu.umd.cs.submitServer.filters;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.zip.ZipInputStream;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.MissingRequiredTestPropertyException;
-import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
-import edu.umd.cs.marmoset.modelClasses.TestRun;
+import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 
-/**
- * TestPropertiesFilter
- * 
- * @author jspacco
- */
-public class TestPropertiesFilter extends SubmitServerFilter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-	 * javax.servlet.ServletResponse, javax.servlet.FilterChain)
-	 */
+public class MyCourseOverviewFilter extends SubmitServerFilter {
+
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) resp;
+		Course course = (Course) request.getAttribute(COURSE);
+		if (course == null)
+		    course =  (Course) request.getAttribute("onlyCourse");
+        StudentRegistration studentRegistration = (StudentRegistration)
+                request.getAttribute(STUDENT_REGISTRATION);
+	
 		Connection conn = null;
+		if (course != null) 
 		try {
 			conn = getConnection();
-			Project project = (Project) request.getAttribute(PROJECT);
-			TestSetup testSetup = null;
-			if (project != null) {
-			    request.setAttribute(THIS_PROJECT_BUILD_STATUS_COUNT, project.getBuildStatusCount(conn));
-	            
-				testSetup = TestSetup.lookupByTestSetupPK(
-						project.getTestSetupPK(), conn);
-			}
-			if (testSetup == null) {
-				TestRun testRun = (TestRun) request.getAttribute("testRun");
-				if (testRun != null)
-					testSetup = TestSetup.lookupByTestSetupPK(
-							testRun.getTestSetupPK(), conn);
-			}
-			if (testSetup != null) {
-				ZipInputStream zipIn = new ZipInputStream(
-						new ByteArrayInputStream(
-								testSetup.downloadArchive(conn)));
-				TestProperties testProperties = new TestProperties();
-				testProperties.load(zipIn);
-				request.setAttribute(TEST_PROPERTIES, testProperties);
-			}
-		} catch (MissingRequiredTestPropertyException e) {
-			throw new ServletException(e);
+			
+			Map<Integer,Submission> myMostRecentSubmissions = 
+			        Submission.lookupAllMostRecent(studentRegistration, conn);
+			request.setAttribute("myMostRecentSubmissions", myMostRecentSubmissions);
+			 Map<Integer, TestSetup> currentTestSetups = 
+			         TestSetup.lookupCurrentTestSetups(course, conn);
+			 request.setAttribute("currentTestSetups", currentTestSetups);
+
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
 			releaseConnection(conn);
 		}
-		chain.doFilter(request, resp);
+		chain.doFilter(request, response);
 	}
+
 
 }

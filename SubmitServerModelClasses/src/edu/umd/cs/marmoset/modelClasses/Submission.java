@@ -115,6 +115,9 @@ public class Submission implements ITestSummary<Submission> {
 			return valueOf(name.toUpperCase());
 		}
 
+		public boolean isDone() {
+		    return this == COMPLETE || this == ACCEPTED || this == BROKEN;
+		}
 	};
 
 	public static final String SUCCESSFUL = "Successful";
@@ -1182,6 +1185,36 @@ public class Submission implements ITestSummary<Submission> {
     	return getListFromPreparedStatement(stmt);
     }
 
+    public static Map<Integer,Submission> lookupAllMostRecent(
+            StudentRegistration studentRegistration,
+            Connection conn)
+    throws SQLException
+    {
+        String query = "SELECT " +ATTRIBUTES+ " "+
+        " FROM " +
+        " submissions " +
+        " WHERE submission_timestamp IS NOT NULL " +
+        " AND student_registration_pk = ?" +
+        " AND most_recent = ? " ;
+
+        PreparedStatement stmt = Queries.setStatement(conn, query, studentRegistration.getStudentRegistrationPK(), true);
+
+        try {
+        	ResultSet rs = stmt.executeQuery();
+        
+        	Map<Integer, Submission> submissions = new HashMap<Integer,Submission>();
+        
+        	while (rs.next())
+        	{
+        		Submission submission = new Submission(rs, 1);
+        		submissions.put(submission.getProjectPK(), submission);
+        	}
+        	return submissions;
+        } finally {
+        	Queries.closeStatement(stmt);
+        }
+    }
+    
     public static List<Submission> lookupAllReleaseTestedStudentSubmissionsByProjectPK(
         Integer projectPK,
         Connection conn)

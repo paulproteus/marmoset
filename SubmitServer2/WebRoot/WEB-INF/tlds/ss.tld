@@ -177,6 +177,10 @@
     <path>/WEB-INF/tags/projectTags/projectTitle.tag</path>
   </tag-file>
   <tag-file>
+    <name>projectStats</name>
+    <path>/WEB-INF/tags/projectTags/projectStats.tag</path>
+  </tag-file>
+  <tag-file>
     <name>projectLegend</name>
     <path>/WEB-INF/tags/projectTags/projectLegend.tag</path>
   </tag-file>

@@ -33,7 +33,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+
+import javax.annotation.CheckForNull;
 
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
@@ -49,12 +53,12 @@ public class TestSetup
     private int version=0;
     private Timestamp datePosted;
     private String comment;
-    private Integer testRunPK; // may be NULL
+    private @CheckForNull Integer testRunPK; // may be NULL
     private int numTotalTests;
     private int valuePublicTests;
     private int valueReleaseTests;
     private int valueSecretTests;
-    private Integer archivePK; // may be NULL
+    private @CheckForNull Integer archivePK; // may be NULL
 
     private byte[] cachedArchive;
 
@@ -109,7 +113,7 @@ public class TestSetup
     /**
      * @return Returns the testRunPK.
      */
-    public Integer getTestRunPK()
+    public @CheckForNull Integer getTestRunPK()
     {
         return testRunPK;
     }
@@ -217,7 +221,7 @@ public class TestSetup
     /**
      * @return Returns the archivePK.
      */
-    public Integer getArchivePK()
+    public @CheckForNull Integer getArchivePK()
     {
         return archivePK;
     }
@@ -316,6 +320,30 @@ public class TestSetup
 
     }
 
+    public static Map<Integer, TestSetup> lookupCurrentTestSetups(Course course, Connection conn)
+            throws SQLException
+            {
+                String query =
+                    " SELECT " +ATTRIBUTES+
+                    " FROM  " + TABLE_NAME +"," + Project.TABLE_NAME +
+                    " WHERE  test_setups.test_setup_pk = projects.test_setup_pk " +
+                    " AND projects.course_pk = ?";
+
+                PreparedStatement stmt = Queries.setStatement(conn, query, course.getCoursePK());
+
+                System.out.println(stmt);
+                ResultSet rs = stmt.executeQuery();
+
+                Map<Integer,TestSetup> allTestSetups = new  HashMap<Integer,TestSetup>();
+                while (rs.next()) {
+                    TestSetup jarFile = new TestSetup();
+                    jarFile.fetchValues(rs, 1);
+                    allTestSetups.put(jarFile.getProjectPK(), jarFile);
+                }
+                return allTestSetups;
+
+            }
+    
     private static TestSetup getFromPreparedStatement(PreparedStatement stmt)
     throws SQLException
     {

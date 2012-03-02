@@ -1299,17 +1299,28 @@ public class Project implements Serializable {
 						);
 		stmt.setInt(1, getProjectPK());
 		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+		int done = 0;
+		int notDone = 0;
 		try {
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				String status = rs.getString(1);
+				BuildStatus bs = BuildStatus.valueOfAnyCase(status);
 				int count = rs.getInt(2);
+				if (bs.isDone())
+				    done += count;
+				else
+				    notDone += count;
 				result.put(status, count);
 
 			}
 		} finally {
 			Queries.closeStatement(stmt);
 		}
+		if (done > 0)
+		    result.put("done", done);
+		if (notDone > 0)
+		    result.put("notDone", notDone);
 		return result;
 
 	}

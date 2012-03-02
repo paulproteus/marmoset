@@ -120,6 +120,7 @@ public interface SubmitServerConstants {
 	public static final String COURSE_STUDENTREG_LIST = "courseStudentRegList";
 	public static final String UPCOMING_PROJECTS = "upcomingProjects";
 	public static final String PROJECT_BUILD_STATUS_COUNT = "buildStatusCount";
+	public static final String THIS_PROJECT_BUILD_STATUS_COUNT = "projectBuildStatusCount";
     public static final String CODE_REVIEW_ASSIGNMENT = "codeReviewAssignment";
     public static final String NEXT_CODE_REVIEW = "nextCodeReview";
     
