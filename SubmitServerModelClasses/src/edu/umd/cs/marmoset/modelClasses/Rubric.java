@@ -76,7 +76,7 @@ public class Rubric {
   private @CodeReviewAssignment.PK int codeReviewAssignmentPK;
   private String name;
   private String description;
-  private String presentation;
+  private final String presentation;
   private String data;
 
   @Override
@@ -156,6 +156,15 @@ public class Rubric {
   }
   public String getData() {
     return data;
+  }
+  public void setData(String data) {
+    this.data = data;
+  }
+  public void setName(String name) {
+    this.name = name;
+  }
+  public void setDescription(String description) {
+    this.description = description;
   }
   public LinkedHashMap<String,Integer> getDataAsMap() {
       return parseDataToMap(data);

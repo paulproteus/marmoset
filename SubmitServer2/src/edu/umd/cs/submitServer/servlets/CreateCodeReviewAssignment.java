@@ -164,18 +164,6 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 String base = String.format("rubric-%d-", i);
                 String name = request.getParameter(base + "name");
                 String pk = request.getParameter(base + "pk");
-                if (!Strings.isNullOrEmpty(pk)) {
-                  // TODO(rwsims): Edit/delete rubrics that already exist.
-                  // For now, skip rubrics that already have a pk, so only create new ones.
-                  int rubricPK = Integer.parseInt(pk);
-                  Rubric rubric = Rubric.lookupByPK(Rubric.asPK(rubricPK), conn);
-                  Preconditions.checkNotNull(rubric);
-                  if ("true".equals(request.getParameter(base + "delete"))) {
-                    rubric.setCodeReviewAssignmentPK(0);
-                  }
-                  rubric.update(conn);
-                  continue;
-                }
                 String presentation = request.getParameter(base
                         + "presentation");
                 String rubricDescription = request.getParameter(base
@@ -201,7 +189,7 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     } else {
                         add(map, "default", defaultValue);
                         add(map, "max", max);
-                        add(map, "max", max);
+                        add(map, "min", min);
                     }
                     data = Rubric.serializeMapToData(map);
                 } else if (presentation.equals("CHECKBOX")) {
@@ -211,8 +199,21 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 } else {
                     data = request.getParameter(base + "value");
                 }
-                new Rubric(conn, assignment, name, rubricDescription,
-                        presentation, data);
+                if (Strings.isNullOrEmpty(pk)) {
+                  new Rubric(conn, assignment, name, rubricDescription,
+                          presentation, data);
+                } else {
+                int rubricPK = Integer.parseInt(pk);
+                  Rubric rubric = Rubric.lookupByPK(Rubric.asPK(rubricPK), conn);
+                  Preconditions.checkNotNull(rubric);
+                  if ("true".equals(request.getParameter(base + "delete"))) {
+                    rubric.setCodeReviewAssignmentPK(0);
+                  }
+                  rubric.setData(data);
+                  rubric.setName(name);
+                  rubric.setDescription(rubricDescription);
+                  rubric.update(conn);
+                }
             }
     }
 

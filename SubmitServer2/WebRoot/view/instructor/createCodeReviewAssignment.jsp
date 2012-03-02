@@ -243,8 +243,8 @@ li.deleted-rubric {
                     </c:when>
                 </c:choose>
             </c:set>
-                <li id="rubric-${rubricStatus.count}">
-                <c:set var="prefix" value="rubric-${rubricStatus.index}" />
+                <c:set var="prefix" value="rubric-${rubricStatus.count}" />
+                <li id="${prefix}">
                 <input type="hidden" name="${prefix}-presentation" value="${rubric.presentation}" />
                 <input type="hidden" name="${prefix}-pk" value="${rubric.rubricPK}" />
                 <div class="rubric-editing">
