@@ -162,6 +162,12 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
             for (int i = 1; i <= rubricCount; i++) {
                 String base = String.format("rubric-%d-", i);
                 String name = request.getParameter(base + "name");
+                String pk = request.getParameter(base + "pk");
+                if (!Strings.isNullOrEmpty(pk)) {
+                  // TODO(rwsims): Edit/delete rubrics that already exist.
+                  // For now, skip rubrics that already have a pk, so only create new ones.
+                  continue;
+                }
                 String presentation = request.getParameter(base
                         + "presentation");
                 String rubricDescription = request.getParameter(base

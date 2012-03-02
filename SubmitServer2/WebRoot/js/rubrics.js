@@ -217,10 +217,10 @@ marmoset.DropdownEditor.prototype._save = function() {
  * @param {string} rubricTableId the id of the rubric table.
  * @param {DropdownEditor} dropdownEditor dropdown editor instance.
  */
-marmoset.RubricManager = function(rubricTableId, dropdownEditor) {
+marmoset.RubricManager = function(count, rubricTableId, dropdownEditor) {
     this.table = $(rubricTableId);
     this.dropdownEditor = dropdownEditor;
-    this.rubricCount = 0;
+    this.rubricCount = count;
 
     this.templates = {
         rubric: $("#rubricTemplate"),
@@ -259,7 +259,7 @@ marmoset.RubricManager.prototype._prefix = function(name) {
  * @return {object} the jQuery object representing the rendered template.
  */
 marmoset.RubricManager.prototype._addRubric = function(template, values) {
-    this.rubricCount += 1;
+	this.rubricCount += 1;
     values.count = this.rubricCount;
     values.prefix = this._prefix();
     values.editWidgets = template.render(values);

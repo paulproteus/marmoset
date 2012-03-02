@@ -116,12 +116,13 @@ div.rubric-editing label:first-child {
             <c:out value="${project.fullTitle}" />
         </p>
     </div>
-
-
 <c:url value="/action/instructor/CreateCodeReviewAssignment" var="createAssignmentAction" />
 <form action="${createAssignmentAction}" method="POST" id="code-review-creation">
     <input type="hidden" name="coursePK" value="${course.coursePK}" />
     <input type="hidden" name="projectPK" value="${project.projectPK}" />
+    <c:if test="${not empty codeReviewAssignment}" >
+    <input type="hidden" name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+    </c:if>
     <fieldset id="basic-review-info">
     <h3>Review Information</h3>
         <ul class="form-fields">
@@ -152,9 +153,19 @@ div.rubric-editing label:first-child {
 	        </li>
 	        <li>
 	           <label for="codereview-deadline-date">Deadline:</label>
-	           <input type="date" id="codereview-deadline-date" name="deadline-date" placeholder="yyyy-mm-dd" size="12" required="required" />
-	           <input type="time" id="codereview-deadline-time" name="deadline-time" placeholder="hh:mm aa" size="12" title="leave blank for 1 second before midnight" />
+	           <c:set var="deadlineDate">
+	               <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="yyyy-MM-dd"/>
+	           </c:set>
+	           <input type="date" id="codereview-deadline-date" name="deadline-date" placeholder="yyyy-mm-dd" size="12" required="required" 
+	           value="${deadlineDate}"/>
+	           
+	           <c:set var="deadlineTime">
+	               <fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="hh:mm aa" />
+	           </c:set>
+	           <input type="time" id="codereview-deadline-time" name="deadline-time" placeholder="hh:mm aa" size="12" title="leave blank for 1 second before midnight"
+	            value="${deadlineTime}"/>
 	        </li>
+	        <c:if test="${empty codeReviewAssignment || codeReviewAssignment.kind == 'PEER_PROTOTYPE'}">
             <li id="anonymity-info">
                 <label>Anonymous:</label>
                     <ul>
@@ -181,6 +192,7 @@ div.rubric-editing label:first-child {
                         </li>
                     </ul>
             </li>
+            </c:if>
         </ul>
     </fieldset>
     <c:if test="${empty codeReviewAssignment}">
@@ -210,8 +222,79 @@ div.rubric-editing label:first-child {
         <button id="add-dropdown-rubric" type="button">Add Dropdown</button>
         <button id="add-checkbox-rubric" type="button">Add Checkbox</button>
     </div>
-    <input type="hidden" name="rubric-count" id="rubric-count" value="0" />
+    <input type="hidden" name="rubric-count" id="rubric-count" value="${fn:length(rubrics)}" />
     <ul id="rubric-list">
+            <c:forEach var="rubric" items="${rubrics}" varStatus="rubricStatus">
+            <c:set var="presentationName">
+                    <c:choose>
+                    <c:when test="${rubric.presentation == 'NUMERIC'}">
+                    Numeric
+                    </c:when>
+                    
+                    <c:when test="${rubric.presentation == 'DROPDOWN'}">
+                    Dropdown
+                    </c:when>
+                    
+                    <c:when test="${rubric.presentation == 'CHECKBOX'}">
+                    Checkbox
+                    </c:when>
+                </c:choose>
+            </c:set>
+                <li id="rubric-${rubricStatus.count}">
+                <c:set var="prefix" value="rubric-${rubricStatus.index}" />
+                <input type="hidden" name="${prefix}-presentation" value="${rubric.presentation}" />
+                <input type="hidden" name="${prefix}-pk" value="${rubric.rubricPK}" />
+                <div class="rubric-editing">
+                <div>
+                <label for="${prefix}-name">${presentationName}: </label>
+                <input type="text" id="${prefix}-name" name="${prefix}-name" size="20" required="required" placeholder="Name of rubric item"
+                        value="${rubric.name}"/>
+                <input type="text" name="${prefix}-description" size="50" placeholder="a longer description of this rubric item" value="${rubric.description}"/>
+                </div>
+                <div>
+                <label>Edit points:</label>
+                <c:choose>
+                    <c:when test="${rubric.presentation == 'NUMERIC'}">
+                    <label for="${prefix}-min-input">min:</label>
+                    <input type="number" name="${prefix}-min" id="${prefix}-in-input" placeholder="min"  size="4" value="${not empty rubric.dataAsMap['min'] ? rubric.dataAsMap['min'] : 0}">
+
+		            <label for="${prefix}-max-input">max:</label>
+		            <input type="number" name="${prefix}-max" id="${prefix}-max-input" placeholder="max"  size="4" value="${rubric.dataAsMap['max']}">
+
+		            <label for="${prefix}-default-input">default:</label>
+		            <input type="number" name="${prefix}-default" id="${prefix}-default-input" placeholder="default"  size="4" value="${rubric.dataAsMap['default']}">
+                    </c:when>
+                    
+                    <c:when test="${rubric.presentation == 'DROPDOWN'}">
+                    <input type="hidden" name="${prefix}-value" id="${prefix}-hidden" value="${rubric.data}"/>
+                    <select id="${prefix}-select">
+                    <c:forEach var="data" items="${rubric.dataAsMap}">
+                        <option>${data.key} [${data.value}]</option>
+                    </c:forEach>
+                    </select>
+                    <button id="${prefix}-edit-button" type="button">edit dropdown</button>
+                    </c:when>
+                    
+                    <c:when test="${rubric.presentation == 'CHECKBOX'}">
+                    <input type="checkbox" value="ignore" onclick="return false;"  >
+		            <input type="number" name="${prefix}-false" title="value if not checked" size="4" required="required"
+		              value="${not empty rubric.dataAsMap['false'] ? rubric.dataAsMap['false'] : 0}">
+		            &nbsp;
+		            <input type="checkbox" value="ignore"   onclick="return false;"  CHECKED >
+		            <input type="number" name="${prefix}-true" title="value if checked"  size="4" required="required"
+		              value="${rubric.dataAsMap['true']}">
+                    </c:when>
+                </c:choose>
+                </div>
+                </div>
+                <!--
+                TODO(rwsims): Enable deletion of rubrics.
+                <div class="rubric-row-controls">
+                   <button type="button" id="{{=prefix}}-delete" value="rubric-{{=count}}">delete</button>
+                </div>
+                -->
+            </li>
+        </c:forEach>
     </ul>
     </fieldset>
     <div style="text-align: right">
@@ -330,7 +413,8 @@ div.rubric-editing label:first-child {
     <ss:script file="rubrics.js" />
     <script type="text/javascript">
 		var dropdownEditor = new marmoset.DropdownEditor("#edit-dialog");
-		var manager = new marmoset.RubricManager("#rubric-list",
+		var manager = new marmoset.RubricManager(parseInt($("#rubric-count").val()),
+				"#rubric-list",
 				dropdownEditor);
 		manager.setAddDropdownButton("#add-dropdown-rubric");
 		manager.setAddNumericButton("#add-numeric-rubric");

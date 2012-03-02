@@ -67,6 +67,10 @@
 
 <c:choose>
 <c:when test="${codeReviewAssignment.prototype}">
+<c:url var="editAssignment" value="/view/instructor/createCodeReviewAssignment.jsp">
+    <c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
+</c:url>
+<p><a href="${editAssignment}">Edit assignment</a></p>
 <c:url var="assignReviews" value="/view/instructor/assignCodeReviews.jsp" >
     <c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
 </c:url>
