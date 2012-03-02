@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
@@ -166,6 +167,13 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 if (!Strings.isNullOrEmpty(pk)) {
                   // TODO(rwsims): Edit/delete rubrics that already exist.
                   // For now, skip rubrics that already have a pk, so only create new ones.
+                  int rubricPK = Integer.parseInt(pk);
+                  Rubric rubric = Rubric.lookupByPK(Rubric.asPK(rubricPK), conn);
+                  Preconditions.checkNotNull(rubric);
+                  if ("true".equals(request.getParameter(base + "delete"))) {
+                    rubric.setCodeReviewAssignmentPK(0);
+                  }
+                  rubric.update(conn);
                   continue;
                 }
                 String presentation = request.getParameter(base

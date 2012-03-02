@@ -97,6 +97,9 @@ div.rubric-editing label:first-child {
     width: 5em;
     display: inline-block;
 }
+li.deleted-rubric {
+    background-color: #e66;
+}
 </style>
 
 </head>
@@ -287,12 +290,10 @@ div.rubric-editing label:first-child {
                 </c:choose>
                 </div>
                 </div>
-                <!--
-                TODO(rwsims): Enable deletion of rubrics.
                 <div class="rubric-row-controls">
-                   <button type="button" id="{{=prefix}}-delete" value="rubric-{{=count}}">delete</button>
+                    <input type="checkbox" id="${prefix}-delete" name="${prefix}-delete" value="true" class="delete-toggle"/>
+                    <label for="${prefix}-delete">mark for deletion</label>
                 </div>
-                -->
             </li>
         </c:forEach>
     </ul>
@@ -349,6 +350,12 @@ div.rubric-editing label:first-child {
 		$("#rubric-controls").buttonset();
 		$("#create-code-review").button();
 		updateForm($kind.filter(":checked").val());
+		
+		$("input.delete-toggle")
+		      .button()
+		      .change(function() {
+		    	    $(this).parents("li").toggleClass('deleted-rubric');
+		       });
 	});
 </script>
     <ss:script file="jsrender.js" />

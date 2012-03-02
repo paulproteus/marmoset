@@ -73,11 +73,11 @@ public class Rubric {
       ATTRIBUTE_NAME_LIST);
 
   private @Rubric.PK int rubricPK; // primary key
-  private final @CodeReviewAssignment.PK int codeReviewAssignmentPK;
-  private final String name;
-  private final String description;
-  private final String presentation;
-  private final String data;
+  private @CodeReviewAssignment.PK int codeReviewAssignmentPK;
+  private String name;
+  private String description;
+  private String presentation;
+  private String data;
 
   @Override
   public int hashCode() {
@@ -141,6 +141,9 @@ public class Rubric {
 
   public int getCodeReviewAssignmentPK() {
     return codeReviewAssignmentPK;
+  }
+  public void setCodeReviewAssignmentPK(@CodeReviewAssignment.PK int codeReviewAssignmentPK) {
+    this.codeReviewAssignmentPK = codeReviewAssignmentPK;
   }
   public String getName() {
     return name;
@@ -237,5 +240,23 @@ public class Rubric {
     this.description = resultSet.getString(startingFrom++);
     this.presentation = resultSet.getString(startingFrom++);
     this.data = resultSet.getString(startingFrom++);
+  }
+  
+  public void update(Connection conn) throws SQLException {
+
+    String update = Queries.makeUpdateStatementWithWhereClause(ATTRIBUTE_NAME_LIST, TABLE_NAME, "WHERE rubric_pk = " + this.rubricPK);
+     PreparedStatement stmt = null;
+     try {
+         stmt = conn.prepareStatement(update);
+         int col = 1;
+         stmt.setInt(col++, codeReviewAssignmentPK);
+         stmt.setString(col++, name);
+         stmt.setString(col++, description);
+         stmt.setString(col++, presentation);
+         stmt.setString(col++, data);
+         stmt.executeUpdate();
+     } finally {
+         Queries.closeStatement(stmt);
+     }
   }
 }
