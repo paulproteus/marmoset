@@ -128,7 +128,7 @@
                                             </c:when>
                                             <c:when test="${submission.releaseTestingRequested}">
                             ${submission.valueReleaseTestsPassed} /
-                            ${testOutcomes.valueReleaseTests}>
+                            ${testSetup.valueReleaseTests}
                             </c:when>
                                             <c:when test="${submission.releaseEligible}">
 
