@@ -43,20 +43,6 @@ import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 public class PrintGradesForAllSubmissionsAdjustedByBackgroundRetests extends
 		SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to get.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -97,11 +83,13 @@ public class PrintGradesForAllSubmissionsAdjustedByBackgroundRetests extends
 
 			for (Submission submission : allSubmissions) {
 				// Get the studentRegistration associated with this submission
+			    if (submission.getCurrentTestRunPK() == null)
+			        continue;
 				StudentRegistration registration = registrationMap
 						.get(submission.getStudentRegistrationPK());
 				// Only interested in student submissions
 				if (registration != null
-						&& registration.getInstructorLevel() == StudentRegistration.STUDENT_CAPABILITY_LEVEL) {
+						&& registration.isNormalStudent()) {
 					// Adjust scores for background retests
 					TestOutcomeCollection testOutcomeCollection = submission
 							.setAdjustScoreBasedOnFailedBackgroundRetests(conn);

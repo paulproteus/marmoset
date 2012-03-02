@@ -1556,7 +1556,12 @@ public class Submission implements ITestSummary<Submission> {
     throws SQLException
     {
         Project project=Project.lookupByProjectPK(getProjectPK(),conn);
+        if (project == null)
+            throw new IllegalArgumentException("No project " + getProjectPK() + " for submissionPK " + getSubmissionPK());
         TestRun currentTestRun=TestRun.lookupByTestRunPK(getCurrentTestRunPK(),conn);
+        if (currentTestRun == null)
+            throw new IllegalArgumentException("No current test run for submissionPK " + getSubmissionPK());
+        
         List<TestOutcomeCollection> allTestOutcomeCollections =
             TestOutcomeCollection.lookupAllBySubmissionPKAndTestSetupPK(
                 getSubmissionPK(),
