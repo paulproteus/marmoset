@@ -40,16 +40,18 @@ import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.tester.JUnitTestCase;
 import edu.umd.cs.buildServer.tester.JUnitTestCaseFinder;
 import edu.umd.cs.buildServer.util.BuildServerUtilities;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 
 /**
  * @author jspacco
  * 
  */
-public class StudentTestFinderRunner implements ISubmissionInspectionStep {
+public class StudentTestFinderRunner implements ISubmissionInspectionStep<JUnitTestProperties> {
 	private TestOutcomeCollection collection = new TestOutcomeCollection();
-	private ProjectSubmission projectSubmission;
+	private ProjectSubmission<JUnitTestProperties> projectSubmission;
 	private Set<JUnitTestCase> publicTestSet;
 
 	/**
@@ -67,7 +69,7 @@ public class StudentTestFinderRunner implements ISubmissionInspectionStep {
 	 * (edu.umd.cs.buildServer.ProjectSubmission)
 	 */
 	@Override
-	public void setProjectSubmission(ProjectSubmission projectSubmission) {
+	public void setProjectSubmission(ProjectSubmission<JUnitTestProperties> projectSubmission) {
 		this.projectSubmission = projectSubmission;
 	}
 
@@ -126,7 +128,7 @@ public class StudentTestFinderRunner implements ISubmissionInspectionStep {
 			TestOutcome outcome = new TestOutcome();
 			outcome.setTestRunPK(Integer.parseInt(projectSubmission
 					.getSubmissionPK()));
-			outcome.setTestType("student");
+			outcome.setTestType(TestType.STUDENT);
 			outcome.setTestName(testCase.getMethodName());
 			getTestOutcomeCollection().add(outcome);
 			System.out.println(testCase.getMethodName());
@@ -148,14 +150,14 @@ public class StudentTestFinderRunner implements ISubmissionInspectionStep {
 	/**
 	 * @return the projectSubmission
 	 */
-	public ProjectSubmission getProjectSubmission() {
+	public ProjectSubmission<JUnitTestProperties> getProjectSubmission() {
 		return projectSubmission;
 	}
 
 	private Set<JUnitTestCase> buildPublicTestSet() {
 		Set<JUnitTestCase> publicTestSet = new HashSet<JUnitTestCase>();
 		String publicTestClass = projectSubmission.getTestProperties()
-				.getTestClass(TestOutcome.PUBLIC_TEST);
+				.getTestClass(TestOutcome.TestType.PUBLIC);
 		if (publicTestClass != null) {
 			JUnitTestCaseFinder publicTestFinder = new JUnitTestCaseFinder();
 			publicTestFinder.addClassPathEntry(getProjectSubmission()

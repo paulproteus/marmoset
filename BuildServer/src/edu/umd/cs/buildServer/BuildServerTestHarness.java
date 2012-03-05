@@ -36,6 +36,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.IOUtils;
 
 import edu.umd.cs.buildServer.tester.DumpTestOutcomes;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
  * A test harness BuildServer that just needs a project jarfile, submission
@@ -127,10 +128,10 @@ public class BuildServerTestHarness extends BuildServer {
 	 * @see edu.umd.cs.buildServer.BuildServer#getProjectSubmission()
 	 */
 	@Override
-	protected ProjectSubmission getProjectSubmission()
+	protected ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException {
 
-		ProjectSubmission projectSubmission = new ProjectSubmission(
+		ProjectSubmission <?>projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), "42", // submissionPK
 				"17", // projectJarfilePK
 				"false", "false");
@@ -157,7 +158,7 @@ public class BuildServerTestHarness extends BuildServer {
 	 * cs.buildServer.ProjectSubmission)
 	 */
 	@Override
-	protected void downloadSubmissionZipFile(ProjectSubmission projectSubmission)
+	protected void downloadSubmissionZipFile(ProjectSubmission<?> projectSubmission)
 			throws IOException {
 		// We don't need to actually download the submission zipfile
 		// (since it already exists).
@@ -171,7 +172,7 @@ public class BuildServerTestHarness extends BuildServer {
 	 * .ProjectSubmission)
 	 */
 	@Override
-	protected void releaseConnection(ProjectSubmission projectSubmission) {
+	protected void releaseConnection(ProjectSubmission<?> projectSubmission) {
 		// Nothing to do, no network connection
 	}
 
@@ -183,7 +184,7 @@ public class BuildServerTestHarness extends BuildServer {
 	 * buildServer.ProjectSubmission)
 	 */
 	@Override
-	protected void downloadProjectJarFile(ProjectSubmission projectSubmission)
+	protected void downloadProjectJarFile(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException, HttpException,
 			IOException, BuilderException {
 		// Nothing to do, project jarfile should already exist
@@ -197,7 +198,7 @@ public class BuildServerTestHarness extends BuildServer {
 	 * .ProjectSubmission)
 	 */
 	@Override
-	protected void reportTestResults(ProjectSubmission projectSubmission)
+	protected void reportTestResults(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException {
 		ObjectOutputStream out = null;
 		File outputFile = new File(testingBaseDirectory, "alltests.out");

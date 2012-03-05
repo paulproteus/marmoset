@@ -43,40 +43,38 @@ import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 
-
 public class MyCourseOverviewFilter extends SubmitServerFilter {
 
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse resp,
+            FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) resp;
+        Course course = (Course) request.getAttribute(COURSE);
+        if (course == null)
+            course = (Course) request.getAttribute("onlyCourse");
+        StudentRegistration studentRegistration = (StudentRegistration) request
+                .getAttribute(STUDENT_REGISTRATION);
 
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) resp;
-		Course course = (Course) request.getAttribute(COURSE);
-		if (course == null)
-		    course =  (Course) request.getAttribute("onlyCourse");
-        StudentRegistration studentRegistration = (StudentRegistration)
-                request.getAttribute(STUDENT_REGISTRATION);
-	
-		Connection conn = null;
-		if (course != null) 
-		try {
-			conn = getConnection();
-			
-			Map<Integer,Submission> myMostRecentSubmissions = 
-			        Submission.lookupAllMostRecent(studentRegistration, conn);
-			request.setAttribute("myMostRecentSubmissions", myMostRecentSubmissions);
-			 Map<Integer, TestSetup> currentTestSetups = 
-			         TestSetup.lookupCurrentTestSetups(course, conn);
-			 request.setAttribute("currentTestSetups", currentTestSetups);
+        Connection conn = null;
+        if (course != null && studentRegistration != null)
+            try {
+                conn = getConnection();
 
-		} catch (SQLException e) {
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
-		chain.doFilter(request, response);
-	}
+                Map<Integer, Submission> myMostRecentSubmissions = Submission
+                        .lookupAllMostRecent(studentRegistration, conn);
+                request.setAttribute("myMostRecentSubmissions",
+                        myMostRecentSubmissions);
+                Map<Integer, TestSetup> currentTestSetups = TestSetup
+                        .lookupCurrentTestSetups(course, conn);
+                request.setAttribute("currentTestSetups", currentTestSetups);
 
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            } finally {
+                releaseConnection(conn);
+            }
+        chain.doFilter(request, response);
+    }
 
 }

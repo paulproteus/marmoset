@@ -26,15 +26,15 @@
  */
 package edu.umd.cs.buildServer.builder;
 
-import edu.umd.cs.buildServer.BuildServerConfiguration;
+import org.apache.log4j.Logger;
+
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.ConfigurationKeys;
 import edu.umd.cs.buildServer.MissingConfigurationPropertyException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.tester.JavaTester;
-import edu.umd.cs.buildServer.tester.Tester;
 import edu.umd.cs.buildServer.util.ArgumentParser;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.utilities.ZipExtractorException;
 
 /**
@@ -42,41 +42,18 @@ import edu.umd.cs.marmoset.utilities.ZipExtractorException;
  * 
  * @author David Hovemeyer
  */
-public class JavaBuilderAndTesterFactory implements BuilderAndTesterFactory {
+public class JavaBuilderAndTesterFactory extends BuilderAndTesterFactory<JUnitTestProperties> {
 
-	private TestProperties testProperties;
-	private DirectoryFinder directoryFinder;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param config
-	 *            the build server Configuration
-	 * @param testProperties
-	 *            TestProperties loaded from test jarfile's test.properties
-	 * @throws MissingConfigurationPropertyException
-	 */
-	public JavaBuilderAndTesterFactory(BuildServerConfiguration config,
-			TestProperties testProperties)
-			throws MissingConfigurationPropertyException {
-		this.testProperties = testProperties;
-		this.directoryFinder = new JavaDirectoryFinder(config);
-	}
+	public JavaBuilderAndTesterFactory(
+            ProjectSubmission<JUnitTestProperties> projectSubmission,
+            JUnitTestProperties testProperties, Logger log) throws MissingConfigurationPropertyException {
+        super(projectSubmission, testProperties, new JavaDirectoryFinder(projectSubmission.getConfig()), log);
+        
+    }
 
-	@Override
-	public DirectoryFinder getDirectoryFinder() {
-		return directoryFinder;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.umd.cs.buildServer.BuilderAndTesterFactory#createBuilder(edu.umd.
-	 * cs.buildServer.ProjectSubmission)
-	 */
-	@Override
-	public Builder createBuilder(ProjectSubmission projectSubmission)
+    @Override
+	public JavaBuilder createBuilder()
 			throws MissingConfigurationPropertyException, BuilderException,
 			ZipExtractorException {
 		JavaSubmissionExtractor submissionExtractor = new JavaSubmissionExtractor(
@@ -94,7 +71,7 @@ public class JavaBuilderAndTesterFactory implements BuilderAndTesterFactory {
 			}
 		}
 
-		Builder builder = new JavaBuilder(testProperties, projectSubmission,
+		JavaBuilder builder = new JavaBuilder(testProperties, projectSubmission,
 				directoryFinder, submissionExtractor);
 
 		builder.addExpectedFile(projectSubmission.getZipFile().getName());
@@ -105,17 +82,10 @@ public class JavaBuilderAndTesterFactory implements BuilderAndTesterFactory {
 		return builder;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see edu.umd.cs.buildServer.BuilderAndTesterFactory#createTester(boolean,
-	 * edu.umd.cs.buildServer.ProjectSubmission)
-	 */
 	@Override
-	public Tester createTester(boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission)
+	public JavaTester createTester()
 			throws MissingConfigurationPropertyException {
-		return new JavaTester(testProperties, haveSecurityPolicyFile,
+		return new JavaTester(testProperties,
 				projectSubmission, directoryFinder);
 	}
 }

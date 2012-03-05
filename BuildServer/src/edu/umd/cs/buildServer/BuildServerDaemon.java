@@ -60,6 +60,7 @@ import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
 
 /**
@@ -258,7 +259,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	 * @see edu.umd.cs.buildServer.BuildServer#getProjectSubmission()
 	 */
 	@Override
-	protected ProjectSubmission getProjectSubmission()
+	protected ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException {
 
 		String url = getRequestProjectURL();
@@ -357,7 +358,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		getLog().info(
                 "Got submission " +submissionPK +  ", testSetup " + testSetupPK + ", kind: " + kind);
         
-		ProjectSubmission projectSubmission = new ProjectSubmission(
+		ProjectSubmission<?> projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), submissionPK, testSetupPK,
 				isNewTestSetup, isBackgroundRetest);
 
@@ -392,14 +393,14 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	}
 
 	@Override
-	protected void downloadSubmissionZipFile(ProjectSubmission projectSubmission)
+	protected void downloadSubmissionZipFile(ProjectSubmission<?> projectSubmission)
 			throws IOException {
 		IO.download(projectSubmission.getZipFile(),
 				projectSubmission.getMethod());
 	}
 
 	@Override
-	protected void downloadProjectJarFile(ProjectSubmission projectSubmission)
+	protected void downloadProjectJarFile(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException, HttpException,
 			IOException, BuilderException {
 		// FIXME: We should cache these
@@ -441,11 +442,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	}
 
 	@Override
-	protected void releaseConnection(ProjectSubmission projectSubmission) {
+	protected void releaseConnection(ProjectSubmission<?> projectSubmission) {
 		projectSubmission.getMethod().releaseConnection();
 	}
 
-	private void dumpOutcomes(ProjectSubmission projectSubmission) {
+	private void dumpOutcomes(ProjectSubmission<?> projectSubmission) {
 		try {
 			// Can't dump outcomes if we don't have a test.properties file.
 			if (projectSubmission.getTestProperties() == null)
@@ -473,7 +474,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 
 	@Override
-	protected void reportTestResults(ProjectSubmission projectSubmission)
+	protected void reportTestResults(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException {
 
 		dumpOutcomes(projectSubmission);

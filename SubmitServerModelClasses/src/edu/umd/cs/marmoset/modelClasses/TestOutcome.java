@@ -23,6 +23,13 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.FINDBUGS;
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.PMD;
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.PUBLIC;
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.RELEASE;
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.SECRET;
+import static edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType.STUDENT;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -52,6 +59,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.meta.TypeQualifier;
 
@@ -65,7 +73,6 @@ import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 import edu.umd.cs.marmoset.utilities.TextFileReader;
 import edu.umd.cs.marmoset.utilities.XSSScrubber;
-
 /**
  * Object to represent a single test outcome.
  *
@@ -117,47 +124,49 @@ public class TestOutcome implements Serializable {
     public static final @OutcomeType String TIMEOUT = asOutcomeType("timeout");
 	public static final @OutcomeType String UNCOVERED_METHOD = asOutcomeType("uncovered_method");
 
-	// Test types
-	   @Documented
-	    @TypeQualifier(applicableTo = String.class)
-	    @Retention(RetentionPolicy.RUNTIME)
-	    public @interface TestType {
-	       
-	   }
-
-	public static final @TestType String BUILD_TEST =  asTestType("build");
-	public static final @TestType String PUBLIC_TEST = asTestType("public");
-	public static final @TestType String RELEASE_TEST = asTestType("release");
-	public static final @TestType String SECRET_TEST = asTestType("secret");
-	public static final @TestType String FINDBUGS_TEST = asTestType("findbugs");
-	public static final @TestType String STUDENT_TEST = asTestType("student");
-	public static final @TestType String PMD_TEST = asTestType("pmd");
-	public static final @TestType String FEATURE = asTestType("feature");
 	
-	public static @TestType String asTestType(String s) {
-        return s;
+    public static enum TestType {
+        BUILD, PUBLIC, RELEASE, SECRET, STUDENT, FINDBUGS, PMD, UNCOVERED_METHOD;
+        
+        public static TestType valueOfAnyCase(String name) {
+            return valueOf(name.toUpperCase());
+        }
+        public static @CheckForNull TestType valueOfAnyCaseOrNull(String name) {
+            try {
+                return valueOfAnyCase(name);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+            
+        }
+        public static TestOutcome.TestType[] DYNAMIC_TEST_TYPES = { PUBLIC, RELEASE, SECRET, STUDENT };
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+        public boolean isDynamic() {
+            switch (this) {
+            case PUBLIC:
+            case RELEASE:
+            case SECRET:
+            case STUDENT:
+                return true;
+            default:
+                return false;
+            }
+        }
     }
-	
-	// Code features
-	public static final String OPCODE_TEST = "opcode";
-	public static final String CLASS_TEST = "class";
-	public static final String METHOD_TEST = "method";
-	public static final String DIGEST1_TEST = "digest1";
-	public static final String DIGEST2_TEST = "digest2";
+
+
     // Granularity of coverage
     public static final String METHOD="METHOD";
     public static final String STATEMENT="STATEMENT";
     public static final String BRANCH="BRANCH";
     public static final String NONE="NONE";
 
-	/**
-	 * Types of dynamically executed tests.
-	 */
-	 public static final String[] DYNAMIC_TEST_TYPES =
-		{ PUBLIC_TEST, RELEASE_TEST, SECRET_TEST, STUDENT_TEST };
-
+		
 	private int testRunPK = 0;
-	private @TestType String testType;
+	private TestType  testType;
 	private String testNumber;
 	private @OutcomeType String outcome;
 	private int pointValue;
@@ -175,9 +184,7 @@ public class TestOutcome implements Serializable {
      */
     private transient CodeCoverageResults codeCoverageResults=null;
 
-	public static String[] getDynamicTestTypes() {
-		return DYNAMIC_TEST_TYPES.clone();
-	}
+	
 
 	/**
 	 * List of all attributes for test_outcomes <code>TEST_OUTCOMES_ATTRIBUTE_NAME_LIST</code>
@@ -233,7 +240,7 @@ public class TestOutcome implements Serializable {
 	}
 	@Override
 	public int hashCode() {
-		return MarmosetUtilities.hashString(testType) +
+		return testType.hashCode() +
 			MarmosetUtilities.hashString(testName) +
 			MarmosetUtilities.hashString(outcome) +
 			MarmosetUtilities.hashString(shortTestResult) +
@@ -245,7 +252,7 @@ public class TestOutcome implements Serializable {
 		if (o == null || this.getClass() != o.getClass())
 			return false;
 		TestOutcome other = (TestOutcome) o;
-		return MarmosetUtilities.stringEquals(testType, other.testType)
+		return testType.equals(other.testType)
 			&& MarmosetUtilities.stringEquals(testName, other.testName)
 			&& MarmosetUtilities.stringEquals(outcome, other.outcome)
 			&& MarmosetUtilities.stringEquals(shortTestResult, other.shortTestResult)
@@ -289,7 +296,7 @@ public class TestOutcome implements Serializable {
     public boolean isExceptionSourceApproximatelyCoveredElsewhere(CodeCoverageResults coverage, int range)
     throws IOException
     {
-        if (!isError() || !RELEASE_TEST.equals(testType))
+        if (!isError() || !RELEASE.equals(testType))
             return false;
         StackTraceElement stackTraceElement=getExceptionSourceFromLongTestResult();
         if (coversLineOrPreviousLines(stackTraceElement, range, coverage))
@@ -349,19 +356,19 @@ public class TestOutcome implements Serializable {
     }
 
     public boolean isPublicTest() {
-        return getTestType().equals(PUBLIC_TEST);
+        return getTestType().equals(PUBLIC);
     }
 
     public boolean isStudentTest() {
-        return getTestType().equals(STUDENT_TEST);
+        return getTestType().equals(STUDENT);
     }
 
     public boolean isReleaseTest() {
-        return getTestType().equals(RELEASE_TEST);
+        return getTestType().equals(RELEASE);
     }
 
     public boolean isSecretTest() {
-        return getTestType().equals(SECRET_TEST);
+        return getTestType().equals(SECRET);
     }
 
     public boolean isPassed()
@@ -682,7 +689,7 @@ public class TestOutcome implements Serializable {
 	                "<b><a href=\"%s/PrintTestOutcome?testRunPK=%d&testType=%s&testNumber=%s\">full result is %d characters, %d lines long</a></b><br>%s",
 	                viewLink,
 	                outcome.getTestRunPK(),
-	                urlEncode(outcome.getTestType()),
+	                urlEncode(outcome.getTestType().name()),
 	                urlEncode(outcome.getTestNumber()),
 	                length, 
 	                numLines(fullResult),
@@ -693,15 +700,12 @@ public class TestOutcome implements Serializable {
 
 	private  @HTML String getHotlink(String viewSourceLink)
 	{
-	    if (testType.equals(FINDBUGS_TEST))
+	    if (testType.equals(FINDBUGS))
 	        return getFindbugsHotlink(viewSourceLink);
-	    else if (testType.equals(PMD_TEST))
+	    else if (testType.equals(PMD))
 	        return getPmdLocation(viewSourceLink);
-	    else if (testType.equals(PUBLIC_TEST) ||
-	            testType.equals(RELEASE_TEST) ||
-                testType.equals(SECRET_TEST) ||
-                testType.equals(STUDENT_TEST) ||
-                testType.equals(UNCOVERED_METHOD))
+	    else if (testType.isDynamic() ||
+                testType.equals(TestType.UNCOVERED_METHOD))
 	        return getStackTraceHotlinks(viewSourceLink);
 	    return getLongTestResultAsHtml();
 	}
@@ -787,7 +791,7 @@ public class TestOutcome implements Serializable {
 
 	private @HTML String getFindbugsHotlink(String viewSourceLink)
 	{
-	    if (!testType.equals(FINDBUGS_TEST))
+	    if (!testType.equals(FINDBUGS))
 	        throw new IllegalArgumentException("is type " + testType + ", not findbugs");
 	    if (shortTestResult == null || shortTestResult.equals(""))
 	        return "";
@@ -902,8 +906,8 @@ public class TestOutcome implements Serializable {
         return XSSScrubber.asHTML("<a href=\"" + viewSourceLink +
         		"?testRunPK=" +testRunPK+
                 "&sourceFileName="+sourceFileName+
-                "&testType="+(testType.equals(TestOutcome.UNCOVERED_METHOD)?"public-student":testType)+
-                "&testNumber="+(testType.equals(TestOutcome.UNCOVERED_METHOD)?"all":testNumber)+
+                "&testType="+(testType.equals(TestOutcome.TestType.UNCOVERED_METHOD)?"public-student":testType)+
+                "&testNumber="+(testType.equals(TestOutcome.TestType.UNCOVERED_METHOD)?"all":testNumber)+
                 "&testName="+testName+
                 "&startHighlight="+startHighlight+
                 "&numToHighlight="+numToHighlight+
@@ -945,13 +949,13 @@ public class TestOutcome implements Serializable {
 	/**
 	 * @return Returns the testType.
 	 */
-	public @TestType String getTestType() {
+	public TestType getTestType() {
 		return testType;
 	}
 	/**
 	 * @param testType The testType to set.
 	 */
-	public void setTestType(@TestType String testType) {
+	public void setTestType(TestType testType) {
 		this.testType = testType;
 	}
 
@@ -1001,12 +1005,12 @@ public class TestOutcome implements Serializable {
     }
 
     public int getFindBugsRank() {
-        if (!getTestType().equals("findbugs"))
+        if (!getTestType().equals(TestType.FINDBUGS))
             throw new IllegalStateException("Not a findbugs outcome");
         return Integer.parseInt(exceptionClassName);
     }
     public String getFindBugsRankDescription() {
-        if (!getTestType().equals("findbugs"))
+        if (!getTestType().equals(FINDBUGS))
             throw new IllegalStateException("Not a findbugs outcome");
         int rank  = Integer.parseInt(exceptionClassName);
         if (rank <=4)
@@ -1082,7 +1086,7 @@ public class TestOutcome implements Serializable {
 	{
 		limitSizes();
 	    stmt.setInt(index++, getTestRunPK());
-	    stmt.setString(index++, getTestType());
+	    stmt.setString(index++, getTestType().name());
 	    stmt.setString(index++, getTestNumber());
 	    stmt.setString(index++, getOutcome());
 	    stmt.setInt(index++, getPointValue());
@@ -1133,7 +1137,7 @@ public class TestOutcome implements Serializable {
 
 	        int index = putValues(stmt, 1);
 	        stmt.setInt(index++, getTestRunPK());
-	        stmt.setString(index++, getTestType());
+	        stmt.setString(index++, getTestType().name());
 	        stmt.setString(index++, getTestNumber());
 
 	        //System.out.println(stmt);
@@ -1156,7 +1160,7 @@ public class TestOutcome implements Serializable {
 	public int fetchValues(ResultSet rs, int startingFrom) throws SQLException
 	{
 		setTestRunPK(rs.getInt(startingFrom++));
-		setTestType(asTestType(rs.getString(startingFrom++)));
+		setTestType(TestType.valueOf(rs.getString(startingFrom++)));
 		setTestNumber(rs.getString(startingFrom++));
 		setOutcome(asOutcomeType(rs.getString(startingFrom++)));
 		setPointValue(rs.getInt(startingFrom++));
@@ -1203,9 +1207,9 @@ public class TestOutcome implements Serializable {
 	 */
 	public boolean isExceptionSourceInTestDriver()
 	{
-	    if (! (testType.equals(PUBLIC_TEST) ||
-	            testType.equals(RELEASE_TEST) ||
-	            testType.equals(SECRET_TEST)))
+	    if (! (testType.equals(PUBLIC) ||
+	            testType.equals(RELEASE) ||
+	            testType.equals(SECRET)))
 	        throw new IllegalStateException("Cannot query source of failure for a testOutcome of type " +testType+
 	                " because the source of a failure only makes sense for a public, release or secret test");
 	    // doesn't really make sense to query this information for a passed test
@@ -1280,9 +1284,9 @@ public class TestOutcome implements Serializable {
 	 * or a student-written test).
 	 */
 	public boolean isCardinalTestType() {
-	    return (testType.equals(PUBLIC_TEST) ||
-	            testType.equals(RELEASE_TEST) ||
-	            testType.equals(SECRET_TEST));
+	    return (testType.equals(PUBLIC) ||
+	            testType.equals(RELEASE) ||
+	            testType.equals(SECRET));
 	}
 
 	/**
@@ -1290,7 +1294,7 @@ public class TestOutcome implements Serializable {
 	 * @return True if this testOutcome is a student-written test; false otherwise.
 	 */
 	public boolean isStudentTestType() {
-		return testType.equals(STUDENT_TEST);
+		return testType.equals(STUDENT);
 	}
 
 	public boolean coversFileAtLineNumber(String fileName, int lineNumber)
@@ -1360,12 +1364,12 @@ public class TestOutcome implements Serializable {
 
 	public boolean isFindBugsWarning()
 	{
-	    return testType.equals(FINDBUGS_TEST);
+	    return testType.equals(FINDBUGS);
 	}
 
 	public boolean isFindBugsWarningAtLine(String requestedSourceFileName, int requestedLineNumber)
 	{
-	    if (!testType.equals(FINDBUGS_TEST))
+	    if (!testType.equals(FINDBUGS))
 	        return false;
 
 
@@ -1427,11 +1431,11 @@ public class TestOutcome implements Serializable {
 
     public FileNameLineNumberPair getFileNameLineNumberPair()
     {
-        if (getTestType().equals(FINDBUGS_TEST)) {
+        if (getTestType().equals(FINDBUGS)) {
             return getFileNameLineNumberPair(getShortTestResult());
-        } else if (getTestType().equals(PUBLIC_TEST) ||
-                getTestType().equals(RELEASE_TEST) ||
-                getTestType().equals(SECRET_TEST))
+        } else if (getTestType().equals(PUBLIC) ||
+                getTestType().equals(RELEASE) ||
+                getTestType().equals(SECRET))
         {
             BufferedReader reader=null;
     	    Pattern pattern = Pattern.compile("\\((\\w+\\.java):(\\d+)\\)");

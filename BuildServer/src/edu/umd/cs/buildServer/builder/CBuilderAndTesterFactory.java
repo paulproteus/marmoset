@@ -26,13 +26,13 @@
  */
 package edu.umd.cs.buildServer.builder;
 
-import edu.umd.cs.buildServer.BuildServerConfiguration;
+import org.apache.log4j.Logger;
+
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.MissingConfigurationPropertyException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.tester.CTester;
-import edu.umd.cs.buildServer.tester.Tester;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
 import edu.umd.cs.marmoset.utilities.ZipExtractorException;
 
 /**
@@ -46,41 +46,17 @@ import edu.umd.cs.marmoset.utilities.ZipExtractorException;
  * @author David Hovemeyer
  * @author jspacco
  */
-public class CBuilderAndTesterFactory implements BuilderAndTesterFactory {
+public class CBuilderAndTesterFactory extends BuilderAndTesterFactory<MakeTestProperties> {
 
-	private TestProperties testProperties;
-	private DirectoryFinder directoryFinder;
+	public CBuilderAndTesterFactory(
+            ProjectSubmission<MakeTestProperties> projectSubmission,
+            MakeTestProperties testProperties, Logger log) throws MissingConfigurationPropertyException {
+        super(projectSubmission, testProperties, new CDirectoryFinder(projectSubmission.getConfig()), log);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param config
-	 *            the build server Configuration
-	 * @param testProperties
-	 *            Properties loaded from test jarfile's test.properties
-	 * @throws MissingConfigurationPropertyException
-	 */
-	public CBuilderAndTesterFactory(BuildServerConfiguration config,
-			TestProperties testProperties)
-			throws MissingConfigurationPropertyException {
-		this.testProperties = testProperties;
-		this.directoryFinder = new CDirectoryFinder(config);
-	}
 
 	@Override
-	public DirectoryFinder getDirectoryFinder() {
-		return directoryFinder;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * edu.umd.cs.buildServer.BuilderAndTesterFactory#createBuilder(edu.umd.
-	 * cs.buildServer.ProjectSubmission)
-	 */
-	@Override
-	public Builder createBuilder(ProjectSubmission projectSubmission)
+	public CBuilder createBuilder()
 			throws BuilderException, MissingConfigurationPropertyException,
 			ZipExtractorException {
 		CSubmissionExtractor submissionExtractor = new CSubmissionExtractor(
@@ -96,18 +72,11 @@ public class CBuilderAndTesterFactory implements BuilderAndTesterFactory {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see edu.umd.cs.buildServer.BuilderAndTesterFactory#createTester(boolean,
-	 * edu.umd.cs.buildServer.ProjectSubmission)
-	 */
 	@Override
-	public Tester createTester(boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission)
+	public CTester createTester()
 			throws MissingConfigurationPropertyException {
 
-		CTester tester = new CTester(testProperties, haveSecurityPolicyFile,
+		CTester tester = new CTester(testProperties,
 				projectSubmission, directoryFinder);
 
 		return tester;

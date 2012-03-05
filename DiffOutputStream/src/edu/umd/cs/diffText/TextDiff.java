@@ -11,11 +11,16 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
+import java.util.EnumSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,16 +79,34 @@ public class TextDiff extends StringsWriter {
     public static Builder withOptions() {
         return new Builder();
     }
+    
+    public static Builder withOptions(EnumSet<Option> options) {
+        return new Builder(options);
+    }
+    
+    public enum Option {
+        TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE;
+        public static Option valueOfAnyCase(String name) {
+            name = name.toUpperCase();
+            if (name.equals("IGNORESCASE"))
+                return IGNORES_CASE;
+            if (name.equals("IGNOREWHITESPACECHANGE"))
+                return IGNORE_WHITESPACE_CHANGE;
+            return valueOf(name);
+        }
+    };
 
     public static class Builder implements Cloneable {
-        boolean ignoresCase;
-        boolean trim;
+        final EnumSet<Option> options;
+     
         final ArrayDeque<Object> expect = new ArrayDeque<Object>();
 
         Builder() {
-
+            options = EnumSet.noneOf(Option.class);
         }
-
+        Builder(EnumSet<Option> options) {
+            this.options = EnumSet.copyOf(options);
+        }
         protected Builder clone() {
             try {
                 return (Builder) super.clone();
@@ -95,14 +118,27 @@ public class TextDiff extends StringsWriter {
         public Builder copy() {
             return this.clone();
         }
+        
+        public Builder set(Option... options) {
+
+            for(Option o : options) {
+                this.options.add(o);
+               
+            }
+            return this;
+        }
 
         public Builder trim() {
-            trim = true;
+            set(Option.TRIM);
             return this;
         }
 
         public Builder ignoreCase() {
-            ignoresCase = true;
+            set(Option.IGNORES_CASE);
+            return this;
+        }
+        public Builder ignoreWhitespaceChange() {
+            set(Option.IGNORE_WHITESPACE_CHANGE);
             return this;
         }
 
@@ -134,8 +170,7 @@ public class TextDiff extends StringsWriter {
         }
 
         public TextDiff build() {
-            return new TextDiff(new ArrayDeque<Object>(expect), trim,
-                    ignoresCase);
+            return new TextDiff(new ArrayDeque<Object>(expect), options);
 
         }
 
@@ -208,24 +243,22 @@ public class TextDiff extends StringsWriter {
         }
     }
 
-    final boolean ignoresCase;
-    final boolean trim;
-    final boolean ignoreBlank;
+    final EnumSet<Option> options;
     final ArrayDeque<Object> expect;
 
-    TextDiff(ArrayDeque<Object> expect, boolean trim, boolean ignoresCase) {
+    TextDiff(ArrayDeque<Object> expect, EnumSet<Option> options) {
         this.expect = expect;
-        this.trim = trim;
-        this.ignoresCase = ignoresCase;
-        this.ignoreBlank = false;
+        this.options = EnumSet.copyOf(options);
 
     }
 
     private String normalize(String s) {
-        if (trim)
+        if (options.contains(Option.TRIM))
             s = s.trim();
-        if (ignoresCase)
+        if (options.contains(Option.IGNORES_CASE))
             s = s.toLowerCase();
+        if (options.contains(Option.IGNORE_WHITESPACE_CHANGE))
+            s = s.replaceAll("\\s+", " ");
         return s;
     }
 
@@ -287,7 +320,87 @@ public class TextDiff extends StringsWriter {
         if (o == null)
             return;
         fail("no more output; expected " + o);
-
     }
+    
+    
+    
+    public static FutureTask<Void> copyTask(final InputStream from, final OutputStream to) { 
+        Callable<Void> doCheck =  new Callable<Void> () {
+
+            @Override
+            public Void call() throws Exception  {
+                byte [] buf = new byte[1024];
+                try {
+                while(true) {
+                    int sz;
+                    try {
+                       sz = from.read(buf);
+                    } catch (Exception e) {
+                        // ignore exceptions that happen while reading, but treat them as EOF
+                        sz = -1;
+                    }
+                    if (sz < 0) {
+                        to.close();
+                        return null;
+                    }
+                    to.write(buf, 0, sz);
+                }
+                } finally {
+                   try {
+                       from.close();
+                       to.close();
+                   } catch (Exception e) {
+                       assert true;
+                   }
+                  
+                }
+            }};
+            
+        return new FutureTask<Void>(doCheck);
+    }
+      
+    
+    public static FutureTask<Void> copyTask(final Reader from, final Writer to) { 
+        Callable<Void> doCheck =  new Callable<Void> () {
+
+            @Override
+            public Void call() throws Exception  {
+                char [] buf = new char[1024];
+                try {
+                while(true) {
+                    int sz;
+                    try {
+                       sz = from.read();
+                    } catch (Exception e) {
+                        // ignore exceptions that happen while reading, but treat them as EOF
+                        sz = -1;
+                    }
+                    if (sz < 0) {
+                        to.close();
+                        return null;
+                    }
+                    to.write(buf, 0, sz);
+                }
+                } finally {
+                   try {
+                       from.close();
+                       to.close();
+                   } catch (Exception e) {
+                       assert true;
+                   }
+                  
+                }
+            }};
+            
+        return new FutureTask<Void>(doCheck);
+    }
+      
+    
+    public FutureTask<Void> check(final InputStream actual) { 
+        return copyTask(actual, this);
+    }
+      
+        
+    
 
 }

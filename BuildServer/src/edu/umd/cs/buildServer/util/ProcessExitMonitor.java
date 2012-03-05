@@ -55,7 +55,7 @@ public final class ProcessExitMonitor extends Thread {
 		this.log = logger;
 		this.exited = false;
 		
-		tree = new ProcessTree(logger);
+		this.tree = new ProcessTree(logger);
 		this.start();
 	}
 
@@ -72,6 +72,7 @@ public final class ProcessExitMonitor extends Thread {
 				notifyAll();
 			}
 		} catch (InterruptedException e) {
+		    Untrusted.destroyProcessTree(process, tree, log);
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -86,19 +87,23 @@ public final class ProcessExitMonitor extends Thread {
 	 *         otherwise
 	 * @throws InterruptedException
 	 */
-	public boolean waitForProcessToExit(long millis)
-			throws InterruptedException {
-        if (!exited) {
-            Thread.sleep(100);
+    public boolean waitForProcessToExit(long millis)
+             {
+        try {
+            if (!exited) {
+                Thread.sleep(100);
+                synchronized (this) {
+                    tree.computeChildren();
+                    wait(millis);
+                }
+            }
+        } catch (InterruptedException e) {
+           interrupt();
+        } finally {
             synchronized (this) {
-                tree.computeChildren();
-                wait(millis);
+                Untrusted.destroyProcessTree(process, tree, log);
             }
         }
-        synchronized (this) {
-            Untrusted.destroyProcessTree(process, tree, log);
-		}
-        
         return exited;
 	}
 

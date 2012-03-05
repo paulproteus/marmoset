@@ -26,17 +26,12 @@
  */
 package edu.umd.cs.buildServer;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
-import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import javax.annotation.CheckForNull;
 import javax.management.InstanceAlreadyExistsException;
@@ -54,12 +49,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
 
-import edu.umd.cs.buildServer.builder.Builder;
 import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
-import edu.umd.cs.buildServer.inspection.ISubmissionInspectionStep;
-import edu.umd.cs.buildServer.tester.Tester;
-import edu.umd.cs.buildServer.util.BuildServerUtilities;
-import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.buildServer.util.LoadAverage;
 import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.MissingRequiredTestPropertyException;
@@ -91,7 +81,6 @@ public abstract class BuildServer implements ConfigurationKeys {
 	public static final String SOURCE_DIR = "src";
 	public static final String INSTRUMENTED_SOURCE_DIR = "inst-src";
 
-	private static final String SECURITY_POLICY_PATH = "edu/umd/cs/buildServer/security.policy";
 	private static final String LOG4J_FILE_CONFIG = "edu/umd/cs/buildServer/log4j-file.properties";
 	private static final String LOG4J_CONSOLE_CONFIG = "edu/umd/cs/buildServer/log4j-console.properties";
 
@@ -478,11 +467,10 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 */
 	private int doOneRequest() throws MissingConfigurationPropertyException {
 
-		ProjectSubmission projectSubmission = null;
-
+	    ProjectSubmission<?> projectSubmission = null;
 		try {
 			// Get a ProjectSubmission to build and test
-			projectSubmission = getProjectSubmission();
+		   projectSubmission  = getProjectSubmission();
 			if (projectSubmission == null)
 				return NO_WORK;
 
@@ -548,12 +536,10 @@ public abstract class BuildServer implements ConfigurationKeys {
 									+ projectSubmission.getTestSetupPK());
 					// Add "cannot build submission" test outcomes for
 					// the dynamic test types
-					String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-					for (int i = 0; i < dynamicTestTypes.length; ++i) {
-						@TestType String testType = TestOutcome.asTestType(dynamicTestTypes[i]);
-						addSpecialFailureTestOutcome(projectSubmission,
-								testType, "Compiler output:\n" + compilerOutput);
-					}
+					for(TestType testType : TestType.DYNAMIC_TEST_TYPES) 
+                        addSpecialFailureTestOutcome(projectSubmission,
+                                testType, "Compiler output:\n" + compilerOutput);
+                        
 
 					result = COMPILE_FAILURE;
 				} catch (CompileFailureException e) {
@@ -574,12 +560,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 
 					// Add "cannot build submission" test outcomes for
 					// the dynamic test types
-					String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-					for (int i = 0; i < dynamicTestTypes.length; ++i) {
-						String testType = dynamicTestTypes[i];
-						addSpecialFailureTestOutcome(projectSubmission,
+					for(TestType testType : TestType.DYNAMIC_TEST_TYPES) 
+					    addSpecialFailureTestOutcome(projectSubmission,
 								testType, "Compiler output:\n" + compilerOutput);
-					}
 
 					result = COMPILE_FAILURE;
 				}
@@ -642,7 +625,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @throws MissingConfigurationPropertyException
 	 * @throws IOException
 	 */
-	protected abstract ProjectSubmission getProjectSubmission()
+	protected abstract ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException;
 
 	/**
@@ -653,7 +636,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @throws IOException
 	 */
 	protected abstract void downloadSubmissionZipFile(
-			ProjectSubmission projectSubmission) throws IOException;
+			ProjectSubmission<?> projectSubmission) throws IOException;
 
 	/**
 	 * Release the connection used to contact the submit server.
@@ -662,7 +645,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 *            the current ProjectSubmission
 	 */
 	protected abstract void releaseConnection(
-			ProjectSubmission projectSubmission);
+			ProjectSubmission<?> projectSubmission);
 
 	/**
 	 * Download the project jarfile into the jarcache directory.
@@ -675,7 +658,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @throws BuilderException
 	 */
 	protected abstract void downloadProjectJarFile(
-			ProjectSubmission projectSubmission)
+			ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException, HttpException,
 			IOException, BuilderException;
 
@@ -688,7 +671,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 *            the PK of the submission
 	 */
 	protected abstract void reportTestResults(
-			ProjectSubmission projectSubmission)
+			ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException;
 
 	/**
@@ -703,10 +686,10 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 *            compiler error messages (if any)
 	 * @param started TODO
 	 */
-	private void addBuildTestResult(ProjectSubmission projectSubmission,
+	private void addBuildTestResult(ProjectSubmission<?> projectSubmission,
 			@OutcomeType String passed, String longDescription, long started) {
 		TestOutcome outcome = new TestOutcome();
-		outcome.setTestType(TestOutcome.BUILD_TEST);
+		outcome.setTestType(TestOutcome.TestType.BUILD);
 		outcome.setTestName("Build Test");
 		outcome.setOutcome(passed);
 		outcome.setShortTestResult("Build test " + passed);
@@ -731,7 +714,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 *            compiler output from the failed build
 	 */
 	private void addSpecialFailureTestOutcome(
-			ProjectSubmission projectSubmission, @TestType String testType,
+			ProjectSubmission<?> projectSubmission, TestType testType,
 			String longTestResult) {
 		TestOutcome outcome = new TestOutcome();
 
@@ -757,7 +740,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @throws BuilderException
 	 * @throws IOException
 	 */
-	private void buildAndTestProject(ProjectSubmission projectSubmission)
+	private <T extends TestProperties> void buildAndTestProject(ProjectSubmission<T> projectSubmission)
 			throws CompileFailureException,
 			MissingConfigurationPropertyException, IOException,
 			BuilderException {
@@ -772,8 +755,8 @@ public abstract class BuildServer implements ConfigurationKeys {
 		TestPropertiesExtractor testPropertiesExtractor = null;
 		try {
 			testPropertiesExtractor = new TestPropertiesExtractor(
-					projectSubmission.getTestSetup(), buildDirectory);
-			testPropertiesExtractor.extract();
+					projectSubmission.getTestSetup());
+			testPropertiesExtractor.extract(buildDirectory);
 		} catch (ZipExtractorException e) {
 			throw new BuilderException(e);
 		}
@@ -785,9 +768,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 
 		// Load test.properties
 		File testPropertiesFile = new File(buildDirectory, "test.properties");
-		TestProperties testProperties = new TestProperties();
+		T testProperties;
 		try {
-			testProperties.load(testPropertiesFile);
+		    testProperties =  (T) TestProperties.load(testPropertiesFile);
 		} catch (MissingRequiredTestPropertyException e) {
 			throw new BuilderException(e.getMessage(), e);
 		}
@@ -797,204 +780,13 @@ public abstract class BuildServer implements ConfigurationKeys {
 
 		// Create a BuilderAndTesterFactory, based on the language specified
 		// in the test properties file
-		BuilderAndTesterFactory builderAndTesterFactory = projectSubmission
+		BuilderAndTesterFactory<T> builderAndTesterFactory = projectSubmission
 				.createBuilderAndTesterFactory();
 
-
-		// Build the submission
-		Builder builder = null;
-		try {
-			builder = builderAndTesterFactory.createBuilder(projectSubmission);
-		} catch (ZipExtractorException e) {
-			throw new BuilderException(e);
-		}
-
-		List<File> files = BuildServerUtilities.listDirContents(buildDirectory);
-		getLog().trace(
-				"Pristine environment before the first compilation attempt:");
-		for (File file : files) {
-			getLog().trace(file.getAbsolutePath());
-		}
-
-		log.debug("Extracting submission and test setup");
-		builder.extract();
-
-		// If the project jarfile didn't contain a security.policy file,
-		// use the default. (Only for Java projects.)
-		boolean extractedSecurityPolicy = testPropertiesExtractor
-				.extractedSecurityPolicyFile();
-		if (testProperties.getLanguage().equals("java")) {
-			addBuildServerPermissionsToSecurityPolicyFile(builderAndTesterFactory
-					.getDirectoryFinder().getTestFilesDirectory());
-			extractedSecurityPolicy = true;
-		}
-
-
-		try {
-			// This compilation is for the inspection step for md5sums of the
-			// classfiles
-			// and should *NOT* include any fancy things like code coverage
-			builder.setInspectionStepCompilation(true);
-			log.debug("Performing first build");
-			builder.execute();
-			// retrieve auxiliary information (if any) about the build
-			projectSubmission.setCodeMetrics(builder.getCodeMetrics());
-			log.debug("Inspection-step compile successful!");
-		} catch (CompileFailureException e) {
-			log.warn("Inspection-step compile failure: " + e.toString());
-			log.warn(builder.getCompilerOutput());
-			throw e;
-		}
-
-		// Run submission inspection steps
-		runSubmissionInspectionSteps(projectSubmission);
-
-		// TODO Clean up build directory
-		// Delete everything that ended up in there from the inspection
-		// compilation
-		// Possibly re-copying the submission and test-setup files
-		// Start by listing out the contents:
-		List<File> afterInspectionState = BuildServerUtilities
-				.listDirContents(buildDirectory);
-		getLog().trace("After inspection");
-		for (File file : afterInspectionState) {
-			getLog().trace(file.getAbsolutePath());
-		}
-
-		try {
-			// This compilation is for the inspection step and should *NOT*
-			// include any fancy things like code coverage
-			builder.setInspectionStepCompilation(false);
-			builder.execute();
-			log.debug("Compile successful!");
-		} catch (CompileFailureException e) {
-			log.warn("Compile failure: " + e.toString());
-			log.warn(builder.getCompilerOutput());
-			throw e;
-		}
-
-		if (getConfig().getOptionalBooleanProperty(SKIP_TESTS)) {
-			getLog().info("Skipping unit tests");
-			return;
-		}
-
-		// Test the submission
-		Tester tester = builderAndTesterFactory.createTester(
-				extractedSecurityPolicy, projectSubmission);
-		if (getConfig().getOptionalBooleanProperty(RUN_STUDENT_TESTS)) {
-			log.debug("Enabling execution of student tests for submission "
-					+ projectSubmission.getSubmissionPK());
-			tester.setExecuteStudentTests(true);
-		}
-		log.trace("Are we running student tests? "
-				+ tester.executeStudentTests());
-		log.trace("Testing project...");
-		// Test the project
-		tester.execute();
-		log.trace("done with test");
-
-		// Add test outcomes to main collection
-		projectSubmission.getTestOutcomeCollection().addAll(
-				tester.getTestOutcomeCollection().getAllOutcomes());
+		builderAndTesterFactory.buildAndTest(buildDirectory, testPropertiesExtractor);
 	}
 
-	private void runSubmissionInspectionSteps(
-			ProjectSubmission projectSubmission) throws BuilderException {
-		String lang = projectSubmission.getTestProperties().getLanguage();
-		String steps = getConfig().getOptionalProperty(
-				ConfigurationKeys.INSPECTION_TOOLS_PFX + lang);
-
-		if (steps != null) {
-			getLog().info("Attempting submission inspection steps: " + steps);
-			StringTokenizer tokenizer = new StringTokenizer(steps, ",");
-			while (tokenizer.hasMoreTokens()) {
-				String stepName = tokenizer.nextToken().trim();
-				if (stepName.equals(""))
-					continue;
-				inspectSubmission(stepName, projectSubmission);
-			}
-		}
-	}
-
-	private void inspectSubmission(String stepName,
-			ProjectSubmission projectSubmission) throws BuilderException {
-		Class<?> inspectionClass = null;
-
-		try {
-			inspectionClass = Class.forName(stepName);
-		} catch (ClassNotFoundException e) {
-			// Ignore
-		}
-
-		if (inspectionClass == null) {
-			try {
-				inspectionClass = Class.forName("edu.umd.cs.buildServer.inspection."
-						+ stepName);
-			} catch (ClassNotFoundException e) {
-				getLog().warn(
-						"Could not load submission inspection step \""
-								+ stepName + "\"");
-				return;
-			}
-		}
-
-		Object inspectionObj = null;
-		try {
-			inspectionObj = inspectionClass.newInstance();
-		} catch (InstantiationException e) {
-			getLog().warn(
-					"Could not create submission inspection step \"" + stepName
-							+ "\"");
-			return;
-		} catch (IllegalAccessException e) {
-			getLog().warn(
-					"Could not create submission inspection step \"" + stepName
-							+ "\"");
-			return;
-		}
-
-		if (!(inspectionObj instanceof ISubmissionInspectionStep)) {
-			getLog().warn(
-					"Class " + inspectionClass.getName()
-							+ " does not implement "
-							+ "ISubmissionInspectionStep");
-			return;
-		}
-		ISubmissionInspectionStep inspectionStep = (ISubmissionInspectionStep) inspectionObj;
-		inspectionStep.setProjectSubmission(projectSubmission);
-		inspectionStep.execute();
-		projectSubmission.getTestOutcomeCollection().addAll(
-				inspectionStep.getTestOutcomeCollection().getAllOutcomes());
-	}
-
-	/**
-	 * Extract the default security.policy file into the testfiles directory.
-	 *
-	 * @param testFilesDirectory
-	 *            the testfiles directory
-	 * @throws BuilderException
-	 */
-	private void addBuildServerPermissionsToSecurityPolicyFile(File testFilesDirectory)
-			throws BuilderException {
-		InputStream in = getClass().getClassLoader().getResourceAsStream(
-				SECURITY_POLICY_PATH);
-		if (in == null)
-			throw new BuilderException("Could not find default security policy");
-		OutputStream out = null;
-		try {
-			File file = new File(
-					testFilesDirectory, "security.policy");
-			out = new BufferedOutputStream(new FileOutputStream(file, true));
-			IO.copyStream(in, out);
-			out.flush();
-		} catch (IOException e) {
-			throw new BuilderException(
-					"Could not create/update security.policy file", e);
-		} finally {
-			IO.closeSilently(in, out);
-		}
-	}
-
+ 
 	/**
 	 * Delete all files in given directory.
 	 *

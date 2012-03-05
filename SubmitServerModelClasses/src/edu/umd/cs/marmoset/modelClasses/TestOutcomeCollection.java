@@ -32,16 +32,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -332,7 +331,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return number of public tests for this collection.
      */
     public int getValuePublicTests() {
-        return scoreOutcomes(getOutcomesForTestType(TestOutcome.PUBLIC_TEST));
+        return scoreOutcomes(getOutcomesForTestType(TestOutcome.TestType.PUBLIC));
     }
 
 
@@ -359,7 +358,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     }
 
     public int getValueSecretTests() {
-        return scoreOutcomes(getOutcomesForTestType(TestOutcome.SECRET_TEST));
+        return scoreOutcomes(getOutcomesForTestType(TestOutcome.TestType.SECRET));
     }
 
     /* (non-Javadoc)
@@ -386,7 +385,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      */
     @Override
 	public int getValuePublicTestsPassed() {
-        List<TestOutcome> publicTests = getOutcomesForTestType(TestOutcome.PUBLIC_TEST);
+        List<TestOutcome> publicTests = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
         return scoreOutcomes(TestOutcome.PASSED, publicTests);
     }
 
@@ -395,7 +394,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * false otherwise.
      */
     public boolean getPassedAllPublicTests() {
-        List<TestOutcome> publicTests = getOutcomesForTestType(TestOutcome.PUBLIC_TEST);
+        List<TestOutcome> publicTests = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
         return (publicTests.size() == countOutcomes(TestOutcome.PASSED, getPublicOutcomes()));
     }
 
@@ -404,7 +403,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * false otherwise.
      */
     public boolean getPassedAllReleaseTests() {
-        List<TestOutcome> releaseTests = getOutcomesForTestType(TestOutcome.RELEASE_TEST);
+        List<TestOutcome> releaseTests = getOutcomesForTestType(TestOutcome.TestType.RELEASE);
         return (releaseTests.size() == countOutcomes(TestOutcome.PASSED, getReleaseOutcomes()));
     }
 
@@ -414,21 +413,6 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     @Override
 	public boolean isCompileSuccessful() {
         return compileSuccessful;
-    }
-
-    public int getNumMethods()
-    {
-        return countOutcomes(TestOutcome.METHOD_TEST);
-    }
-
-    public int getNumOpcodes()
-    {
-        return countOutcomes(TestOutcome.OPCODE_TEST);
-    }
-
-    public int getNumClasses()
-    {
-        return countOutcomes(TestOutcome.CLASS_TEST);
     }
 
     /**
@@ -505,7 +489,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         for (Iterator<TestOutcome> ii=testOutcomes.iterator(); ii.hasNext();)
         {
             TestOutcome outcome = ii.next();
-            if (outcome.getTestType().equals(TestOutcome.FINDBUGS_TEST))
+            if (outcome.getTestType().equals(TestOutcome.TestType.FINDBUGS))
                 continue;
             if (!outcome.getOutcome().equals(TestOutcome.PASSED))
                 nonPassedScore += outcome.getPointValue();
@@ -518,7 +502,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         int count = 0;
         for (Iterator<TestOutcome> i = list.iterator(); i.hasNext();) {
             TestOutcome testOutcome = i.next();
-            if (testOutcome.getTestType().equals(TestOutcome.FINDBUGS_TEST))
+            if (testOutcome.getTestType().equals(TestOutcome.TestType.FINDBUGS))
                 continue;
             if (testOutcome.getOutcome().equals(outcome))
                 count += testOutcome.getPointValue();
@@ -541,9 +525,9 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the build and quick outcomes.
      */
     public List<TestOutcome> getAllTestOutcomes() {
-        List<TestOutcome> outcomes = getOutcomesForTestType(TestOutcome.PUBLIC_TEST);
-        outcomes.addAll(getOutcomesForTestType(TestOutcome.RELEASE_TEST));
-        outcomes.addAll(getOutcomesForTestType(TestOutcome.SECRET_TEST));
+        List<TestOutcome> outcomes = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
+        outcomes.addAll(getOutcomesForTestType(TestOutcome.TestType.RELEASE));
+        outcomes.addAll(getOutcomesForTestType(TestOutcome.TestType.SECRET));
         return outcomes;
     }
 
@@ -553,7 +537,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the build and quick outcomes.
      */
     public TestOutcome getBuildOutcome() {
-        List<TestOutcome> buildOutcomes = getOutcomesForTestType(TestOutcome.BUILD_TEST);
+        List<TestOutcome> buildOutcomes = getOutcomesForTestType(TestOutcome.TestType.BUILD);
         return buildOutcomes.get(0);
     }
 
@@ -563,24 +547,24 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the build and quick outcomes.
      */
     public List<TestOutcome> getPublicOutcomes() {
-        List<TestOutcome> publicOutcomes = getOutcomesForTestType(TestOutcome.PUBLIC_TEST);
+        List<TestOutcome> publicOutcomes = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
         return publicOutcomes;
     }
 
     public boolean getCouldNotRunPublicTests() {
-        List<TestOutcome> publicOutcomes = getOutcomesForTestType(TestOutcome.PUBLIC_TEST);
+        List<TestOutcome> publicOutcomes = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
         if (publicOutcomes.size() != 1) return false;
         return (publicOutcomes.get(0)).getOutcome().equals(TestOutcome.COULD_NOT_RUN);
     }
 
     public boolean getCouldNotRunReleaseTests() {
-        List<TestOutcome> releaseOutcomes = getOutcomesForTestType(TestOutcome.RELEASE_TEST);
+        List<TestOutcome> releaseOutcomes = getOutcomesForTestType(TestOutcome.TestType.RELEASE);
         if (releaseOutcomes.size() != 1) return false;
         return (releaseOutcomes.get(0)).getOutcome().equals(TestOutcome.COULD_NOT_RUN);
     }
 
     public boolean getCouldNotRunSecretTests() {
-        List<TestOutcome> secretOutcomes = getOutcomesForTestType(TestOutcome.SECRET_TEST);
+        List<TestOutcome> secretOutcomes = getOutcomesForTestType(TestOutcome.TestType.SECRET);
         if (secretOutcomes.size() != 1) return false;
         return (secretOutcomes.get(0)).getOutcome().equals(TestOutcome.COULD_NOT_RUN);
     }
@@ -596,7 +580,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return A list of all release test outcomes contained in this collection.
      */
     public List<TestOutcome> getReleaseOutcomes() {
-        return getOutcomesForTestType(TestOutcome.RELEASE_TEST);
+        return getOutcomesForTestType(TestOutcome.TestType.RELEASE);
     }
 
     /**
@@ -605,14 +589,14 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return A list of the secret test outcomes in this collection.
      */
     public List<TestOutcome> getSecretOutcomes() {
-        return getOutcomesForTestType(TestOutcome.SECRET_TEST);
+        return getOutcomesForTestType(TestOutcome.TestType.SECRET);
     }
     /**
      * Gets a list of student test outcomes.
      * @return A list of all student test outcomes in this collection.
      */
     public List<TestOutcome> getStudentOutcomes() {
-    	return getOutcomesForTestType(TestOutcome.STUDENT_TEST);
+    	return getOutcomesForTestType(TestOutcome.TestType.STUDENT);
     }
 
     /**
@@ -620,7 +604,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the findbugs outcomes.
      */
     public List<TestOutcome> getFindBugsOutcomes() {
-        return getOutcomesForTestType(TestOutcome.FINDBUGS_TEST);
+        return getOutcomesForTestType(TestOutcome.TestType.FINDBUGS);
     }
 
     /**
@@ -628,7 +612,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the pmd outcomes.
      */
     public List<TestOutcome> getPmdOutcomes() {
-        return getOutcomesForTestType(TestOutcome.PMD_TEST);
+        return getOutcomesForTestType(TestOutcome.TestType.PMD);
     }
 
     /**
@@ -666,7 +650,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     public void add(TestOutcome outcome) {
         if (testRunPK == null)
             testRunPK = outcome.getTestRunPK();
-        if (outcome.getTestType().equals(TestOutcome.BUILD_TEST))
+        if (outcome.getTestType().equals(TestOutcome.TestType.BUILD))
             compileSuccessful = outcome.getOutcome().equals(TestOutcome.PASSED);
         testOutcomes.add(outcome);
         testMap.put(outcome.getTestName(), outcome);
@@ -677,7 +661,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     }
 
     
-    public @CheckForNull TestOutcome getTest(String type, String number) {
+    public @CheckForNull TestOutcome getTest(TestType type, String number) {
         for(TestOutcome t : testOutcomes)
             if (type.equals(t.getTestType()) && number.equals(t.getTestNumber()))
                 return t;
@@ -694,16 +678,15 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         }
     }
 
-    private static final String[] cardinalTestTypesArr = new String[] {TestOutcome.PUBLIC_TEST,
-		TestOutcome.RELEASE_TEST,
-		TestOutcome.SECRET_TEST};
     public Iterator<TestOutcome> cardinalTestTypesIterator()
     {
-    	return iterator(cardinalTestTypesArr);
+    	return iterator(TestOutcome.TestType.PUBLIC,
+    	        TestOutcome.TestType.RELEASE,
+    	        TestOutcome.TestType.SECRET);
     }
 
     public Iterator<TestOutcome> findBugsIterator() {
-    	return iterator(TestOutcome.FINDBUGS_TEST);
+    	return iterator(TestOutcome.TestType.FINDBUGS);
     }
 
     public Iterable<TestOutcome> getIterableForCardinalTestTypes()
@@ -722,7 +705,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     	};
     }
 
-    private Iterator<TestOutcome> iterator(final String[] testTypes) {
+    private Iterator<TestOutcome> iterator(final TestType... testTypes) {
         return new Iterator<TestOutcome>() {
             private Iterator<TestOutcome> ii = testOutcomes.iterator();
 
@@ -757,10 +740,6 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         };
     }
 
-    private Iterator<TestOutcome> iterator(final String testType) {
-        return iterator(new String[] { testType });
-    }
-
     /**
      * Returns a list of the outcomes mapped to the given test type.
      *
@@ -768,7 +747,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      * @return a List of the test outcomes of the given type that are contained
      *         in this collection.
      */
-    private List<TestOutcome> getOutcomesForTestType(String testType) {
+    private List<TestOutcome> getOutcomesForTestType(TestType testType) {
         List<TestOutcome> result = new ArrayList<TestOutcome>();
         for (Iterator<TestOutcome> ii = iterator(testType); ii.hasNext();) {
             result.add((TestOutcome)ii.next());
@@ -842,19 +821,19 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
 
     List<String> getHeaders() {
         List<String> headers = new ArrayList<String>();
-        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.BUILD_TEST).iterator(); ii
+        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.TestType.BUILD).iterator(); ii
                 .hasNext();) {
             TestOutcome outcome = (TestOutcome) ii.next();
 
             headers.add("b" + Formats.twoDigitInt.format(outcome.getTestNumber()));
         }
-        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.PUBLIC_TEST).iterator(); ii
+        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.TestType.PUBLIC).iterator(); ii
                 .hasNext();) {
             TestOutcome outcome = (TestOutcome) ii.next();
 
             headers.add("q" + Formats.twoDigitInt.format(outcome.getTestNumber()));
         }
-        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.RELEASE_TEST).iterator(); ii
+        for (Iterator<TestOutcome> ii = getOutcomesForTestType(TestOutcome.TestType.RELEASE).iterator(); ii
                 .hasNext();) {
             TestOutcome outcome = (TestOutcome) ii.next();
 
@@ -871,7 +850,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         //return countOutcomes(TestOutcome.WARNING);
         int count = 0;
         for (TestOutcome testOutcome : testOutcomes) {
-            if (testOutcome.getTestType().equals(TestOutcome.FINDBUGS_TEST))
+            if (testOutcome.getTestType().equals(TestOutcome.TestType.FINDBUGS))
                 ++count;
         }
         return count;
@@ -1043,7 +1022,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
                 int index=1;
                 stmt.setInt(index++, outcome.getPointValue());
                 stmt.setInt(index++, outcome.getTestRunPK());
-                stmt.setString(index++, outcome.getTestType());
+                stmt.setString(index++, outcome.getTestType().name());
                 stmt.setString(index++, outcome.getTestNumber());
                 stmt.addBatch();
             }
@@ -1126,18 +1105,15 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         });
     }
 
-    private CodeCoverageResults getCodeCoverageResultsOfGivenType(String[] types)
+    private CodeCoverageResults getCodeCoverageResultsOfGivenType(TestType... types)
     throws IOException
     {
     	CodeCoverageResults results = new CodeCoverageResults();
-    	Set<String> set = new HashSet<String>();
-    	for (String type : types) {
-    		set.add(type);
-    	}
+    	List<TestType> typesList = Arrays.asList(types);
     	for (TestOutcome outcome : testOutcomes) {
     		// Note that timeouts don't produce any coverage output
             // but still shouldn't cause everything else to fail!
-            if (set.contains(outcome.getTestType()) && outcome.isCoverageType() && !outcome.getOutcome().equals(TestOutcome.TIMEOUT)) {
+            if (typesList.contains(outcome.getTestType()) && outcome.isCoverageType() && !outcome.getOutcome().equals(TestOutcome.TIMEOUT)) {
                 //System.out.println("Adding test of type " +outcome.getTestType());
     			CodeCoverageResults currentCoverageResults = outcome.getCodeCoverageResults();
     			results.union(currentCoverageResults);
@@ -1154,40 +1130,40 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     public CodeCoverageResults getOverallCoverageResultsForCardinalTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {
-    			TestOutcome.PUBLIC_TEST,
-    			TestOutcome.RELEASE_TEST,
-    			TestOutcome.SECRET_TEST});
+    	return getCodeCoverageResultsOfGivenType(
+    			TestOutcome.TestType.PUBLIC,
+    			TestOutcome.TestType.RELEASE,
+    			TestOutcome.TestType.SECRET);
     }
 
     public CodeCoverageResults getOverallCoverageResultsForPublicTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {TestOutcome.PUBLIC_TEST});
+    	return getCodeCoverageResultsOfGivenType(TestOutcome.TestType.PUBLIC);
     }
 
     public CodeCoverageResults getOverallCoverageResultsForReleaseTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {TestOutcome.RELEASE_TEST});
+    	return getCodeCoverageResultsOfGivenType(TestOutcome.TestType.RELEASE);
     }
 
     public CodeCoverageResults getOverallCoverageResultsForSecretTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {TestOutcome.SECRET_TEST});
+    	return getCodeCoverageResultsOfGivenType(TestOutcome.TestType.SECRET);
     }
 
     public CodeCoverageResults getOverallCoverageResultsForStudentTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {TestOutcome.STUDENT_TEST});
+    	return getCodeCoverageResultsOfGivenType(TestOutcome.TestType.STUDENT);
     }
 
     public CodeCoverageResults getOverallCoverageResultsForPublicAndStudentTests()
     throws IOException
     {
-    	return getCodeCoverageResultsOfGivenType(new String[] {TestOutcome.PUBLIC_TEST, TestOutcome.STUDENT_TEST});
+    	return getCodeCoverageResultsOfGivenType(TestOutcome.TestType.PUBLIC, TestOutcome.TestType.STUDENT);
     }
     /**
      * Get the code coverage results divided up by packages.
@@ -1221,7 +1197,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
 
     public List<TestOutcome> getUncoveredMethods()
     {
-        return getOutcomesForTestType(TestOutcome.UNCOVERED_METHOD);
+        return getOutcomesForTestType(TestOutcome.TestType.UNCOVERED_METHOD);
     }
 
     /**
@@ -1334,7 +1310,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         return getTestOutcomesCoveringFileAtLine(pair.getFileName(), pair.getLineNumber());
     }
 
-	public TestOutcome getOutcomeByTestTypeAndTestNumber(@TestType String testType, String testNumber)
+	public TestOutcome getOutcomeByTestTypeAndTestNumber(TestType testType, String testNumber)
 	{
 		for (TestOutcome outcome : testOutcomes) {
 			if (outcome.getTestType().equals(testType) && outcome.getTestNumber().equals(testNumber))
@@ -1483,14 +1459,10 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     public CodeCoverageResults getOverallCoverageResultsForAllPassingTests()
     {
         CodeCoverageResults results=new CodeCoverageResults();
-        Set<String> set=new HashSet<String>();
-        set.add(TestOutcome.PUBLIC_TEST);
-        set.add(TestOutcome.RELEASE_TEST);
-        set.add(TestOutcome.SECRET_TEST);
-        set.add(TestOutcome.STUDENT_TEST);
+
         for (TestOutcome outcome : testOutcomes) {
             try {
-                if (set.contains(outcome.getTestType()) && outcome.getOutcome().equals(TestOutcome.PASSED)) {
+                if (outcome.getTestType().isDynamic() && outcome.getOutcome().equals(TestOutcome.PASSED)) {
                     results.union(outcome.getCodeCoverageResults());
                 }
             } catch (IOException e) {

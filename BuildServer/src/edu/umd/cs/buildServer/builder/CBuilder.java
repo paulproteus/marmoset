@@ -30,17 +30,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ProjectSubmission;
-import edu.umd.cs.buildServer.tester.CTester;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
-import edu.umd.cs.marmoset.modelClasses.TestOutcome;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
+import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
 
 /**
@@ -72,7 +70,7 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
  * @author David Hovemeyer
  * @author jspacco
  */
-public class CBuilder extends Builder implements TestPropertyKeys {
+public class CBuilder extends Builder<MakeTestProperties> implements TestPropertyKeys {
 
 	/**
 	 * Constructor.
@@ -87,8 +85,8 @@ public class CBuilder extends Builder implements TestPropertyKeys {
 	 * @param submissionExtractor
 	 *            SubmissionExtractor to be used to extract the submission
 	 */
-	protected CBuilder(TestProperties testProperties,
-			ProjectSubmission projectSubmission,
+	protected CBuilder(MakeTestProperties testProperties,
+			ProjectSubmission<MakeTestProperties> projectSubmission,
 			DirectoryFinder directoryFinder,
 			SubmissionExtractor submissionExtractor) {
 		super(testProperties, projectSubmission, directoryFinder,
@@ -213,21 +211,13 @@ public class CBuilder extends Builder implements TestPropertyKeys {
 	 */
 	private void deleteTestExecutables() throws CompileFailureException,
 			BuilderException {
-		String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-		for (int i = 0; i < dynamicTestTypes.length; ++i) {
-			String testType = dynamicTestTypes[i];
-
-			StringTokenizer testExes = CTester.getTestExecutables(
-					getTestProperties(), testType);
-			if (testExes == null)
-				continue;
-
-			while (testExes.hasMoreTokens()) {
-				String testExe = testExes.nextToken();
-				if (!filesExtractedFromTestSetup.contains(testExe))
-					deleteTestExecutable(testExe);
-			}
-		}
+	    
+	    for(ExecutableTestCase e : getTestProperties().getExecutableTestCases())  {
+	        String exec = e.getProperty(ExecutableTestCase.Property.EXEC).split("\\s+")[0];
+	        if (!filesExtractedFromTestSetup.contains(exec))
+                deleteTestExecutable(exec);
+	    }
+	 
 	}
 
 	/**

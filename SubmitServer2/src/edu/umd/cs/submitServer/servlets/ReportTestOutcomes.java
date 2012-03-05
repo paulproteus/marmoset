@@ -217,7 +217,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 						.getAllOutcomes()) {
 					// TODO should this check isTestType()???
 					if (!testOutcome.getTestType().equals(
-							TestOutcome.FINDBUGS_TEST)
+							TestOutcome.TestType.FINDBUGS)
 							&& !testOutcome.getTestType().equals(
 									TestOutcome.UNCOVERED_METHOD)
 							&& canonicalTestOutcomeMap.containsKey(testOutcome

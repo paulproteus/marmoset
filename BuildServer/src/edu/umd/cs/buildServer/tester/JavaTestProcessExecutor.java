@@ -44,6 +44,7 @@ import edu.umd.cs.buildServer.builder.DirectoryFinder;
 import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
@@ -60,7 +61,7 @@ import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 public class JavaTestProcessExecutor implements ConfigurationKeys {
 	private final JavaTester tester;
 	private final String testClass;
-	private final @TestType String testType;
+	private final TestType testType;
 	private String outputFilename;
 	private final String classPath;
 	private String testMethod;
@@ -80,7 +81,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	 *            classpath to use when executing the tests
 	 */
 	public JavaTestProcessExecutor(JavaTester tester, String testClass,
-			@TestType String testType, String classPath) {
+			TestType testType, String classPath) {
 		this.tester = tester;
 		this.testClass = testClass;
 		this.testType = testType;
@@ -127,7 +128,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		return tester.getDirectoryFinder();
 	}
 
-	public ProjectSubmission getProjectSubmission() {
+	public ProjectSubmission<JUnitTestProperties> getProjectSubmission() {
 		return tester.getProjectSubmission();
 	}
 
@@ -218,7 +219,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		javaArgs.add(String.valueOf(nextTestNumber));
 
 		javaArgs.add(getProjectSubmission().getSubmissionPK());
-		javaArgs.add(testType);
+		javaArgs.add(testType.toString());
 		javaArgs.add(testClass);
 		javaArgs.add(outputFilename);
 		int timeoutInSeconds = tester.getTestProperties()
@@ -242,7 +243,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		// Student-written tests must be run from the build directory
 		// (where the student code is extracted) no matter what
 		if (tester.getTestProperties().isTestRunnerInTestfileDir()
-				&& !testType.equals(TestOutcome.STUDENT_TEST))
+				&& !testType.equals(TestOutcome.TestType.STUDENT))
 			testRunnerCWD = getDirectoryFinder().getTestFilesDirectory();
 
 		getLog().debug("TestRunner working directory: " + testRunnerCWD);
@@ -480,6 +481,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 	 * @return
 	 */
 	private boolean isStudentTestType() {
-		return testType.equals(TestOutcome.STUDENT_TEST);
+		return testType.equals(TestOutcome.TestType.STUDENT);
 	}
 }
