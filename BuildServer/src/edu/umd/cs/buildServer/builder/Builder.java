@@ -369,6 +369,10 @@ public abstract class Builder<T extends TestProperties> implements Configuration
 			CompileFailureException {
 		return null;
 	}
+	
+	protected boolean doesInspectSubmission() {
+	    return false;
+	}
 
 	public CodeMetrics getCodeMetrics() {
 		return codeMetrics;

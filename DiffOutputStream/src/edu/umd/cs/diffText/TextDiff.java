@@ -37,7 +37,7 @@ public class TextDiff extends StringsWriter {
         PrintStream oldOut = System.out;
         try {
             Method main;
-            
+
             try {
                 main = c.getMethod("main", String[].class);
 
@@ -79,11 +79,11 @@ public class TextDiff extends StringsWriter {
     public static Builder withOptions() {
         return new Builder();
     }
-    
+
     public static Builder withOptions(EnumSet<Option> options) {
         return new Builder(options);
     }
-    
+
     public enum Option {
         TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE;
         public static Option valueOfAnyCase(String name) {
@@ -98,15 +98,17 @@ public class TextDiff extends StringsWriter {
 
     public static class Builder implements Cloneable {
         final EnumSet<Option> options;
-     
+
         final ArrayDeque<Object> expect = new ArrayDeque<Object>();
 
         Builder() {
             options = EnumSet.noneOf(Option.class);
         }
+
         Builder(EnumSet<Option> options) {
             this.options = EnumSet.copyOf(options);
         }
+
         protected Builder clone() {
             try {
                 return (Builder) super.clone();
@@ -118,12 +120,12 @@ public class TextDiff extends StringsWriter {
         public Builder copy() {
             return this.clone();
         }
-        
+
         public Builder set(Option... options) {
 
-            for(Option o : options) {
+            for (Option o : options) {
                 this.options.add(o);
-               
+
             }
             return this;
         }
@@ -137,6 +139,7 @@ public class TextDiff extends StringsWriter {
             set(Option.IGNORES_CASE);
             return this;
         }
+
         public Builder ignoreWhitespaceChange() {
             set(Option.IGNORE_WHITESPACE_CHANGE);
             return this;
@@ -296,6 +299,7 @@ public class TextDiff extends StringsWriter {
     }
 
     protected void got(int line, String txt) {
+        System.out.printf("got line %d : %s%n", line, txt);
         txt = normalize(txt);
         Object o = getExpected();
         if (o == null) {
@@ -321,86 +325,95 @@ public class TextDiff extends StringsWriter {
             return;
         fail("no more output; expected " + o);
     }
-    
-    
-    
-    public static FutureTask<Void> copyTask(final InputStream from, final OutputStream to) { 
-        Callable<Void> doCheck =  new Callable<Void> () {
+
+    public static FutureTask<Void> copyTask(final String name, final InputStream from,
+            final OutputStream to) {
+        Callable<Void> doCheck = new Callable<Void>() {
 
             @Override
-            public Void call() throws Exception  {
-                byte [] buf = new byte[1024];
+            public Void call() throws Exception {
+                System.out.println("copying input stream in " + name);
+
+                byte[] buf = new byte[1024];
                 try {
-                while(true) {
-                    int sz;
-                    try {
-                       sz = from.read(buf);
-                    } catch (Exception e) {
-                        // ignore exceptions that happen while reading, but treat them as EOF
-                        sz = -1;
+                    while (true) {
+                        int sz;
+                        try {
+                            sz = from.read(buf);
+                        } catch (Exception e) {
+                            // ignore exceptions that happen while reading, but
+                            // treat them as EOF
+                            System.err.println("Error in " + name);
+                            e.printStackTrace();
+                            sz = -1;
+                        }
+                        if (sz < 0) {
+                            to.close();
+                            return null;
+                        }
+                        to.write(buf, 0, sz);
+
                     }
-                    if (sz < 0) {
-                        to.close();
-                        return null;
-                    }
-                    to.write(buf, 0, sz);
-                }
                 } finally {
-                   try {
-                       from.close();
-                       to.close();
-                   } catch (Exception e) {
-                       assert true;
-                   }
-                  
+                    try {
+                        from.close();
+                        to.close();
+                    } catch (Exception e) {
+                        System.err.println("Error in " + name);
+                        e.printStackTrace();
+                        assert true;
+                    }
+
                 }
-            }};
-            
+            }
+        };
+
         return new FutureTask<Void>(doCheck);
     }
-      
-    
-    public static FutureTask<Void> copyTask(final Reader from, final Writer to) { 
-        Callable<Void> doCheck =  new Callable<Void> () {
+
+    public static FutureTask<Void> copyTask(final String name, final Reader from, final Writer to) {
+        Callable<Void> doCheck = new Callable<Void>() {
 
             @Override
-            public Void call() throws Exception  {
-                char [] buf = new char[1024];
+            public Void call() throws Exception {
+                char[] buf = new char[1024];
                 try {
-                while(true) {
-                    int sz;
-                    try {
-                       sz = from.read();
-                    } catch (Exception e) {
-                        // ignore exceptions that happen while reading, but treat them as EOF
-                        sz = -1;
+                    while (true) {
+                        int sz;
+                        try {
+                            sz = from.read();
+                        } catch (Exception e) {
+                            // ignore exceptions that happen while reading, but
+                            // treat them as EOF
+                            System.err.println("Error in " + name);
+                            e.printStackTrace();
+                            sz = -1;
+                        }
+                        if (sz < 0) {
+                            to.close();
+                            return null;
+                        }
+                        to.write(buf, 0, sz);
                     }
-                    if (sz < 0) {
-                        to.close();
-                        return null;
-                    }
-                    to.write(buf, 0, sz);
-                }
                 } finally {
-                   try {
-                       from.close();
-                       to.close();
-                   } catch (Exception e) {
-                       assert true;
-                   }
-                  
+                    try {
+                        from.close();
+                        to.close();
+                    } catch (Exception e) {
+                        System.err.println("Error in " + name);
+                        e.printStackTrace();
+                        assert true;
+                    }
+
                 }
-            }};
-            
+            }
+        };
+
         return new FutureTask<Void>(doCheck);
     }
-      
-    
-    public FutureTask<Void> check(final InputStream actual) { 
-        return copyTask(actual, this);
+
+    public FutureTask<Void> check(final InputStream actual) {
+        return copyTask("TextDiffCheck", actual, this);
     }
-      
-        
-    
 
 }

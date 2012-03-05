@@ -227,12 +227,12 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 		                getLog());
 		        break;
 		    case SCRIPT:
-		        throw new UnsupportedOperationException("not implemented yet");
 		    case MAKE:
 		        this.builderAndTesterFactory  = (BuilderAndTesterFactory<T>) 
 		        new CBuilderAndTesterFactory(
 		                (ProjectSubmission<MakeTestProperties>) this, 
                         (MakeTestProperties) testProperties, getLog());
+		        break;
 
 		        default:
 		            throw new AssertionError();

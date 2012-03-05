@@ -219,7 +219,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 					if (!testOutcome.getTestType().equals(
 							TestOutcome.TestType.FINDBUGS)
 							&& !testOutcome.getTestType().equals(
-									TestOutcome.UNCOVERED_METHOD)
+									TestOutcome.TestType.UNCOVERED_METHOD)
 							&& canonicalTestOutcomeMap.containsKey(testOutcome
 									.getTestName())) {
 						TestOutcome canonicalTestOutcome = canonicalTestOutcomeMap

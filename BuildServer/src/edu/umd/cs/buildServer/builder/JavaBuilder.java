@@ -180,11 +180,13 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
         }
     }
     
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see edu.umd.cs.buildServer.Builder#inspectSubmission()
-	 */
+    
+    @Override
+    protected boolean doesInspectSubmission() {
+        return true;
+    }
+    
+
 	@Override
 	protected CodeMetrics inspectSubmission() throws BuilderException,
 			CompileFailureException {

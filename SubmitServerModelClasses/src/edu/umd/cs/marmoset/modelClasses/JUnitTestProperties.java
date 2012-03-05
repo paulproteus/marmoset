@@ -48,6 +48,7 @@ public class JUnitTestProperties extends TestProperties {
 
     }
     
+    @Override
     public boolean isPerformCodeCoverage() {
         return performCodeCoverage;
     }

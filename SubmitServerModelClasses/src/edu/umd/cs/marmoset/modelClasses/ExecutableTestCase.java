@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 
@@ -70,7 +71,7 @@ public class ExecutableTestCase {
     }
 
     public enum Property {
-        EXEC, REFERENCE_EXEC, OPTIONS, INPUT, OUTPUT;
+        EXEC, REFERENCE_EXEC, OPTIONS, INPUT, EXPECTED;
         public static Property valueOfAnyCase(String name) {
             name = name.toUpperCase();
             if (name.equals("REFERENCEEXEC"))
@@ -89,16 +90,15 @@ public class ExecutableTestCase {
 
     final @CheckForNull
     ExecutableTestCase defaults;
-    final TestType testType;
+    final TestType testType; // nonnull only for leaf test cases
     final String name;
     final int number;
 
     private EnumMap<Property, String> properties = new EnumMap<Property, String>(
             Property.class);
 
-    private InputKind inputKind;
-
-    private OutputKind outputKind;
+    private  InputKind inputKind;
+    private  OutputKind outputKind;
 
     private ExecutableTestCase(ExecutableTestCase defaults, TestType testType,
             String name, int number) {
@@ -108,6 +108,9 @@ public class ExecutableTestCase {
         this.number = number;
     }
 
+    public boolean isLeafTestCase() {
+        return testType != null;
+    }
     public TestType getTestType() {
         return testType;
     }
@@ -121,11 +124,27 @@ public class ExecutableTestCase {
     }
     
     public InputKind getInputKind() {
-        return inputKind;
+        InputKind result = inputKind;
+        if (result != null)
+            return result;
+        if (defaults != null)
+            result = defaults.getInputKind();
+        if (result != null) return result;
+        if (isLeafTestCase())
+            return InputKind.NONE;
+        return null;
     }
 
     public OutputKind getOutputKind() {
-        return outputKind;
+        OutputKind result = outputKind;
+        if (result != null)
+            return result;
+        if (defaults != null)
+            result = defaults.getOutputKind();
+        if (result != null) return result;
+        if (isLeafTestCase())
+            return OutputKind.NONE;
+        return null;
     }
 
     public String getProperty0(Property p) {
@@ -158,7 +177,7 @@ public class ExecutableTestCase {
                 inputKind = InputKind.FILE;
             }
             break;
-        case OUTPUT:
+        case EXPECTED:
             if (outputKind != null)
                 throw new IllegalArgumentException("Can't set both output of  "
                         + value + " and a reference exec");

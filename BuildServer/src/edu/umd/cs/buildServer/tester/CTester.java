@@ -29,6 +29,7 @@ package edu.umd.cs.buildServer.tester;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -106,6 +107,18 @@ public class CTester extends Tester<MakeTestProperties> {
             .newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true)
                     .build());
 
+    static class WhoClosedMeInputStream extends FilterInputStream {
+
+        protected WhoClosedMeInputStream(InputStream arg0) {
+            super(arg0);
+        }
+        
+        public void close() throws IOException {
+            new RuntimeException("input stream closed at").printStackTrace();
+            super.close();
+        }
+        
+    }
     private TestOutcome executeTest(ExecutableTestCase testCase)  {
         TestOutcome testOutcome = new TestOutcome();
         testOutcome.setTestNumber(Integer.toString(testCase.getNumber()));
@@ -160,12 +173,12 @@ public class CTester extends Tester<MakeTestProperties> {
             switch (outputKind) {
             case STRING:
                 builder.expect(testCase
-                        .getProperty(ExecutableTestCase.Property.OUTPUT));
+                        .getProperty(ExecutableTestCase.Property.EXPECTED));
                 break;
             case FILE:
                 File f = new File(
                         buildDirectory,
-                        testCase.getProperty(ExecutableTestCase.Property.OUTPUT));
+                        testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
                 if (!readableFile(f))
                     throw new IllegalStateException("No input file " + f);
                 builder.expect(f);
@@ -179,20 +192,24 @@ public class CTester extends Tester<MakeTestProperties> {
         long started = System.currentTimeMillis();
 
         Process process = Untrusted.execute(buildDirectory, exec);
-        FutureTask<Void> copyInput = TextDiff.copyTask(in,
+        FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
                 process.getOutputStream());
         FutureTask<Void> checkOutput = null;
         if (output != null)
-            checkOutput = output.check(process.getInputStream());
+            checkOutput = output.check((process.getInputStream()));
         StringWriter err = new StringWriter();
-        FutureTask<Void> copyError = TextDiff.copyTask(new InputStreamReader(
+        FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
                 process.getErrorStream()), err);
 
         executor.submit(copyInput);
-        if (checkOutput != null)
-            executor.submit(copyInput);
         executor.submit(copyError);
-
+        Thread.sleep(1000);
+        if (checkOutput != null) {
+            executor.submit(checkOutput);
+        }
+      
+       
+        
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
                 getLog());
 
@@ -205,17 +222,17 @@ public class CTester extends Tester<MakeTestProperties> {
         boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
 
         boolean failed = false;
-        copyInput.cancel(true);
-        copyError.cancel(true);
-
+       
         if (checkOutput != null) {
             try {
-                checkOutput.cancel(true);
                 checkOutput.get(50, TimeUnit.MILLISECONDS);
+                System.out.println("Output matches");
             } catch (TimeoutException e) {
+                checkOutput.cancel(true);
                 if (done)
                     throw new AssertionError("done but output not ready");
             } catch (InterruptedException e) {
+                checkOutput.cancel(true);
                 if (done)
                     throw new AssertionError("done but output not ready");
             } catch (ExecutionException e) {
@@ -227,13 +244,13 @@ public class CTester extends Tester<MakeTestProperties> {
                 }
             }
         }
+        copyInput.cancel(true);
+        copyError.cancel(true);
 
         if (failed) {
-
             getLog().debug(
                     "Process didn't generate expected output: "
                             + testOutcome.getShortTestResult());
-
         } else if (done) {
             int exitCode = exitMonitor.getExitCode();
             getLog().debug("Process exited with exit code: " + exitCode);
@@ -260,6 +277,7 @@ public class CTester extends Tester<MakeTestProperties> {
             testOutcome.setLongTestResult(TestRunner.toString(t));
         }
       
+        getLog().info(testOutcome.getOutcome() + " : " + testOutcome.getShortTestResult());
         return testOutcome;
     }
 

@@ -1160,7 +1160,7 @@ public class TestOutcome implements Serializable {
 	public int fetchValues(ResultSet rs, int startingFrom) throws SQLException
 	{
 		setTestRunPK(rs.getInt(startingFrom++));
-		setTestType(TestType.valueOf(rs.getString(startingFrom++)));
+		setTestType(TestType.valueOfAnyCase(rs.getString(startingFrom++)));
 		setTestNumber(rs.getString(startingFrom++));
 		setOutcome(asOutcomeType(rs.getString(startingFrom++)));
 		setPointValue(rs.getInt(startingFrom++));

@@ -87,97 +87,98 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
 	public abstract Tester<T> createTester()
 			throws MissingConfigurationPropertyException;
 	
-	   public void buildAndTest(File buildDirectory,
-	            TestPropertiesExtractor testPropertiesExtractor)
-	            throws BuilderException, MissingConfigurationPropertyException,
-	            CompileFailureException {
-	        // Build the submission
-	        Builder<T> builder = null;
-	        try {
-	            builder = createBuilder();
-	        } catch (ZipExtractorException e) {
-	            throw new BuilderException(e);
-	        }
+    public void buildAndTest(File buildDirectory,
+            TestPropertiesExtractor testPropertiesExtractor)
+            throws BuilderException, MissingConfigurationPropertyException,
+            CompileFailureException {
+        // Build the submission
+        Builder<T> builder = null;
+        try {
+            builder = createBuilder();
+        } catch (ZipExtractorException e) {
+            throw new BuilderException(e);
+        }
 
-	        List<File> files = BuildServerUtilities.listDirContents(buildDirectory);
-	        log.trace(
-	                "Pristine environment before the first compilation attempt:");
-	        for (File file : files) {
-	            log.trace(file.getAbsolutePath());
-	        }
+        List<File> files = BuildServerUtilities.listDirContents(buildDirectory);
+        log.trace("Pristine environment before the first compilation attempt:");
+        for (File file : files) {
+            log.trace(file.getAbsolutePath());
+        }
 
-	        log.debug("Extracting submission and test setup");
-	        builder.extract();
+        log.debug("Extracting submission and test setup");
+        builder.extract();
 
-	        
+        if (builder.doesInspectSubmission()) {
 
+            try {
+                // This compilation is for the inspection step for md5sums of
+                // the
+                // classfiles
+                // and should *NOT* include any fancy things like code coverage
+                builder.setInspectionStepCompilation(true);
+                log.debug("Performing first build");
+                builder.execute();
+                // retrieve auxiliary information (if any) about the build
+                projectSubmission.setCodeMetrics(builder.getCodeMetrics());
+                log.debug("Inspection-step compile successful!");
+            } catch (CompileFailureException e) {
+                log.warn("Inspection-step compile failure: " + e.toString());
+                log.warn(builder.getCompilerOutput());
+                throw e;
+            }
 
-	        try {
-	            // This compilation is for the inspection step for md5sums of the
-	            // classfiles
-	            // and should *NOT* include any fancy things like code coverage
-	            builder.setInspectionStepCompilation(true);
-	            log.debug("Performing first build");
-	            builder.execute();
-	            // retrieve auxiliary information (if any) about the build
-	            projectSubmission.setCodeMetrics(builder.getCodeMetrics());
-	            log.debug("Inspection-step compile successful!");
-	        } catch (CompileFailureException e) {
-	            log.warn("Inspection-step compile failure: " + e.toString());
-	            log.warn(builder.getCompilerOutput());
-	            throw e;
-	        }
+            // Run submission inspection steps
+            runSubmissionInspectionSteps();
 
-	        // Run submission inspection steps
-	        runSubmissionInspectionSteps();
+            // TODO Clean up build directory
+            // Delete everything that ended up in there from the inspection
+            // compilation
+            // Possibly re-copying the submission and test-setup files
+            // Start by listing out the contents:
+            List<File> afterInspectionState = BuildServerUtilities
+                    .listDirContents(buildDirectory);
+            log.trace("After inspection");
+            for (File file : afterInspectionState) {
+                log.trace(file.getAbsolutePath());
+            }
+        }
 
-	        // TODO Clean up build directory
-	        // Delete everything that ended up in there from the inspection
-	        // compilation
-	        // Possibly re-copying the submission and test-setup files
-	        // Start by listing out the contents:
-	        List<File> afterInspectionState = BuildServerUtilities
-	                .listDirContents(buildDirectory);
-	        log.trace("After inspection");
-	        for (File file : afterInspectionState) {
-	            log.trace(file.getAbsolutePath());
-	        }
+        try {
+            // This compilation is for the inspection step and should *NOT*
+            // include any fancy things like code coverage
+            builder.setInspectionStepCompilation(false);
+            builder.execute();
+            log.debug("Compile successful!");
+        } catch (CompileFailureException e) {
+            log.warn("Compile failure: " + e.toString());
+            log.warn(builder.getCompilerOutput());
+            throw e;
+        }
 
-	        try {
-	            // This compilation is for the inspection step and should *NOT*
-	            // include any fancy things like code coverage
-	            builder.setInspectionStepCompilation(false);
-	            builder.execute();
-	            log.debug("Compile successful!");
-	        } catch (CompileFailureException e) {
-	            log.warn("Compile failure: " + e.toString());
-	            log.warn(builder.getCompilerOutput());
-	            throw e;
-	        }
+        if (getConfig().getConfig().getOptionalBooleanProperty(SKIP_TESTS)) {
+            log.info("Skipping unit tests");
+            return;
+        }
 
-	        if (getConfig().getConfig().getOptionalBooleanProperty(SKIP_TESTS)) {
-	            log.info("Skipping unit tests");
-	            return;
-	        }
+        // Test the submission
+        Tester<T> tester = createTester();
+        if (getConfig().getConfig().getOptionalBooleanProperty(
+                RUN_STUDENT_TESTS)) {
+            log.debug("Enabling execution of student tests for submission "
+                    + projectSubmission.getSubmissionPK());
+            tester.setExecuteStudentTests(true);
+        }
+        log.trace("Are we running student tests? "
+                + tester.executeStudentTests());
+        log.trace("Testing project...");
+        // Test the project
+        tester.execute();
+        log.trace("done with test");
 
-	        // Test the submission
-	        Tester<T> tester = createTester();
-	        if (getConfig().getConfig().getOptionalBooleanProperty(RUN_STUDENT_TESTS)) {
-	            log.debug("Enabling execution of student tests for submission "
-	                    + projectSubmission.getSubmissionPK());
-	            tester.setExecuteStudentTests(true);
-	        }
-	        log.trace("Are we running student tests? "
-	                + tester.executeStudentTests());
-	        log.trace("Testing project...");
-	        // Test the project
-	        tester.execute();
-	        log.trace("done with test");
-
-	        // Add test outcomes to main collection
-	        projectSubmission.getTestOutcomeCollection().addAll(
-	                tester.getTestOutcomeCollection().getAllOutcomes());
-	    }
+        // Add test outcomes to main collection
+        projectSubmission.getTestOutcomeCollection().addAll(
+                tester.getTestOutcomeCollection().getAllOutcomes());
+    }
 
 	   private void runSubmissionInspectionSteps() throws BuilderException {
 	        String lang = projectSubmission.getTestProperties().getLanguage();
