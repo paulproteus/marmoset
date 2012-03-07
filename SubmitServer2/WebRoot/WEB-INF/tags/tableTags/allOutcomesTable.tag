@@ -115,7 +115,7 @@
 				</c:if>
 				<c:out value="${test.shortTestResult}" />
 			</td>
-			<td class="description">
+			<td class="code">
 				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
 			</td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">

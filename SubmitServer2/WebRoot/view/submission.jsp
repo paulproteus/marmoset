@@ -222,7 +222,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 					<td class="description">
 						<c:out value="${test.shortTestResult}" />
 					</td>
-					<td class="description">
+					<td class="code">
 					<c:choose>
 					<c:when test="${testProperties.performCodeCoverage and testProperties.language=='java'}">
 						<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>

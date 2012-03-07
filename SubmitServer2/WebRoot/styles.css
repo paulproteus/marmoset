@@ -151,7 +151,12 @@ td {
 td.description {
 	text-align: left;
 }
-
+td.code {
+	text-align: left;
+	white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Menlo', 'DejaVu Sans Mono', 'Consolas', 'Ubuntu Mono', monospace;
+}
 td.left {
 	text-align: left;
 }

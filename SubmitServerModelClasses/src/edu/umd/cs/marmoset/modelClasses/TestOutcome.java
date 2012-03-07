@@ -392,9 +392,9 @@ public class TestOutcome implements Serializable {
 	 */
 	public @CheckReturnValue String getLongTrimmedTestResult() {
 		String result = longTestResult;
-		int i = result.indexOf("sun.reflect.NativeMethodAccessorImpl.invoke0");
+		int i = result.indexOf("at sun.reflect.NativeMethodAccessorImpl.invoke0");
         if (i > 0) 
-            result = result.substring(0,i).trim() + "\n" + " ... elided text after sun.reflect.NativeMethodAccessorImpl.invoke0";
+            result = result.substring(0,i).trim();
         
 		if (result.length() >  MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY)
 			result = result.substring(0,MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY)
