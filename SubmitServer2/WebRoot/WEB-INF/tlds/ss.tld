@@ -28,7 +28,10 @@
     <name>submitProject</name>
     <path>/WEB-INF/tags/submitProject.tag</path>
   </tag-file>
-  
+  <tag-file>
+    <name>ajaxUpdateSubmitStatus</name>
+    <path>/WEB-INF/tags/ajaxUpdateSubmitStatus.tag</path>
+  </tag-file>
 <tag-file>
     <name>editSourceCode</name>
     <path>/WEB-INF/tags/editSourceCode.tag</path>
