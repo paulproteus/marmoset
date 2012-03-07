@@ -393,9 +393,11 @@ public class DisplaySourceCodeAsHTML {
 		}
 
 		// Callback for adding coverage information to the generated page
-		style = coverageCallback(style);
+		CoverageInfo coverageInfo = coverageCallback(style);
 		boolean wasElided = isElided;
 
+		style = coverageInfo.style;
+		
 		if (style != null) {
 		    isElided = false;
 		} else if (isChanged != null && !isChanged.get(lineNo - 1)) {
@@ -420,6 +422,7 @@ public class DisplaySourceCodeAsHTML {
         // right align the line number count
         // also drop an anchor at each line
         out.print("<tr><td class=\"linenumber\"><a title=\"" + lineNo + "\">" + lineNo + "</a></td>");
+        out.print(coverageInfo.coverageCol);
         out.print("<td");
 		if (style != null) {
 			// XXX HACK ALERT: Trying to set either a style and a class.
@@ -442,33 +445,39 @@ public class DisplaySourceCodeAsHTML {
      */
     public void printElidedMessage() {
         out.print("<tr><td class=\"linenumber\"/>");
+        if (fileWithCoverage != null)
+        	  out.print("<td/>");
         out.print("<td class=\"codeelided\">");
         out.printf(" ... %d lines elided ... </td>%n", elidedCount);
     }
 
+	static class CoverageInfo {	
+
+		 String style;
+		 String coverageCol;
+	}
 	/**
 	 * @param style
 	 * @return
 	 * @throws IOException
 	 */
-	private String coverageCallback(String style) throws IOException {
+	private CoverageInfo coverageCallback(String style) throws IOException {
+		CoverageInfo result = new CoverageInfo();
+		result.style = style;
+		result.coverageCol = "";
 		if (fileWithCoverage != null) {
 			Line<?> line = fileWithCoverage.getCoverage(lineNo);
 			if (line == null)
-				out.print("<td/>");
+				result.coverageCol = "<td/>";
 			else {
 				String codeClass;
 
-				// XXX: It should be ok to use the standard code class even for
-				// an anchored line
-				if (false && anchoredLine)
-					codeClass = "";
-				else if (line.isCovered() ^ isExcludingCodeCoverage)
-					codeClass = "class=\"codecoveredcount\"";
+				if (line.isCovered() ^ isExcludingCodeCoverage)
+					codeClass = "codecoveredcount";
 				else {
-					codeClass = "class=\"codeuncoveredcount\"";
+					codeClass = "codeuncoveredcount";
 					if (!anchoredLine)
-						style = "codeuncovered";
+						result.style = "codeuncovered";
 				}
 
 				String body = "";
@@ -478,14 +487,15 @@ public class DisplaySourceCodeAsHTML {
 				} else
 					body = Integer.toString(line.getCount());
 
-				out.print("<td " + codeClass + ">" + body + "</td>");
+				result.coverageCol = String.format("<td class=\"%s\">%s</td>", codeClass, body);
+				
 
 				// Display coverage information split up by testOutcome.
-				style = tarantulaCallback(style);
+//				style = tarantulaCallback(style);
 
 			}
 		}
-		return style;
+		return result;
 	}
 
 	/**
