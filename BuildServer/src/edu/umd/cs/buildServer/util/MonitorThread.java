@@ -53,6 +53,7 @@ public class MonitorThread extends Thread {
 				CombinedStreamMonitor.MAX_NUM_BYTES_INPUT);
 		this.reader = new BufferedReader(new InputStreamReader(this.in));
 		this.outputSink = outputSink;
+		this.setDaemon(true);
 	}
 
 	public TextOutputSink getOutputSink() {

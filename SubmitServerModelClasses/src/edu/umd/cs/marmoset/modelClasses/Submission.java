@@ -1440,7 +1440,7 @@ public class Submission implements ITestSummary<Submission> {
             for (Iterator<TestOutcome> ii=testOutcomeCollection.iterator(); ii.hasNext();)
             {
                 TestOutcome outcome = ii.next();
-                if (!outcome.getTestType().equals(TestOutcome.FINDBUGS_TEST)) {
+                if (!outcome.getTestType().equals(TestOutcome.TestType.FINDBUGS)) {
                     newCollection.add(outcome);
                 }
             }

@@ -34,8 +34,8 @@ import java.util.Set;
 public class TestPropertiesExtractor extends ZipExtractor {
 	private final Set<String> extractedSet = new HashSet<String>();
 	
-	public TestPropertiesExtractor(File testSetupFile, File buildDirectory) throws ZipExtractorException{
-		super(testSetupFile, buildDirectory);
+	public TestPropertiesExtractor(File testSetupFile) throws ZipExtractorException{
+		super(testSetupFile);
 	}
 
 	/* (non-Javadoc)

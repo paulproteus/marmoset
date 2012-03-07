@@ -88,7 +88,7 @@ public class WarningWithCoverageFilter extends SubmitServerFilter {
 			// don't
 			// bother to put them into the database.
 			TestOutcome warning = new TestOutcome();
-			warning.setTestType(TestOutcome.FINDBUGS_TEST);
+			warning.setTestType(TestOutcome.TestType.FINDBUGS);
 			warning.setOutcome(TestOutcome.STATIC_ANALYSIS);
 			warning.setTestRunPK(testRunPK);
 			warning.setExceptionClassName(priority);

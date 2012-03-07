@@ -27,6 +27,7 @@
 package edu.umd.cs.buildServer.builder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public abstract class SubmissionExtractor extends ZipExtractor {
 	private Logger log;
 	private boolean prunedSourceFileList;
 
+	private final File directory;
 	/**
 	 * Constructor.
 	 * 
@@ -62,13 +64,18 @@ public abstract class SubmissionExtractor extends ZipExtractor {
 	 */
 	public SubmissionExtractor(File zipFile, File directory,
 			Logger buildServerLog) throws ZipExtractorException {
-		super(zipFile, directory);
+		super(zipFile);
 		this.projectRoot = "";
+		this.directory = directory;
 		this.log = buildServerLog;
 		this.sourceFileList = new LinkedList<String>();
 		this.prunedSourceFileList = false;
 	}
 
+	
+	File getDirectory() {
+	    return directory;
+	}
 	/**
 	 * Set the project root directory inside the submission zipfile. Only files
 	 * inside this directory will be extracted from the zipfile.
@@ -120,6 +127,10 @@ public abstract class SubmissionExtractor extends ZipExtractor {
 		}
 	}
 
+	
+	public void extract() throws ZipExtractorException, IOException {
+	    extract(directory);
+	}
 	/**
 	 * Return whether or not the file whose name is given is a source file.
 	 * 

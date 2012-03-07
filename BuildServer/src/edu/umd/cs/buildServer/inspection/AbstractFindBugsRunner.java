@@ -36,17 +36,18 @@ import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.ArgumentParser;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
 public abstract class AbstractFindBugsRunner implements
-		ISubmissionInspectionStep {
+		ISubmissionInspectionStep<JUnitTestProperties>{
 
 	/**
 	 * Test properties key for additional command line options to be passed to
 	 * FindBugs process.
 	 */
-	private static final String OPTIONS_PROPERTY_KEY = "findbugs.options";
+	private static final String FINDBUGS_OPTIONS_PROPERTY_KEY = "findbugs.options";
 
 	private static final boolean DEBUG = Boolean
 			.getBoolean("buildserver.findbugs.debug");
@@ -54,7 +55,7 @@ public abstract class AbstractFindBugsRunner implements
 	private static final int FINDBUGS_TIMEOUT_IN_SECONDS = 240;
 
 	// Fields
-	protected ProjectSubmission projectSubmission;
+	protected ProjectSubmission<JUnitTestProperties> projectSubmission;
 	private TestOutcomeCollection testOutcomeCollection;
 
 	/**
@@ -66,7 +67,7 @@ public abstract class AbstractFindBugsRunner implements
 	}
 
 	@Override
-	public void setProjectSubmission(ProjectSubmission projectSubmission) {
+	public void setProjectSubmission(ProjectSubmission<JUnitTestProperties> projectSubmission) {
 		this.projectSubmission = projectSubmission;
 	}
 
@@ -75,7 +76,7 @@ public abstract class AbstractFindBugsRunner implements
 		return testOutcomeCollection;
 	}
 
-	public ProjectSubmission getProjectSubmission() {
+	public ProjectSubmission<JUnitTestProperties> getProjectSubmission() {
 		return projectSubmission;
 	}
 
@@ -120,10 +121,10 @@ public abstract class AbstractFindBugsRunner implements
 		args.add("-textui");
 		// See if findbugs options were specified in the test properties file.
 		if (projectSubmission.getTestProperties().getOptionalStringProperty(
-				OPTIONS_PROPERTY_KEY) != null) {
+				FINDBUGS_OPTIONS_PROPERTY_KEY) != null) {
 			ArgumentParser parser = new ArgumentParser(projectSubmission
 					.getTestProperties().getOptionalStringProperty(
-							OPTIONS_PROPERTY_KEY));
+							FINDBUGS_OPTIONS_PROPERTY_KEY));
 			while (parser.hasNext())
 				args.add(parser.next());
 		}

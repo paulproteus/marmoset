@@ -86,9 +86,9 @@ public class DumpTestOutcomes {
 					+ ","
 					+ testOutcome.getOutcome()
 					+ (testOutcome.getTestType().equals(
-							TestOutcome.RELEASE_TEST)
+							TestOutcome.TestType.RELEASE)
 							|| testOutcome.getTestType().equals(
-									TestOutcome.SECRET_TEST) ? ","
+									TestOutcome.TestType.SECRET) ? ","
 							+ testOutcome.getExceptionSourceCoveredElsewhere()
 							+ "," + testOutcome.getCoarsestCoverageLevel() : ""));
 			if (testOutcome.getOutcome().equals(TestOutcome.FAILED)
@@ -104,7 +104,7 @@ public class DumpTestOutcomes {
 						+ testOutcome.getLongTestResult());
 			}
 
-			if (testOutcome.getTestType().equals(TestOutcome.FINDBUGS_TEST)) {
+			if (testOutcome.getTestType().equals(TestOutcome.TestType.FINDBUGS)) {
 				out.println("findbugs: " + testOutcome.getLongTestResult());
 				if (testOutcome.getShortTestResult().length() > 0) {
 					out.println("\t" + testOutcome.getShortTestResult());

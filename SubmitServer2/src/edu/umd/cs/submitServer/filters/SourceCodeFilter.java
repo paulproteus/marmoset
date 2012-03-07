@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -39,7 +40,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.submitServer.RequestParser;
@@ -107,55 +110,58 @@ public class SourceCodeFilter extends SubmitServerFilter {
 			// Instructors can see code coverage results for any class of tests
 			// Students can only see coverage results for student/public tests
 
-			@TestOutcome.TestType String testType = TestOutcome.asTestType(
-			        parser.getOptionalCheckedParameter(TEST_TYPE));
+			String testTypeString =  parser.getOptionalCheckedParameter(TEST_TYPE);
+			 
+			@CheckForNull TestType testType = TestType.valueOfAnyCaseOrNull(testTypeString);
+			       
 			String testNumber = parser.getOptionalCheckedParameter(TEST_NUMBER);
 			String hybridTestType = parser
 					.getOptionalCheckedParameter(HYBRID_TEST_TYPE);
 			// Setting test type and testNumber as request attributes so that
 			// JSPs can use them
 			// more easily
-			request.setAttribute(TEST_TYPE, testType);
+			if (testType != null) 
+			    request.setAttribute(TEST_TYPE, testType);
 			request.setAttribute(TEST_NUMBER, testNumber);
 			request.setAttribute(HYBRID_TEST_TYPE, hybridTestType);
 			TestOutcomeCollection currentTestOutcomes = (TestOutcomeCollection) request
 					.getAttribute("testOutcomeCollection");
 			CodeCoverageResults codeCoverageResults = null;
 
-			if (testType != null && !testType.isEmpty() && !"none".equals(testType) )
+			if (testType != null )
 			try {
 				// Instructor's view of coverage
 				if (testProperties != null && testProperties.isJava()
 						&& userSession.canActivateCapabilities()
-						&& testProperties.isPerformCodeCoverage()) {
-					if (TestOutcome.FINDBUGS_TEST.equals(testType)
-							|| TestOutcome.UNCOVERED_METHOD.equals(testType)) {
+						&& ((JUnitTestProperties)testProperties).isPerformCodeCoverage()) {
+					if (TestOutcome.TestType.FINDBUGS.equals(testType)
+							|| TestOutcome.TestType.UNCOVERED_METHOD.equals(testType)) {
 						// display union of public and student tests
 						codeCoverageResults = currentTestOutcomes
 								.getOverallCoverageResultsForPublicAndStudentTests();
 					} else if ("all".equals(testNumber) || testNumber == null) {
-						if (TestOutcome.STUDENT_TEST.equals(testType)) {
+						if (TestOutcome.TestType.STUDENT.equals(testType)) {
 							// Get coverage for all the student tests
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForStudentTests();
 							getSubmitServerFilterLog().trace(
 									"instructor " + testType + ", "
 											+ testNumber);
-						} else if (TestOutcome.PUBLIC_TEST.equals(testType)) {
+						} else if (TestOutcome.TestType.PUBLIC.equals(testType)) {
 							// Get coverage for all the public tests.
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForPublicTests();
 							getSubmitServerFilterLog().trace(
 									"instructor " + testType + ", "
 											+ testNumber);
-						} else if (TestOutcome.RELEASE_TEST.equals(testType)) {
+						} else if (TestOutcome.TestType.RELEASE.equals(testType)) {
 							// Get coverage for all the release tests.
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForReleaseTests();
 							getSubmitServerFilterLog().trace(
 									"instructor " + testType + ", "
 											+ testNumber);
-						} else if (TestOutcome.SECRET_TEST.equals(testType)) {
+						} else if (TestOutcome.TestType.SECRET.equals(testType)) {
 							// Get coverage for all the secret tests.
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForSecretTests();
@@ -163,7 +169,7 @@ public class SourceCodeFilter extends SubmitServerFilter {
 									"instructor " + testType + ", "
 											+ testNumber);
 						} else if (SubmitServerConstants.RELEASE_UNIQUE
-								.equals(testType)) {
+								.equals(testTypeString)) {
 							// Get coverage for all the release tests
 							// excluding anything covered by a public or student
 							// test
@@ -177,14 +183,14 @@ public class SourceCodeFilter extends SubmitServerFilter {
 									"instructor " + testType + ", "
 											+ testNumber);
 						} else if (SubmitServerConstants.PUBLIC_STUDENT
-								.equals(testType)) {
+								.equals(testTypeString)) {
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForPublicAndStudentTests();
 							getSubmitServerFilterLog().trace(
 									"instructor " + testType + ", "
 											+ testNumber);
 						} else if (SubmitServerConstants.CARDINAL
-								.equals(testType)) {
+								.equals(testTypeString)) {
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForCardinalTests();
 							request.setAttribute(
@@ -213,7 +219,7 @@ public class SourceCodeFilter extends SubmitServerFilter {
 								// all public/student written tests
 								codeCoverageResults = currentTestOutcomes
 										.getOutcomeByTestTypeAndTestNumber(
-												TestOutcome.RELEASE_TEST,
+												TestOutcome.TestType.RELEASE,
 												testNumber)
 										.getCodeCoverageResults();
 								codeCoverageResults
@@ -251,27 +257,27 @@ public class SourceCodeFilter extends SubmitServerFilter {
 
 					// TODO students should be allowed to see the combination of
 					// student/public tests
-					if (TestOutcome.FINDBUGS_TEST.equals(testType)
-							|| TestOutcome.UNCOVERED_METHOD.equals(testType)) {
+					if (TestOutcome.TestType.FINDBUGS.equals(testType)
+							|| TestOutcome.TestType.UNCOVERED_METHOD.equals(testType)) {
 						// for FindBugs or UncoveredMethod, show coverage for
 						// all public/student tests
 						codeCoverageResults = currentTestOutcomes
 								.getOverallCoverageResultsForPublicAndStudentTests();
 					} else if ("all".equals(testNumber)) {
-						if (TestOutcome.STUDENT_TEST.equals(testType)) {
+						if (TestOutcome.TestType.STUDENT.equals(testType)) {
 							// Get coverage for all the student tests
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForStudentTests();
 							getSubmitServerFilterLog().trace(
 									"student " + testType + ", " + testNumber);
-						} else if (TestOutcome.PUBLIC_TEST.equals(testType)) {
+						} else if (TestOutcome.TestType.PUBLIC.equals(testType)) {
 							// Get coverage for all the public tests
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForPublicTests();
 							getSubmitServerFilterLog().trace(
 									"public " + testType + ", " + testNumber);
 						} else if (SubmitServerConstants.PUBLIC_STUDENT
-								.equals(testType)) {
+								.equals(testTypeString)) {
 							// Get coverage for all the public tests
 							codeCoverageResults = currentTestOutcomes
 									.getOverallCoverageResultsForPublicAndStudentTests();
@@ -283,8 +289,8 @@ public class SourceCodeFilter extends SubmitServerFilter {
 									"student: bad testType: " + testType);
 						}
 					} else {
-						if (TestOutcome.STUDENT_TEST.equals(testType)
-								|| TestOutcome.PUBLIC_TEST.equals(testType)) {
+						if (TestOutcome.TestType.STUDENT.equals(testType)
+								|| TestOutcome.TestType.PUBLIC.equals(testType)) {
 							codeCoverageResults = currentTestOutcomes
 									.getOutcomeByTestTypeAndTestNumber(
 											testType, testNumber)
@@ -298,7 +304,7 @@ public class SourceCodeFilter extends SubmitServerFilter {
 			} catch (Exception e) {
 				String testNumberStr = (testNumber == null ? "null"
 						: testNumber);
-				String testTypeStr = (testType == null ? "null" : testType);
+				String testTypeStr = (testType == null ? "null" : testType.toString());
 				String instructor = Boolean.toString(userSession
 						.canActivateCapabilities());
 				getSubmitServerFilterLog().error(

@@ -26,21 +26,36 @@
  */
 package edu.umd.cs.buildServer.tester;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
-import java.util.StringTokenizer;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.EnumSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.builder.DirectoryFinder;
-import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
+import edu.umd.cs.buildServer.util.DevNullInputStream;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.diffText.TextDiff;
+import edu.umd.cs.diffText.TextDiff.Option;
+import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
+import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.OutputKind;
+import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
-import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
-import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
-import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
 /**
  * Tester for C, OCaml and Ruby submissions.
@@ -48,240 +63,251 @@ import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
  * <b>NOTE:</b> "CTester" is a legacy name. We use the same infrastructure for
  * building and testing C, OCaml and Ruby code because the process is exactly
  * the same. For more details see {@see CBuilder}.
- *
+ * 
  * @author David Hovemeyer
  * @author jspacco
  */
-public class CTester extends Tester {
+public class CTester extends Tester<MakeTestProperties> {
 
-	/**
-	 * Constructor.
-	 *
-	 * @param testProperties
-	 *            TestProperties loaded from the project jarfile's
-	 *            test.properties
-	 * @param haveSecurityPolicyFile
-	 *            true if there is a security.policy file in the project jarfile
-	 * @param projectSubmission
-	 *            the ProjectSubmission
-	 * @param directoryFinder
-	 *            DirectoryFinder to locate build and testfiles directories
-	 */
-	public CTester(TestProperties testProperties,
-			boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission, DirectoryFinder directoryFinder) {
-		super(testProperties, haveSecurityPolicyFile, projectSubmission,
-				directoryFinder);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param testProperties
+     *            TestProperties loaded from the project jarfile's
+     *            test.properties
+     * @param haveSecurityPolicyFile
+     *            true if there is a security.policy file in the project jarfile
+     * @param projectSubmission
+     *            the ProjectSubmission
+     * @param directoryFinder
+     *            DirectoryFinder to locate build and testfiles directories
+     */
+    public CTester(MakeTestProperties testProperties,
+            ProjectSubmission<MakeTestProperties> projectSubmission,
+            DirectoryFinder directoryFinder) {
+        super(testProperties, projectSubmission, directoryFinder);
+    }
+
+    @Override
+    protected void loadTestProperties() throws BuilderException {
+        super.loadTestProperties();
+    }
+
+    @Override
+    protected void executeTests() throws BuilderException {
+        loadTestProperties();
+        for(ExecutableTestCase e : getTestProperties().getExecutableTestCases()) {
+            getTestOutcomeCollection().add(executeTest(e));
+        }
+     
+        testsCompleted();
+    }
+
+    ExecutorService executor = Executors
+            .newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true)
+                    .build());
+
+    static class WhoClosedMeInputStream extends FilterInputStream {
+
+        protected WhoClosedMeInputStream(InputStream arg0) {
+            super(arg0);
+        }
+        
+        public void close() throws IOException {
+            new RuntimeException("input stream closed at").printStackTrace();
+            super.close();
+        }
+        
+    }
+    private TestOutcome executeTest(ExecutableTestCase testCase)  {
+        TestOutcome testOutcome = new TestOutcome();
+        testOutcome.setTestNumber(Integer.toString(testCase.getNumber()));
+        testOutcome.setTestName(testCase.getName());
+        testOutcome.setTestType(testCase.getTestType());
+        
+        try {
+
+        String exec[] = testCase.getProperty(ExecutableTestCase.Property.EXEC)
+                .split("\\s+");
+
+        exec[0] = checkTestExe(exec[0]);
+        File buildDirectory = getDirectoryFinder().getBuildDirectory();
+       String options = testCase.getProperty(ExecutableTestCase.Property.OPTIONS);
+       EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
+       if (options != null) {
+           for(String oName : options.split("[\\s,]+")) {
+               Option o = Option.valueOfAnyCase(oName);
+               optionsForDiffing.add(o);
+           }
+           
+       }
+
+        InputStream in;
+        switch (testCase.getInputKind()) {
+        case NONE:
+            in = new DevNullInputStream();
+            break;
+        case FILE:
+            File f = new File(buildDirectory,
+                    testCase.getProperty(ExecutableTestCase.Property.INPUT));
+            if (!readableFile(f))
+                throw new IllegalStateException("No input file " + f);
+
+            in = new FileInputStream(f);
+            break;
+        case STRING:
+            String input = testCase
+                    .getProperty(ExecutableTestCase.Property.INPUT) + "\n";
+            in = new ByteArrayInputStream(input.getBytes());
+            break;
+        default:
+            throw new AssertionError();
+        }
+
+        ExecutableTestCase.OutputKind outputKind = testCase.getOutputKind();
+        TextDiff output = null;
+        if (outputKind == OutputKind.NONE) {
+            output = null;
+        } else {
+            TextDiff.Builder builder = TextDiff.withOptions(optionsForDiffing);
+            switch (outputKind) {
+            case STRING:
+                builder.expect(testCase
+                        .getProperty(ExecutableTestCase.Property.EXPECTED));
+                break;
+            case FILE:
+                File f = new File(
+                        buildDirectory,
+                        testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
+                if (!readableFile(f))
+                    throw new IllegalStateException("No input file " + f);
+                builder.expect(f);
+                break;
+            }
+
+            output = builder.build();
+
+        }
+
+        long started = System.currentTimeMillis();
+
+        Process process = Untrusted.execute(buildDirectory, exec);
+        FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
+                process.getOutputStream());
+        FutureTask<Void> checkOutput = null;
+        if (output != null)
+            checkOutput = output.check((process.getInputStream()));
+        StringWriter err = new StringWriter();
+        FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
+                process.getErrorStream()), err);
+
+        executor.submit(copyInput);
+        executor.submit(copyError);
+        Thread.sleep(1000);
+        if (checkOutput != null) {
+            executor.submit(checkOutput);
+        }
+      
+       
+        
+        ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
+                getLog());
+
+        // Record a test outcome.
+       int testTimeoutInSeconds = getTestProperties()
+                .getTestTimeoutInSeconds();
+
+        long processTimeoutMillis = testTimeoutInSeconds * 1000L;
+
+        boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
+        testOutcome
+        .setExecutionTimeMillis(System.currentTimeMillis() - started);
 
 
-	@Override
-	protected void loadTestProperties() throws BuilderException {
-		super.loadTestProperties();
-	}
+        boolean failed = false;
+       
+        if (checkOutput != null) {
+            try {
+                checkOutput.get(50, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                checkOutput.cancel(true);
+                if (done)
+                    throw new AssertionError("done but output not ready");
+            } catch (InterruptedException e) {
+                checkOutput.cancel(true);
+                if (done)
+                    throw new AssertionError("done but output not ready");
+            } catch (ExecutionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof AssertionError) {
+                    failed = true;
+                    testOutcome.setOutcome(TestOutcome.FAILED);
+                    testOutcome.setShortTestResult(t.getMessage());
+                }
+            }
+        }
+        copyInput.cancel(true);
+        copyError.cancel(true);
 
+        if (failed) {
+            getLog().debug(
+                    "Process didn't generate expected output: "
+                            + testOutcome.getShortTestResult());
+        } else if (done) {
+            int exitCode = exitMonitor.getExitCode();
+            getLog().debug("Process exited with exit code: " + exitCode);
+            if (exitCode == 0) {
+                testOutcome.setOutcome(TestOutcome.PASSED);
+            } else {
+                testOutcome.setOutcome(TestOutcome.ERROR);
+                testOutcome.setShortTestResult("Exited with error code "
+                        + exitCode);
+            }
+        } else {
+            getLog().debug("Process timed out");
+            // didn't terminate
+            testOutcome.setOutcome(TestOutcome.TIMEOUT);
+        }
+         testOutcome.setLongTestResult(err.toString());
+        
+        } catch (Throwable t) {
+            testOutcome.setOutcome(TestOutcome.ERROR);
+            testOutcome.setShortTestResult("Build server failure");
+            testOutcome.setLongTestResult(TestRunner.toString(t));
+        }
+      
+        getLog().info(testOutcome.getOutcome() + " : " + testOutcome.getShortTestResult());
+        return testOutcome;
+    }
 
-	@Override
-	protected void executeTests() throws BuilderException {
-		loadTestProperties();
-		String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-		for (int i = 0; i < dynamicTestTypes.length; ++i) {
-			String testType = dynamicTestTypes[i];
+    private static boolean readableFile(File f) {
+        return f.exists() && f.canRead() && !f.isDirectory();
+    }
 
-			StringTokenizer testExes = getTestExecutables(getTestProperties(),
-					testType);
-			if (testExes == null)
-				// No tests of this kind specified
-				continue;
-
-			// Create list of the executables
-			int testCount = TestOutcome.FIRST_TEST_NUMBER;
-			while (testExes.hasMoreTokens()) {
-				executeTest(testExes.nextToken(), testType,
-						Integer.toString(testCount++));
-			}
-		}
-		testsCompleted();
-	}
-
-	public static StringTokenizer getTestExecutables(TestProperties testProperties,
-			String testType) {
-		String testExes = testProperties.getTestClass(testType);
-		if (testExes == null)
-			// No tests of this kind specified
-			return null;
-
-		return new StringTokenizer(testExes, ", \t\r\n");
-	}
-
-	/**
-	 * Execute a single test executable.
-	 *
-	 * @param exeName
-	 *            name of the test executable
-	 * @param testType
-	 *            test type (public, release, secret, etc.)
-	 * @param testNumber
-	 *            test number (among other tests of the same type)
-	 */
-	private void executeTest(String exeName, @TestType String testType, String testNumber)
-			throws BuilderException {
-		Process process = null;
-		boolean finished = false;
-
-		CombinedStreamMonitor streamMonitor = null;
-		
-		String execString = getTestProperties().getTestExec(testType, exeName);
-		if (execString == null) {
-		    // Hopefully the test executable is really there.
-		    execString = checkTestExe(exeName);
-		}
-
-		try {
-		
-
-			// Run the test executable in the build directory.
-			getLog().debug(
-					"Running C test number " + testNumber + ": " + exeName
-							+ " process in directory "
-							+ getDirectoryFinder().getBuildDirectory());
-			getLog().debug(
-                    "executing " + execString);
-            
-			// Add LD_LIBRARY_PATH according to the environment, if requested
-			String[] environment = null;
-			if (getTestProperties().getLdLibraryPath() != null) {
-				environment = new String[] { getTestProperties()
-						.getLdLibraryPath() };
-				getLog().debug("Library path: " + getTestProperties().getLdLibraryPath());
-			}
-
-			int testTimeoutInSeconds = getTestProperties()
-					.getTestTimeoutInSeconds();
-			
-			long started = System.currentTimeMillis();
-			process = Untrusted.execute(getDirectoryFinder().getBuildDirectory(), 
-			        "/bin/bash", "-c", execString);
-					
-
-			// Read the stdout/stderr from the test executable.
-			getLog().trace("Starting stream monitor");
-			streamMonitor = new CombinedStreamMonitor(process.getInputStream(),
-					process.getErrorStream());
-			streamMonitor.start();
-
-			// Start a thread which will wait for the process to exit.
-			// The issue here is that Java has timed monitor waits,
-			// but not timed process waits. We emulate the latter
-			// using the former.
-			getLog().trace("Starting exit monitor");
-			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
-			
-			// Record a test outcome.
-			TestOutcome testOutcome = new TestOutcome();
-			testOutcome.setTestNumber(testNumber);
-			testOutcome.setTestName(exeName);
-			testOutcome.setTestType(testType);
-			long processTimeoutMillis = testTimeoutInSeconds * 1000L;
-
-			// Wait for the process to exit.
-			getLog().trace(
-					"Waiting " + testTimeoutInSeconds
-							+ " seconds for the process to stop...");
-			if (exitMonitor.waitForProcessToExit(processTimeoutMillis)) {
-				int exitCode = exitMonitor.getExitCode();
-				getLog().debug("Process exited with exit code: " + exitCode);
-				finished = true;
-				streamMonitor.join();
-				getLog().trace("Joined with stream monitor " + exitCode);
-
-				// Use the process exit code to decide whether the test
-				// passed or failed.
-				boolean passed = exitCode == 0;
-				@OutcomeType String outcome = passed ? TestOutcome.PASSED
-						: TestOutcome.FAILED;
-
-				getLog().debug("Process exited with exit code " + exitCode);
-
-				// Add a TestOutcome to the TestOutcomeCollection
-				testOutcome.setOutcome(outcome);
-
-				testOutcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
-				testOutcome.setShortTestResult("Test " + exeName + " "
-						+ testOutcome.getOutcome());
-				// XXX We're storing the output from the streamMonitor in the
-				// testOutcome record whether it passes or fails
-				testOutcome
-						.setLongTestResult(streamMonitor.getCombinedOutput());
-			} else {
-			    finished = true;
-				// Test timed out!
-				getLog().warn("Process timed out!");
-
-				testOutcome.setOutcome(TestOutcome.TIMEOUT);
-				testOutcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
-				testOutcome.setShortTestResult("Test " + exeName
-						+ " did not complete before the timeout of "
-						+ testTimeoutInSeconds
-						+ " seconds)");
-				testOutcome
-						.setLongTestResult(streamMonitor != null ? streamMonitor
-								.getCombinedOutput() : "");
-			}
-
-			getTestOutcomeCollection().add(testOutcome);
-		} catch (IOException e) {
-			// Possible reasons this could happen are:
-			// - the Makefile is buggy and didn't create the exes it should have
-			// - a temporary resource exhaustion prevented the process from
-			// running
-			// In any case, we can't trust the test results at this point,
-			// so we'll abort all testing of this submission.
-			throw new BuilderException("Could not run test process", e);
-		} catch (InterruptedException e) {
-			throw new BuilderException(
-					"Test process wait interrupted unexpectedly", e);
-		} finally {
-			// Whatever happens, make sure we don't leave the process running
-			if (process != null && !finished) {
-				MarmosetUtilities.destroyProcessGroup(process, getLog());
-			}
-		}
-	}
-
-	/**
-	 * Check if a test executable really exists in the build directory. Right
-	 * now we just emit log messages if it doesn't.
-	 *
-	 * @param exeName
-	 *            name of the test executable.
-	 */
-	private String checkTestExe(String exeName) {
-		File buildDirectory = getDirectoryFinder().getBuildDirectory();
+    /**
+     * Check if a test executable really exists in the build directory. Right
+     * now we just emit log messages if it doesn't.
+     * 
+     * @param exeName
+     *            name of the test executable.
+     */
+    private String checkTestExe(String exeName) {
+        File buildDirectory = getDirectoryFinder().getBuildDirectory();
         File exeFile = new File(buildDirectory, exeName);
         try {
-            if (!exeFile.getCanonicalPath().startsWith(buildDirectory.getCanonicalPath()))
-                    throw new IllegalArgumentException("executable not in build directory: " + exeName);
-        } catch (IOException e1) {
-            throw new IllegalArgumentException("Unable to resolve canonical path for " + exeFile.getAbsolutePath());
+            if (readableFile(exeFile) && exeFile.getCanonicalPath().startsWith(
+                    buildDirectory.getCanonicalPath())) {
+                // OK, this looks like an executable
+                if (!exeFile.canExecute())
+                    exeFile.setExecutable(true);
+                return "./" + exeName;
+            }
+        } catch (IOException e) {
+            getLog().warn("Could not check executable " + exeFile + " in build directory " + buildDirectory);
         }
-		int tries = 0;
-		while (tries++ < 5) {
-			if (exeFile.isFile())
-				break;
+        
+        getLog().debug("Test executable " + exeFile + " not in build directory " + buildDirectory);
+        return "./" + exeName;
 
-			getLog().warn(
-					"Test executable " + exeFile + " doesn't exist -- sleeping");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// Ignore
-			}
-		}
-		if (!exeFile.canExecute())
-		    getLog().warn(
-                    "Test executable " + exeFile + " isn't executable");
-		return "./" + exeName;
-            
-	}
+    }
 }

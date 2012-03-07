@@ -50,11 +50,10 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
  * 
  * @author David Hovemeyer
  */
-public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
+public abstract class Tester<T extends TestProperties> implements ConfigurationKeys, TestPropertyKeys {
 
-	private TestProperties testProperties;
-	protected ProjectSubmission projectSubmission;
-	private boolean hasSecurityPolicyFile;
+	private T testProperties;
+	protected ProjectSubmission<T> projectSubmission;
 	private DirectoryFinder directoryFinder;
 
 	private TestOutcomeCollection testOutcomeCollection;
@@ -76,13 +75,11 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 	 * @param directoryFinder
 	 *            DirectoryFinder used to locate build and testfiles directories
 	 */
-	public Tester(TestProperties testProperties,
-			boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission, DirectoryFinder directoryFinder) {
+	public Tester(T testProperties,
+	        ProjectSubmission<T> projectSubmission, DirectoryFinder directoryFinder) {
 
 		this.testProperties = testProperties;
 		this.projectSubmission = projectSubmission;
-		this.hasSecurityPolicyFile = haveSecurityPolicyFile;
 		this.directoryFinder = directoryFinder;
 
 		this.testOutcomeCollection = new TestOutcomeCollection();
@@ -99,7 +96,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 	/**
 	 * @return Returns the projectSubmission.
 	 */
-	public ProjectSubmission getProjectSubmission() {
+	public ProjectSubmission<T> getProjectSubmission() {
 		return projectSubmission;
 	}
 
@@ -110,17 +107,11 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 		return testOutcomeCollection;
 	}
 
-	/**
-	 * Return whether or not there is a security.policy file for the project.
-	 */
-	public boolean getHasSecurityPolicyFile() {
-		return hasSecurityPolicyFile;
-	}
-
+	
 	/**
 	 * @return Returns the testProperties.
 	 */
-	public TestProperties getTestProperties() {
+	public T getTestProperties() {
 		return testProperties;
 	}
 
@@ -186,7 +177,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 		return directoryFinder;
 	}
 
-	public static TestOutcome createCouldNotRunOutcome(@TestType String testType,
+	public static TestOutcome createCouldNotRunOutcome(TestType testType,
 			String shortTestResult, String longTestresult) {
 		TestOutcome outcome = new TestOutcome();
 		outcome.setTestType(testType);
@@ -198,7 +189,7 @@ public abstract class Tester implements ConfigurationKeys, TestPropertyKeys {
 		return outcome;
 	}
 
-	public static TestOutcome createUnableToRunOneTestOutcome(@TestType String testType,
+	public static TestOutcome createUnableToRunOneTestOutcome(TestType testType,
 			String testMethod, String testClass, int testNumber,
 			@OutcomeType String outcome, String shortTestResult, String longTestResult) {
 		TestOutcome testOutcome = new TestOutcome();

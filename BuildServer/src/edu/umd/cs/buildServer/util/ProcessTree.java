@@ -37,11 +37,11 @@ public class ProcessTree {
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
         String header = s.nextLine();
-        log.trace("ps header: " + header);
+        // log.trace("ps header: " + header);
         while (s.hasNext()) {
             String txt = s.nextLine();
             if (!txt.contains(user)) continue;
-            log.debug(txt);
+            // log.debug(txt);
             try {
                 String fields [] = txt.trim().split(" +");
                 if (fields.length < 2)
@@ -90,6 +90,7 @@ public class ProcessTree {
 
     public void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
         Set<Integer> result = findTree(rootPid);
+        if (result.isEmpty()) return;
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
         while (true) {
             killProcesses("-STOP", result);
@@ -117,7 +118,6 @@ public class ProcessTree {
      */
     public void killProcesses(String signal, Set<Integer> result) throws IOException, InterruptedException {
         if (result.isEmpty()) {
-            log.info("no processes to kill");
             return;
         }
         ArrayList<String> cmd = new ArrayList<String>();

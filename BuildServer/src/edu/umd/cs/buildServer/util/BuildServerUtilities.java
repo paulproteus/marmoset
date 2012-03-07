@@ -37,8 +37,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 
 /**
  * @author jspacco
@@ -80,21 +81,9 @@ public class BuildServerUtilities {
 		t.start();
 	}
 
-	public static void main(String args[]) throws Exception {
-		File dir = new File("/workspace/BuildServer/bs1.localhost/build/obj");
-		TestProperties testProperties = new TestProperties();
-		testProperties
-				.load(new File(
-						"/workspace/BuildServer/bs1.localhost/testfiles/test.properties"));
-		List<File> list = listNonCloverClassFilesInDirectory(dir,
-				testProperties);
-		for (File f : list) {
-			System.out.println(f);
-		}
-	}
 
 	public static List<File> listNonCloverClassFilesInDirectory(File dir,
-			final TestProperties testProperties) {
+			final JUnitTestProperties testProperties) {
 		List<File> results = new ArrayList<File>();
 		listDirContents(dir, new FileFilter() {
 			@Override
@@ -104,8 +93,8 @@ public class BuildServerUtilities {
 					return false;
 				// Skip the classfiles containing JUnit tests since covering
 				// test cases isn't interesting
-				for (String testClass : TestOutcome.getDynamicTestTypes()) {
-					String className = testProperties.getTestClass(testClass);
+				for (TestType testType : TestOutcome.TestType.values()) {
+					String className = testProperties.getTestClass(testType);
 					if (className != null) {
 						// Make the classname look like a path
 						className = new File(className).getName().replace('.',

@@ -61,10 +61,10 @@ public interface TestPropertyKeys {
 	 * tests.
 	 */
 	public static final String TESTCLASS_PREFIX = "test.class.";
+	public static final String TESTCASES_PREFIX = "test.cases.";
 
 
-    public static final String TESTEXEC_PREFIX = "test.exec.";
-
+   
 	/**
 	 * Property names to specify individual test timeout.
 	 */
@@ -113,7 +113,9 @@ public interface TestPropertyKeys {
 	/**
 	 * Project language.
 	 */
-	public static final String BUILD_LANGUAGE = "build.language";
+	public static final String [] BUILD_FRAMEWORK = new String[] { "build.language",
+	    "build.framework", "test.framework",
+	    "test.language"};
 
 	/**
 	 * Property name to specify whether we want to perform code coverage.

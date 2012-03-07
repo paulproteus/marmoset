@@ -94,7 +94,7 @@ public class FindBugsRunner extends AbstractFindBugsRunner {
 	public TestOutcome convert(BugInstance bug) {
 		// Turn the warning into a TestOutcome
 		TestOutcome testOutcome = new TestOutcome();
-		testOutcome.setTestType(TestOutcome.FINDBUGS_TEST);
+		testOutcome.setTestType(TestOutcome.TestType.FINDBUGS);
 		testOutcome.setTestName(bug.getBugPattern().getType());
 		testOutcome.setOutcome(TestOutcome.STATIC_ANALYSIS);
 		testOutcome.setShortTestResult(bug.getPrimarySourceLineAnnotation()

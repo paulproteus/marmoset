@@ -53,9 +53,9 @@ import edu.umd.cs.marmoset.utilities.ZipExtractorException;
  *
  * @author David Hovemeyer
  */
-public abstract class Builder implements ConfigurationKeys {
-	private ProjectSubmission projectSubmission;
-	private TestProperties testProperties;
+public abstract class Builder<T extends TestProperties> implements ConfigurationKeys {
+	private ProjectSubmission<T> projectSubmission;
+	protected T testProperties;
 	private DirectoryFinder directoryFinder;
 	private SubmissionExtractor submissionExtractor;
 	private Set<String> expectedFileSet;
@@ -74,8 +74,8 @@ public abstract class Builder implements ConfigurationKeys {
 	 * @param projectSubmisison
 	 *            the ProjectSubmission to build
 	 */
-	protected Builder(TestProperties testProperties,
-			ProjectSubmission projectSubmission,
+	protected Builder(T testProperties,
+			ProjectSubmission<T> projectSubmission,
 			DirectoryFinder directoryFinder,
 			SubmissionExtractor submissionExtractor) {
 		this.projectSubmission = projectSubmission;
@@ -90,7 +90,7 @@ public abstract class Builder implements ConfigurationKeys {
 	/**
 	 * @return Returns the projectSubmission.
 	 */
-	public ProjectSubmission getProjectSubmission() {
+	public ProjectSubmission<T> getProjectSubmission() {
 		return projectSubmission;
 	}
 
@@ -104,7 +104,7 @@ public abstract class Builder implements ConfigurationKeys {
 	/**
 	 * @return Returns the testProperties.
 	 */
-	public TestProperties getTestProperties() {
+	public T getTestProperties() {
 		return testProperties;
 	}
 
@@ -133,7 +133,6 @@ public abstract class Builder implements ConfigurationKeys {
 	public void addExpectedFile(String fileName) {
 		expectedFileSet.add(fileName);
 	}
-
 
 	public void extract() throws BuilderException {
 		String msg = "extracting submission " + projectSubmission.getSubmissionPK()
@@ -167,7 +166,7 @@ public abstract class Builder implements ConfigurationKeys {
 		
 		// pause to ensure that the unzipped files are stable before
 		// compiling
-		pause(1000);
+		pause(100);
 
 	}
 	/**
@@ -210,7 +209,6 @@ public abstract class Builder implements ConfigurationKeys {
 						+ " for test setup "
 						+ projectSubmission.getTestSetupPK()
 						+ " built successfully");
-
 	}
 
 	/**
@@ -220,10 +218,9 @@ public abstract class Builder implements ConfigurationKeys {
 	 * @throws IOException
 	 */
 	protected void extractTestFiles() throws IOException, ZipExtractorException {
-		ZipExtractor extractor = new ZipExtractor(
-				projectSubmission.getTestSetup(),
-				directoryFinder.getTestFilesDirectory());
-		extractor.extract();
+	    ZipExtractor extractor = new ZipExtractor(
+				projectSubmission.getTestSetup());
+		extractor.extract(directoryFinder.getTestFilesDirectory());
 		filesExtractedFromTestSetup = extractor
 				.getEntriesExtractedFromZipArchive();
 	}
@@ -305,7 +302,7 @@ public abstract class Builder implements ConfigurationKeys {
 		submissionExtractor.extract();
 
 		// another pause to make sure files are set after extraction
-		pause(3000);
+		pause(30);
 
 		// Add all source files found in submission
 		List<String> files = submissionExtractor.getSourceFileList();
@@ -371,6 +368,10 @@ public abstract class Builder implements ConfigurationKeys {
 	protected CodeMetrics inspectSubmission() throws BuilderException,
 			CompileFailureException {
 		return null;
+	}
+	
+	protected boolean doesInspectSubmission() {
+	    return false;
 	}
 
 	public CodeMetrics getCodeMetrics() {

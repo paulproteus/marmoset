@@ -120,10 +120,10 @@
     <p>build status: <span id="buildStatus">${submission.buildStatus}</span>
     
             <c:if test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'NEW' or submission.buildStatus == 'RETEST'}">
-    (will automatically refresh)
+   <span id="refresh"> (will automatically refresh)</span>
 <script>
 $(document).ready(function() {
-	function update() {
+	function update(count) {
 		$.ajax({url: "${submissionStatusLink}",
 			dataType: "json",
 			success: function(status) {
@@ -132,19 +132,23 @@ $(document).ready(function() {
 			case 'NEW':
 			case 'PENDING':
 			case 'RETEST':
-				startAJAXcalls();
+				if (count > 0)
+				  startAJAXcalls(count-1);
+				else
+					$("#refresh").html("(automatic refresh timed out)");
 				break;
 			default:
 				location.reload();
 			}
 			}});
 	}
-	function startAJAXcalls() {
+	function startAJAXcalls(count) {
+		$("#refresh").html("(will automatically refresh " +  count + " more times)");
 		setTimeout(function() {
-			update();
-		}, 10000)
+			update(count);
+		}, 15000)
 	};
-	startAJAXcalls();
+	startAJAXcalls(10);
 	
 });
 </script>

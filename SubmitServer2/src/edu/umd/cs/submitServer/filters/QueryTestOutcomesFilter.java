@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Queries;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 import edu.umd.cs.submitServer.RequestParser;
 
@@ -70,7 +71,8 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerFilterLog(), strictParameterChecking());
-			String testType = parser.getOptionalCheckedParameter("testType");
+			String testTypeString = parser.getOptionalCheckedParameter("testType");
+			TestType testType = TestType.valueOfAnyCaseOrNull(testTypeString);
 			String testName = parser.getOptionalCheckedParameter("testName");
 			String optionalQuality = parser
 					.getOptionalCheckedParameter("optionalQuality");
@@ -88,11 +90,11 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 			if (testType != null) {
 				List<TestOutcome> outcomeList = null;
 
-				if (testType.equals(PUBLIC_OR_RELEASE_TESTS))
+				if (testTypeString.equals(PUBLIC_OR_RELEASE_TESTS))
 					outcomeList = lookupPublicAndReleaseTests(optionalQuality,
 							offset, numRecords, conn);
-				else if (testType.equals(TestOutcome.FINDBUGS_TEST)
-						|| testType.equals(TestOutcome.PMD_TEST)) {
+				else if (testType.equals(TestOutcome.TestType.FINDBUGS)
+						|| testType.equals(TestOutcome.TestType.PMD)) {
 					if (optionalQuality == null || optionalQuality.equals(""))
 						outcomeList = lookupWarningsByTypeAndName(testType,
 								testName, offset, numRecords, conn);
@@ -141,7 +143,7 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 	}
 
 	private static List<TestOutcome> lookupWarningsByTypeAndName(
-			String testType, String testName, Integer offset,
+			TestType testType, String testName, Integer offset,
 			Integer numRecords, Connection conn) throws SQLException {
 		String query = " SELECT " + TestOutcome.ATTRIBUTES + " FROM "
 				+ TestOutcome.TABLE_NAME + " WHERE test_type = ? "
@@ -152,7 +154,7 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(query);
-			stmt.setString(1, testType);
+			stmt.setString(1, testType.toString());
 			SqlUtilities.setInteger(stmt, 2, offset);
 			SqlUtilities.setInteger(stmt, 3, numRecords);
 
@@ -186,7 +188,7 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 	 * @throws SQLException
 	 */
 	private static List<TestOutcome> lookupWarningsByTypeNameAndPriority(
-			String testType, String testName, String priority, Integer offset,
+			TestType testType, String testName, String priority, Integer offset,
 			Integer numRecords, Connection conn) throws SQLException {
 		String query = " SELECT " + TestOutcome.ATTRIBUTES + " FROM "
 				+ TestOutcome.TABLE_NAME + " WHERE test_type = ? "
@@ -198,7 +200,7 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(query);
-			stmt.setString(1, testType);
+			stmt.setString(1, testType.toString());
 			SqlUtilities.setInteger(stmt, 2, offset);
 			SqlUtilities.setInteger(stmt, 3, numRecords);
 
