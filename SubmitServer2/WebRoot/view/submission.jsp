@@ -222,16 +222,15 @@ not empty testOutcomeCollection.releaseOutcomes}">
 					<td class="description">
 						<c:out value="${test.shortTestResult}" />
 					</td>
-					<td class="code">
 					<c:choose>
 					<c:when test="${testProperties.performCodeCoverage and testProperties.language=='java'}">
-						<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
+					<td class="code"><c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/></td>
 					</c:when>
 					<c:otherwise>
-						<pre><c:out	value="${test.longTestResult}" /></pre>
+						<td class="code"><pre><c:out	value="${test.longTestResult}" /></pre></td>
 					</c:otherwise>
 					</c:choose>
-					</td>
+					
 				</tr>
 			</c:forEach>
 
@@ -269,7 +268,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 								<td></td>
 								<c:choose>
 									<c:when test="${project.stackTracePolicy == 'full_stack_trace'}">
-										<td><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
+										<td class="code"><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
 									</c:when>
 									<c:when test="${release.error and project.stackTracePolicy != 'test_name_only'}">
 										<c:if test="${project.stackTracePolicy == 'exception_location'}">
@@ -291,7 +290,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 										</c:if>
 
 										<c:if test="${project.stackTracePolicy == 'full_stack_trace'}">
-											<td><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
+											<td class="code"><c:out value="${ss:hotlink(release, viewLink)}" escapeXml="false"/></td>
 										</c:if>
 									</c:when>
 									<c:otherwise>

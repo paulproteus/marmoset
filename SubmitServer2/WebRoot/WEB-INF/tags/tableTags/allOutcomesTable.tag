@@ -46,9 +46,7 @@
 			<td class="description">
 
 			<c:out value="${test.shortTestResult}" /></td>
-			<td class="description">
-			<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
-			</td>
+			<td class="code"><c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/></td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>
 				<c:url var="rawCoverageLink" value="/research/PrintRawCoverageXmlResults">
@@ -115,9 +113,7 @@
 				</c:if>
 				<c:out value="${test.shortTestResult}" />
 			</td>
-			<td class="code">
-				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
-			</td>
+			<td class="code"><c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/></td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>
 				<c:url var="rawCoverageLink" value="/research/PrintRawCoverageXmlResults">
@@ -162,9 +158,7 @@
 				</c:if>
 				<c:out value="${test.shortTestResult}" />
 			</td>
-			<td class="description">
-				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
-			</td>
+			<td class="code"><c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/></td>
 			<c:if test="${hasCodeCoverageResults && userSession.superUser}">
 			<td>
 				<c:url var="rawCoverageLink" value="/research/PrintRawCoverageXmlResults">

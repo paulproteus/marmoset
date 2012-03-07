@@ -914,7 +914,11 @@ public class TestOutcome implements Serializable {
      */
     private @HTML String createSourceCodeLink(String viewSourceLink, String line, String sourceFileName, String startHighlight, int numToHighlight, int numContext)
     {
-        return XSSScrubber.asHTML("<a href=\"" + viewSourceLink +
+    	int leadingSpaces = 0;
+    	while (leadingSpaces < line.length() &&( line.charAt(leadingSpaces) == ' ' || line.charAt(leadingSpaces) == '\t'))
+    		leadingSpaces++;
+    	
+        return line.substring(0,leadingSpaces) + XSSScrubber.asHTML("<a href=\"" + viewSourceLink +
         		"?testRunPK=" +testRunPK+
                 "&sourceFileName="+sourceFileName+
                 "&testType="+(testType.equals(TestOutcome.TestType.UNCOVERED_METHOD)?"public-student":testType)+
@@ -923,7 +927,7 @@ public class TestOutcome implements Serializable {
                 "&startHighlight="+startHighlight+
                 "&numToHighlight="+numToHighlight+
                 "&numContext="+numContext+
-                "#codehighlight0\"> " +line+
+                "#codehighlight0\"> " +line.substring(leadingSpaces)+
                 "</a>\n");
     }
 
