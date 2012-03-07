@@ -8,7 +8,8 @@ import java.util.logging.Logger;
 import javax.inject.Provider;
 
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.shared.ResettableEventBus;
@@ -84,6 +85,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
       fileViews.put(file.getPath(), fileView);
       FileView.Presenter filePresenter = presenterFactory.makeFilePresenter(fileView, file);
       filePresenter.start();
+      filePresenter.showFile(isElided);
       filePresenters.put(file.getPath(), filePresenter);
     }
     heartbeat.scheduleRepeating(millisPerMinute);
@@ -127,6 +129,9 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   @Override
   public void toggleElision() {
     isElided = !isElided;
+    for (FileView.Presenter filePresenter : filePresenters.values()) {
+    	filePresenter.showFile(isElided);
+    }
     view.setElisionStatus(isElided);
   }
 }

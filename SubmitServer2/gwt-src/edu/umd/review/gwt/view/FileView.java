@@ -19,12 +19,12 @@ import edu.umd.review.gwt.view.impl.FileViewImpl;
  */
 @ImplementedBy(FileViewImpl.class)
 public interface FileView extends IsWidget {
-
   /** Set the name of the file under display. */
   void setFileName(String name);
 
-  /** Set the file to display. */
-  void setFile(FileDto file);
+  /** Set the file to display. 
+   * @param elideCode TODO*/
+  void setFile(FileDto file, boolean elideCode);
 
   /** Return a view for a thread at {@code line}.
    * @param before {@code ThreadView} to insert before, if null insert at end of list
@@ -36,9 +36,6 @@ public interface FileView extends IsWidget {
 
   /** Set the presenter to drive the view of this file. */
   void setPresenter(Presenter presenter);
-
-  /** Mark a range of lines as modified. */
-  void markModifiedLines(int[] lines);
 
   /** Interface for presenters that can drive the view of a file. */
   @ImplementedBy(FilePresenter.class)
@@ -55,5 +52,7 @@ public interface FileView extends IsWidget {
      */
     void registerDropController(DropController controller);
     void unregisterDropController(DropController controller);
+    
+    void showFile(boolean elideCode);
   }
 }

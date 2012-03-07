@@ -55,8 +55,6 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
   @Override
   public void start() {
     view.setPresenter(this);
-    view.setFileName(file.getPath());
-    view.setFile(file);
     scrollManager.registerFile(file.getPath(), view);
     for (ThreadDto thread : file.getThreads()) {
       ThreadView threadView = view.getThreadView(thread.getLine(), null);
@@ -68,6 +66,12 @@ public class FilePresenter extends AbstractPresenter implements FileView.Present
         old.finish();
       }
     }
+  }
+  
+  @Override
+  public void showFile(boolean elideCode) {
+    view.setFileName(file.getPath());
+    view.setFile(file, elideCode);
   }
 
   @Override

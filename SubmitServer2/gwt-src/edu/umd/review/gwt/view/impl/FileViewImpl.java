@@ -54,8 +54,7 @@ public class FileViewImpl extends Composite implements FileView {
   private final Provider<ThreadView> threadViewProvider;
   private final Map<Integer, FlowPanel> codePanels = Maps.newTreeMap();
   /** Maps the number of a line of code to the row in codeGrid where it is displayed. */
-  private final BiMap<Integer, Integer> linesToRows = HashBiMap.create();
-  private final Map<Integer, Integer> rowsToLines = linesToRows.inverse();
+  private final Map<Integer, Integer> rowsToLines = Maps.newTreeMap();
 
   private FileDropController controller;
 
@@ -90,6 +89,27 @@ public class FileViewImpl extends Composite implements FileView {
     label.addStyleName("code");
     return label;
   }
+  
+  private void showAllCode(FileDto file) {
+  	codeGrid.removeAllRows();
+  	List<String> lines = file.getLines();
+  	for (int line = 0; line < lines.size(); line++) {
+  		String code = lines.get(line);
+  		setLineNumber(line, line);
+      FlowPanel codePanel = new FlowPanel();
+      codePanel.setStylePrimaryName("code-panel");
+      if (file.isModified(line)) {
+        codeGrid.getRowFormatter().setStylePrimaryName(line, "modified-code-row");
+      } else {
+        codeGrid.getRowFormatter().setStylePrimaryName(line, "unmodified-code-row");
+      }
+      Widget codeWidget = makeCodeLabel(line, code, file.isModified(line));
+      codePanel.add(codeWidget);
+      codeGrid.setWidget(line, 1, codePanel);
+      codePanels.put(line, codePanel);
+      rowsToLines.put(line, line);
+  	}
+  }
 
   private void showCollapsedCode(FileDto file) {
     codeGrid.removeAllRows();
@@ -122,7 +142,7 @@ public class FileViewImpl extends Composite implements FileView {
       codePanel.add(codeWidget);
       codeGrid.setWidget(row, 1, codePanel);
       codePanels.put(line, codePanel);
-      linesToRows.put(line, row);
+      rowsToLines.put(row, line);
       line++;
       row++;
       if (i < linesToShow.length - 1 && linesToShow[i + 1] > line + 1) {
@@ -144,10 +164,14 @@ public class FileViewImpl extends Composite implements FileView {
   }
 
   @Override
-  public void setFile(FileDto file) {
+  public void setFile(FileDto file, boolean elideCode) {
     Preconditions.checkNotNull(presenter, "Must set presenter before setting lines.");
     codeGrid.removeAllRows();
-    showCollapsedCode(file);
+    if (elideCode) {
+    	showCollapsedCode(file);
+    } else {
+    	showAllCode(file);
+    }
     // TODO(rwsims): Syntax highlighting. Tried external prettify.js library, but prettifying eats
     //               the event handling.
   }
@@ -191,17 +215,6 @@ public class FileViewImpl extends Composite implements FileView {
   @Override
   public void deleteThreadView(int line, ThreadView view) {
     view.asWidget().removeFromParent();
-  }
-
-  @Override
-  public void markModifiedLines(int[] lines) {
-    for (int line : lines) {
-      Integer row = linesToRows.get(line);
-      if (row == null) {
-        continue;
-      }
-      codeGrid.getRowFormatter().setStylePrimaryName(row, "modified-code-row");
-    }
   }
 
   @Override
