@@ -34,6 +34,8 @@
 	title="All submissions for ${course.courseName} project ${project.projectNumber}" />
       <c:url var="codemirror" value="/codemirror" />
        <link rel="stylesheet" href="${codemirror}/lib/codemirror.css">
+         <c:url var="jsBase" value="/js" />
+  <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
     </head>
 
 <body>

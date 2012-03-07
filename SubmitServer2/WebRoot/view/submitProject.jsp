@@ -35,10 +35,11 @@
 	title="Submit project ${project.projectNumber} for ${course.courseName} in ${course.semester}" />
           <c:url var="codemirror" value="/codemirror" />
        <link rel="stylesheet" href="${codemirror}/lib/codemirror.css">
+         <c:url var="jsBase" value="/js" />
+  <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
 </head>
 <body>
-  <c:url var="jsBase" value="/js" />
-  <script src="${jsBase}/jquery.MultiFile.js" type="text/javascript"></script>
+
   
 <ss:header />
 <ss:breadCrumb />
