@@ -861,9 +861,16 @@ public class TestOutcome implements Serializable {
 	    	    String line=reader.readLine();
                 if (line==null) break;
                 /** skip stacktracelements resulting from Clover */
-                if (line.contains(".__CLR3_0_")
-                        && line.trim().startsWith("at "))
-                    continue;
+                String trimmed = line.trim();
+                if (trimmed.startsWith("at ")) {
+                		if (line.contains(".__CLR3_0_")
+                				|| trimmed.startsWith("at junit.framework.Assert")
+                				|| trimmed.startsWith("at java.io")
+                				|| trimmed.startsWith("at sun.")
+                					|| trimmed.startsWith("at edu.umd.cs.diffText"))
+                			continue;
+                }
+               
                 line=line.replaceAll("&","&amp;");
                 line=line.replaceAll("<","&lt;");
                 line=line.replaceAll(">","&gt;");
