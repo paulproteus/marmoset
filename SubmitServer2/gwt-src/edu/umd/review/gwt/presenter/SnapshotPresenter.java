@@ -47,6 +47,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   private final Timer heartbeat;
   private final Provider<GeneralCommentsView.Presenter> generalCommmentsPresenterProvider;
 
+  private boolean isElided = true;
   private int idleMinutes;
   private GeneralCommentsView.Presenter generalCommentsPresenter;
 
@@ -77,6 +78,7 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
     view.setPresenter(this);
     view.addKeyPressHandler(hotkey);
     eventBus.addHandler(SessionExpiryEvent.getType(), this);
+    view.setElisionStatus(isElided);
     for (FileDto file : files) {
       FileView fileView = view.addFileView(null);
       fileViews.put(file.getPath(), fileView);
@@ -120,5 +122,11 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
   public void onSessionExpiry(SessionExpiryEvent event) {
     logger.info("Session expiry, reloading window.");
     view.expireSession();
+  }
+  
+  @Override
+  public void toggleElision() {
+    isElided = !isElided;
+    view.setElisionStatus(isElided);
   }
 }

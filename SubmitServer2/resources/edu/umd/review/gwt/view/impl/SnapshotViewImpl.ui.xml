@@ -1,26 +1,31 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:v="urn:import:edu.umd.review.gwt.view">
-  <ui:style>
-    .scroller {
-      height: 100%;
-    }
-    .header {
-	margin-top: 1em;
-	   font-size: 120%;
-        font-weight: bold;
-	}
-  </ui:style>
-  <g:ScrollPanel ui:field="scrollPanel" styleName="{style.scroller}">
-    <g:FlowPanel>
-    <v:GeneralCommentsView ui:field="generalCommentsView" />
-    <g:FocusPanel ui:field="outer">
-    <g:FlowPanel>
-      <g:FlowPanel ui:field="mainPanel" />
-
-      </g:FlowPanel>
-    </g:FocusPanel>
-    </g:FlowPanel>
-  </g:ScrollPanel>
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:v="urn:import:edu.umd.review.gwt.view">
+	   <ui:with type="edu.umd.review.gwt.CodeReviewStyle" field="reviewStyle" />
+	<ui:style>
+		.scroller {
+			height: 100%;
+		}
+		
+		.header {
+			margin-top: 1em;
+			font-size: 120%;
+			font-weight: bold;
+		}
+		
+		.focusPanel {
+	       outline: 0;
+  	   }
+	</ui:style>
+	<g:ScrollPanel ui:field="scrollPanel" styleName="{style.scroller}">
+		<g:FlowPanel>
+			<v:GeneralCommentsView ui:field="generalCommentsView" />
+			<g:FocusPanel ui:field="outer" styleName="{style.focusPanel}">
+				<g:FlowPanel>
+				    <g:Anchor ui:field="elisionLink" styleName="{reviewStyle.actionLink}">Show elided code</g:Anchor>
+					<g:FlowPanel ui:field="mainPanel" />
+				</g:FlowPanel>
+			</g:FocusPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
 </ui:UiBinder>

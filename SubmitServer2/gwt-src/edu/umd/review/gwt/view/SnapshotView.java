@@ -26,10 +26,12 @@ public interface SnapshotView extends IsWidget, HasKeyPressHandlers, HasKeyDownH
   void setPresenter(Presenter presenter);
 
   void expireSession();
+  
+  void setElisionStatus(boolean isElided);
 
   /** Presenter for a snapshot view. */
   @ImplementedBy(SnapshotPresenter.class)
   interface Presenter extends IsPresenter {
-
+  	void toggleElision();
   }
 }

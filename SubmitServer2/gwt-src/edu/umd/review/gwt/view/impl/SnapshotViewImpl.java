@@ -3,13 +3,16 @@ package edu.umd.review.gwt.view.impl;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -19,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+import edu.umd.review.gwt.CodeReviewStyle;
 import edu.umd.review.gwt.view.FileView;
 import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.ScrollManager;
@@ -39,17 +43,21 @@ public class SnapshotViewImpl extends Composite implements SnapshotView {
   @UiField(provided = true) GeneralCommentsView generalCommentsView;
   @UiField FlowPanel mainPanel;
   @UiField FocusPanel outer;
+  @UiField(provided = true) CodeReviewStyle reviewStyle;
+  @UiField Anchor elisionLink;
 
   private Presenter presenter;
   private final Provider<FileView> fileViewProvider;
   private final ScrollManager scrollManager;
 
   @Inject
-  public SnapshotViewImpl(ScrollManager scrollManager, Provider<FileView> fileViewProvider, GeneralCommentsView generalCommentsView) {
+  public SnapshotViewImpl(ScrollManager scrollManager, Provider<FileView> fileViewProvider, GeneralCommentsView generalCommentsView,
+                          CodeReviewStyle reviewStyle) {
     this.fileViewProvider = fileViewProvider;
     this.scrollManager = scrollManager;
     this.scrollPanel = scrollManager.getScrollPanel();
     this.generalCommentsView = generalCommentsView;
+    this.reviewStyle = reviewStyle;
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -89,6 +97,15 @@ public class SnapshotViewImpl extends Composite implements SnapshotView {
   public HandlerRegistration addMouseMoveHandler(MouseMoveHandler handler) {
     return outer.addMouseMoveHandler(handler);
   }
+  
+  @Override
+  public void setElisionStatus(boolean isElided) {
+    if (isElided) {
+    	elisionLink.setText("Show elided code");
+    } else {
+    	elisionLink.setText("Hide elided code");
+    }
+  }
 
   @Override
   public void expireSession() {
@@ -99,5 +116,12 @@ public class SnapshotViewImpl extends Composite implements SnapshotView {
         Window.Location.reload();
       }
     });
+  }
+  
+  @UiHandler("elisionLink")
+  void onElisionLinkClicked(ClickEvent event) {
+  	if (presenter != null) {
+  		presenter.toggleElision();
+  	}
   }
 }
