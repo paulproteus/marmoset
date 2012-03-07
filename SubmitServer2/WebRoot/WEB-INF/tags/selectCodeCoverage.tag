@@ -6,9 +6,9 @@
     and testProperties.language == 'java' 
     and testProperties.performCodeCoverage}">
 	<c:if
-		test="${! empty testType  and testType != 'none' and ! empty testNumber}">
+		test="${! empty testType  and testTypeString != 'none' and ! empty testNumber}">
 		<p style="margin-left: 1em">
-			<b>Coverage information for ${hybridTestType} ${testType} <c:choose>
+			<b>Coverage information for ${hybridTestType} ${testTypeString} <c:choose>
 					<c:when test="${testNumber != 'all'}">
          test #${testNumber}: ${testName}</c:when>
 					<c:otherwise>tests</c:otherwise>

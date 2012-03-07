@@ -105,6 +105,7 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 				}
 
 				request.setAttribute("testType", testType);
+				request.setAttribute("testTypeString", testTypeString);
 				request.setAttribute("testName", testName);
 				request.setAttribute("optionalQuality", optionalQuality);
 				request.setAttribute("outcomeList", outcomeList);
