@@ -963,33 +963,17 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
 
         try {
             // Put values into statement (preparing for bulk insert)
+            List<String> kinds = new ArrayList<String>();
             for (TestOutcome outcome : testOutcomes) {
+                kinds.add( outcome.getTestType() + "-" + outcome.getTestNumber());
                 outcome.putValues(stmt, 1);
                 stmt.addBatch();
             }
 
+            System.out.println(kinds);
+            System.err.println(kinds);
             // Insert the values!
             stmt.executeBatch();
-        } catch (java.sql.BatchUpdateException e) {
-        	
-        	StringBuffer buf = new StringBuffer("test outsize sizes: ");
-            for (TestOutcome outcome : testOutcomes) {
-               buf.append(outcome.getLongTestResult().length());
-               log.warn("test " + outcome.getTestName() + " " + outcome.getTestNumber()
-            		   + " has long outcome length " + outcome.getLongTestResult().length());
-       		
-               buf.append(" ");
-            }
-            for (TestOutcome outcome : testOutcomes) {
-                String longResult = outcome.getLongTestResult();
-                if (longResult.length() > 20000)
-                    outcome.setLongTestResult(longResult.substring(0,20000));
-                outcome.putValues(stmt, 1);
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
-
-
         } finally {
             Queries.closeStatement(stmt);
         }

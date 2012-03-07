@@ -166,7 +166,7 @@ public abstract class Builder<T extends TestProperties> implements Configuration
 		
 		// pause to ensure that the unzipped files are stable before
 		// compiling
-		pause(1000);
+		pause(100);
 
 	}
 	/**
@@ -302,7 +302,7 @@ public abstract class Builder<T extends TestProperties> implements Configuration
 		submissionExtractor.extract();
 
 		// another pause to make sure files are set after extraction
-		pause(3000);
+		pause(30);
 
 		// Add all source files found in submission
 		List<String> files = submissionExtractor.getSourceFileList();

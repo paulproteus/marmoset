@@ -183,7 +183,7 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
                 }
 
                 // Wait for a while, to give files a chance to settle
-                pause(2000);
+                pause(20);
             } else {
                 throw new CompileFailureException("make timed-out" + getProjectSubmission().getZipFile().getPath(),
                         this.getCompilerOutput());

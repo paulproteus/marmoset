@@ -435,7 +435,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 			// the mysterious "file not found" problems we've been
 			// seeing when trying to execute the project.
 			// (These may be NFS-related.)
-			pause(1000);
+			pause(10);
 			
 
 		} catch (IOException e) {

@@ -156,7 +156,9 @@ public class ExecutableTestCase {
     }
     public String getProperty(Property p) {
         String value = getProperty0(p);
-        if (value.contains("&"))
+        if (value == null && isLeafTestCase() && p == Property.EXEC)
+            return name;
+        if (value != null && value.contains("&"))
             value = value.replaceAll("&", name);
         return value;
     }

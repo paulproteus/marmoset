@@ -66,6 +66,8 @@ import javax.annotation.meta.TypeQualifier;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
 
+import com.google.common.base.Strings;
+
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.CoverageLevel;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
@@ -132,9 +134,11 @@ public class TestOutcome implements Serializable {
             return valueOf(name.toUpperCase());
         }
         public static @CheckForNull TestType valueOfAnyCaseOrNull(String name) {
+            if (Strings.isNullOrEmpty(name))
+                return null;
             try {
                 return valueOfAnyCase(name);
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 return null;
             }
             
@@ -172,7 +176,7 @@ public class TestOutcome implements Serializable {
 	private int pointValue;
 	private int executionTimeMillis;
 	private String testName;
-	private String shortTestResult;
+	private String shortTestResult = "";
 	private String longTestResult="";
 	private String exceptionClassName;
 	private Object details;

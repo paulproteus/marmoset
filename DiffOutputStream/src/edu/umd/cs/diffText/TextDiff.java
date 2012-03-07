@@ -299,7 +299,6 @@ public class TextDiff extends StringsWriter {
     }
 
     protected void got(int line, String txt) {
-        System.out.printf("got line %d : %s%n", line, txt);
         txt = normalize(txt);
         Object o = getExpected();
         if (o == null) {
@@ -332,8 +331,6 @@ public class TextDiff extends StringsWriter {
 
             @Override
             public Void call() throws Exception {
-                System.out.println("copying input stream in " + name);
-
                 byte[] buf = new byte[1024];
                 try {
                     while (true) {

@@ -220,13 +220,15 @@ public class CTester extends Tester<MakeTestProperties> {
         long processTimeoutMillis = testTimeoutInSeconds * 1000L;
 
         boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
+        testOutcome
+        .setExecutionTimeMillis(System.currentTimeMillis() - started);
+
 
         boolean failed = false;
        
         if (checkOutput != null) {
             try {
                 checkOutput.get(50, TimeUnit.MILLISECONDS);
-                System.out.println("Output matches");
             } catch (TimeoutException e) {
                 checkOutput.cancel(true);
                 if (done)
@@ -256,7 +258,6 @@ public class CTester extends Tester<MakeTestProperties> {
             getLog().debug("Process exited with exit code: " + exitCode);
             if (exitCode == 0) {
                 testOutcome.setOutcome(TestOutcome.PASSED);
-                testOutcome.setShortTestResult("Passed");
             } else {
                 testOutcome.setOutcome(TestOutcome.ERROR);
                 testOutcome.setShortTestResult("Exited with error code "
@@ -267,10 +268,8 @@ public class CTester extends Tester<MakeTestProperties> {
             // didn't terminate
             testOutcome.setOutcome(TestOutcome.TIMEOUT);
         }
-        testOutcome
-                .setExecutionTimeMillis(System.currentTimeMillis() - started);
-
-        testOutcome.setLongTestResult(err.toString());
+         testOutcome.setLongTestResult(err.toString());
+        
         } catch (Throwable t) {
             testOutcome.setOutcome(TestOutcome.ERROR);
             testOutcome.setShortTestResult("Build server failure");
