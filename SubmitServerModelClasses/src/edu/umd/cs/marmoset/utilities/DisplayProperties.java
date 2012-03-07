@@ -58,7 +58,9 @@ public class DisplayProperties {
         Integer rank = this.rank.get(filename);
         if (rank != null)
             return rank;
-        return UNRANKED;
+        if (filename.endsWith("Tests.java"))
+        		return UNRANKED;
+        return UNRANKED*2;
     }
 
     public Map<String, FileProperties> getProperties() {
