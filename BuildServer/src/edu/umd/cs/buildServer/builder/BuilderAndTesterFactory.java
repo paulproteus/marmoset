@@ -26,10 +26,26 @@
  */
 package edu.umd.cs.buildServer.builder;
 
+import static edu.umd.cs.buildServer.ConfigurationKeys.RUN_STUDENT_TESTS;
+import static edu.umd.cs.buildServer.ConfigurationKeys.SKIP_TESTS;
+
+import java.io.File;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import org.apache.log4j.Logger;
+
+import edu.umd.cs.buildServer.BuildServerConfiguration;
 import edu.umd.cs.buildServer.BuilderException;
+import edu.umd.cs.buildServer.CompileFailureException;
+import edu.umd.cs.buildServer.ConfigurationKeys;
 import edu.umd.cs.buildServer.MissingConfigurationPropertyException;
 import edu.umd.cs.buildServer.ProjectSubmission;
+import edu.umd.cs.buildServer.inspection.ISubmissionInspectionStep;
 import edu.umd.cs.buildServer.tester.Tester;
+import edu.umd.cs.buildServer.util.BuildServerUtilities;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.utilities.TestPropertiesExtractor;
 import edu.umd.cs.marmoset.utilities.ZipExtractorException;
 
 /**
@@ -37,33 +53,200 @@ import edu.umd.cs.marmoset.utilities.ZipExtractorException;
  * 
  * @author David Hovemeyer
  */
-public interface BuilderAndTesterFactory {
-	public DirectoryFinder getDirectoryFinder();
+public abstract class BuilderAndTesterFactory<T extends TestProperties> {
+    protected final ProjectSubmission<T> projectSubmission;
+	protected final DirectoryFinder directoryFinder;
+	protected final T testProperties;
+	protected final Logger log;
+	
+	protected Logger getLog() {
+	    return log;
+	}
 
-	/**
-	 * Create a Builder for a ProjectSubmission.
-	 * 
-	 * @param projectSubmission
-	 *            the ProjectSubmission to build
-	 * @return a Builder which can build the ProjectSubmission
-	 * @throws BuilderException
-	 * @throws MissingConfigurationPropertyException
-	 */
-	public Builder createBuilder(ProjectSubmission projectSubmission)
+    public BuildServerConfiguration getConfig() {
+        return projectSubmission.getConfig();
+    }
+
+    public BuilderAndTesterFactory(ProjectSubmission<T> projectSubmission,
+            T testProperties, DirectoryFinder directoryFinder, Logger log) {
+        super();
+        this.projectSubmission = projectSubmission;
+        this.testProperties = testProperties;
+        this.directoryFinder = directoryFinder;
+        this.log = log;
+    }
+    public  DirectoryFinder getDirectoryFinder()  {
+        return directoryFinder;
+    }
+    
+
+	public abstract Builder<T> createBuilder()
 			throws BuilderException, MissingConfigurationPropertyException,
 			ZipExtractorException;
 
-	/**
-	 * Create a Tester for a ProjectSubmission.
-	 * 
-	 * @param haveSecurityPolicyFile
-	 *            true if there is a security.policy file
-	 * @param projectSubmission
-	 *            the ProjectSubmission to test
-	 * @return a Tester which can test the ProjectSubmission
-	 * @throws MissingConfigurationPropertyException
-	 */
-	public Tester createTester(boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission)
+	public abstract Tester<T> createTester()
 			throws MissingConfigurationPropertyException;
+	
+    public void buildAndTest(File buildDirectory,
+            TestPropertiesExtractor testPropertiesExtractor)
+            throws BuilderException, MissingConfigurationPropertyException,
+            CompileFailureException {
+        // Build the submission
+        Builder<T> builder = null;
+        try {
+            builder = createBuilder();
+        } catch (ZipExtractorException e) {
+            throw new BuilderException(e);
+        }
+
+        List<File> files = BuildServerUtilities.listDirContents(buildDirectory);
+        log.trace("Pristine environment before the first compilation attempt:");
+        for (File file : files) {
+            log.trace(file.getAbsolutePath());
+        }
+
+        log.debug("Extracting submission and test setup");
+        builder.extract();
+
+        if (builder.doesInspectSubmission()) {
+
+            try {
+                // This compilation is for the inspection step for md5sums of
+                // the
+                // classfiles
+                // and should *NOT* include any fancy things like code coverage
+                builder.setInspectionStepCompilation(true);
+                log.debug("Performing first build");
+                builder.execute();
+                // retrieve auxiliary information (if any) about the build
+                projectSubmission.setCodeMetrics(builder.getCodeMetrics());
+                log.debug("Inspection-step compile successful!");
+            } catch (CompileFailureException e) {
+                log.warn("Inspection-step compile failure: " + e.toString());
+                log.warn(builder.getCompilerOutput());
+                throw e;
+            }
+
+            // Run submission inspection steps
+            runSubmissionInspectionSteps();
+
+            // TODO Clean up build directory
+            // Delete everything that ended up in there from the inspection
+            // compilation
+            // Possibly re-copying the submission and test-setup files
+            // Start by listing out the contents:
+            List<File> afterInspectionState = BuildServerUtilities
+                    .listDirContents(buildDirectory);
+            log.trace("After inspection");
+            for (File file : afterInspectionState) {
+                log.trace(file.getAbsolutePath());
+            }
+        }
+
+        try {
+            // This compilation is for the inspection step and should *NOT*
+            // include any fancy things like code coverage
+            builder.setInspectionStepCompilation(false);
+            builder.execute();
+            log.debug("Compile successful!");
+        } catch (CompileFailureException e) {
+            log.warn("Compile failure: " + e.toString());
+            log.warn(builder.getCompilerOutput());
+            throw e;
+        }
+
+        if (getConfig().getConfig().getOptionalBooleanProperty(SKIP_TESTS)) {
+            log.info("Skipping unit tests");
+            return;
+        }
+
+        // Test the submission
+        Tester<T> tester = createTester();
+        if (getConfig().getConfig().getOptionalBooleanProperty(
+                RUN_STUDENT_TESTS)) {
+            log.debug("Enabling execution of student tests for submission "
+                    + projectSubmission.getSubmissionPK());
+            tester.setExecuteStudentTests(true);
+        }
+        log.trace("Are we running student tests? "
+                + tester.executeStudentTests());
+        log.trace("Testing project...");
+        // Test the project
+        tester.execute();
+        log.trace("done with test");
+
+        // Add test outcomes to main collection
+        projectSubmission.getTestOutcomeCollection().addAll(
+                tester.getTestOutcomeCollection().getAllOutcomes());
+    }
+
+	   private void runSubmissionInspectionSteps() throws BuilderException {
+	        String lang = projectSubmission.getTestProperties().getLanguage();
+	        String steps = getConfig().getConfig().getOptionalProperty(
+	                ConfigurationKeys.INSPECTION_TOOLS_PFX + lang);
+
+	        if (steps != null) {
+	            getLog().info("Attempting submission inspection steps: " + steps);
+	            StringTokenizer tokenizer = new StringTokenizer(steps, ",");
+	            while (tokenizer.hasMoreTokens()) {
+	                String stepName = tokenizer.nextToken().trim();
+	                if (stepName.equals(""))
+	                    continue;
+	                inspectSubmission(stepName);
+	            }
+	        }
+	    }
+
+	    private void inspectSubmission(String stepName) throws BuilderException {
+	        Class<?> inspectionClass = null;
+
+	        try {
+	            inspectionClass = Class.forName(stepName);
+	        } catch (ClassNotFoundException e) {
+	            // Ignore
+	        }
+
+	        if (inspectionClass == null) {
+	            try {
+	                inspectionClass = Class.forName("edu.umd.cs.buildServer.inspection."
+	                        + stepName);
+	            } catch (ClassNotFoundException e) {
+	                getLog().warn(
+	                        "Could not load submission inspection step \""
+	                                + stepName + "\"");
+	                return;
+	            }
+	        }
+
+	        Object inspectionObj = null;
+	        try {
+	            inspectionObj = inspectionClass.newInstance();
+	        } catch (InstantiationException e) {
+	            getLog().warn(
+	                    "Could not create submission inspection step \"" + stepName
+	                            + "\"");
+	            return;
+	        } catch (IllegalAccessException e) {
+	            getLog().warn(
+	                    "Could not create submission inspection step \"" + stepName
+	                            + "\"");
+	            return;
+	        }
+
+	        if (!(inspectionObj instanceof ISubmissionInspectionStep)) {
+	            getLog().warn(
+	                    "Class " + inspectionClass.getName()
+	                            + " does not implement "
+	                            + "ISubmissionInspectionStep");
+	            return;
+	        }
+	        ISubmissionInspectionStep<T> inspectionStep = (ISubmissionInspectionStep<T>) inspectionObj;
+	        inspectionStep.setProjectSubmission(projectSubmission);
+	        inspectionStep.execute();
+	        projectSubmission.getTestOutcomeCollection().addAll(
+	                inspectionStep.getTestOutcomeCollection().getAllOutcomes());
+	    }
+
+	   
+
 }

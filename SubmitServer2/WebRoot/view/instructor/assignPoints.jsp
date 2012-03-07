@@ -114,7 +114,7 @@ No previous activated test setup
   			<th> point value </th>
   		</tr>
 		<c:forEach var="outcome" items="${testOutcomeCollection.allTestOutcomes}" varStatus="counter">
-			<c:if test="${outcome.testType != 'build'}">
+			<c:if test="${outcome.testType != 'BUILD'}">
 				<tr class="$r{counter.index % 2 == 1 ? 'odd' : 'even'}">
 				<td> ${outcome.testNumber} </td>
 				<td> ${outcome.testType} </td>

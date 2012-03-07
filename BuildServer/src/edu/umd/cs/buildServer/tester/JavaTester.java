@@ -30,10 +30,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.bcel.classfile.ClassFormatException;
 
@@ -47,21 +45,22 @@ import edu.umd.cs.buildServer.util.BuildServerUtilities;
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.CoverageLevel;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
  * Tester for Java ProjectSubmissions.
  *
  * @author David Hovemeyer
  */
-public class JavaTester extends Tester {
+public class JavaTester extends Tester<JUnitTestProperties> {
 	private static final String CLOVER_BUILD_FILE_PATH = "edu/umd/cs/buildServer/clover-clean.xml";
 
 	// Fields
 	private TrustedCodeBaseFinder trustedCodeBaseFinder;
-
+	private boolean hasSecurityPolicyFile;
+    
 	private boolean debugJavaSecurity;
 
 	/**
@@ -77,15 +76,13 @@ public class JavaTester extends Tester {
 	 * @param directoryFinder
 	 *            DirectoryFinder to locate build and testfiles directories
 	 */
-	public JavaTester(TestProperties testProperties,
-			boolean haveSecurityPolicyFile,
-			ProjectSubmission projectSubmission, DirectoryFinder directoryFinder) {
-		super(testProperties, haveSecurityPolicyFile, projectSubmission,
+	public JavaTester(JUnitTestProperties testProperties,
+			ProjectSubmission<JUnitTestProperties> projectSubmission, DirectoryFinder directoryFinder) {
+		super(testProperties, projectSubmission,
 				directoryFinder);
 
 		this.trustedCodeBaseFinder = new TrustedCodeBaseFinder(this);
 		this.trustedCodeBaseFinder.execute();
-
 		this.debugJavaSecurity = projectSubmission.getConfig().getConfig()
 				.getOptionalBooleanProperty(DEBUG_SECURITY)
 				|| projectSubmission.getConfig().getConfig().getOptionalBooleanProperty(
@@ -109,6 +106,13 @@ public class JavaTester extends Tester {
 		return debugJavaSecurity;
 	}
 
+	/**
+     * Return whether or not there is a security.policy file for the project.
+     */
+    public boolean getHasSecurityPolicyFile() {
+        return hasSecurityPolicyFile;
+    }
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -128,6 +132,11 @@ public class JavaTester extends Tester {
 
 	}
 
+	  public boolean isPerformCodeCoverage() {
+	        return getTestProperties().isPerformCodeCoverage()
+	                &&  Clover.isAvailable();
+	    }
+	  
 	private void cleanUpCloverFiles() {
 		try {
 			String cloverDBPath = getProjectSubmission().getConfig().getConfig()
@@ -148,19 +157,17 @@ public class JavaTester extends Tester {
 		// Execute all of the kinds of dynamic tests (public, release, secret,
 		// etc.)
 		// specified in test.properties.
-		String[] dynamicTestTypes = TestOutcome.DYNAMIC_TEST_TYPES;
-		for (String tt : dynamicTestTypes) {
-		    @TestType String testType = TestOutcome.asTestType(tt);
-			String testClassName = getTestProperties().getTestClass(testType);
+		for (TestType testType  : TestType.DYNAMIC_TEST_TYPES) {
+		   String testClassName = getTestProperties().getTestClass(testType);
 			// TODO if classname is empty then return COULD_NOT_RUN
 			if (testClassName != null) {
-				String classpath = buildInstructorTestClasspath();
-				// Classpath for student tests should be the student directory
-				// to make sure
-				// we get the correct classfile.
-				if (isStudentTestType(testType))
+			    
+				String classpath;
+				if (testType == TestType.STUDENT)
 					classpath = buildStudentTestClasspath();
-
+				else
+				    classpath = buildInstructorTestClasspath();
+				    
 				// Execute the tests, and load the outcomes into the test
 				// outcome collection
 				JavaTestProcessExecutor executor = new JavaTestProcessExecutor(
@@ -168,7 +175,7 @@ public class JavaTester extends Tester {
 
 				JUnitTestCaseFinder finder = new JUnitTestCaseFinder();
 
-				if (getProjectSubmission().isPerformCodeCoverage()) {
+				if (isPerformCodeCoverage()) {
 					// Clean up the clover DB to prepare it to store new
 					// coverage results
 					runCloverClean();
@@ -183,7 +190,7 @@ public class JavaTester extends Tester {
 				// probably
 				// be empty or have 1 or 2 tests.
 				File classFilesDir = null;
-				if (isStudentTestType(testType)) {
+				if (testType == TestType.STUDENT) {
 					classFilesDir = getProjectSubmission()
 							.getBuilderAndTesterFactory().getDirectoryFinder()
 							.getBuildDirectory();
@@ -248,7 +255,7 @@ public class JavaTester extends Tester {
 				for (Iterator<JUnitTestCase> ii = finder
 						.getTestCaseCollection().iterator(); ii.hasNext(); testNumber++) {
 					JUnitTestCase junitTestCase = ii.next();
-					if (getProjectSubmission().isPerformCodeCoverage()) {
+					if (isPerformCodeCoverage()) {
 						// clean up the results in the clover database
 						// so that we get fresh coverage for each unit test
 						// set the title as the name of the test method
@@ -276,7 +283,7 @@ public class JavaTester extends Tester {
 
 					// TODO move the addCodeCoverageToTestOutcome functionality
 					// into the executeTests() method
-					if (getProjectSubmission().isPerformCodeCoverage()) {
+					if (isPerformCodeCoverage()) {
 						addCodeCoverageToTestOutcome(outcome);
 					}
 					getTestOutcomeCollection().add(outcome);
@@ -286,7 +293,7 @@ public class JavaTester extends Tester {
 			}
 		}
 		// Make sure we clean up the final remaining coverage files
-		if (getProjectSubmission().isPerformCodeCoverage()) {
+		if (isPerformCodeCoverage()) {
 			runCloverClean();
 		}
 	}
@@ -306,14 +313,7 @@ public class JavaTester extends Tester {
 		}
 	}
 
-	/**
-	 * @param testType
-	 * @return
-	 */
-	private boolean isStudentTestType(String testType) {
-		return testType.equals(TestOutcome.STUDENT_TEST);
-	}
-
+	
 	/**
 	 * Load required information from the test properties.
 	 *
@@ -350,7 +350,7 @@ public class JavaTester extends Tester {
 		JavaBuilder.appendBuildServerToClasspath(cp);
 		JavaBuilder.appendJUnitToClassPath(cp);
 		JavaBuilder.appendLibrariesToClassPath(cp);
-		if (getProjectSubmission().isPerformCodeCoverage())
+		if (isPerformCodeCoverage())
 			JavaBuilder.appendCloverToClassPath(cp);
 		cp.append(File.pathSeparator);
 		cp.append(getProjectSubmission().getBuildOutputDirectory()
@@ -391,7 +391,7 @@ public class JavaTester extends Tester {
 		cp.append(getProjectSubmission().getTestSetup().getAbsolutePath());
 		JavaBuilder.appendBuildServerToClasspath(cp);
 		JavaBuilder.appendJUnitToClassPath(cp);
-		if (getProjectSubmission().isPerformCodeCoverage())
+		if (isPerformCodeCoverage())
 			JavaBuilder.appendCloverToClassPath(cp);
 		return cp.toString();
 	}
@@ -407,7 +407,7 @@ public class JavaTester extends Tester {
 	 * @throws BuilderException
 	 *             if the test outcome file couldn't be opened
 	 */
-	public FileInputStream openTestOutcomeFile(String testType,
+	public FileInputStream openTestOutcomeFile(TestType testType,
 			String outputFilename) throws FileNotFoundException {
 		// Try several times to open the test outcomes file.
 		// It seems that on Linux, files created by subprocesses
@@ -502,11 +502,11 @@ public class JavaTester extends Tester {
 			// Track overall code coverage information here, to be
 			// used later when we compute if a release test covers code that
 			// is uncovered by anything else.
-			if (outcome.getTestType().equals(TestOutcome.PUBLIC_TEST)) {
+			if (outcome.getTestType().equals(TestOutcome.TestType.PUBLIC)) {
 				publicStudentCoverage.union(outcome.getCodeCoverageResults());
-			} else if (outcome.getTestType().equals(TestOutcome.STUDENT_TEST)) {
+			} else if (outcome.getTestType().equals(TestOutcome.TestType.STUDENT)) {
 				publicStudentCoverage.union(outcome.getCodeCoverageResults());
-			} else if (outcome.getTestType().equals(TestOutcome.RELEASE_TEST)) {
+			} else if (outcome.getTestType().equals(TestOutcome.TestType.RELEASE)) {
 				releaseCoverage.union(outcome.getCodeCoverageResults());
 			}
 
@@ -521,30 +521,6 @@ public class JavaTester extends Tester {
 		}
 	}
 
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	@Deprecated
-	private Set<JUnitTestCase> buildPublicTestSet() {
-		Set<JUnitTestCase> publicTestSet = new HashSet<JUnitTestCase>();
-		String publicTestClass = getTestProperties().getTestClass(
-				TestOutcome.PUBLIC_TEST);
-		if (publicTestClass != null) {
-			JUnitTestCaseFinder publicTestFinder = new JUnitTestCaseFinder();
-			publicTestFinder.addClassPathEntry(getProjectSubmission()
-					.getTestSetup().getAbsolutePath());
-			try {
-				publicTestFinder.setInspectedClass(publicTestClass);
-				publicTestFinder.findTestCases();
-
-				publicTestSet.addAll(publicTestFinder.getTestCaseCollection());
-			} catch (ClassNotFoundException e) {
-				getLog().warn("Could not inspect public tests", e);
-			}
-		}
-		return publicTestSet;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -567,9 +543,9 @@ public class JavaTester extends Tester {
 				// publicStudentCoverage=getTestOutcomeCollection().getOverallCoverageResultsForPublicAndStudentTests();
 				for (TestOutcome outcome : getTestOutcomeCollection()
 						.getReleaseAndSecretOutcomes()) {
-					if (!outcome.getTestType().equals(TestOutcome.RELEASE_TEST)
+					if (!outcome.getTestType().equals(TestOutcome.TestType.RELEASE)
 							&& !outcome.getTestType().equals(
-									TestOutcome.SECRET_TEST))
+									TestOutcome.TestType.SECRET))
 						throw new IllegalStateException(
 								"TestOutcomeCollection.getReleaseAndSecretOutcomes() "
 										+ "is badly broken and returning non-release, non-secret test outcomes!");
@@ -578,12 +554,7 @@ public class JavaTester extends Tester {
 					// that are uncovered by student/public tests
 					CodeCoverageResults testCoverage = new CodeCoverageResults(
 							outcome.getCodeCoverageResults());
-					// If for some reason we didn't get any coverage, skip this
-					// one
-					if (testCoverage == null) {
-						getLog().trace("Cannot find coverage for " + outcome);
-						continue;
-					}
+
 					getLog().trace(
 							"this single test's overall coverage: "
 									+ testCoverage.getOverallCoverageStats());
@@ -676,7 +647,7 @@ public class JavaTester extends Tester {
 			int methodNum) {
 		TestOutcome outcome = new TestOutcome();
 
-		outcome.setTestType(TestOutcome.UNCOVERED_METHOD);
+		outcome.setTestType(TestOutcome.TestType.UNCOVERED_METHOD);
 		outcome.setTestNumber(Integer.toString(methodNum));
 		outcome.setOutcome(TestOutcome.UNCOVERED_METHOD);
 		outcome.setTestName(trace.getMethodName());

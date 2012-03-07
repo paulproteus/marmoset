@@ -41,6 +41,7 @@ import edu.umd.cs.buildServer.XMLDocumentBuilder;
 import edu.umd.cs.buildServer.util.Alarm;
 import edu.umd.cs.buildServer.util.DevNullOutputStream;
 import edu.umd.cs.buildServer.util.IO;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
@@ -52,8 +53,8 @@ import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
  * @author David Hovemeyer
  * @author Jaime Spacco
  */
-public class PMDRunner implements ConfigurationKeys, ISubmissionInspectionStep {
-	private ProjectSubmission projectSubmission;
+public class PMDRunner implements ConfigurationKeys, ISubmissionInspectionStep<JUnitTestProperties> {
+	private ProjectSubmission<JUnitTestProperties> projectSubmission;
 	private TestOutcomeCollection testOutcomeCollection;
 
 	/**
@@ -67,7 +68,7 @@ public class PMDRunner implements ConfigurationKeys, ISubmissionInspectionStep {
 	private static final int PMD_TIMEOUT_IN_SECONDS = 120;
 
 	@Override
-	public void setProjectSubmission(ProjectSubmission projectSubmission) {
+	public void setProjectSubmission(ProjectSubmission<JUnitTestProperties> projectSubmission) {
 		this.projectSubmission = projectSubmission;
 	}
 
@@ -165,9 +166,9 @@ public class PMDRunner implements ConfigurationKeys, ISubmissionInspectionStep {
 
 				// Turn the warning into a TestOutcome
 				TestOutcome testOutcome = new TestOutcome();
-				testOutcome.setTestType(TestOutcome.PMD_TEST);
+				testOutcome.setTestType(TestOutcome.TestType.PMD);
 				testOutcome.setTestName(rule);
-				testOutcome.setOutcome(TestOutcome.PMD_TEST);
+				testOutcome.setOutcome(TestOutcome.STATIC_ANALYSIS);
 				testOutcome.setShortTestResult(fileName + ":" + line);
 				testOutcome.setLongTestResult(description);
 				testOutcome.setTestNumber(Integer.toString(count++));

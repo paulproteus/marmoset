@@ -33,9 +33,10 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.CBuilderAndTesterFactory;
-import edu.umd.cs.buildServer.builder.Clover;
 import edu.umd.cs.buildServer.builder.JavaBuilderAndTesterFactory;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
+import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
@@ -47,7 +48,7 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
  *
  * @author David Hovemeyer
  */
-public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
+public class ProjectSubmission<T extends TestProperties> implements ConfigurationKeys, TestPropertyKeys {
 	private BuildServerConfiguration config;
 	private Logger log;
 	private String submissionPK;
@@ -67,8 +68,8 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	private TestOutcomeCollection testOutcomeCollection;
 
 	private HttpMethod method;
-	private TestProperties testProperties;
-	private BuilderAndTesterFactory builderAndTesterFactory;
+	private T testProperties;
+	private BuilderAndTesterFactory<T> builderAndTesterFactory;
 
 	/**
 	 * Constructor.
@@ -194,7 +195,7 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	 * @param testProperties
 	 *            the TestProperties
 	 */
-	public void setTestProperties(TestProperties testProperties) {
+	public void setTestProperties(T testProperties) {
 		this.testProperties = testProperties;
 	}
 
@@ -203,7 +204,7 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	 *
 	 * @return the TestProperties
 	 */
-	public TestProperties getTestProperties() {
+	public T getTestProperties() {
 		return testProperties;
 	}
 
@@ -215,29 +216,28 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	 *         submission
 	 * @throws BuilderException
 	 */
-	public BuilderAndTesterFactory createBuilderAndTesterFactory()
+	public BuilderAndTesterFactory<T> createBuilderAndTesterFactory()
 			throws BuilderException {
 		try {
-			String language = testProperties.getLanguage();
-			if (language.equals(JAVA)) {
-				this.builderAndTesterFactory = new JavaBuilderAndTesterFactory(
-						getConfig(), testProperties);
-			} else if (language.equals(C) || language.equals(OCAML)
-					|| language.equals(RUBY)) {
-				// XXX The CBuilder and CTester are also used for OCaml and Ruby
-				// projects.
-				// The CBuilder and CTester are flexible and only require a
-				// Makefile and
-				// a list of test executables that return zero to signal passing
-				// and non-zero
-				// to signal failure.
-				this.builderAndTesterFactory = new CBuilderAndTesterFactory(
-						getConfig(), testProperties);
-			} else {
-				throw new BuilderException(
-						"Unknown language specified in test.properties: "
-								+ language);
-			}
+		    switch(testProperties.getFramework()) {
+		    case JUNIT:
+		        this.builderAndTesterFactory = (BuilderAndTesterFactory<T>) 
+		        new JavaBuilderAndTesterFactory((ProjectSubmission<JUnitTestProperties>) this, 
+		                (JUnitTestProperties) testProperties,
+		                getLog());
+		        break;
+		    case SCRIPT:
+		    case MAKE:
+		        this.builderAndTesterFactory  = (BuilderAndTesterFactory<T>) 
+		        new CBuilderAndTesterFactory(
+		                (ProjectSubmission<MakeTestProperties>) this, 
+                        (MakeTestProperties) testProperties, getLog());
+		        break;
+
+		        default:
+		            throw new AssertionError();
+		    }
+			
 		} catch (MissingConfigurationPropertyException e) {
 			throw new BuilderException(
 					"Could not create builder/tester factory for submission", e);
@@ -250,38 +250,11 @@ public class ProjectSubmission implements ConfigurationKeys, TestPropertyKeys {
 	 *
 	 * @return the BuilderAndTesterFactory
 	 */
-	public BuilderAndTesterFactory getBuilderAndTesterFactory() {
+	public BuilderAndTesterFactory<T> getBuilderAndTesterFactory() {
 		return builderAndTesterFactory;
 	}
 
-	/**
-	 * Should we use the directory with src code instrumented for code coverage?
-	 *
-	 * TODO Instrumented source is specific to Clover; other code coverage tools
-	 * (such as Emma) don't have instrument the source and so make this step
-	 * unnecessary. It's still not clear how to integrate everything together.
-	 *
-	 * @return True if we should use the src directory instrumented for code
-	 *         coverage; false otherwise.
-	 *         <p>
-	 *         TODO If the buildServer's configuration asks for code coverage,
-	 *         but we notice that we don't have permission to read and write the
-	 *         directory where the code coverage data is being written, then we
-	 *         need to either:
-	 *         <ul>
-	 *         <li>over-ride the code coverage setting or else all the test
-	 *         outcomes will fail.
-	 *         <li>add the necessary permissions to the security policy file.
-	 *         </ul>
-	 *         This would be easy if there were some way to ask a
-	 *         security.policy file what permissions it is granting. I don't
-	 *         know if this is possible or how to do so. Future work.
-	 *
-	 */
-	public boolean isPerformCodeCoverage() {
-		return getTestProperties().isPerformCodeCoverage()
-		        &&  Clover.isAvailable();
-	}
+	
 
 	/**
 	 * Get the build output directory. It is not legal to call this method until

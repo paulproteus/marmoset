@@ -29,6 +29,7 @@ package edu.umd.cs.buildServer.inspection;
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
  * An analysis step for examining a compiled submission and reporting test
@@ -36,14 +37,14 @@ import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
  * 
  * @author David Hovemeyer
  */
-public interface ISubmissionInspectionStep {
+public interface ISubmissionInspectionStep<T extends TestProperties> {
 	/**
 	 * Set the ProjectSubmission to inspect.
 	 * 
 	 * @param projectSubmission
 	 *            the ProjectSubmission to inspect
 	 */
-	public void setProjectSubmission(ProjectSubmission projectSubmission);
+	public void setProjectSubmission(ProjectSubmission<T> projectSubmission);
 
 	/**
 	 * Execute the analysis.

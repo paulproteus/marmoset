@@ -82,7 +82,7 @@ public class TestRunner extends BaseTestRunner {
 	private static final int DEFAULT_TEST_TIMEOUT_IN_SECONDS = 30;
 
 	
-	private @TestType String testType;
+	private TestType testType;
 	private int testTimeoutInSeconds;
 	private TestOutcomeCollection outcomeCollection;
 	/** If nonnull, the named test method will be the only test case executed. */
@@ -108,7 +108,7 @@ public class TestRunner extends BaseTestRunner {
 	 * @param testType
 	 *            type of test being performed
 	 */
-	public TestRunner(@TestType String testType, int testTimeoutInSeconds) {
+	public TestRunner(TestType testType, int testTimeoutInSeconds) {
 		this.testType = testType;
 		this.testTimeoutInSeconds = testTimeoutInSeconds;
 		this.outcomeCollection = new TestOutcomeCollection();
@@ -213,7 +213,7 @@ public class TestRunner extends BaseTestRunner {
 		currentTestOutcome.setExecutionTimeMillis(System.currentTimeMillis() - currentTestStarted);
 		currentTestOutcome.setShortTestResult(t.toString()
 				+ formatShortExceptionMessage(t));
-		currentTestOutcome.setLongTestResult(formatExceptionText(original));
+		currentTestOutcome.setLongTestResult(toString(original));
 		currentTestOutcome.setExceptionClassName(t.getClass().getName());
 	}
 
@@ -278,7 +278,7 @@ public class TestRunner extends BaseTestRunner {
 	 *            the exception
 	 * @return the long description string for the exception
 	 */
-	private static String formatExceptionText(Throwable t) {
+	public static String toString(Throwable t) {
 	    StringWriter out = new StringWriter();
 	    PrintWriter pw = new PrintWriter(out);
 	    t.printStackTrace(pw);
@@ -490,7 +490,7 @@ public class TestRunner extends BaseTestRunner {
 		}
 
 		String submissionPK = args[0];
-		String testType = args[1];
+		TestType testType = TestType.valueOfAnyCase(args[1]);
 		String testClassname = args[2];
 		String outputFile = args[3];
 

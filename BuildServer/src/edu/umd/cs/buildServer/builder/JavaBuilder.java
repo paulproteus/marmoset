@@ -26,8 +26,12 @@
  */
 package edu.umd.cs.buildServer.builder;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -61,11 +65,12 @@ import edu.umd.cs.buildServer.inspection.CodeMetricsComputation;
 import edu.umd.cs.buildServer.tester.TestRunner;
 import edu.umd.cs.buildServer.util.BuildServerUtilities;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
+import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
+import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
 
 /**
@@ -73,7 +78,10 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
  *
  * @author David Hovemeyer
  */
-public class JavaBuilder extends Builder implements TestPropertyKeys {
+public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPropertyKeys {
+    
+    private static final String SECURITY_POLICY_PATH = "edu/umd/cs/buildServer/security.policy";
+    
 	/**
 	 * Constructor.
 	 *
@@ -84,14 +92,15 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 	 * @param directoryFinder
 	 *            DirectoryFinder used to locate build and testfiles directories
 	 */
-	public JavaBuilder(TestProperties testProperties,
-			ProjectSubmission projectSubmission,
+	public JavaBuilder(JUnitTestProperties testProperties,
+			ProjectSubmission<JUnitTestProperties> projectSubmission,
 			DirectoryFinder directoryFinder,
-			SubmissionExtractor submissionExtractor) {
+			JavaSubmissionExtractor submissionExtractor) {
 		super(testProperties, projectSubmission, directoryFinder,
 				submissionExtractor);
 	}
 
+	
 	/*
 	 * Get the directory prefix leading to the Java project. Returns an empty
 	 * string if the project is in the root directory of the submission zipfile.
@@ -136,11 +145,48 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		return prefix;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see edu.umd.cs.buildServer.Builder#inspectSubmission()
-	 */
+	
+	public void extract() throws BuilderException {
+	    super.extract();
+	    addBuildServerPermissionsToSecurityPolicyFile(
+                    getDirectoryFinder().getTestFilesDirectory());
+	}
+	
+	 /**
+     * Extract the default security.policy file into the testfiles directory.
+     *
+     * @param testFilesDirectory
+     *            the testfiles directory
+     * @throws BuilderException
+     */
+    private void addBuildServerPermissionsToSecurityPolicyFile(File testFilesDirectory)
+            throws BuilderException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(
+                SECURITY_POLICY_PATH);
+        if (in == null)
+            throw new BuilderException("Could not find default security policy");
+        OutputStream out = null;
+        try {
+            File file = new File(
+                    testFilesDirectory, "security.policy");
+            out = new BufferedOutputStream(new FileOutputStream(file, true));
+            IO.copyStream(in, out);
+            out.flush();
+        } catch (IOException e) {
+            throw new BuilderException(
+                    "Could not create/update security.policy file", e);
+        } finally {
+            IO.closeSilently(in, out);
+        }
+    }
+    
+    
+    @Override
+    protected boolean doesInspectSubmission() {
+        return true;
+    }
+    
+
 	@Override
 	protected CodeMetrics inspectSubmission() throws BuilderException,
 			CompileFailureException {
@@ -389,7 +435,7 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 			// the mysterious "file not found" problems we've been
 			// seeing when trying to execute the project.
 			// (These may be NFS-related.)
-			pause(1000);
+			pause(10);
 			
 
 		} catch (IOException e) {
@@ -415,9 +461,37 @@ public class JavaBuilder extends Builder implements TestPropertyKeys {
 		if (isInspectionStepCompilation())
 			doCompile(false, "-g");
 		else
-			doCompile(getProjectSubmission().isPerformCodeCoverage(), "-g");
+			doCompile(isPerformCodeCoverage(), "-g");
 	}
 
+	/**
+     * Should we use the directory with src code instrumented for code coverage?
+     *
+     * TODO Instrumented source is specific to Clover; other code coverage tools
+     * (such as Emma) don't have instrument the source and so make this step
+     * unnecessary. It's still not clear how to integrate everything together.
+     *
+     * @return True if we should use the src directory instrumented for code
+     *         coverage; false otherwise.
+     *         <p>
+     *         TODO If the buildServer's configuration asks for code coverage,
+     *         but we notice that we don't have permission to read and write the
+     *         directory where the code coverage data is being written, then we
+     *         need to either:
+     *         <ul>
+     *         <li>over-ride the code coverage setting or else all the test
+     *         outcomes will fail.
+     *         <li>add the necessary permissions to the security policy file.
+     *         </ul>
+     *         This would be easy if there were some way to ask a
+     *         security.policy file what permissions it is granting. I don't
+     *         know if this is possible or how to do so. Future work.
+     *
+     */
+    public boolean isPerformCodeCoverage() {
+        return getTestProperties().isPerformCodeCoverage()
+                &&  Clover.isAvailable();
+    }
 
 	public static void appendJUnitToClassPath(StringBuffer buf) {
 		File f = getJUnitJar();

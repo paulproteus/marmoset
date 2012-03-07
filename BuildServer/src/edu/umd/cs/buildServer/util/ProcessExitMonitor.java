@@ -28,7 +28,6 @@ package edu.umd.cs.buildServer.util;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * Wait a fixed amount of time for a process to exit.
  * 
@@ -42,20 +41,13 @@ public final class ProcessExitMonitor extends Thread {
 	private volatile int exitCode;
 	private final ProcessTree tree;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param process
-	 *            the process to monitor for exit
-	 * @param logger TODO
-	 */
 	public ProcessExitMonitor(Process process, Logger logger) {
 		this.setDaemon(true);
 		this.process = process;
 		this.log = logger;
 		this.exited = false;
 		
-		tree = new ProcessTree(logger);
+		this.tree = new ProcessTree(logger);
 		this.start();
 	}
 
@@ -72,7 +64,10 @@ public final class ProcessExitMonitor extends Thread {
 				notifyAll();
 			}
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
+		    assert true;
+		} finally {
+		    // no matter how we exit, kill process tree
+		    Untrusted.destroyProcessTree(process, tree, log);
 		}
 	}
 
@@ -86,19 +81,19 @@ public final class ProcessExitMonitor extends Thread {
 	 *         otherwise
 	 * @throws InterruptedException
 	 */
-	public boolean waitForProcessToExit(long millis)
-			throws InterruptedException {
-        if (!exited) {
-            Thread.sleep(100);
-            synchronized (this) {
-                tree.computeChildren();
-                wait(millis);
+    public boolean waitForProcessToExit(long millis) {
+        try {
+            if (!exited) {
+                Thread.sleep(100);
+                synchronized (this) {
+                    tree.computeChildren();
+                    wait(millis);
+                }
             }
-        }
-        synchronized (this) {
-            Untrusted.destroyProcessTree(process, tree, log);
-		}
-        
+            this.interrupt();
+        } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+        } 
         return exited;
 	}
 

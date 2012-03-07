@@ -72,7 +72,7 @@ public class TestOutcomeTest extends TestCase
     {
         int testRunPK = 99988;
         TestOutcomeCollection collection=TestOutcomeCollection.lookupByTestRunPK(testRunPK,conn);
-        TestOutcome outcome=collection.getOutcomeByTestTypeAndTestNumber(TestOutcome.RELEASE_TEST, "10");
+        TestOutcome outcome=collection.getOutcomeByTestTypeAndTestNumber(TestOutcome.TestType.RELEASE, "10");
         System.out.println(outcome.getExceptionSourceFromLongTestResult());
         System.out.println(collection.isExceptionSourceApproximatelyCovered(outcome, 3));
         

@@ -70,7 +70,7 @@ public class PrintGradesForAllSubmissionsAdjustedByBackgroundRetests extends
 			// format and print the header
 			StringBuilder header = new StringBuilder("classAccount,timestamp,UTC,total");
 			for (TestOutcome outcome : canonicalCollection) {
-				if (outcome.getTestType().equals(TestOutcome.BUILD_TEST))
+				if (outcome.getTestType().equals(TestOutcome.TestType.BUILD))
 					continue;
 				header.append("," + outcome.getTestType() + "_"
 						+ outcome.getTestName());

@@ -84,8 +84,7 @@ public class TestPropertiesFilter extends SubmitServerFilter {
 				ZipInputStream zipIn = new ZipInputStream(
 						new ByteArrayInputStream(
 								testSetup.downloadArchive(conn)));
-				TestProperties testProperties = new TestProperties();
-				testProperties.load(zipIn);
+				TestProperties testProperties =  TestProperties.load(zipIn);
 				request.setAttribute(TEST_PROPERTIES, testProperties);
 			}
 		} catch (MissingRequiredTestPropertyException e) {

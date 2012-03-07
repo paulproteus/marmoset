@@ -63,7 +63,7 @@ public class TestLoadNewBugsOutcomes extends TestCase
             {
                 TestOutcome outcome = new TestOutcome();
 
-                outcome.setTestType(TestOutcome.FINDBUGS_TEST);
+                outcome.setTestType(TestOutcome.TestType.FINDBUGS);
                 outcome.setTestNumber(Integer.toString(testNumber));
                 outcome.setOutcome(TestOutcome.STATIC_ANALYSIS);
                 outcome.setPointValue(0);

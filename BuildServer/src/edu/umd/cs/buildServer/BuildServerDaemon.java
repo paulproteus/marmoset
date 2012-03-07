@@ -38,10 +38,11 @@ import java.security.SecureRandom;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -60,6 +61,7 @@ import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
 
 /**
@@ -258,7 +260,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	 * @see edu.umd.cs.buildServer.BuildServer#getProjectSubmission()
 	 */
 	@Override
-	protected ProjectSubmission getProjectSubmission()
+	protected ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException {
 
 		String url = getRequestProjectURL();
@@ -357,7 +359,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		getLog().info(
                 "Got submission " +submissionPK +  ", testSetup " + testSetupPK + ", kind: " + kind);
         
-		ProjectSubmission projectSubmission = new ProjectSubmission(
+		ProjectSubmission<?> projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), submissionPK, testSetupPK,
 				isNewTestSetup, isBackgroundRetest);
 
@@ -392,14 +394,14 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	}
 
 	@Override
-	protected void downloadSubmissionZipFile(ProjectSubmission projectSubmission)
+	protected void downloadSubmissionZipFile(ProjectSubmission<?> projectSubmission)
 			throws IOException {
 		IO.download(projectSubmission.getZipFile(),
 				projectSubmission.getMethod());
 	}
 
 	@Override
-	protected void downloadProjectJarFile(ProjectSubmission projectSubmission)
+	protected void downloadProjectJarFile(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException, HttpException,
 			IOException, BuilderException {
 		// FIXME: We should cache these
@@ -431,7 +433,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 			// wait for a while in case the files have not "settled"
 			// TODO: Verify that this is still necessary; should be OK unless
 			// run on NFS
-			pause(1000);
+			pause(10);
 
 			getLog().trace("Done.");
 		} finally {
@@ -441,11 +443,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	}
 
 	@Override
-	protected void releaseConnection(ProjectSubmission projectSubmission) {
+	protected void releaseConnection(ProjectSubmission<?> projectSubmission) {
 		projectSubmission.getMethod().releaseConnection();
 	}
 
-	private void dumpOutcomes(ProjectSubmission projectSubmission) {
+	private void dumpOutcomes(ProjectSubmission<?> projectSubmission) {
 		try {
 			// Can't dump outcomes if we don't have a test.properties file.
 			if (projectSubmission.getTestProperties() == null)
@@ -473,7 +475,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 
 	@Override
-	protected void reportTestResults(ProjectSubmission projectSubmission)
+	protected void reportTestResults(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException {
 
 		dumpOutcomes(projectSubmission);
@@ -611,35 +613,61 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	 * Command-line interface.
 	 */
 	
-	public static Options getOptions() {
+	@SuppressWarnings("static-access")
+    public static Options getOptions() {
 	    Options options = new Options();
         Option configFile = OptionBuilder.withArgName( "file" )
                 .hasArg()
                 .withDescription(  "use given config file" )
-                .create( "config");
+                .withLongOpt("config")
+                .create( "c");
         Option submission = OptionBuilder.withArgName( "submissionPK" )
                 .hasArg()
                 .withDescription(  "test the specified submission" )
-                .create( "submission");
+                  .withLongOpt("submission")
+                .create( "s");
         Option testSetup = OptionBuilder.withArgName( "testSetupPK" )
                 .hasArg()
                 .withDescription(  "use the specified test setup" )
-                .create( "testSetup");
+                 .withLongOpt( "testSetup")
+                .create( "t");
+         
+        Option onceOption = new Option( "o", "once", false, "quit after handling one request" );
         Option logLevel = OptionBuilder.withArgName("logLevel")
                 .hasArg().withDescription("Log4j log level")
-                .create("logLevel");
-        Option onceOption = new Option( "once", "quit after handling one request" );
+                .withLongOpt("logLevel")
+                .create( "l");
+        Option help = new Option( "h", "help",false, "print this message" );
+        options.addOption(help);
         options.addOption(configFile);
         options.addOption(submission);
         options.addOption(testSetup);
         options.addOption(onceOption);
+        options.addOption(logLevel);
+        
         return options;
 	}
+	
+	private static void printHelp(Options options) {
+	    HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp( "java -jar buildserver.jar <options> ", options );
+	}
 	public static void main(String[] args) throws Exception {
-	      CommandLineParser parser = new GnuParser();
+	      CommandLineParser parser = new PosixParser();
 	    Options  options = getOptions();
-	    CommandLine line = parser.parse( options, args );
+	    CommandLine line;
+	    try { line = parser.parse( options, args );
 	    
+	    } catch (Exception e) {
+	        printHelp(options);
+	        return;
+	    }
+	    if (line.hasOption("help")) {
+	        printHelp(options);
+            return;
+	    }
+	    
+	    String [] remainingArgs = line.getArgs();
 	  
 	   Protocol easyhttps = new Protocol("https",
                 new EasySSLProtocolSocketFactory(), 443);
@@ -649,7 +677,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         if (line.hasOption("config")) {
             String c = line.getOptionValue("config");
             buildServer.setConfigFile(c);
-        }
+        } else if (remainingArgs.length == 1)
+            buildServer.setConfigFile(remainingArgs[0]);
+            
            
         boolean once = line.hasOption("once");
 

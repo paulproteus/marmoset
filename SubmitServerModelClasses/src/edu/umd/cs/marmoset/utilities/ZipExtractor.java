@@ -39,13 +39,14 @@ import org.apache.commons.io.CopyUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.BuildServer;
+
 /**
  * Extract a zip file into a directory.
  * @author David Hovemeyer
  */
 public class ZipExtractor {
 	private File zipFile;
-	private File directory;
 	private int numFilesExtacted;
 	private Set<String> entriesExtractedFromZipArchive = new HashSet<String>();
 	private Logger log;
@@ -54,43 +55,32 @@ public class ZipExtractor {
 	{
 		if (log!=null)
 			return log;
-		// FIXME: Shouldn't hard-code the name of the logs
-        log = Logger.getLogger("edu.umd.cs.buildServer.BuildServer");
+		 log = Logger.getLogger(BuildServer.class);
 		return log;
 	}
 
 	/**
 	 * Constructor.
 	 * @param zipFile the zip file to extract
-	 * @param directory the directory where the extracted files should be created
 	 * @throws BuilderException
 	 */
-	public ZipExtractor(File zipFile, File directory) throws ZipExtractorException {
+	public ZipExtractor(File zipFile) throws ZipExtractorException {
 		this.zipFile = zipFile;
-		this.directory = directory;
 		this.numFilesExtacted = 0;
 
 		// Paranoia
 		if (!zipFile.isFile())
 			throw new ZipExtractorException("File " + zipFile + " is not a file");
-		if (!directory.isDirectory())
-			throw new ZipExtractorException("Directory " + directory + " is not a directory");
 	}
 
-	/**
-	 * Get the directory the zipfile is being extracted into.
-	 * @return the directory
-	 */
-	protected File getDirectory() {
-		return directory;
-	}
+
 
 	/**
 	 * Extract the zip file.
 	 * @throws IOException
 	 * @throws BuilderException
 	 */
-	public void extract() throws IOException, ZipExtractorException {
+	public void extract(File directory) throws IOException, ZipExtractorException {
 		ZipFile z = new ZipFile(zipFile);
 
 		try {

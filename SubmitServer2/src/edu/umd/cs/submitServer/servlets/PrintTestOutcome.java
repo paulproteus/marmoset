@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
@@ -51,10 +52,10 @@ public class PrintTestOutcome extends SubmitServerServlet {
 		TestOutcomeCollection testOutcomeCollection =  (TestOutcomeCollection) request.getAttribute(TEST_OUTCOME_COLLECTION);
 
 		response.setContentType("text/plain");
-		String testType = request.getParameter("testType");
+		TestType testType = TestType.valueOfAnyCase(request.getParameter("testType"));
 		String testNumber = request.getParameter("testNumber");
         
-		if (testType.equals(TestOutcome.RELEASE_TEST) || testType.equals(TestOutcome.SECRET_TEST)) {
+		if (testType.equals(TestOutcome.TestType.RELEASE) || testType.equals(TestOutcome.TestType.SECRET)) {
             if (!((Boolean) request
                     .getAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY))
                     .booleanValue()) {
