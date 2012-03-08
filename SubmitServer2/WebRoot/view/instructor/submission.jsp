@@ -92,10 +92,9 @@
 
 
 		<c:choose>
-			<c:when
-				test="${submission.buildStatus == 'PENDING' or submission.buildStatus == 'RETEST'}">
-	being retested
-	</c:when>
+			<c:when test="${!submission.buildStatus.done}">
+				<span id="buildStatus">${submission.buildStatus}</span>
+			</c:when>
 			<c:otherwise>
 
 				<c:url var="reTestSubmissionLink"
@@ -138,42 +137,31 @@ result, the submission is flagged as broken.
 		</c:choose>
 
 
-		<c:if test="${submission.numPendingBuildRequests > 0}">
-			<p>
-				Submission has ${submission.numPendingBuildRequests} outstanding
-				build requests, most recent at
-				<fmt:formatDate value="${submission.buildRequestTimestamp}"
-					pattern="dd MMM, hh:mm a" />
-		</c:if>
-
 		<c:if
 			test="${testRun != null && project.testSetupPK != testRun.testSetupPK}">
 			<p>This is not the current test setup.</p>
 		</c:if>
-
+		<c:if
+			test="${!submission.buildStatus.done}">
+			<p><span id="refresh"></span>
+			<span id="pendingBuildRequests"><c:if test="${submission.numPendingBuildRequests > 0}"><br>
+			Submission has ${submission.numPendingBuildRequests}
+			outstanding attempts to build and test the submission.</c:if></span>
+			<span id="lastBuildRequest"><c:if test="${not empty submission.buildRequestTimestamp
+			&& !submission.buildStatus.done}">Most recent build attempt started at
+			<fmt:formatDate value="${submission.buildRequestTimestamp}"
+				pattern="dd MMM, hh:mm a" /></c:if></span>
+			<ss:ajaxUpdateSubmitStatus />
+		</c:if>
 		<c:choose>
 			<c:when test="${requestScope.testRun == null}">
 				<h2>No test results available</h2>
-				<ul>
+				
 					<c:if test="${empty testSetup}">
-						<li>No test setup</li>
+						<p>No test setup
 					</c:if>
 
-					<li>build status: <span id="buildStatus">${submission.buildStatus}</span>
-						<c:if test="${!submission.buildStatus.done}">
-							<span id="refresh"></span>
-							<ss:ajaxUpdateSubmitStatus />
-						</c:if> 
-						
-		<span id="numPendingBuildRequests"><c:if test="${submission.numPendingBuildRequests > 0}">
-			Submission has ${submission.numPendingBuildRequests}
-			outstanding build requests.</c:if></span>
-			<span id="lastBuildRequest"><c:if test="${submission.buildRequestTimestamp}">Most recent at
-			<fmt:formatDate value="${submission.buildRequestTimestamp}"
-				pattern="dd MMM, hh:mm a" /></c:if></span>
-
-
-					</li>
+					
 				</ul>
 			</c:when>
 

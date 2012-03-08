@@ -142,10 +142,11 @@
 			<ss:ajaxUpdateSubmitStatus />
 		</c:if>
 		
-			<span id="numPendingBuildRequests"><c:if test="${submission.numPendingBuildRequests > 0}">
+			<span id="pendingBuildRequests"><c:if test="${submission.numPendingBuildRequests > 0}"><br>
 			Submission has ${submission.numPendingBuildRequests}
-			outstanding build requests.</c:if></span>
-			<span id="lastBuildRequest"><c:if test="${submission.buildRequestTimestamp}">Most recent at
+			outstanding attempts to build and test the submission.</c:if></span>
+			<span id="lastBuildRequest"><c:if test="${not empty submission.buildRequestTimestamp
+			&& !submission.buildStatus.done}">Most recent build attempt started at
 			<fmt:formatDate value="${submission.buildRequestTimestamp}"
 				pattern="dd MMM, hh:mm a" /></c:if></span>
 

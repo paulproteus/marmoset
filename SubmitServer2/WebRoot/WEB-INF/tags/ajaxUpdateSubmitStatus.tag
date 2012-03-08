@@ -14,23 +14,26 @@ $(document).ready(function() {
 			dataType: "json",
 			success: function(status) {
 				$("#buildStatus").html(status.buildStatus);
-				if (status.buildRequestTimestamp)
-					$("#lastBuildRequest").html("Most recent build request at " + status.buildRequestTimestamp +".");
-				else
-					$("#lastBuildRequest").html("");
+				console.log(status.numPendingBuildRequests);
+				console.log(status.buildRequestTimestamp);
 				if (status.numPendingBuildRequests ==  0)
 					$("#pendingBuildRequests").html("");
-				else if (status.numPendingBuildRequests ==  0)
-					$("#pendingBuildRequests").html("There is 1 outstanding build requestå. ");
+				else if (status.numPendingBuildRequests ==  1)
+					$("#pendingBuildRequests").html("<br>A build server started work to build and test the submission. ");
 				else 
-					$("#pendingBuildRequests").html("There are " + status.numPendingBuildRequests
-							+" outstanding build requests. ");
+					$("#pendingBuildRequests").html("<br>There are " + status.numPendingBuildRequests
+							+" outstanding build attempts. ");
+				if (status.buildRequestTimestamp)
+					$("#lastBuildRequest").html("Most recent build attempt started at " + status.buildRequestTimestamp +".");
+				else
+					$("#lastBuildRequest").html("");
+				
 			switch(status.buildStatus) {
 			case 'NEW':
 			case 'PENDING':
 			case 'RETEST':
 				if (attempts > 0)
-				  startAJAXcalls(attempts-1, 15);
+					delayedUpdate(attempts-1, 15);
 				else
 					$("#refresh").html("(automatic refresh timed out)");
 				break;
@@ -39,7 +42,7 @@ $(document).ready(function() {
 			}
 			}});
 	}
-	function delayedUpdate(attempts, counts) {
+	function delayedUpdate(attempts, count) {
 		setTimeout(function() {
 			update(attempts, count);
 		}, 1000)
