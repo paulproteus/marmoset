@@ -228,7 +228,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		return header.getValue();
 	}
 
-    protected void doWelcome() throws MissingConfigurationPropertyException, IOException {
+    @Override
+	protected void doWelcome() throws MissingConfigurationPropertyException, IOException {
         System.out.println("Connecting to submit server");
         String url = getWelcomeURL();
         MultipartPostMethod method = new MultipartPostMethod(url);

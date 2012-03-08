@@ -146,6 +146,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 	}
 
 	
+	@Override
 	public void extract() throws BuilderException {
 	    super.extract();
 	    addBuildServerPermissionsToSecurityPolicyFile(

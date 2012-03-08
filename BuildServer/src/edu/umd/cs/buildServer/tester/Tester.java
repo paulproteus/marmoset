@@ -53,7 +53,7 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
 public abstract class Tester<T extends TestProperties> implements ConfigurationKeys, TestPropertyKeys {
 
 	private T testProperties;
-	protected ProjectSubmission<T> projectSubmission;
+	protected ProjectSubmission<? extends T> projectSubmission;
 	private DirectoryFinder directoryFinder;
 
 	private TestOutcomeCollection testOutcomeCollection;
@@ -76,7 +76,7 @@ public abstract class Tester<T extends TestProperties> implements ConfigurationK
 	 *            DirectoryFinder used to locate build and testfiles directories
 	 */
 	public Tester(T testProperties,
-	        ProjectSubmission<T> projectSubmission, DirectoryFinder directoryFinder) {
+	        ProjectSubmission<? extends T> projectSubmission, DirectoryFinder directoryFinder) {
 
 		this.testProperties = testProperties;
 		this.projectSubmission = projectSubmission;
@@ -96,7 +96,7 @@ public abstract class Tester<T extends TestProperties> implements ConfigurationK
 	/**
 	 * @return Returns the projectSubmission.
 	 */
-	public ProjectSubmission<T> getProjectSubmission() {
+	public ProjectSubmission<? extends T> getProjectSubmission() {
 		return projectSubmission;
 	}
 

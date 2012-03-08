@@ -54,7 +54,7 @@ import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.diffText.TextDiff.Option;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.OutputKind;
-import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
+import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 
 /**
@@ -67,7 +67,7 @@ import edu.umd.cs.marmoset.modelClasses.TestOutcome;
  * @author David Hovemeyer
  * @author jspacco
  */
-public class CTester extends Tester<MakeTestProperties> {
+public class CTester extends Tester<ScriptTestProperties> {
 
     /**
      * Constructor.
@@ -82,8 +82,8 @@ public class CTester extends Tester<MakeTestProperties> {
      * @param directoryFinder
      *            DirectoryFinder to locate build and testfiles directories
      */
-    public CTester(MakeTestProperties testProperties,
-            ProjectSubmission<MakeTestProperties> projectSubmission,
+    public CTester(ScriptTestProperties testProperties,
+            ProjectSubmission<? extends ScriptTestProperties> projectSubmission,
             DirectoryFinder directoryFinder) {
         super(testProperties, projectSubmission, directoryFinder);
     }
@@ -113,7 +113,8 @@ public class CTester extends Tester<MakeTestProperties> {
             super(arg0);
         }
         
-        public void close() throws IOException {
+        @Override
+		public void close() throws IOException {
             new RuntimeException("input stream closed at").printStackTrace();
             super.close();
         }
@@ -206,9 +207,7 @@ public class CTester extends Tester<MakeTestProperties> {
         Thread.sleep(1000);
         if (checkOutput != null) {
             executor.submit(checkOutput);
-        }
-      
-       
+        }     
         
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
                 getLog());

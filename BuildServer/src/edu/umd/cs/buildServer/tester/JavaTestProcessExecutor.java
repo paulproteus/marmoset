@@ -128,7 +128,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		return tester.getDirectoryFinder();
 	}
 
-	public ProjectSubmission<JUnitTestProperties> getProjectSubmission() {
+	public ProjectSubmission<? extends JUnitTestProperties> getProjectSubmission() {
 		return tester.getProjectSubmission();
 	}
 

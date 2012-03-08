@@ -80,11 +80,11 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
     }
     
 
-	public abstract Builder<T> createBuilder()
+	public abstract Builder<? super T> createBuilder()
 			throws BuilderException, MissingConfigurationPropertyException,
 			ZipExtractorException;
 
-	public abstract Tester<T> createTester()
+	public abstract Tester<? super T> createTester()
 			throws MissingConfigurationPropertyException;
 	
     public void buildAndTest(File buildDirectory,
@@ -92,7 +92,7 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
             throws BuilderException, MissingConfigurationPropertyException,
             CompileFailureException {
         // Build the submission
-        Builder<T> builder = null;
+        Builder<? super T> builder = null;
         try {
             builder = createBuilder();
         } catch (ZipExtractorException e) {
@@ -161,7 +161,7 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
         }
 
         // Test the submission
-        Tester<T> tester = createTester();
+        Tester<? super T> tester = createTester();
         if (getConfig().getConfig().getOptionalBooleanProperty(
                 RUN_STUDENT_TESTS)) {
             log.debug("Enabling execution of student tests for submission "

@@ -34,9 +34,11 @@ import org.apache.log4j.Logger;
 import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.CBuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.JavaBuilderAndTesterFactory;
+import edu.umd.cs.buildServer.builder.ScriptBuilderAndTesterFactory;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
 import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
+import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
@@ -227,6 +229,11 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 		                getLog());
 		        break;
 		    case SCRIPT:
+		    	 this.builderAndTesterFactory  = (BuilderAndTesterFactory<T>) 
+			        new ScriptBuilderAndTesterFactory(
+			                (ProjectSubmission<ScriptTestProperties>) this, 
+	                        (ScriptTestProperties) testProperties, getLog());
+			        break;
 		    case MAKE:
 		        this.builderAndTesterFactory  = (BuilderAndTesterFactory<T>) 
 		        new CBuilderAndTesterFactory(
