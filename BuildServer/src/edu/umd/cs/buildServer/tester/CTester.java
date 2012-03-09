@@ -48,8 +48,10 @@ import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.builder.DirectoryFinder;
 import edu.umd.cs.buildServer.util.DevNullInputStream;
+import edu.umd.cs.buildServer.util.DevNullOutputStream;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.diffText.StringListWriter;
 import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.diffText.TextDiff.Option;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
@@ -125,13 +127,14 @@ public class CTester extends Tester<ScriptTestProperties> {
         testOutcome.setTestNumber(Integer.toString(testCase.getNumber()));
         testOutcome.setTestName(testCase.getName());
         testOutcome.setTestType(testCase.getTestType());
-        
-        try {
 
-        String exec[] = testCase.getProperty(ExecutableTestCase.Property.EXEC)
-                .split("\\s+");
+        // Record a test outcome.
+       int testTimeoutInSeconds = getTestProperties()
+                .getTestTimeoutInSeconds();
 
-        exec[0] = checkTestExe(exec[0]);
+        long processTimeoutMillis = testTimeoutInSeconds * 1000L;
+
+        String[] exec = getExecLine(testCase, ExecutableTestCase.Property.EXEC);
         File buildDirectory = getDirectoryFinder().getBuildDirectory();
        String options = testCase.getProperty(ExecutableTestCase.Property.OPTIONS);
        EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
@@ -142,6 +145,9 @@ public class CTester extends Tester<ScriptTestProperties> {
            }
            
        }
+
+       
+        try {
 
         InputStream in;
         switch (testCase.getInputKind()) {
@@ -184,6 +190,33 @@ public class CTester extends Tester<ScriptTestProperties> {
                     throw new IllegalStateException("No input file " + f);
                 builder.expect(f);
                 break;
+            case  REFERENCE_IMPL:
+                String[] refExec = getExecLine(testCase, ExecutableTestCase.Property.REFERENCE_EXEC);
+                Process refProcess = Untrusted.execute(buildDirectory,refExec);
+                FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
+                        refProcess.getOutputStream());
+                StringListWriter expectedOutput = new StringListWriter();
+                FutureTask<Void> saveOutput =  TextDiff.copyTask("capture expected output",
+                        refProcess.getInputStream(), expectedOutput);
+                FutureTask<Void> drainErr = TextDiff.copyTask("drain expected err",
+                        refProcess.getErrorStream(), new DevNullOutputStream());
+              
+                executor.submit(copyInput);
+                executor.submit(saveOutput);
+                executor.submit(drainErr);
+                ProcessExitMonitor referenceExitMonitor = new ProcessExitMonitor(refProcess,
+                        getLog());
+                boolean done = referenceExitMonitor.waitForProcessToExit(processTimeoutMillis);
+                if (!done)
+                    throw new BuilderException("Capture of reference output for " + testCase.getName() 
+                            + " timed out");
+                saveOutput.get();
+                copyInput.cancel(true);
+                drainErr.cancel(true);
+                
+                builder.expect(expectedOutput.getStrings());
+                
+                
             }
 
             output = builder.build();
@@ -191,8 +224,12 @@ public class CTester extends Tester<ScriptTestProperties> {
         }
 
         long started = System.currentTimeMillis();
-
-        Process process = Untrusted.execute(buildDirectory, exec);
+        Process process ;
+        if (output == null) 
+            process = Untrusted.executeCombiningOutput(buildDirectory, exec);
+        else 
+            process = Untrusted.execute(buildDirectory, exec);
+        
         FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
                 process.getOutputStream());
         FutureTask<Void> checkOutput = null;
@@ -204,19 +241,12 @@ public class CTester extends Tester<ScriptTestProperties> {
 
         executor.submit(copyInput);
         executor.submit(copyError);
-        Thread.sleep(1000);
         if (checkOutput != null) {
             executor.submit(checkOutput);
         }     
         
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
                 getLog());
-
-        // Record a test outcome.
-       int testTimeoutInSeconds = getTestProperties()
-                .getTestTimeoutInSeconds();
-
-        long processTimeoutMillis = testTimeoutInSeconds * 1000L;
 
         boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
         testOutcome
@@ -278,9 +308,25 @@ public class CTester extends Tester<ScriptTestProperties> {
             testOutcome.setShortTestResult("Build server failure");
             testOutcome.setLongTestResult(TestRunner.toString(t));
         }
-      
-        getLog().info(testOutcome.getOutcome() + " : " + testOutcome.getShortTestResult());
+        
+        if (testOutcome.getOutcome().equals(TestOutcome.PASSED)) 
+            getLog().info(testOutcome.getOutcome());
+        else
+            getLog().info(testOutcome.getOutcome() + " : " + testOutcome.getShortTestResult());
+        
         return testOutcome;
+    }
+
+    /**
+     * @param testCase
+     * @return
+     */
+    public String[] getExecLine(ExecutableTestCase testCase, ExecutableTestCase.Property property) {
+        String exec[] = testCase.getProperty(property)
+                .split("\\s+");
+
+        exec[0] = checkTestExe(exec[0]);
+        return exec;
     }
 
     private static boolean readableFile(File f) {
@@ -309,8 +355,7 @@ public class CTester extends Tester<ScriptTestProperties> {
             getLog().warn("Could not check executable " + exeFile + " in build directory " + buildDirectory);
         }
         
-        getLog().debug("Test executable " + exeFile + " not in build directory " + buildDirectory);
-        return "./" + exeName;
+        return exeName;
 
     }
 }

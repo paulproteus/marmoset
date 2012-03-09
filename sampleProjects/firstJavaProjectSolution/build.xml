@@ -38,7 +38,6 @@
 			</classpath>
 			<formatter type="brief" usefile="false" />
 			<test name="PublicTests"/>
-			<test name="StudentTests"/>
 			<test name="ReleaseTests"/>
 		</junit>
 

@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 

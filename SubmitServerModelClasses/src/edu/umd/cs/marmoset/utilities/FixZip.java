@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -27,9 +28,9 @@ import com.google.common.base.Strings;
 
 public class FixZip {
 
-
     private static boolean strictSuffix(String suffix, String full) {
-        return full.length() > suffix.length() && suffix.length() > 0 && full.endsWith(suffix);
+        return full.length() > suffix.length() && suffix.length() >= 0
+                && full.endsWith(suffix);
     }
 
     public static boolean anySlashes(Collection<String> c) {
@@ -39,31 +40,81 @@ public class FixZip {
         return false;
     }
 
+    public static String simpleName(String name) {
+        int i = name.lastIndexOf('/');
+        if (i == -1)
+            return name;
+        return name.substring(i + 1);
+    }
+
     public static Map<String, String> getFullNames(Collection<String> c) {
         Map<String, String> result = new HashMap<String, String>();
+        HashSet<String> dups = new HashSet<String>();
+
         for (String s : c) {
-            int i = s.lastIndexOf('/');
-            if (i == -1)
+            String simpleName = simpleName(s);
+            if (dups.contains(simpleName))
                 continue;
-            String simpleName = s.substring(i + 1);
-            if (result.containsKey(simpleName))
-                result.put(simpleName, simpleName);
-            else
+            if (result.containsKey(simpleName)) {
+                result.remove(simpleName);
+                dups.add(simpleName);
+            } else
                 result.put(simpleName, s);
         }
         return result;
     }
 
+    public static boolean ignoredName(String name) {
+        String simpleName = simpleName(name);
+        if (simpleName.isEmpty())
+            return true;
+        if (name.contains("CVS/") || name.contains(".svn/"))
+            return true;
+        if (simpleName.endsWith("~"))
+            return true;
+        if (name.contains("__MACOSX"))
+            return true;
+        return false;
+    }
+
+    public static byte[] discardIgnoredFiles(byte[] zipContents) {
+        AdjustName adjuster = new AdjustName() {
+            @Override
+            public String adjustName(String name) {
+                if (ignoredName(name))
+                    return null;
+                return name;
+            }
+        };
+        return adjustNames(adjuster, zipContents);
+    }
+
     public static byte[] adjustZipNames(byte[] canonical, byte[] adjustMe) {
         List<String> providedNames = getZipEntryNames(adjustMe);
+       
+        for (String name : providedNames) {
+            if (ignoredName(name)) {
+                adjustMe = discardIgnoredFiles(adjustMe);
+                providedNames = getZipEntryNames(adjustMe);
+                break;
+            }
+        }
+
+        if (canonical == null)
+            return adjustMe;
+        
         List<String> canonicalNames = getZipEntryNames(canonical);
 
+        final Map<String, String> map = getFullNames(canonicalNames);
+
         if (!anySlashes(providedNames)) {
-            final Map<String, String> map = getFullNames(canonicalNames);
+            if (!anySlashes(canonicalNames))
+                return adjustMe;
+
             AdjustName adjuster = new AdjustName() {
                 @Override
                 public String adjustName(String name) {
-                    String s = map.get(name);
+                    String s = map.get(simpleName(name));
                     if (s != null)
                         return s;
                     else if (name.endsWith(".java"))
@@ -73,14 +124,51 @@ public class FixZip {
             };
             return adjustNames(adjuster, adjustMe);
         }
-        String commonProvided = getCommonPrefix(providedNames);
 
+        List<String> matchingProvidedNames = new ArrayList<String>();
+        List<String> matchingCanonicalNames = new ArrayList<String>();
+        for (String p : providedNames) {
+            String c = map.get(simpleName(p));
+            if (c == null)
+                continue;
+            matchingProvidedNames.add(p);
+            matchingCanonicalNames.add(c);
+        }
+
+        String commonProvided = getCommonPrefix(providedNames);
         String commonCanonical = getCommonPrefix(canonicalNames);
+        
+        if (!matchingProvidedNames.isEmpty()) {
+
+            String commonMatchingProvided = getCommonPrefix(matchingProvidedNames);
+            String commonMatchingCanonical = getCommonPrefix(matchingCanonicalNames);
+
+            if (strictSuffix(commonMatchingCanonical, commonMatchingProvided)) {
+                String strip = commonMatchingProvided.substring(0,
+                        commonMatchingProvided.length() - commonMatchingCanonical.length());
+                if (commonProvided.startsWith(strip))
+                    return adjustNames(strip, "", adjustMe);
+            } else if (strictSuffix(commonMatchingProvided, commonMatchingCanonical)) {
+                String add = commonMatchingCanonical.substring(0,
+                        commonMatchingCanonical.length() - commonMatchingProvided.length());
+                if (commonCanonical.startsWith(add))
+                    return adjustNames("", add, adjustMe);
+            } else {
+                String add = getPrefix(matchingProvidedNames, matchingCanonicalNames);
+                if (add != null && commonCanonical.startsWith(add)) 
+                    return adjustNames("", add, adjustMe);
+            }
+        }
+
+
+
         if (strictSuffix(commonCanonical, commonProvided)) {
-            String strip = commonProvided.substring(0, commonProvided.length() - commonCanonical.length());
+            String strip = commonProvided.substring(0, commonProvided.length()
+                    - commonCanonical.length());
             return adjustNames(strip, "", adjustMe);
         } else if (strictSuffix(commonProvided, commonCanonical)) {
-            String add = commonCanonical.substring(0, commonCanonical.length() - commonProvided.length());
+            String add = commonCanonical.substring(0, commonCanonical.length()
+                    - commonProvided.length());
             return adjustNames("", add, adjustMe);
         } else {
             String add = getPrefix(providedNames, canonicalNames);
@@ -91,10 +179,12 @@ public class FixZip {
     }
 
     interface AdjustName {
-        public String adjustName(String name);
+        public @CheckForNull
+        String adjustName(String name);
     }
 
-    private static byte[] adjustNames(final String strip, final String add, byte[] zipContents) {
+    private static byte[] adjustNames(final String strip, final String add,
+            byte[] zipContents) {
         AdjustName adjuster = new AdjustName() {
 
             @Override
@@ -102,16 +192,15 @@ public class FixZip {
                 if (name.startsWith(strip))
                     return add + name.substring(strip.length());
                 return name;
-
             }
-
         };
         return adjustNames(adjuster, zipContents);
     }
 
     private static byte[] adjustNames(AdjustName adjuster, byte[] zipContents) {
 
-        ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipContents));
+        ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(
+                zipContents));
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         ZipOutputStream zOut = new ZipOutputStream(bOut);
         byte[] buf = new byte[1024];
@@ -123,16 +212,19 @@ public class FixZip {
                 String name = ze.getName();
                 name = adjuster.adjustName(name);
 
-                ZipEntry ze2 = makeZipEntry(name, ze);
-                zOut.putNextEntry(ze2);
-                while (true) {
-                    int sz = zin.read(buf);
-                    if (sz == -1)
-                        break;
-                    zOut.write(buf, 0, sz);
+                if (name != null) {
+                    ZipEntry ze2 = makeZipEntry(name, ze);
+                    zOut.putNextEntry(ze2);
+                    while (true) {
+                        int sz = zin.read(buf);
+                        if (sz == -1)
+                            break;
+                        zOut.write(buf, 0, sz);
+                    }
+                    zOut.closeEntry();
                 }
                 zin.closeEntry();
-                zOut.closeEntry();
+
             }
             zOut.close();
         } catch (IOException e) {
@@ -208,7 +300,8 @@ public class FixZip {
 
     public static List<String> getZipEntryNames(byte[] zipContents) {
         ArrayList<String> result = new ArrayList<String>();
-        ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipContents));
+        ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(
+                zipContents));
         try {
             while (true) {
                 ZipEntry ze = zin.getNextEntry();
@@ -233,7 +326,8 @@ public class FixZip {
         return hasProblem(new ByteArrayInputStream(zipContents));
     }
 
-    public static byte[] fixProblem(byte[] zipContents, int pk) throws IOException {
+    public static byte[] fixProblem(byte[] zipContents, int pk)
+            throws IOException {
         File tmpFile = writeToTempFile(zipContents, pk);
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         copyZipFile(tmpFile, result);
@@ -241,7 +335,8 @@ public class FixZip {
         return result.toByteArray();
     }
 
-    private static File writeToTempFile(byte[] zipContents, int pk) throws IOException, FileNotFoundException {
+    private static File writeToTempFile(byte[] zipContents, int pk)
+            throws IOException, FileNotFoundException {
         File tmpFile = File.createTempFile(pk + "fixme", ".zip");
         OutputStream out = new FileOutputStream(tmpFile);
         out.write(zipContents);
@@ -255,7 +350,8 @@ public class FixZip {
      * @throws ZipException
      * @throws IOException
      */
-    private static void copyZipFile(File tmpFile, OutputStream result) throws ZipException, IOException {
+    private static void copyZipFile(File tmpFile, OutputStream result)
+            throws ZipException, IOException {
         ZipOutputStream zOut = new ZipOutputStream(result);
         ZipFile zf = new ZipFile(tmpFile);
         Enumeration<? extends ZipEntry> e = zf.entries();

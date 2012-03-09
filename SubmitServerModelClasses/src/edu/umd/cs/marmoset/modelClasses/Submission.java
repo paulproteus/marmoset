@@ -1165,6 +1165,46 @@ public class Submission implements ITestSummary<Submission> {
         return getFromPreparedStatement(stmt);
     }
 
+    public static @CheckForNull Submission lookupCanonicalSubmission(@Project.PK Integer projectPK, Connection conn)
+    throws SQLException
+    {
+        String query =
+            " SELECT " +ATTRIBUTES+
+             " FROM test_runs, test_setups, submissions " +
+            " where test_runs.test_run_pk = test_setups.test_run_pk " +
+            " and test_setups.jarfile_status = 'active' " +
+            " and test_runs.submission_pk = submissions.submission_pk " +
+            " AND submission.project_pk = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        SqlUtilities.setInteger(stmt, 1, projectPK);
+        return getFromPreparedStatement(stmt);
+    }
+   
+
+    public static @CheckForNull
+    byte[] lookupCanonicalSubmissionArchive(@Project.PK Integer projectPK,
+            Connection conn) throws SQLException {
+        String query = " SELECT submission.archive_pk "
+                + " FROM test_runs, test_setups, submissions "
+                + " where test_runs.test_run_pk = test_setups.test_run_pk "
+                + " and test_setups.jarfile_status = 'active' "
+                + " and test_runs.submission_pk = submissions.submission_pk "
+                + " AND submission.project_pk = ?";
+
+        PreparedStatement stmt = Queries.setStatement(conn, query, projectPK);
+        try {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Archive.downloadBytesFromArchive(SUBMISSION_ARCHIVES,
+                        rs.getInt(1), conn);
+            }
+        } finally {
+            Queries.closeStatement(stmt);
+        }
+        return null;
+    }
+    
     public static List<Submission> lookupAllByStudentPKAndProjectPK(
     		@Student.PK Integer studentPK,
             Integer projectPK,

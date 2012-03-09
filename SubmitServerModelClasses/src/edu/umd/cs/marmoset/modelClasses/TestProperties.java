@@ -131,9 +131,14 @@ public class TestProperties {
         Properties testProperties = new Properties();
 
         testProperties.load(is);
-        String f = testProperties.getProperty("build.framework");
-        if (f == null)
-            f = testProperties.getProperty("build.language");
+        
+        String f = null;
+        for(String p : new String[] { "test.framework", "build.language", "test.language", "build.framework"}) {
+            f = testProperties.getProperty(p);
+            if (f != null)
+                break;
+        }
+        
         if (f == null)
             f = "junit";
 

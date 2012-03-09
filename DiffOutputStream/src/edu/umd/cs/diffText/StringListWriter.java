@@ -11,7 +11,7 @@ public class StringListWriter extends StringsWriter {
         result.add(s);
     }
     
-    List<String> getStrings() {
+    public List<String> getStrings() {
         return result;
     }
 

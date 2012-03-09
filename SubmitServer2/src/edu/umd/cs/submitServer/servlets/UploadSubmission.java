@@ -60,6 +60,7 @@ import com.ice.tar.TarInputStream;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.marmoset.utilities.FixZip;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
@@ -283,13 +284,18 @@ public class UploadSubmission extends SubmitServerServlet {
         boolean transactionSuccess = false;
         
         try {
-
             Integer baselinePK = project.getArchivePK();
+            int testSetupPK = project.getTestSetupPK();
+            byte baseLineSubmission[] = null;
             if (baselinePK != null && baselinePK.intValue() != 0) {
-                byte canonicalSubmission[] = project.downloadArchive(conn);
-                zipOutput = FixZip.adjustZipNames(canonicalSubmission, zipOutput);
+                 baseLineSubmission = project.downloadArchive(conn); 
+            } else if (testSetupPK != 0){
+                baseLineSubmission = Submission.lookupCanonicalSubmissionArchive(project.getProjectPK(), conn);
             }
+            zipOutput = FixZip.adjustZipNames(baseLineSubmission, zipOutput);
+            
             int archivePK = Submission.uploadSubmissionArchive(zipOutput, conn);
+            
             synchronized (UPLOAD_LOCK) {
                 final int NUMBER_OF_ATTEMPTS = 2;
                 int attempt = 1;
@@ -297,7 +303,6 @@ public class UploadSubmission extends SubmitServerServlet {
                     try {
                         conn.setAutoCommit(false);
                         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-
                        
                         submission = Submission.submit(archivePK, studentRegistration, project, cvsTimestamp, clientTool,
                                 clientVersion, submissionTimestamp, conn);
