@@ -1,0 +1,29 @@
+<project name="firstPythonProjectSolution" default="all" basedir=".">
+
+	<property name="setup.name" value="test-setup.zip"/>
+	<property name="submission.name" value="submission.zip"/>
+
+
+	<target name="all" depends="submission,test.setup"/>
+	<target name="clean" description="Delete all generated files">
+		<delete file="submission.zip"/>
+		<delete file="test-setup.zip"/>
+		</target>
+	<target name="test.setup" description="create the test setup file for Marmoset">
+		<delete file="${setup.name}"/>
+
+		<zip destfile="${setup.name}">
+			<fileset dir="." includes="main.py,test.properties"/>
+		</zip>
+	</target>
+
+	<target name="submission" description="build a zip file containing the submission">
+		<delete file="${submission.name}"/>
+		<zip destfile="${submission.name}">
+			<fileset dir="." includes=".submit,.submitUser,.submitDisplay,*.py">
+			<exclude name="main.py"/>
+			</fileset>
+		</zip>
+	</target>
+
+</project>

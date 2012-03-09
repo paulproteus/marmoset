@@ -65,7 +65,6 @@ public class ScriptBuilder extends Builder<ScriptTestProperties> implements Test
 				submissionExtractor);
 	}
 
-
 	@Override
 	protected String getProjectPathPrefix() throws IOException {
 		return "";
@@ -78,10 +77,6 @@ public class ScriptBuilder extends Builder<ScriptTestProperties> implements Test
 
 		// nothing to do
 	}
-
-	
-
-	
 
 	
 
