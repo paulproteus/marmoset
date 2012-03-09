@@ -970,8 +970,6 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
                 stmt.addBatch();
             }
 
-            System.out.println(kinds);
-            System.err.println(kinds);
             // Insert the values!
             stmt.executeBatch();
         } finally {

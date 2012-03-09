@@ -241,7 +241,11 @@ public class CTester extends Tester<ScriptTestProperties> {
                 if (t instanceof AssertionError) {
                     failed = true;
                     testOutcome.setOutcome(TestOutcome.FAILED);
-                    testOutcome.setShortTestResult(t.getMessage());
+                    String msg = t.getMessage();
+                    int i = msg.indexOf(" at junit.framework.Assert.fail(");
+                    if (i >= 0)
+                    	   msg = msg.substring(0,i);
+                    testOutcome.setShortTestResult(msg);
                 }
             }
         }
