@@ -81,9 +81,9 @@ $(function() {
 function changedIsTested(isTested)
 {
     if (isTested) {
-        document.getElementById("tested").style.display = "block";
+    	    showItem("tested");
     } else {
-        document.getElementById("tested").style.display = "none";
+    	    hideItem("tested");
     }
 }
 
@@ -248,7 +248,7 @@ function changedIsTested(isTested)
     
     </table>
 
-<div id="tested" display="${testItemStyle}"> 
+<div id="tested" style="${testItemStyle}"> 
 <table class="form">
 <thead>
   <tr  class="submit">
