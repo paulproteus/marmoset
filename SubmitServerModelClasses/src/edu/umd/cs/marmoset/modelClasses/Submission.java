@@ -1185,12 +1185,12 @@ public class Submission implements ITestSummary<Submission> {
     public static @CheckForNull
     byte[] lookupCanonicalSubmissionArchive(@Project.PK Integer projectPK,
             Connection conn) throws SQLException {
-        String query = " SELECT submission.archive_pk "
+        String query = " SELECT submissions.archive_pk "
                 + " FROM test_runs, test_setups, submissions "
                 + " where test_runs.test_run_pk = test_setups.test_run_pk "
                 + " and test_setups.jarfile_status = 'active' "
                 + " and test_runs.submission_pk = submissions.submission_pk "
-                + " AND submission.project_pk = ?";
+                + " AND submissions.project_pk = ?";
 
         PreparedStatement stmt = Queries.setStatement(conn, query, projectPK);
         try {
