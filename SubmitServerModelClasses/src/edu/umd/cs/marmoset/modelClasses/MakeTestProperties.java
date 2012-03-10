@@ -17,7 +17,7 @@ public class MakeTestProperties extends ScriptTestProperties {
     private String studentMakefileName;
 
     public MakeTestProperties(Properties testProperties) {
-        super(testProperties);
+        super(Framework.MAKE, testProperties);
         setMakeCommand(getOptionalStringProperty(MAKE_COMMAND,
                 DEFAULT_MAKE_COMMAND));
         setMakefileName(getOptionalStringProperty(MAKE_FILENAME));
