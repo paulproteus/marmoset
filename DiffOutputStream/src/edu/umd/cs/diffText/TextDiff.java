@@ -85,13 +85,15 @@ public class TextDiff extends StringsWriter {
     }
 
     public enum Option {
-        TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE;
+        TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES;
         public static Option valueOfAnyCase(String name) {
             name = name.toUpperCase();
             if (name.equals("IGNORESCASE"))
                 return IGNORES_CASE;
             if (name.equals("IGNOREWHITESPACECHANGE"))
                 return IGNORE_WHITESPACE_CHANGE;
+            if (name.equals("IGNOREBLANKLINES"))
+                return IGNORE_BLANK_LINES;
             return valueOf(name);
         }
     };
@@ -142,6 +144,11 @@ public class TextDiff extends StringsWriter {
 
         public Builder ignoreWhitespaceChange() {
             set(Option.IGNORE_WHITESPACE_CHANGE);
+            return this;
+        }
+        
+        public Builder ignoreBlankLines() {
+            set(Option.IGNORE_BLANK_LINES);
             return this;
         }
 
@@ -299,8 +306,15 @@ public class TextDiff extends StringsWriter {
     }
 
     protected void got(int line, String txt) {
+        boolean ignoreBlankLines = options.contains(Option.IGNORE_BLANK_LINES);
         txt = normalize(txt);
-        Object o = getExpected();
+        if (ignoreBlankLines && txt.isEmpty())
+            return;
+        Object o;
+        do {
+           o = getExpected();
+        } while (ignoreBlankLines && "".equals(o));
+        
         if (o == null) {
             fail("Didn't expect any more output but got " + txt);
         } else if (o instanceof String) {
