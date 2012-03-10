@@ -70,7 +70,7 @@ public class ExecutableTestCase {
     }
 
     public enum Property {
-        EXEC, REFERENCE_EXEC, OPTIONS, INPUT, EXPECTED;
+        EXEC, REFERENCE_EXEC, OPTIONS, INPUT, EXPECTED, POINTS;
         public static Property valueOfAnyCase(String name) {
             name = name.toUpperCase();
             if (name.equals("REFERENCEEXEC"))
