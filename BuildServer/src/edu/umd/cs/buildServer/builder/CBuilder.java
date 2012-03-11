@@ -214,6 +214,8 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 	    
 	    for(ExecutableTestCase e : getTestProperties().getExecutableTestCases())  {
 	        String exec = e.getProperty(ExecutableTestCase.Property.EXEC).split("\\s+")[0];
+	        getLog().info("Cleaning " + exec + " for " + e.getTestType() + " test case " + e.getName());
+	                
 	        if (!filesExtractedFromTestSetup.contains(exec))
                 deleteTestExecutable(exec);
 	    }
