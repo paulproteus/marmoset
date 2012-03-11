@@ -28,6 +28,9 @@ public class ScriptTestProperties extends TestProperties {
            names =  getOptionalStringProperty(TestPropertyKeys.TESTCLASS_PREFIX + testType.toString());
        if (names == null)
            return null;
+       names = names.trim();
+       if (names.isEmpty())
+           return null;
        return Arrays.asList(names.split("[,\\s]+"));
            
     }
