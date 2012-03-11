@@ -83,10 +83,12 @@ public class AssignCodeReviews extends SubmitServerServlet {
         if (kind.isPrototype())
             throw new IllegalArgumentException(
                     "Can only create assign non-prototype code reviews");
-
+        boolean transactionSuccess = false;
         Connection conn = null;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
+			conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
             assignment.setKind(kind);
             assignment.update(conn);
@@ -166,6 +168,8 @@ public class AssignCodeReviews extends SubmitServerServlet {
                         + kind);
             }
 
+            conn.commit();
+			transactionSuccess = true;
             String redirectUrl = request.getContextPath()
                     + "/view/instructor/codeReviewAssignment.jsp?codeReviewAssignmentPK="
                     + assignment.getCodeReviewAssignmentPK();
@@ -176,7 +180,8 @@ public class AssignCodeReviews extends SubmitServerServlet {
             handleSQLException(e);
             throw new ServletException(e);
         } finally {
-            releaseConnection(conn);
+        	rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
+					transactionSuccess, request, conn);
         }
     }
 

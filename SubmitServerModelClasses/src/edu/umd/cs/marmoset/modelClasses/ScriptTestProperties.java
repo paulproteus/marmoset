@@ -12,10 +12,12 @@ public class ScriptTestProperties extends TestProperties {
     
     final Map<String, ExecutableTestCase> testCases;
     public ScriptTestProperties(Properties testProperties) {
-        super(Framework.SCRIPT, testProperties);
+        this(Framework.SCRIPT, testProperties);
+    }
+    protected ScriptTestProperties(Framework framework, Properties testProperties) {
+        super(framework, testProperties);
         testCases = ExecutableTestCase.parse(this);
     }
-    
     public Collection<ExecutableTestCase> getExecutableTestCases() {
         return testCases.values();
     }
