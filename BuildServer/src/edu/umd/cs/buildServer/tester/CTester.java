@@ -258,28 +258,29 @@ public class CTester extends Tester<ScriptTestProperties> {
 
         boolean failed = false;
 
-        try {
-            checkOutput.get(50, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            checkOutput.cancel(true);
-            if (done)
-                throw new AssertionError("done but output not ready");
-        } catch (InterruptedException e) {
-            checkOutput.cancel(true);
-            if (done)
-                throw new AssertionError("done but output not ready");
-        } catch (ExecutionException e) {
-            Throwable t = e.getCause();
-            if (t instanceof AssertionError) {
-                failed = true;
-                testOutcome.setOutcome(TestOutcome.FAILED);
-                String msg = t.getMessage();
-                int i = msg.indexOf(" at junit.framework.Assert.fail(");
-                if (i >= 0)
-                    msg = msg.substring(0, i);
-                testOutcome.setShortTestResult(msg);
+        if (checkOutput != null) 
+            try {
+                checkOutput.get(50, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                checkOutput.cancel(true);
+                if (done)
+                    throw new AssertionError("done but output not ready");
+            } catch (InterruptedException e) {
+                checkOutput.cancel(true);
+                if (done)
+                    throw new AssertionError("done but output not ready");
+            } catch (ExecutionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof AssertionError) {
+                    failed = true;
+                    testOutcome.setOutcome(TestOutcome.FAILED);
+                    String msg = t.getMessage();
+                    int i = msg.indexOf(" at junit.framework.Assert.fail(");
+                    if (i >= 0)
+                        msg = msg.substring(0, i);
+                    testOutcome.setShortTestResult(msg);
+                }
             }
-        }
 
         copyInput.cancel(true);
         copyError.cancel(true);
