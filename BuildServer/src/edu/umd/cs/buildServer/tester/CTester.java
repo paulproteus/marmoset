@@ -236,7 +236,6 @@ public class CTester extends Tester<ScriptTestProperties> {
         
         StringWriter err = new StringWriter();
         
-        
         if (output != null)
             checkOutput = output.check((process.getInputStream()));
        
