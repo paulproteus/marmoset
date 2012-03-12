@@ -26,7 +26,6 @@ public class ExecutableTestCase {
             kindDefaults.put(testType, kindOptions);
             int number = 1;
             for (String name : names) {
-
                 ExecutableTestCase options = new ExecutableTestCase(defaults,
                         testType, name, number++);
                 if (testCases.containsKey(name))
