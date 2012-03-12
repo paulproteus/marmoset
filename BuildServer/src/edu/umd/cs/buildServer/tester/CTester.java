@@ -308,6 +308,7 @@ public class CTester extends Tester<ScriptTestProperties> {
          testOutcome.setLongTestResult(err.toString());
         
         } catch (Throwable t) {
+            getLog().error("CTester error",  t );
             testOutcome.setOutcome(TestOutcome.ERROR);
             testOutcome.setShortTestResult("Build server failure");
             testOutcome.setLongTestResult(TestRunner.toString(t));
