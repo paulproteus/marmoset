@@ -54,20 +54,6 @@ import edu.umd.cs.marmoset.modelClasses.ZipFileAggregator;
 public class DownloadMostRecentOnTimeAndLateSubmissions extends
 		SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -92,19 +78,19 @@ public class DownloadMostRecentOnTimeAndLateSubmissions extends
 			File tempfile = File.createTempFile("temp", "zipfile");
 			fileOutputStream = new FileOutputStream(tempfile);
 
+			int count = 0;
 			// zip aggregator
 			ZipFileAggregator zipAggregator = new ZipFileAggregator(
 					fileOutputStream);
 
 			for (StudentRegistration registration : registrationSet) {
-				StudentSubmitStatus studentSubmitStatus = studentSubmitStatusMap
-						.get(registration.getStudentRegistrationPK());
 
 				Submission ontime = lastOnTime.get(registration
 						.getStudentRegistrationPK());
 
 				if (ontime != null) {
 					try {
+					    count++;
 						byte[] bytes = ontime.downloadArchive(conn);
 						zipAggregator.addFileFromBytes(
 								registration.getClassAccount() + "__"
@@ -124,6 +110,7 @@ public class DownloadMostRecentOnTimeAndLateSubmissions extends
 
 				if (late != null) {
 					try {
+					    count++;
 						byte[] bytes = late.downloadArchive(conn);
 						zipAggregator.addFileFromBytes(
 								registration.getClassAccount() + "-late" + "__"
@@ -139,6 +126,8 @@ public class DownloadMostRecentOnTimeAndLateSubmissions extends
 				}
 			}
 
+			if (count == 0)
+			    throw new ServletException("No submissions to download");
 			zipAggregator.close();
 
 			// write the zipfile to the client
