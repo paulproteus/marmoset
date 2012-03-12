@@ -232,24 +232,20 @@ public class CTester extends Tester<ScriptTestProperties> {
         
         FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
                 process.getOutputStream());
-        FutureTask<Void> checkOutput;
-        StringWriter stdOut = null;
+        FutureTask<Void> checkOutput = null;
         
         
         if (output != null)
             checkOutput = output.check((process.getInputStream()));
-        else  {
-            stdOut = new StringWriter();
-            checkOutput =  TextDiff.copyTask("copy stdout", new InputStreamReader(
-                    process.getInputStream()), stdOut);
-        }
+       
         StringWriter err = new StringWriter();
         FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
                 process.getErrorStream()), err);
 
         executor.submit(copyInput);
         executor.submit(copyError);
-        executor.submit(checkOutput);
+        if (checkOutput != null) 
+            executor.submit(checkOutput);
          
         
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
@@ -287,6 +283,7 @@ public class CTester extends Tester<ScriptTestProperties> {
 
         copyInput.cancel(true);
         copyError.cancel(true);
+        err.flush();
 
         if (failed) {
             getLog().debug(
@@ -300,15 +297,13 @@ public class CTester extends Tester<ScriptTestProperties> {
             } else {
                 testOutcome.setOutcome(TestOutcome.ERROR);
                 testOutcome.setShortTestResult("Test failed");
-                if (stdOut != null)
-                    testOutcome.setLongTestResult(stdOut.toString());
+                testOutcome.setLongTestResult(err.toString());
             }
         } else {
             getLog().debug("Process timed out");
             // didn't terminate
             testOutcome.setOutcome(TestOutcome.TIMEOUT);
-            if (stdOut != null)
-                testOutcome.setLongTestResult(stdOut.toString());
+            testOutcome.setLongTestResult(err.toString());
         }
          testOutcome.setLongTestResult(err.toString());
         
