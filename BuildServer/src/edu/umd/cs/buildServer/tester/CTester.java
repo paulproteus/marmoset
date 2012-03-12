@@ -234,13 +234,14 @@ public class CTester extends Tester<ScriptTestProperties> {
                 process.getOutputStream());
         FutureTask<Void> checkOutput = null;
         
+        StringWriter err = new StringWriter();
+        
         
         if (output != null)
             checkOutput = output.check((process.getInputStream()));
        
-        StringWriter err = new StringWriter();
         FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
-                process.getErrorStream()), err);
+               output != null ? process.getErrorStream() : process.getInputStream()), err);
 
         executor.submit(copyInput);
         executor.submit(copyError);
@@ -273,6 +274,9 @@ public class CTester extends Tester<ScriptTestProperties> {
                 Throwable t = e.getCause();
                 if (t instanceof AssertionError) {
                     failed = true;
+                    getLog().debug(
+                            "Test didn't generate expected output: "
+                                    + testOutcome.getShortTestResult());
                     testOutcome.setOutcome(TestOutcome.FAILED);
                     String msg = t.getMessage();
                     int i = msg.indexOf(" at junit.framework.Assert.fail(");
@@ -282,14 +286,14 @@ public class CTester extends Tester<ScriptTestProperties> {
                 }
             }
 
+        err.flush();
         copyInput.cancel(true);
         copyError.cancel(true);
         err.flush();
 
         if (failed) {
-            getLog().debug(
-                    "Process didn't generate expected output: "
-                            + testOutcome.getShortTestResult());
+            // nothing to do
+           
         } else if (done) {
             int exitCode = exitMonitor.getExitCode();
             getLog().debug("Process exited with exit code: " + exitCode);
@@ -301,7 +305,7 @@ public class CTester extends Tester<ScriptTestProperties> {
                 testOutcome.setLongTestResult(err.toString());
             }
         } else {
-            getLog().debug("Process timed out");
+            getLog().debug("Test timed out");
             // didn't terminate
             testOutcome.setOutcome(TestOutcome.TIMEOUT);
             testOutcome.setLongTestResult(err.toString());
