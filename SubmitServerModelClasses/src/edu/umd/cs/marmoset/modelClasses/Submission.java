@@ -1174,7 +1174,7 @@ public class Submission implements ITestSummary<Submission> {
             " where test_runs.test_run_pk = test_setups.test_run_pk " +
             " and test_setups.jarfile_status = 'active' " +
             " and test_runs.submission_pk = submissions.submission_pk " +
-            " AND submission.project_pk = ?";
+            " AND submissions.project_pk = ?";
 
         PreparedStatement stmt = conn.prepareStatement(query);
         SqlUtilities.setInteger(stmt, 1, projectPK);
