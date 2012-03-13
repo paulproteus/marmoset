@@ -169,6 +169,8 @@ public interface ConfigurationKeys {
 
 	/** Debug property: don't loop (i.e., only do one request). */
 	public static final String DEBUG_DO_NOT_LOOP = DEBUG_PFX + "donotloop";
+	
+	public static final String DOWNLOAD_ONLY = DEBUG_PFX + "downloadOnly";
 
 	/** Debug property: don't loop, build specific submission */
 	public static final String DEBUG_SPECIFIC_SUBMISSION = DEBUG_PFX

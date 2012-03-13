@@ -622,7 +622,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
                 .withDescription(  "use given config file" )
                 .withLongOpt("config")
                 .create( "c");
-        Option submission = OptionBuilder.withArgName( "submissionPK" )
+        Option downloadOnly = OptionBuilder
+                .withDescription(  "download only" )
+                .withLongOpt("download")
+                .create( "d");
+       Option submission = OptionBuilder.withArgName( "submissionPK" )
                 .hasArg()
                 .withDescription(  "test the specified submission" )
                   .withLongOpt("submission")
@@ -645,7 +649,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         options.addOption(testSetup);
         options.addOption(onceOption);
         options.addOption(logLevel);
-        
+        options.addOption(downloadOnly);
         return options;
 	}
 	
@@ -699,12 +703,18 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             buildServer.getConfig().setProperty(LOG4J_THRESHOLD,
                     line.getOptionValue(line.getOptionValue("logLevel")));
 
+        if (line.hasOption("downloadOnly")) {
+       	 buildServer.setDownloadOnly(true);
+          once = true;
+	     }
         if (once) {
             buildServer.getConfig().setProperty(LOG_DIRECTORY, "console");
-            buildServer.getConfig().setProperty(DEBUG_DO_NOT_LOOP, "true");
+            buildServer.setDoNotLoop(true);
             buildServer.getConfig().setProperty(
                     DEBUG_PRESERVE_SUBMISSION_ZIPFILES, "true");
         }
+        
+       
         buildServer.initConfig();
         try {
             buildServer.executeServerLoop();

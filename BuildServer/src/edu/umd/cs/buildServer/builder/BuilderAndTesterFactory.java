@@ -58,7 +58,7 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
 	protected final DirectoryFinder directoryFinder;
 	protected final T testProperties;
 	protected final Logger log;
-	
+	protected boolean downloadOnly = false;
 	protected Logger getLog() {
 	    return log;
 	}
@@ -77,6 +77,10 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
     }
     public  DirectoryFinder getDirectoryFinder()  {
         return directoryFinder;
+    }
+    
+    public void setDownloadOnly() {
+    		downloadOnly = true;
     }
     
 
@@ -107,6 +111,9 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
 
         log.debug("Extracting submission and test setup");
         builder.extract();
+        
+        if (downloadOnly)
+        	  return;
 
         if (builder.doesInspectSubmission()) {
 

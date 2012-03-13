@@ -895,6 +895,13 @@ public abstract class BuildServer implements ConfigurationKeys {
 	public void setDoNotLoop(boolean shutdownRequested) {
 		config.setProperty(DEBUG_DO_NOT_LOOP, "true");
 	}
+	public boolean getDownloadOnly() {
+		return config.getDebugProperty(DOWNLOAD_ONLY);
+	}
+	
+	public void setDownloadOnly(boolean downloadOnly) {
+		config.setProperty(DOWNLOAD_ONLY, "true");
+	}
 }
 
 // vim:ts=4
