@@ -28,8 +28,15 @@ package edu.umd.cs.buildServer.builder;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
@@ -37,6 +44,7 @@ import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
+import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
 import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
@@ -134,6 +142,11 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 		invokeMakeCommand(makeCommand, makeFile);
 	}
 
+	 ExecutorService executor = Executors
+	            .newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true)
+	                    .build());
+
+	 
 	/**
 	 * Invoke 'make' for a given makefile. If no makefile exists, the make
 	 * command will be invoked with no arguments and use the default makefile in
@@ -156,43 +169,42 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 				args.add(makeFile);
 			}
 
-			process = Untrusted.execute(
+			process = Untrusted.executeCombiningOutput(
 					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
 
-			CombinedStreamMonitor monitor = new CombinedStreamMonitor(
-					process.getInputStream(), process.getErrorStream());
-
-			monitor.start();
-			
+			StringWriter makeOutput = new StringWriter();
+	        
+	        
+	        FutureTask<Void> copyMakeOutput = TextDiff.copyTask("copy make output", new InputStreamReader(
+	                process.getInputStream()), makeOutput, testProperties.getMaxDrainOutputInBytes());
+	        executor.submit(copyMakeOutput);
+	        
 			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
            
             long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;
 
-            if (exitMonitor.waitForProcessToExit(processTimeoutMillis)) {
+            boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
+            copyMakeOutput.cancel(true);
+			if (done) {
 
-                int exitCode = process.waitFor();
+                int exitCode = exitMonitor.getExitCode();
                 finished = true;
 
-                monitor.join();
-
                 if (exitCode != 0) {
-                    setCompilerOutput(monitor.getCombinedOutput());
+                    setCompilerOutput(makeOutput.toString());
 
                     throw new CompileFailureException("make failed for project " + getProjectSubmission().getZipFile().getPath(),
-                            this.getCompilerOutput());
+                    		makeOutput.toString());
                 }
 
                 // Wait for a while, to give files a chance to settle
                 pause(20);
             } else {
                 throw new CompileFailureException("make timed-out" + getProjectSubmission().getZipFile().getPath(),
-                        this.getCompilerOutput());
+                		makeOutput.toString());
             }
 		} catch (IOException e) {
 			throw new BuilderException("Could not execute make", e);
-		} catch (InterruptedException e) {
-			throw new BuilderException("Wait for make process was interrupted",
-					e);
 		} finally {
 			if (process != null && !finished) {
 				process.destroy();

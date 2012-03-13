@@ -1,7 +1,5 @@
 package edu.umd.cs.diffText;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 import java.io.BufferedReader;
@@ -18,7 +16,6 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -31,8 +28,7 @@ public class TextDiff extends StringsWriter {
      * Invoke the main method of a class, redirecting System.in and System.out,
      * and passing the supplied arguments to main
      */
-    public static void invokeMain(Class<?> c, InputStream input,
-            OutputStream out, String... args) throws Exception {
+    public static void invokeMain(Class<?> c, InputStream input, OutputStream out, String... args) throws Exception {
         PrintStream oStream = new PrintStream(out);
         InputStream oldIn = System.in;
         PrintStream oldOut = System.out;
@@ -66,9 +62,9 @@ public class TextDiff extends StringsWriter {
         }
     }
 
-    private static void setSystemInAndOut(final InputStream input,
-            final PrintStream oStream) {
+    private static void setSystemInAndOut(final InputStream input, final PrintStream oStream) {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            @Override
             public Void run() {
                 System.setIn(input);
                 System.setOut(oStream);
@@ -112,6 +108,7 @@ public class TextDiff extends StringsWriter {
             this.options = EnumSet.copyOf(options);
         }
 
+        @Override
         protected Builder clone() {
             try {
                 return (Builder) super.clone();
@@ -147,7 +144,7 @@ public class TextDiff extends StringsWriter {
             set(Option.IGNORE_WHITESPACE_CHANGE);
             return this;
         }
-        
+
         public Builder ignoreBlankLines() {
             set(Option.IGNORE_BLANK_LINES);
             return this;
@@ -198,16 +195,14 @@ public class TextDiff extends StringsWriter {
          * @throws Exception
          *             - if if any exception is thrown by the tested code.
          */
-        public void check(Class<?> testedMain, Class<?> referenceMain,
-                String inputFile) throws Exception {
+        public void check(Class<?> testedMain, Class<?> referenceMain, String inputFile) throws Exception {
             File f;
             Builder b = copy();
             try {
                 StringListWriter expectedWriter = new StringListWriter();
                 f = new File(inputFile);
 
-                invokeMain(referenceMain, new FileInputStream(f),
-                        expectedWriter);
+                invokeMain(referenceMain, new FileInputStream(f), expectedWriter);
                 b.expect(expectedWriter.getStrings());
             } catch (Throwable t) {
                 throw new TestInfrastructureException(t);
@@ -229,16 +224,14 @@ public class TextDiff extends StringsWriter {
          * @throws Exception
          *             - if if any exception is thrown by the tested code.
          */
-        public void check(Class<?> testedMain, String inputFile,
-                String expectedOutputFile) throws Exception {
+        public void check(Class<?> testedMain, String inputFile, String expectedOutputFile) throws Exception {
             Builder b = copy();
             try {
                 b.expect(new File(expectedOutputFile));
             } catch (Throwable t) {
                 throw new TestInfrastructureException(t);
             }
-            invokeMain(testedMain, new FileInputStream(new File(inputFile)),
-                    b.build());
+            invokeMain(testedMain, new FileInputStream(new File(inputFile)), b.build());
         }
     }
 
@@ -273,7 +266,7 @@ public class TextDiff extends StringsWriter {
         return s;
     }
 
-    private Object getExpected() {
+    private Object getNextExpected() {
         try {
             while (true) {
                 Object o = expect.pollFirst();
@@ -281,7 +274,7 @@ public class TextDiff extends StringsWriter {
                     return null;
                 Class<?> c = o.getClass();
                 if (c == String.class) {
-                    return normalize((String) o);
+                    return o;
                 } else if (c == Pattern.class) {
                     return c;
                 } else if (c == BufferedReader.class) {
@@ -290,11 +283,10 @@ public class TextDiff extends StringsWriter {
                     if (txt == null)
                         continue;
                     expect.addFirst(r);
-                    return normalize(txt);
+                    return txt;
 
                 } else if (c == File.class) {
-                    BufferedReader r = new BufferedReader(new FileReader(
-                            (File) o));
+                    BufferedReader r = new BufferedReader(new FileReader((File) o));
                     expect.addFirst(r);
                 } else {
                     throw new AssertionError("Did not expect " + c);
@@ -306,25 +298,43 @@ public class TextDiff extends StringsWriter {
 
     }
 
-    protected void got(int line, String txt) {
+    private String actual;
+    private Object expected;
+
+    public String getActual() {
+        return actual;
+    }
+
+    public Object getExpected() {
+        return expected;
+    }
+
+    @Override
+    protected void got(String txt) {
+        actual = txt;
+
+        int line = getLine();
         boolean ignoreBlankLines = options.contains(Option.IGNORE_BLANK_LINES);
-        txt = normalize(txt);
-        if (ignoreBlankLines && txt.isEmpty())
+        if (ignoreBlankLines && txt.trim().isEmpty())
             return;
         Object o;
         do {
-           o = getExpected();
-        } while (ignoreBlankLines && "".equals(o));
-        
+            o = getExpected();
+        } while (ignoreBlankLines && o instanceof String && ((String) o).trim().isEmpty());
+        expected = o;
         if (o == null) {
-            fail("Didn't expect any more output but got " + txt);
+            fail(String.format("On line %d, expected no more output but saw '%s'", line, txt));
         } else if (o instanceof String) {
-            assertEquals("On line " + line, o, txt);
+            if (!normalize((String) o).equals(normalize(txt)))
+
+                fail(String.format("On line %d, expected '%s' but saw '%s'", line, o, txt));
+
         } else if (o instanceof Pattern) {
             Pattern p = (Pattern) o;
-            Matcher m = p.matcher(txt);
-            assertTrue("On line" + line + "," + p + " doesn't match " + txt,
-                    m.matches());
+            Matcher m = p.matcher(normalize(txt));
+            if (!m.matches())
+                fail(String.format("On line %d, /%s/ doesn't match '%s'", line, p, txt));
+
         } else {
             fail("Got " + o.getClass());
         }
@@ -334,18 +344,27 @@ public class TextDiff extends StringsWriter {
     @Override
     public void close() {
         super.close();
-        Object o = getExpected();
+        Object o = getNextExpected();
         if (o == null)
             return;
-        fail("no more output; expected " + o);
+        if (o instanceof Pattern)
+            fail(String.format("On line %d, expected line matching /%s/ but output ended", getLine() + 1, o));
+        else
+            fail(String.format("On line %d, expected '%s' but output ended", getLine() + 1, o));
+
     }
 
-    public static FutureTask<Void> copyTask(final String name, final InputStream from,
-            final OutputStream to) {
+    public static FutureTask<Void> copyTask(final String name, final InputStream from, final OutputStream to) {
+        return copyTask(name, from, to, Integer.MAX_VALUE);
+    }
+
+    public static FutureTask<Void> copyTask(final String name, final InputStream from, final OutputStream to,
+            final int maxDrain) {
         Callable<Void> doCheck = new Callable<Void>() {
 
             @Override
             public Void call() throws Exception {
+                int capacity = maxDrain;
                 byte[] buf = new byte[1024];
                 try {
                     while (true) {
@@ -363,8 +382,10 @@ public class TextDiff extends StringsWriter {
                             to.close();
                             return null;
                         }
+                        if (sz > capacity)
+                            sz = capacity;
                         to.write(buf, 0, sz);
-
+                        capacity -= sz;
                     }
                 } finally {
                     try {
@@ -384,10 +405,15 @@ public class TextDiff extends StringsWriter {
     }
 
     public static FutureTask<Void> copyTask(final String name, final Reader from, final Writer to) {
+        return copyTask(name, from, to, Integer.MAX_VALUE);
+    }
+
+    public static FutureTask<Void> copyTask(final String name, final Reader from, final Writer to, final int maxDrain) {
         Callable<Void> doCheck = new Callable<Void>() {
 
             @Override
             public Void call() throws Exception {
+                int capacity = maxDrain;
                 char[] buf = new char[1024];
                 try {
                     while (true) {
@@ -405,7 +431,10 @@ public class TextDiff extends StringsWriter {
                             to.close();
                             return null;
                         }
+                        if (sz > capacity)
+                            sz = capacity;
                         to.write(buf, 0, sz);
+                        capacity -= sz;
                     }
                 } finally {
                     try {

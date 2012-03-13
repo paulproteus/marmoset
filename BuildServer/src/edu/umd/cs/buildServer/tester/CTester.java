@@ -197,7 +197,7 @@ public class CTester extends Tester<ScriptTestProperties> {
                         refProcess.getOutputStream());
                 StringListWriter expectedOutput = new StringListWriter();
                 FutureTask<Void> saveOutput =  TextDiff.copyTask("capture expected output",
-                        refProcess.getInputStream(), expectedOutput);
+                        refProcess.getInputStream(), expectedOutput, getTestProperties().getMaxDrainOutputInBytes());
                 FutureTask<Void> drainErr = TextDiff.copyTask("drain expected err",
                         refProcess.getErrorStream(), new DevNullOutputStream());
               
@@ -240,7 +240,7 @@ public class CTester extends Tester<ScriptTestProperties> {
             checkOutput = output.check((process.getInputStream()));
        
         FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
-               output != null ? process.getErrorStream() : process.getInputStream()), err);
+               output != null ? process.getErrorStream() : process.getInputStream()), err, getTestProperties().getMaxDrainOutputInBytes());
 
         executor.submit(copyInput);
         executor.submit(copyError);
