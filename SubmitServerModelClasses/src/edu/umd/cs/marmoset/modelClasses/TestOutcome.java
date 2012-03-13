@@ -408,9 +408,16 @@ public class TestOutcome implements Serializable {
 	 * @return Returns the longTestResult.
 	 */
 	public String getLongTestResult() {
-		if (LONG_TEST_RESULTS_ARE_COMPRESSED.equals(longTestResult) && details instanceof byte[])
+		if (isLongTestResultCompressed())
 			return decompress((byte[]) details);
 		return longTestResult;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isLongTestResultCompressed() {
+		return LONG_TEST_RESULTS_ARE_COMPRESSED.equals(longTestResult) && details instanceof byte[];
 	}
 
 	/**
