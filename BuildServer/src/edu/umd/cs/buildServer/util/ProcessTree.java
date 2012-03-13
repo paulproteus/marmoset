@@ -171,19 +171,19 @@ public class ProcessTree {
         Process p = b.start();
         p.getOutputStream().close();
         drainToLog(p.getInputStream());
-        boolean isInterrupted = Thread.interrupted();
-        int exitCode;
-        while (true) {
-        try {
-        	  exitCode = p.waitFor();
-        	  break;
-        } catch (InterruptedException e) {
-        	  isInterrupted = true;
-        }
-        p.getInputStream().close();
-        p.destroy();
-        if (isInterrupted)
-        	Thread.currentThread().interrupt();
+		boolean isInterrupted = Thread.interrupted();
+		int exitCode;
+		while (true)
+			try {
+				exitCode = p.waitFor();
+				break;
+			} catch (InterruptedException e) {
+				isInterrupted = true;
+			}
+		p.getInputStream().close();
+		p.destroy();
+		if (isInterrupted)
+			Thread.currentThread().interrupt();
         return exitCode;
     }
         
