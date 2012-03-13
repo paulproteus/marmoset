@@ -88,13 +88,20 @@ public class ProcessTree {
         return result;
     }
 
-    public void killProcessTree(int rootPid, int signal) throws IOException, InterruptedException {
+    private void pause(int milliseconds) {
+    	try {
+    		Thread.sleep(milliseconds);
+    	} catch (InterruptedException e) {
+    		Thread.currentThread().interrupt();
+    	}
+    }
+    public void killProcessTree(int rootPid, int signal) throws IOException {
         Set<Integer> result = findTree(rootPid);
         if (result.isEmpty()) return;
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
         while (true) {
             killProcesses("-STOP", result);
-            Thread.sleep(100);
+            pause(100);
             computeChildren();
             Set<Integer> r = findTree(rootPid);
             if (r.equals(result))
@@ -102,9 +109,8 @@ public class ProcessTree {
             result = r;
             log.info("process tree starting at " + rootPid + " changed to " + result);
         }
-        log.info("Killing process tree starting at " + rootPid + " which is " + result);
         killProcesses("-KILL", result);
-        Thread.sleep(1000);
+        pause(1000);
         log.debug("tree should now be dead");
         computeChildren();
         result.retainAll(children.keySet());
@@ -116,7 +122,7 @@ public class ProcessTree {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void killProcesses(String signal, Set<Integer> result) throws IOException, InterruptedException {
+    public void killProcesses(String signal, Set<Integer> result) throws IOException {
         if (result.isEmpty()) {
             return;
         }
@@ -160,12 +166,17 @@ public class ProcessTree {
        
         
     }
-    private  int execute(ProcessBuilder b) throws IOException, InterruptedException {
+    private  int execute(ProcessBuilder b) throws IOException {
         b.redirectErrorStream(true);
         Process p = b.start();
         p.getOutputStream().close();
         drainToLog(p.getInputStream());
-        int exitCode = p.waitFor();
+        int exitCode -1;
+        try {
+        	  exitCode = p.waitFor();
+        } catch (InterruptedException e) {
+        	  Thread.currentThread().interrupt();
+        }
         p.getInputStream().close();
         p.destroy();
         return exitCode;
