@@ -55,7 +55,7 @@ public final class ProcessExitMonitor extends Thread {
 	@Override
 	public void run() {
 		try {
-		    Thread.sleep(500);
+		    Thread.sleep(300);
 
 		    tree.computeChildren();
 			this.exitCode = process.waitFor();
@@ -86,11 +86,11 @@ public final class ProcessExitMonitor extends Thread {
             if (!exited) {
                 Thread.sleep(100);
                 synchronized (this) {
-                    tree.computeChildren();
                     wait(millis);
                 }
             }
-            this.interrupt();
+            if (!exited) 
+                this.interrupt();
         } catch (InterruptedException e) {
            Thread.currentThread().interrupt();
         } 
