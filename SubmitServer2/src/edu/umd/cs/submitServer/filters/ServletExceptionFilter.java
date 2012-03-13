@@ -99,12 +99,16 @@ public class ServletExceptionFilter extends SubmitServerFilter {
 	   }
 	 
 	
-    public <E extends Throwable> void logErrorAndUpdateResponse(HttpServletRequest request, 
-           @CheckForNull  HttpServletResponse response, E e) {
+    public  void logErrorAndUpdateResponse(HttpServletRequest request, 
+           @CheckForNull  HttpServletResponse response, Throwable e) {
         getServletExceptionLog().error(e.getMessage(), e);
 
         // Get the most specific non-null message.
         Throwable cause = e.getCause();
+        if (e instanceof ServletException && cause != null) {
+        	  e = cause;
+        	  cause = e.getCause();
+        }
         String message = e.getMessage();
         if (cause != null) {
         	if (cause.getMessage() != null)
