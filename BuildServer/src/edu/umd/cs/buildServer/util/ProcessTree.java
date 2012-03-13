@@ -92,6 +92,7 @@ public class ProcessTree {
     	try {
     		Thread.sleep(milliseconds);
     	} catch (InterruptedException e) {
+    		pause(20);
     		Thread.currentThread().interrupt();
     	}
     }
@@ -114,8 +115,14 @@ public class ProcessTree {
         log.debug("process tree should now be dead");
         computeChildren();
         result.retainAll(children.keySet());
-        if (!result.isEmpty())
+        if (!result.isEmpty()) {
             log.error("Undead processes: " + result);
+            killProcesses("-KILL", result);
+            computeChildren();
+            result.retainAll(children.keySet());
+            if (!result.isEmpty()) 
+            	  log.error("super zombie processes: " + result);
+        }
     }
     /**
      * @param result
