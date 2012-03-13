@@ -171,7 +171,7 @@ public class ProcessTree {
         Process p = b.start();
         p.getOutputStream().close();
         drainToLog(p.getInputStream());
-        int exitCode -1;
+        int exitCode = -1;
         try {
         	  exitCode = p.waitFor();
         } catch (InterruptedException e) {
