@@ -111,7 +111,7 @@ public class ProcessTree {
         }
         killProcesses("-KILL", result);
         pause(1000);
-        log.debug("tree should now be dead");
+        log.debug("process tree should now be dead");
         computeChildren();
         result.retainAll(children.keySet());
         if (!result.isEmpty())
@@ -134,7 +134,7 @@ public class ProcessTree {
         ProcessBuilder b = new ProcessBuilder(cmd);
         int exitCode = execute(b);
         if (exitCode != 0)
-            log.warn("exit code from kill" + exitCode);
+            log.warn("exit code from kill " + exitCode);
     }
     
     void drainToLog(final InputStream in) {
@@ -171,14 +171,19 @@ public class ProcessTree {
         Process p = b.start();
         p.getOutputStream().close();
         drainToLog(p.getInputStream());
-        int exitCode = -1;
+        boolean isInterrupted = Thread.interrupted();
+        int exitCode;
+        while (true) {
         try {
         	  exitCode = p.waitFor();
+        	  break;
         } catch (InterruptedException e) {
-        	  Thread.currentThread().interrupt();
+        	  isInterrupted = true;
         }
         p.getInputStream().close();
         p.destroy();
+        if (isInterrupted)
+        	Thread.currentThread().interrupt();
         return exitCode;
     }
         
