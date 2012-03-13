@@ -463,7 +463,6 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			outcome.setLongTestResult(e.getMessage());
 			outcome.setTestNumber(Integer.toString(nextTestNumber));
 			outcome.setExceptionClassName("");
-			outcome.setDetails(null);
 			return outcome;
 		} finally {
 			try {

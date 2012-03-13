@@ -170,10 +170,10 @@ public class PMDRunner implements ConfigurationKeys, ISubmissionInspectionStep<J
 				testOutcome.setTestName(rule);
 				testOutcome.setOutcome(TestOutcome.STATIC_ANALYSIS);
 				testOutcome.setShortTestResult(fileName + ":" + line);
-				testOutcome.setLongTestResult(description);
+				testOutcome.setLongTestResultCompressIfNeeded(description);
 				testOutcome.setTestNumber(Integer.toString(count++));
 				testOutcome.setExceptionClassName(priority); // XXX: HACK!
-				testOutcome.setDetails(null);
+
 
 				testOutcomeCollection.add(testOutcome);
 			}

@@ -296,21 +296,11 @@ public class CTester extends Tester<ScriptTestProperties> {
         String errOutput = err.toString();
         if (errOutput.length() > 1000) {
         		getLog().debug("Error output length is " + errOutput.length() +", max drain is " + getTestProperties().getMaxDrainOutputInBytes());
-        		if (testOutcome.getDetails() == null)
-        			getLog().debug("details are null");
-        		else
-        			getLog().debug("details are " + testOutcome.getDetails().getClass().getName());
         }
-        	testOutcome.setLongTestResult(errOutput);
-        	 if (errOutput.length() > 1000) {
-        		 getLog().debug("testOutcome.longTestResults  is length  " + testOutcome.getLongTestResult().length());
-        		 if (testOutcome.isLongTestResultCompressed())
+        	testOutcome.setLongTestResultCompressIfNeeded(errOutput);
+        	if (testOutcome.isLongTestResultCompressed())
         			 getLog().debug("testOutcome.longTestResults is compressed");
-        		 if (testOutcome.getDetails() == null)
-         			getLog().debug("details are null");
-         		else
-         			getLog().debug("details are " + testOutcome.getDetails().getClass().getName());
-        	 }
+        		 
         	 
 		if (failed) {
             // nothing to do
@@ -337,7 +327,7 @@ public class CTester extends Tester<ScriptTestProperties> {
             getLog().error("CTester error",  t );
             testOutcome.setOutcome(TestOutcome.ERROR);
             testOutcome.setShortTestResult("Build server failure");
-            testOutcome.setLongTestResult(TestRunner.toString(t));
+            testOutcome.setLongTestResultCompressIfNeeded(TestRunner.toString(t));
         }
         
         if (testOutcome.getOutcome().equals(TestOutcome.PASSED)) 

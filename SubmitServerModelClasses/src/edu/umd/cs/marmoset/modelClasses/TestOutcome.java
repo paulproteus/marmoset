@@ -568,15 +568,15 @@ public class TestOutcome implements Serializable {
 	
 	public static byte[] compress(String txt) {
 		byte[] rawBYtes = txt.getBytes();
-		ByteArrayInputStream bytes = new ByteArrayInputStream(rawBYtes);
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			GZIPOutputStream gzout =  new GZIPOutputStream(out);
 			
-			IO.copyStream(bytes, gzout);
+			gzout.write(rawBYtes);
 			gzout.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			return rawBYtes;	
 		}
 		return out.toByteArray();
@@ -599,6 +599,7 @@ public class TestOutcome implements Serializable {
 	public static final String LONG_TEST_RESULTS_ARE_COMPRESSED = "Long test results are compressed (MVRnYVfnYvDotUpeNOHDaD31DlJYkgs)";
 	public void setLongTestResultCompressIfNeeded(String longTestResult) {
 		if (longTestResult.length() > MAX_LONG_TEST_RESULT_CHARS && details == null) {
+			
 			byte[] bytes = compress(longTestResult);
 			if (bytes.length <= MAX_LONG_TEST_RESULT_CHARS)
 				details = bytes;

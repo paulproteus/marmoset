@@ -693,10 +693,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 		outcome.setTestName("Build Test");
 		outcome.setOutcome(passed);
 		outcome.setShortTestResult("Build test " + passed);
-		outcome.setLongTestResult(longDescription);
+		outcome.setDetails(null);
+		outcome.setLongTestResultCompressIfNeeded(longDescription);
 		outcome.setTestNumber("0");
 		outcome.setExceptionClassName("");
-		outcome.setDetails(null);
+
 		outcome.setExecutionTimeMillis(System.currentTimeMillis() - started);
 
 		projectSubmission.getTestOutcomeCollection().add(outcome);
@@ -723,7 +724,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		outcome.setOutcome(TestOutcome.COULD_NOT_RUN);
 		outcome.setShortTestResult(testType
 				+ " tests could not be run because the project did not compile");
-		outcome.setLongTestResult(longTestResult);
+		outcome.setLongTestResultCompressIfNeeded(longTestResult);
 		outcome.setTestNumber("0");
 
 		projectSubmission.getTestOutcomeCollection().add(outcome);

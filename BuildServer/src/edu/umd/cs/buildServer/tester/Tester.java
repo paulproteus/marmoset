@@ -184,7 +184,7 @@ public abstract class Tester<T extends TestProperties> implements ConfigurationK
 		outcome.setTestName("All " + testType + " tests");
 		outcome.setOutcome(TestOutcome.COULD_NOT_RUN);
 		outcome.setShortTestResult(shortTestResult);
-		outcome.setLongTestResult(longTestresult);
+		outcome.setLongTestResultCompressIfNeeded(longTestresult);
 		outcome.setTestNumber("0");
 		return outcome;
 	}
@@ -198,7 +198,7 @@ public abstract class Tester<T extends TestProperties> implements ConfigurationK
 		testOutcome.setOutcome(outcome);
 		testOutcome.setTestNumber(Integer.toString(testNumber));
 		testOutcome.setShortTestResult(shortTestResult);
-		testOutcome.setLongTestResult(longTestResult);
+		testOutcome.setLongTestResultCompressIfNeeded(longTestResult);
 		return testOutcome;
 	}
 
