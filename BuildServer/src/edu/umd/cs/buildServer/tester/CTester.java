@@ -58,6 +58,7 @@ import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.OutputKind;
 import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
+import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
  * Tester for C, OCaml and Ruby submissions.
@@ -289,8 +290,14 @@ public class CTester extends Tester<ScriptTestProperties> {
         copyInput.cancel(true);
         copyError.cancel(true);
         err.flush();
+        
+        
 
-        if (failed) {
+        String errOutput = err.toString();
+        if (errOutput.length() > 1000)
+        		getLog().debug("Error output length is " + errOutput.length() +", max drain is " + getTestProperties().getMaxDrainOutputInBytes());
+        	testOutcome.setLongTestResult(errOutput);
+		if (failed) {
             // nothing to do
            
         } else if (done) {
@@ -298,18 +305,18 @@ public class CTester extends Tester<ScriptTestProperties> {
             getLog().debug("Process exited with exit code: " + exitCode);
             if (exitCode == 0) {
                 testOutcome.setOutcome(TestOutcome.PASSED);
+                testOutcome.setLongTestResult("");
             } else {
                 testOutcome.setOutcome(TestOutcome.ERROR);
                 testOutcome.setShortTestResult("Test failed");
-                testOutcome.setLongTestResult(err.toString());
             }
         } else {
             getLog().debug("Test timed out");
             // didn't terminate
             testOutcome.setOutcome(TestOutcome.TIMEOUT);
-            testOutcome.setLongTestResult(err.toString());
+            testOutcome.setShortTestResult("Timed out at " + TimeUnit.SECONDS.convert(testOutcome.getExecutionTimeMillis(), TimeUnit.MILLISECONDS) + " secs");
         }
-         testOutcome.setLongTestResult(err.toString());
+        
         
         } catch (Throwable t) {
             getLog().error("CTester error",  t );
