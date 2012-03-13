@@ -393,7 +393,7 @@ public class TestOutcome implements Serializable {
 	 * @return Returns the longTestResult.
 	 */
 	public @CheckReturnValue String getLongTrimmedTestResult() {
-		String result = longTestResult;
+		String result = getLongTestResult();
 		int i = result.indexOf("at sun.reflect.NativeMethodAccessorImpl.invoke0");
         if (i > 0) 
             result = result.substring(0,i).trim();
@@ -742,7 +742,7 @@ public class TestOutcome implements Serializable {
        
 	    String viewSourceLink = viewLink + "/sourceCode.jsp";
 	    String fullResult  = outcome.getLongTestResult();
-	         
+	    
 	    int length = fullResult.length();
 	    
 	    @HTML String result =  outcome.getHotlink(viewSourceLink);
