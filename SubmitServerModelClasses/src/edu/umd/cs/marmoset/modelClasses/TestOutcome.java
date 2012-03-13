@@ -55,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -406,6 +408,8 @@ public class TestOutcome implements Serializable {
 	 * @return Returns the longTestResult.
 	 */
 	public String getLongTestResult() {
+		if (LONG_TEST_RESULTS_ARE_COMPRESSED.equals(longTestResult) && details instanceof byte[])
+			return decompress((byte[]) details);
 		return longTestResult;
 	}
 
@@ -413,7 +417,7 @@ public class TestOutcome implements Serializable {
 	 * @return Returns the longTestResult.
 	 */
 	public @HTML String getLongTestResultAsHtml() {
-		StringBuffer builder = XSSScrubber.scrubbed(longTestResult, false);
+		StringBuffer builder = XSSScrubber.scrubbed(getLongTestResult(), false);
 		return XSSScrubber.asHTML(builder.toString().replaceAll("\n","<br>"));
 	}
 
@@ -545,7 +549,8 @@ public class TestOutcome implements Serializable {
 
 	public @CheckReturnValue String getCappedLongTestResult()
 	{
-		return longTestResult.substring(0, Math.min(longTestResult.length(), MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY));
+		String result = getLongTestResult();
+		return result.substring(0, Math.min(result.length(), MAX_LONG_TEST_RESULT_CHARS_TO_DISPLAY));
 	}
 
 	private static @CheckReturnValue String limitLength(String txt, int maxLength) {
@@ -553,10 +558,55 @@ public class TestOutcome implements Serializable {
 			return txt;
 		return txt.substring(0, maxLength);
 	}
+	
+	public static byte[] compress(String txt) {
+		byte[] rawBYtes = txt.getBytes();
+		ByteArrayInputStream bytes = new ByteArrayInputStream(rawBYtes);
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			GZIPOutputStream gzout =  new GZIPOutputStream(out);
+			
+			IO.copyStream(bytes, gzout);
+			gzout.close();
+		} catch (IOException e) {
+			return rawBYtes;	
+		}
+		return out.toByteArray();
+	}
+	public static String  decompress(byte [] rawBytes ) {
+		ByteArrayInputStream bytes = new ByteArrayInputStream(rawBytes);
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			 GZIPInputStream gzin = new GZIPInputStream(bytes);
+			
+			IO.copyStream(gzin, out);
+			out.close();
+		} catch (IOException e) {
+			return "  -- unable to decompress: " +  e.getMessage() + " -- ";	
+		}
+		return new String(out.toByteArray());
+	}
+	
+	public static final String LONG_TEST_RESULTS_ARE_COMPRESSED = "Long test results are compressed (MVRnYVfnYvDotUpeNOHDaD31DlJYkgs)";
+	public void setLongTestResultCompressIfNeeded(String longTestResult) {
+		if (longTestResult.length() > MAX_LONG_TEST_RESULT_CHARS && details == null) {
+			byte[] bytes = compress(longTestResult);
+			if (bytes.length <= MAX_LONG_TEST_RESULT_CHARS)
+				details = bytes;
+				this.longTestResult = LONG_TEST_RESULTS_ARE_COMPRESSED;
+				return;
+		}
+		setLongTestResult(longTestResult);
+	}
+	
 	/**
 	 * @param longTestResult The longTestResult to set.
 	 */
 	public void setLongTestResult(String longTestResult) {
+		
+			
 		// Truncate long test results that are excessively long.  These
 		// could cause an OutOfMemory down the line when we serialize
 		// the test results for submission.
@@ -757,7 +807,8 @@ public class TestOutcome implements Serializable {
     {
         StringBuffer buf=new StringBuffer();
         if (isError()) {
-            if (longTestResult == null || longTestResult.equals(""))
+        	    String testResult = getLongTestResult();
+            if (Strings.isNullOrEmpty(testResult))	
                 return "";
             BufferedReader reader = null;
             Pattern pattern = FINDBUGS_LOCATION_REGEX;
@@ -819,7 +870,8 @@ public class TestOutcome implements Serializable {
     {
         if (!isError())
             throw new IllegalStateException("Can ONLY get exception source from test outcome of type " +TestOutcome.ERROR);
-        if (longTestResult == null || longTestResult.equals(""))
+        String testResult = getLongTestResult();
+        if (Strings.isNullOrEmpty(testResult))	
             throw new IllegalStateException("No stack trace available in this outcome: " +outcome);
 
         BufferedReader reader = null;
@@ -847,7 +899,9 @@ public class TestOutcome implements Serializable {
 
 	private @HTML String getStackTraceHotlinks(String viewSourceLink) {
 	   //  System.out.println("Calling getStackTraceHotlinks!");
-        if (longTestResult == null || longTestResult.equals("") || getOutcome().equals(NOT_IMPLEMENTED))
+		 String testResult = getLongTestResult();
+	       
+        if (Strings.isNullOrEmpty(testResult) || getOutcome().equals(NOT_IMPLEMENTED))
 	        return "";
        
 	    StringBuffer buf=new StringBuffer();
