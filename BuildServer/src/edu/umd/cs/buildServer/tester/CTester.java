@@ -233,17 +233,20 @@ public class CTester extends Tester<ScriptTestProperties> {
         FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
                 process.getOutputStream());
         FutureTask<Void> checkOutput = null;
+        
+        StringWriter err = new StringWriter();
+        
         if (output != null)
             checkOutput = output.check((process.getInputStream()));
-        StringWriter err = new StringWriter();
+       
         FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
-                process.getErrorStream()), err);
+               output != null ? process.getErrorStream() : process.getInputStream()), err);
 
         executor.submit(copyInput);
         executor.submit(copyError);
-        if (checkOutput != null) {
+        if (checkOutput != null) 
             executor.submit(checkOutput);
-        }     
+         
         
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
                 getLog());
@@ -254,8 +257,8 @@ public class CTester extends Tester<ScriptTestProperties> {
 
 
         boolean failed = false;
-       
-        if (checkOutput != null) {
+
+        if (checkOutput != null) 
             try {
                 checkOutput.get(50, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
@@ -270,22 +273,26 @@ public class CTester extends Tester<ScriptTestProperties> {
                 Throwable t = e.getCause();
                 if (t instanceof AssertionError) {
                     failed = true;
+                    getLog().debug(
+                            "Test didn't generate expected output: "
+                                    + testOutcome.getShortTestResult());
                     testOutcome.setOutcome(TestOutcome.FAILED);
                     String msg = t.getMessage();
                     int i = msg.indexOf(" at junit.framework.Assert.fail(");
                     if (i >= 0)
-                    	   msg = msg.substring(0,i);
+                        msg = msg.substring(0, i);
                     testOutcome.setShortTestResult(msg);
                 }
             }
-        }
+
+        err.flush();
         copyInput.cancel(true);
         copyError.cancel(true);
+        err.flush();
 
         if (failed) {
-            getLog().debug(
-                    "Process didn't generate expected output: "
-                            + testOutcome.getShortTestResult());
+            // nothing to do
+           
         } else if (done) {
             int exitCode = exitMonitor.getExitCode();
             getLog().debug("Process exited with exit code: " + exitCode);
@@ -293,17 +300,19 @@ public class CTester extends Tester<ScriptTestProperties> {
                 testOutcome.setOutcome(TestOutcome.PASSED);
             } else {
                 testOutcome.setOutcome(TestOutcome.ERROR);
-                testOutcome.setShortTestResult("Exited with error code "
-                        + exitCode);
+                testOutcome.setShortTestResult("Test failed");
+                testOutcome.setLongTestResult(err.toString());
             }
         } else {
-            getLog().debug("Process timed out");
+            getLog().debug("Test timed out");
             // didn't terminate
             testOutcome.setOutcome(TestOutcome.TIMEOUT);
+            testOutcome.setLongTestResult(err.toString());
         }
          testOutcome.setLongTestResult(err.toString());
         
         } catch (Throwable t) {
+            getLog().error("CTester error",  t );
             testOutcome.setOutcome(TestOutcome.ERROR);
             testOutcome.setShortTestResult("Build server failure");
             testOutcome.setLongTestResult(TestRunner.toString(t));

@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -392,7 +393,7 @@ public class TextDiff extends StringsWriter {
                     while (true) {
                         int sz;
                         try {
-                            sz = from.read();
+                            sz = from.read(buf);
                         } catch (Exception e) {
                             // ignore exceptions that happen while reading, but
                             // treat them as EOF
