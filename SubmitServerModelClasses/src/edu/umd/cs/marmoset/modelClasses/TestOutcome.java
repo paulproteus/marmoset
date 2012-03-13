@@ -1171,7 +1171,7 @@ public class TestOutcome implements Serializable {
 	    stmt.setInt(index++, getPointValue());
 	    stmt.setString(index++, getTestName());
 	    stmt.setString(index++, getShortTestResult());
-	    stmt.setString(index++, getLongTestResult());
+	    stmt.setString(index++, longTestResult);
 	    stmt.setString(index++, getExceptionClassName());
         stmt.setString(index++, (getCoarsestCoverageLevel()!=null)?getCoarsestCoverageLevel().toString():CoverageLevel.NONE.toString());
         stmt.setBoolean(index++, getExceptionSourceCoveredElsewhere());
