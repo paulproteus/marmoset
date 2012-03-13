@@ -168,9 +168,7 @@
 		<c:when test="${!testOutcomeCollection.compileSuccessful}">
 			<h2>Compile/Build unsuccessful</h2>
 			<p>
-			<pre>
-				<c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" />
-			</pre>
+			<pre><c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" /></pre>
 		</c:when>
 		<c:otherwise>
 			<ss:findBugsTable />
@@ -222,9 +220,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 												value="${ss:hotlink(test, viewLink)}" escapeXml="false" /></td>
 									</c:when>
 									<c:otherwise>
-										<td class="code"><pre>
-												<c:out value="${test.longTestResult}" />
-											</pre></td>
+										<td class="code"><pre><c:out value="${test.longTestResult}" /></pre></td>
 									</c:otherwise>
 								</c:choose>
 
