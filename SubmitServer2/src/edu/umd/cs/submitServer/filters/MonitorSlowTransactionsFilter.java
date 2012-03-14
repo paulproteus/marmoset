@@ -159,7 +159,7 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
                         "Slow", 
                         request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(), request.getHeader("referer"), userAgent, null);
+                        SubmitServerFilter.getRemoteHost(request), request.getHeader("referer"), userAgent, null);
     }
     public static void insertServerError(Connection conn, HttpServletRequest request,
            String msg, String type, String servlet) throws SQLException {
@@ -170,6 +170,6 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
                         servlet, 
                         request.getRequestURI(),
                         request.getQueryString(),
-                        request.getRemoteHost(), request.getHeader("referer"), userAgent, null);
+                        SubmitServerFilter.getRemoteHost(request), request.getHeader("referer"), userAgent, null);
     }
 }

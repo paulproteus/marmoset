@@ -55,6 +55,7 @@ import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
+import edu.umd.cs.submitServer.filters.SubmitServerFilter;
 
 /**
  * @author jspacco
@@ -108,7 +109,7 @@ public class RequestSubmission extends SubmitServerServlet {
         Kind kind = Kind.UNKNOWN;
         Queries.RetestPriority foundPriority = null;
         String courses = multipartRequest.getStringParameter("courses");
-        String remoteHost = request.getRemoteHost();
+        String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 
         try {
             boolean foundNewTestSetup = false;

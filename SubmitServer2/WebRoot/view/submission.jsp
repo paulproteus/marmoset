@@ -213,17 +213,8 @@ not empty testOutcomeCollection.releaseOutcomes}">
 								<td>${test.shortTestName}</td>
 								<td class="description"><c:out
 										value="${test.shortTestResult}" /></td>
-								<c:choose>
-									<c:when
-										test="${testProperties.performCodeCoverage and testProperties.language=='java'}">
-										<td class="code"><c:out
+								<td class="code"><c:out
 												value="${ss:hotlink(test, viewLink)}" escapeXml="false" /></td>
-									</c:when>
-									<c:otherwise>
-										<td class="code"><pre><c:out value="${test.longTestResult}" /></pre></td>
-									</c:otherwise>
-								</c:choose>
-
 							</tr>
 						</c:forEach>
 

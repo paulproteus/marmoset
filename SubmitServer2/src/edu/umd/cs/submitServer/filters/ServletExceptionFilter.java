@@ -150,7 +150,7 @@ public class ServletExceptionFilter extends SubmitServerFilter {
 
         try {
         String referer = request.getHeader("referer");
-        String remoteHost = request.getRemoteHost();
+        String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 
         String type = null;
         if (logOnlyMessage!= null)

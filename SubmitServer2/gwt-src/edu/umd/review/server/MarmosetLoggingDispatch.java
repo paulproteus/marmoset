@@ -24,6 +24,7 @@ import edu.umd.cs.marmoset.review.MarmosetDaoService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.filters.SubmitServerFilter;
 import edu.umd.review.common.CommonConstants;
 import edu.umd.review.server.dao.ReviewDao;
 
@@ -91,7 +92,7 @@ public class MarmosetLoggingDispatch extends SimpleDispatch {
                          "gwtCodeReview",
                          requestURI,
                          request.getQueryString(),
-                         request.getRemoteHost(),
+                         SubmitServerFilter.getRemoteHost(request),
                          "", userAgent, thrown);
     } catch (SQLException sqlException) {
       assert true; // ignore

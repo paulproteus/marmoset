@@ -58,6 +58,7 @@ import edu.umd.cs.marmoset.utilities.JavaMail;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
+import edu.umd.cs.submitServer.filters.SubmitServerFilter;
 
 /**
  * @author jspacco Called (usually by the Build Server) to report the outcomes
@@ -116,7 +117,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 			String load = multipartRequest.getOptionalStringParameter("load");
 			if (load == null)
 				load = "unknown";
-			String remoteHost = request.getRemoteHost();
+			String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 			// Get test machine (if specified)
 			String testMachine = multipartRequest
 					.getOptionalStringParameter("testMachine");

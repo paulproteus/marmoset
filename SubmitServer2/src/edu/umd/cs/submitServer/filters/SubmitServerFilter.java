@@ -38,10 +38,13 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import com.google.gwt.thirdparty.guava.common.base.Strings;
 
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
@@ -61,6 +64,17 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
 	private static final WebConfigProperties webProperties = WebConfigProperties.get();
     private Logger authenticationLog;
 
+    
+    public static String getRemoteHost(HttpServletRequest req) {
+    	 String xff = req.getHeader("X-Forwarded-For");
+    	 if (Strings.isNullOrEmpty(xff))
+    		 return req.getRemoteHost();
+    	 String path[] = xff.split("[ ,]+");
+    	 if (path.length == 0 || Strings.isNullOrEmpty(path[0]))
+    		 return req.getRemoteHost();
+    	 return path[0];
+
+    }
     protected Logger getAuthenticationLog() {
         if (authenticationLog == null) {
             authenticationLog = Logger.getLogger(AUTHENTICATION_LOG);

@@ -63,7 +63,7 @@ public class LogErrorFilter extends SubmitServerFilter {
 			Project project = (Project) req.getAttribute(PROJECT);
 			Submission submission = (Submission) req.getAttribute(SUBMISSION);
 			String referer = req.getHeader("referer");
-			String remoteHost = req.getRemoteHost();
+			String remoteHost =  SubmitServerFilter.getRemoteHost(req);
 			 
 			
 			String code = getOptionalParameterAsString(req,
