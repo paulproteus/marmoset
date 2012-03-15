@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -114,11 +115,17 @@ public class VerifyOpenId extends SubmitServerServlet {
 		DiscoveryInformation discovered = (DiscoveryInformation) req.getSession()
 		                                                            .getAttribute(SubmitServerConstants.OPENID_DISCOVERED);
 
+		Set<Map.Entry<String, String[]>> entrySet = req.getParameterMap().entrySet();
+        for(Map.Entry<String, String[]> e : entrySet) {
+            getSubmitServerServletLog().info(e.getKey() + " : " + Arrays.asList(e.getValue()));
+		}
+        getSubmitServerServletLog().info("discovered: " + discovered);
 		StringBuffer receivingUrl = req.getRequestURL();
 		String queryString = req.getQueryString();
 		if (!Strings.isNullOrEmpty(queryString)) {
 			receivingUrl.append("?").append(queryString);
 		}
+		getSubmitServerServletLog().info("Receiving URL: " + receivingUrl);
 		VerificationResult verification;
 		String uid = null;
 		try {
