@@ -916,6 +916,15 @@
     	<url-pattern>/action/RequestRegistration</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>Echo</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.EchoServlet </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Echo</servlet-name>
+        <url-pattern>/view/echo</url-pattern>
+    </servlet-mapping>
+    
 	<servlet>
 		<servlet-name>CourseRSS</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.CourseRSS </servlet-class>
