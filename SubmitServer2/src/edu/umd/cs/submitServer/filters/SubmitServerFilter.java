@@ -38,20 +38,18 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.google.gwt.thirdparty.guava.common.base.Strings;
+import com.google.common.base.Strings;
 
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.cs.submitServer.SubmitServerUtilities;
 import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
-
 /**
  * @author jspacco
  * 
