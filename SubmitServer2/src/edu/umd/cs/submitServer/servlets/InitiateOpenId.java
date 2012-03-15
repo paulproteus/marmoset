@@ -53,7 +53,9 @@ public class InitiateOpenId extends SubmitServerServlet {
     DiscoveryInformation discovered = consumerManager.associate(discoveries);
     req.getSession().setAttribute(SubmitServerConstants.OPENID_DISCOVERED, discovered);
     getSubmitServerServletLog().info("request uri " + req.getRequestURI());
-    
+    getSubmitServerServletLog().info("request scheme " + req.getScheme());
+    getSubmitServerServletLog().info("request name " + req.getServerName());
+    getSubmitServerServletLog().info("request port " + req.getServerPort());
     try {
     	UrlBuilder returnUrl = new UrlBuilder(req);
     	returnUrl.addPathElement("authenticate/openid/verify");
