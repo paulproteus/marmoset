@@ -319,7 +319,7 @@ public class TextDiff extends StringsWriter {
             return;
         Object o;
         do {
-            o = getExpected();
+            o = getNextExpected();
         } while (ignoreBlankLines && o instanceof String && ((String) o).trim().isEmpty());
         expected = o;
         if (o == null) {
