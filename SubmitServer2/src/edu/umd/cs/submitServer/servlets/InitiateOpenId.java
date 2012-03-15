@@ -59,6 +59,8 @@ public class InitiateOpenId extends SubmitServerServlet {
     	if (!Strings.isNullOrEmpty(targetPath)) {
     		returnUrl.setParameter("marmoset.target", targetPath);
     	}
+      getSubmitServerServletLog().info("Using returnURL  " + returnUrl);
+         
       AuthRequest authReq = consumerManager.authenticate(discovered, returnUrl.toString());
       String realm = getOpenidRealm(req);
       getSubmitServerServletLog().info("Using openid realm " + realm);
