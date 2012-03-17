@@ -31,7 +31,7 @@ public class TextUtilities {
 
 	private static final FileNameMap mimeMap = URLConnection.getFileNameMap();
 	static final HashSet<String> binaryFileExtensions = new HashSet<String>(
-			Arrays.asList("o","class","zip","jar","gif","png","jpg","mp4", "exe", "tar", "Z", "gz", "tgz"));
+			Arrays.asList("o","class","zip","jar","gif","png","jpg","mp4", "exe", "tar", "Z", "gz", "tgz" , "img"));
 
 	public static void main(String args[]) throws IOException {
 		for(String e : binaryFileExtensions)
