@@ -89,6 +89,13 @@ public class FixZip {
         return adjustNames(adjuster, zipContents);
     }
 
+    public static String getDirectoryPrefix(String path) {
+        if (path == null) return null;
+        int i = path.indexOf("/");
+        if (i == -1)
+            return "";
+        return path.substring(0,i+1);
+    }
     public static byte[] adjustZipNames(byte[] canonical, byte[] adjustMe) {
         List<String> providedNames = getZipEntryNames(adjustMe);
        
@@ -100,6 +107,17 @@ public class FixZip {
             }
         }
 
+        
+        final Map<String, String> providedMap = getFullNames(providedNames);
+        String submitFile = providedMap.get(".submit");
+        if (submitFile != null && submitFile.length() > 7) {
+            String prefix = getDirectoryPrefix(submitFile);
+            if (!submitFile.equals(prefix + ".submit"))
+                throw new IllegalArgumentException("huh: " + submitFile);
+            return adjustNames(prefix, "", adjustMe);
+        }
+
+      
         if (canonical == null)
             return adjustMe;
         
@@ -147,16 +165,16 @@ public class FixZip {
                 String strip = commonMatchingProvided.substring(0,
                         commonMatchingProvided.length() - commonMatchingCanonical.length());
                 if (commonProvided.startsWith(strip))
-                    return adjustNames(strip, "", adjustMe);
+                    return adjustNames(getDirectoryPrefix(strip), "", adjustMe);
             } else if (strictSuffix(commonMatchingProvided, commonMatchingCanonical)) {
                 String add = commonMatchingCanonical.substring(0,
                         commonMatchingCanonical.length() - commonMatchingProvided.length());
                 if (commonCanonical.startsWith(add))
-                    return adjustNames("", add, adjustMe);
+                    return adjustNames("", getDirectoryPrefix(add), adjustMe);
             } else {
                 String add = getPrefix(matchingProvidedNames, matchingCanonicalNames);
                 if (add != null && commonCanonical.startsWith(add)) 
-                    return adjustNames("", add, adjustMe);
+                    return adjustNames("", getDirectoryPrefix(add), adjustMe);
             }
         }
 
@@ -165,15 +183,15 @@ public class FixZip {
         if (strictSuffix(commonCanonical, commonProvided)) {
             String strip = commonProvided.substring(0, commonProvided.length()
                     - commonCanonical.length());
-            return adjustNames(strip, "", adjustMe);
+            return adjustNames(getDirectoryPrefix(strip), "", adjustMe);
         } else if (strictSuffix(commonProvided, commonCanonical)) {
             String add = commonCanonical.substring(0, commonCanonical.length()
                     - commonProvided.length());
-            return adjustNames("", add, adjustMe);
+            return adjustNames("", getDirectoryPrefix(add), adjustMe);
         } else {
             String add = getPrefix(providedNames, canonicalNames);
             if (add != null)
-                return adjustNames("", add, adjustMe);
+                return adjustNames("", getDirectoryPrefix(add), adjustMe);
         }
         return adjustMe;
     }
@@ -185,6 +203,13 @@ public class FixZip {
 
     private static byte[] adjustNames(final String strip, final String add,
             byte[] zipContents) {
+        if (strip.length() == 0 && add.length() == 0)
+            return zipContents;
+        if (strip.length() > 0 && !strip.endsWith("/"))
+            throw new IllegalArgumentException("Strip: " + strip);
+        if (add.length() > 0 && !add.endsWith("/"))
+            throw new IllegalArgumentException("Add: " + add);
+        
         AdjustName adjuster = new AdjustName() {
 
             @Override
