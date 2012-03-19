@@ -106,10 +106,15 @@ public class FixZip {
                 break;
             }
         }
-
         
         if (providedNames.contains(".submit"))
             return adjustMe;
+        
+        String commonProvided = getCommonPrefix(providedNames);
+        
+        if (commonProvided != null && commonProvided.endsWith("/") && providedNames.contains(commonProvided + ".submit"))
+            return adjustNames(commonProvided, "", adjustMe);
+            
         
         final Map<String, String> providedMap = getFullNames(providedNames);
         String submitFile = providedMap.get(".submit");
@@ -156,7 +161,6 @@ public class FixZip {
             matchingCanonicalNames.add(c);
         }
 
-        String commonProvided = getCommonPrefix(providedNames);
         String commonCanonical = getCommonPrefix(canonicalNames);
         
         if (!matchingProvidedNames.isEmpty()) {
