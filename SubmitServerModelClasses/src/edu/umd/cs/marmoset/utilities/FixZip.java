@@ -91,7 +91,7 @@ public class FixZip {
 
     public static String getDirectoryPrefix(String path) {
         if (path == null) return null;
-        int i = path.indexOf("/");
+        int i = path.lastIndexOf("/");
         if (i == -1)
             return "";
         return path.substring(0,i+1);
@@ -113,7 +113,7 @@ public class FixZip {
         if (submitFile != null && submitFile.length() > 7) {
             String prefix = getDirectoryPrefix(submitFile);
             if (!submitFile.equals(prefix + ".submit"))
-                throw new IllegalArgumentException("huh: " + submitFile);
+                throw new IllegalArgumentException("huh: " + submitFile + " : " + prefix);
             return adjustNames(prefix, "", adjustMe);
         }
 
