@@ -108,6 +108,9 @@ public class FixZip {
         }
 
         
+        if (providedNames.contains(".submit"))
+            return adjustMe;
+        
         final Map<String, String> providedMap = getFullNames(providedNames);
         String submitFile = providedMap.get(".submit");
         if (submitFile != null && submitFile.length() > 7) {
