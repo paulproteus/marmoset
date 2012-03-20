@@ -72,7 +72,8 @@ public class RequestSubmission extends SubmitServerServlet {
     private static Lock lock = new java.util.concurrent.locks.ReentrantLock();
 
     enum Kind {
-        UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP, BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS;
+        UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP,
+        BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST;
     }
 
     public static void timeDump(StringBuffer buf, Timestamp started, String f, Object... args) {
@@ -206,6 +207,7 @@ public class RequestSubmission extends SubmitServerServlet {
                         }
 
                         foundSubmissionForBackgroundRetesting = true;
+                        kind = Kind.BACKGROUND_RETEST;
                         // *) look for ambient background retest
                         if (isBackgroundRetestingEnabled()
                                 && Queries.lookupSubmissionForBackgroundRetest(conn, submission, testSetup, allowedCourses))
@@ -279,14 +281,16 @@ public class RequestSubmission extends SubmitServerServlet {
                     response.setHeader(HttpHeaders.HTTP_BACKGROUND_RETEST, "no");
 
                 // If this is *NOT* a background re-test then
-                // update build_status to pending, and build_request_timestamp
-                // to current time.
+                // update build_status to pending and increment number of pending build requests
                 if (!foundSubmissionForBackgroundRetesting) {
                     submission.setBuildStatus(Submission.BuildStatus.PENDING);
-                    submission.setBuildRequestTimestamp(new Timestamp(System.currentTimeMillis()));
-                    submission.incrementNumPendingBuildRequests();
-                    submission.update(conn);
+                   
                 }
+                submission.incrementNumPendingBuildRequests();
+                submission.setBuildRequestTimestamp(new Timestamp(System
+                        .currentTimeMillis()));
+               submission.update(conn);
+
             } finally {
                 lock.unlock();
             }

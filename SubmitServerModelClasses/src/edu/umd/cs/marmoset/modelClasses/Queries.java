@@ -36,6 +36,7 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.WillClose;
@@ -286,8 +287,9 @@ public final class Queries {
 			throws SQLException {
 		// SQL timestamp of build requests that have,
 		// as of this moment, taken too long.
+	    
 		Timestamp buildTimeout = new Timestamp(System.currentTimeMillis()
-				- (maxBuildDurationInMinutes * 60L * 1000L));
+				- TimeUnit.MILLISECONDS.convert(maxBuildDurationInMinutes, TimeUnit.MINUTES));
 
 		String query = querySubmissionAndTestSetup(allowedCourses, priority);
 
@@ -384,15 +386,20 @@ public final class Queries {
 			throws SQLException {
 
 		String query = querySubmissionAndTestSetup(allowedCourses, RetestPriority.ANY);
+		
+		Timestamp buildTimeout = new Timestamp(System.currentTimeMillis()
+                - TimeUnit.MILLISECONDS.convert(20, TimeUnit.MINUTES));
 
 		query += " AND submissions.build_status = ? "
 			    + " AND submissions.num_successful_background_retests < ? "
 			    + " AND submissions.num_failed_background_retests < ? "
+			    + " AND submissions.build_request_timestamp < ? "
+			    + " AND submissions.num_pending_build_requests < ? "
 				+ " ORDER BY rand()  "
 				+ " LIMIT 1 " ;
 
 		PreparedStatement stmt = conn.prepareStatement(query);
-		setStatement(stmt, BuildStatus.COMPLETE, 2, 4);
+		setStatement(stmt, BuildStatus.COMPLETE, 2, 4, buildTimeout, 4);
 		return getFromPreparedStatement(stmt, submission, testSetup);
 	}
 
