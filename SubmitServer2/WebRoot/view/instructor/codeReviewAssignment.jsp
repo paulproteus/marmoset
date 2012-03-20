@@ -133,6 +133,7 @@
 </tr>
 <c:forEach var="submission" items="${submissionsUnderReview}" varStatus="counter">
 
+
 <c:url var="viewCodeReview" value="/view/codeReview/index.jsp">
 		<c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
@@ -153,6 +154,7 @@
 	<c:set var="studentRegistration"  value="${studentRegistrationMap[submission.studentRegistrationPK]}"/>
     <c:set var="reviewers" value="${reviewersForSubmission[submission.submissionPK]}"/>
     <c:set var="author" value="${authorForSubmission[submission.submissionPK]}"/>
+    <c:set vat=status" value="$[codeReviewStatus[submission.submissionPK]}"/>
 	
 <tr class="r${counter.index % 2}">
 <td rowspan="${1 + fn:length(reviewers)}"/>
@@ -165,6 +167,9 @@
 <br><a href="${submissionLink}" title="test results"><c:out value="${submission.testSummary}"/></a>
 </td>
 <c:choose>
+<c:when test="${status == 'NOT_STARTED'}">
+ <td rowspan="${1 + fn:length(reviewers)}" colspan="${1+cols}">Not started</td>
+</c:when>
 <c:when test="${author.numComments > 0}">
 <td>responses
   <td><c:out value="${author.numComments}" /></td>
@@ -189,6 +194,8 @@
  </c:if>
  
   <c:choose>
+  <c:when test="${status == 'NOT_STARTED'}">
+  </c:when>
   <c:when test="${codeReviewer.numComments > 0 || ! empty evaluations}">
   <td><c:out value="${codeReviewer.numComments}" /></td>
   <td><fmt:formatDate value="${codeReviewer.lastUpdate}" pattern="dd MMM, hh:mm a" /></td>

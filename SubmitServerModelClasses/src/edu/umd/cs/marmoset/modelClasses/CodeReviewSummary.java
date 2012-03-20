@@ -30,6 +30,7 @@ import edu.umd.cs.marmoset.utilities.TextUtilities;
 public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	private static final String FINDBUGS_TEST_TYPE = "findbugs";
 
+  public enum Status { NOT_STARTED, DRAFT, PUBLISHED, INTERACTIVE };
 
   final @Nonnull Submission submission;
   final @Nonnull  Project project;
@@ -286,6 +287,35 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		result.remove(viewerAsReviewer);
 		return result;
 
+	}
+	
+	public Status getStatus() {
+	    
+	    if (allComments.isEmpty() && rubricEvaluations.isEmpty())
+	        return Status.NOT_STARTED;
+	
+	    boolean published = false;
+	    boolean byAuthor = false;
+	    boolean byReviewer = false;
+	    
+	   for(CodeReviewComment c : allComments) {
+	        if (!c.isDraft()) published = true;
+	        if (c.getCodeReviewerPK() == author.getCodeReviewerPK())
+	            byAuthor = true;
+	        else
+	            byReviewer = true;
+	   }
+	   for(RubricEvaluation r : rubricEvaluations.values()) 
+	       if (!r.isDraft()) {
+	           published = true;
+	           byReviewer = true;
+	       }
+	   if (!published)
+	       return Status.DRAFT;
+	   if (byAuthor && byReviewer)
+	       return Status.INTERACTIVE;
+	   return Status.PUBLISHED;
+	    
 	}
 
 	private CodeReviewer getAuthor(CodeReviewComment c) {

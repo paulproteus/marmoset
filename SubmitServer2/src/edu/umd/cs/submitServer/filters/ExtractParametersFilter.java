@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Ordering;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
@@ -147,10 +148,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		List<Project> projectList = null;
 		StudentSubmitStatus studentSubmitStatus = null;
 		CodeReviewAssignment codeReviewAssignment = null;
-		Collection<Submission> submissionsUnderReview = null;
-		Collection<CodeReviewer> codeReviewersForAssignment = null;
-		Collection<CodeReviewer> studentCodeReviewersForAssignment = null;
-        
+		  
 		Connection conn = null;
 		try {
 			conn = getConnection();
@@ -262,16 +260,17 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 
 
 			if (codeReviewAssignmentPK != null && codeReviewAssignmentPK.intValue() != 0) {
-				codeReviewAssignment = CodeReviewAssignment.lookupByPK(codeReviewAssignmentPK, conn);
-				projectPK = codeReviewAssignment.getProjectPK();
-				submissionsUnderReview = Submission.getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
-				codeReviewersForAssignment = CodeReviewer.lookupByCodeReviewAssignmentPK(codeReviewAssignmentPK, conn);
-				HashMultimap<Integer, CodeReviewer> reviewersForSubmission
-				=  HashMultimap.create();
-				Map<Integer, CodeReviewer> authorForSubmission 
-				= new HashMap<Integer, CodeReviewer>();
-				studentCodeReviewersForAssignment
-				 = new ArrayList<CodeReviewer>();
+			    Collection<Submission> submissionsUnderReview = Submission.getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
+			    if (!submissionsUnderReview.isEmpty())  {
+		        Collection<CodeReviewer> codeReviewersForAssignment  = CodeReviewer.lookupByCodeReviewAssignmentPK(codeReviewAssignmentPK, conn);
+		        codeReviewAssignment = CodeReviewAssignment.lookupByPK(codeReviewAssignmentPK, conn);
+                projectPK = codeReviewAssignment.getProjectPK();
+                 
+                
+		        Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();			
+				HashMultimap<Integer, CodeReviewer> reviewersForSubmission =  HashMultimap.create();
+				Map<Integer, CodeReviewer> authorForSubmission = new HashMap<Integer, CodeReviewer>();
+				 
 				for(CodeReviewer  r : codeReviewersForAssignment)  {
 				    if (r.isAuthor()) {
 				        authorForSubmission.put(r.getSubmissionPK(), r);
@@ -280,9 +279,36 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				    if (!r.isInstructor() && !r.isAuthor())
 				        studentCodeReviewersForAssignment.add(r);
 				}
+				Map<Submission, CodeReviewSummary.Status> codeReviewStatus = new HashMap<Submission, CodeReviewSummary.Status> ();
+				for(Submission s : submissionsUnderReview) {
+				    boolean reviewerComments = false;
+				    Collection<CodeReviewer> reviewers = reviewersForSubmission.get(s.getSubmissionPK());
+				    if (reviewers != null)
+				        for (CodeReviewer r : reviewers) 
+				            if (!r.isAutomated() && r.getNumComments() > 0) {
+				                reviewerComments = true;
+				                break;
+				            }
+				   CodeReviewer author= authorForSubmission.get(s.getSubmissionPK());
+				   boolean authorComments  =  author != null && author.getNumComments() > 0;
+				   CodeReviewSummary.Status status;
+				   if (!reviewerComments) 
+				       status = authorComments ? CodeReviewSummary.Status.PUBLISHED : CodeReviewSummary.Status.NOT_STARTED;
+				   else
+				       status = authorComments ? CodeReviewSummary.Status.INTERACTIVE : CodeReviewSummary.Status.PUBLISHED;
+				   codeReviewStatus.put(s, status);
+				    
+				}
+				request.setAttribute("codeReviewStatus", codeReviewStatus);
+				request.setAttribute("overallCodeReviewStatus",Ordering.natural().max(codeReviewStatus.values()));
+                
 				request.setAttribute("reviewersForSubmission", reviewersForSubmission.asMap());
 				request.setAttribute("authorForSubmission", authorForSubmission);
-				
+	            request.setAttribute("codeReviewersForAssignment", codeReviewersForAssignment);
+	            request.setAttribute("studentCodeReviewersForAssignment", studentCodeReviewersForAssignment);
+	            request.setAttribute("submissionsUnderReview", submissionsUnderReview);
+			    }
+
 			}
 
 
@@ -669,14 +695,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 			if (codeReviewAssignment != null)
 				request.setAttribute(SubmitServerConstants.CODE_REVIEW_ASSIGNMENT, codeReviewAssignment);
 
-			if (codeReviewersForAssignment != null) { 
-				request.setAttribute("codeReviewersForAssignment", codeReviewersForAssignment);
-				request.setAttribute("studentCodeReviewersForAssignment", studentCodeReviewersForAssignment);
-			}
-
-			if (submissionsUnderReview != null)
-				request.setAttribute("submissionsUnderReview", submissionsUnderReview);
-
+		
 			if (course != null)
 				request.setAttribute(COURSE, course);
 			
