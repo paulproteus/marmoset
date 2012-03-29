@@ -84,6 +84,7 @@ public class Student  implements Comparable<Student> {
 
   public static final @Deprecated  String DEMO_ACCOUNT = "demo";
   public static final String NORMAL_ACCOUNT = "normal";
+  public static final String PSEUDO_ACCOUNT = "pseudo";
   // [NAT]
   public static final @Deprecated String TEAM_ACCOUNT = "team";
 
@@ -275,6 +276,10 @@ public class Student  implements Comparable<Student> {
      */
     public @Deprecated boolean isTeamAccount() {
       return TEAM_ACCOUNT.equals(getAccountType());
+    }
+    
+    public boolean isPseudoAccount() {
+        return PSEUDO_ACCOUNT.equals(getAccountType());
     }
 
      public String getEmail() {

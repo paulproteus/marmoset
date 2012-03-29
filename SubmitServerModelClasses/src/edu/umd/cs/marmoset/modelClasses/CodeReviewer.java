@@ -337,6 +337,71 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		return new CodeReviewer(conn, 0, submissionPK, studentPK, knownAs, isAuthor, isInstructor, false);
 	}
 
+	public static boolean deleteInactiveReviewers(Connection conn, 
+	       CodeReviewAssignment assignment)  throws SQLException {
+	    String u = "DELETE FROM " + TABLE_NAME + " WHERE code_review_assignment_pk = ? "
+	            + " AND last_update is NULL";
+	    PreparedStatement update = Queries.setStatement(conn, u, assignment.getCodeReviewAssignmentPK());
+	    try {
+	        return update.execute();
+	    } finally {
+	        Queries.closeStatement(update);
+	    }
+	}
+	   public static boolean deleteInactiveReviewers(Connection conn, 
+	           CodeReviewAssignment assignment, Submission submission)  throws SQLException {
+	        String u = "DELETE FROM " + TABLE_NAME + " WHERE code_review_assignment_pk = ? "
+	                + " AND submission_pk = ? "
+	                + " AND last_update is NULL";
+	        PreparedStatement update = Queries.setStatement(conn, u, assignment.getCodeReviewAssignmentPK(), submission.getSubmissionPK());
+	        try {
+	            return update.execute();
+	        } finally {
+	            Queries.closeStatement(update);
+	        }
+	    }
+	   
+	   public static boolean deleteInactiveReviewers(Connection conn, 
+                Submission submission)  throws SQLException {
+            String u = "DELETE FROM " + TABLE_NAME + " WHERE "
+                    + " AND submission_pk = ? "
+                    + " AND last_update is NULL";
+            PreparedStatement update = Queries.setStatement(conn, u,  submission.getSubmissionPK());
+            try {
+                return update.execute();
+            } finally {
+                Queries.closeStatement(update);
+            }
+        }
+	   public static int numInactiveReviewers(Connection conn, 
+               CodeReviewAssignment assignment)  throws SQLException {
+            String u = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE code_review_assignment_pk = ? "
+                    + " AND last_update is NULL";
+            PreparedStatement query = Queries.setStatement(conn, u,  assignment.getCodeReviewAssignmentPK());
+            try {
+                ResultSet rs = query.executeQuery();
+                if (rs.next())
+                return rs.getInt(1);
+                return 0;
+            } finally {
+                Queries.closeStatement(query);
+            }
+        }
+	   public static int numInactiveReviewers(Connection conn, 
+               Submission submission)  throws SQLException {
+            String u = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE "
+                    + " AND submission_pk = ? "
+                    + " AND last_update is NULL";
+            PreparedStatement query = Queries.setStatement(conn, u,  submission.getSubmissionPK());
+            try {
+                ResultSet rs = query.executeQuery();
+                if (rs.next())
+                return rs.getInt(1);
+                return 0;
+            } finally {
+                Queries.closeStatement(query);
+            }
+        }
     public static CodeReviewer updateOrInsert(Connection conn, 
     		@CodeReviewAssignment.PK int codeReviewAssignmentPK,
             @Submission.PK int submissionPK, @Student.PK int studentPK,

@@ -132,6 +132,7 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
         student2.setFirstname(student.getFirstname());
         student2.setCampusUID(student.getCampusUID());
         student2.setLoginName(student.getLoginName() + "-student");
+        student2.setLoginName(Student.PSEUDO_ACCOUNT);
         student2 = student2.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
         return student2;
     }

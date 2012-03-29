@@ -182,11 +182,13 @@ function changedIsTested(isTested)
     
         <td class="label">canonical account</td>
         <td class="input"><select name="canonicalStudentRegistrationPK">
+            <c:set var="first" value="true"/>
             <c:forEach var="studentRegistration" items="${courseInstructors}">
                 <c:choose>
-                   <c:when test="${studentRegistration.studentRegistrationPK == studentRegistrationPK}">
+                   <c:when test="${studentRegistration.studentRegistrationPK == studentRegistrationPK || first}">
                     <option value="${studentRegistration.studentRegistrationPK}" selected="selected">
                    <c:out value="${studentRegistration.fullname}"/> </option>
+                   <c:set var="first" value="false"/>
                     </c:when>
                     <c:otherwise>
                     <option value="${studentRegistration.studentRegistrationPK}">

@@ -186,31 +186,26 @@ public class AssignCodeReviews extends SubmitServerServlet {
     }
 
     public static void reviewOneSubmission(CodeReviewAssignment assignment,
-            Submission submission, Collection<StudentRegistration> students,
+            Submission submission, Collection<StudentRegistration> reviewers,
             Connection conn) throws SQLException {
-        StudentRegistration author = StudentRegistration
-                .lookupByStudentRegistrationPK(
-                        submission.getStudentRegistrationPK(), conn);
-        @Student.PK
-        int authorPK = author.getStudentPK();
-        CodeReviewer.lookupOrInsertAuthor(conn, submission, assignment,
+         CodeReviewer author = CodeReviewer.lookupOrInsertAuthor(conn, submission, assignment,
                 assignment.isAnonymous() ? "Author" : "");
 
         if (assignment.isAnonymous()) {
             List<StudentRegistration> shuffled = new ArrayList<StudentRegistration>(
-                    students);
+                    reviewers);
             Collections.shuffle(shuffled);
-            students = shuffled;
+            reviewers = shuffled;
         }
 
         int reviewerNumber = 1;
-        for (StudentRegistration studentRegistration : students) {
+        for (StudentRegistration studentRegistration : reviewers) {
             String knownAs = "";
             if (assignment.isAnonymous())
                 knownAs = "Reviewer " + reviewerNumber++;
             @Student.PK
             int reviewerPK = studentRegistration.getStudentPK();
-            if (authorPK != reviewerPK)
+            if (author.getStudentPK() != reviewerPK)
                 CodeReviewer.updateOrInsert(conn,
                         assignment.getCodeReviewAssignmentPK(),
                         submission.getSubmissionPK(), reviewerPK, knownAs,

@@ -479,7 +479,7 @@ CREATE TABLE IF NOT EXISTS `test_outcomes` (
   `test_name` varchar(100) NOT NULL DEFAULT '',
   `short_test_result` varchar(300) NOT NULL DEFAULT '',
   `long_test_result` text NOT NULL,
-  `exception_class_name` varchar(75) DEFAULT NULL,
+  `exception_class_name` text,
   `coarsest_coverage_level` enum('method','statement','branch','none') DEFAULT NULL,
   `exception_source_covered_elsewhere` tinyint(1) NOT NULL DEFAULT '0',
   `details` mediumblob,

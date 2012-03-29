@@ -978,7 +978,17 @@
 	</servlet>
 
 
-
+<servlet>
+        <servlet-name>RemoveCodeReviewers</servlet-name>
+        <servlet-class>edu.umd.cs.submitServer.servlets.RemoveCodeReviewers</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RemoveCodeReviewers</servlet-name>
+        <url-pattern>/action/instructor/RemoveCodeReviewers</url-pattern>
+    </servlet-mapping>
+    
+    
+    
 	<servlet>
 		<servlet-name>AssignCodeReviews</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.AssignCodeReviews</servlet-class>

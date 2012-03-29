@@ -76,6 +76,12 @@
 </c:url>
 <p><a href="${assignReviews}">Assign reviews</a></p>
 </c:when>
+<c:when test="${overallCodeReviewStatus == 'NOT_STARTED'}">
+<c:url var="unassignReviews" value="/view/instructor/unassignCodeReviews.jsp" >
+    <c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
+</c:url>
+<p>Code review activated, no reviews started. <a href="${unassignReviews}">Revert to prototype review</a></p>
+</c:when>
 <c:otherwise>
 <c:url var="PrintRubricEvaluationsForDatabase" value="/data/instructor/PrintRubricEvaluationsForDatabase">
         <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
@@ -90,7 +96,13 @@
     <c:param name="coursePK" value="${course.coursePK}" />
 </c:url>
 <p><a href="${PrintRubricsForDatabase}">List rubrics in CSV format for upload to grades server</a>
-<p><a href="${PrintRubricEvaluationsForDatabase}">List rubric evaluations in CSV format for upload to grades server</a>
+<p><a href="${PrintRubricEvaluationsForDatabase}">List rubric evaluations in CSV format for upload to grades server</a></p>
+<p><c:url var="removeCodeReviewers" value="/action/instructor/RemoveCodeReviewers" />
+                <form action="${reviewCodeReviewers}" method="post" name="removeCodeReviewersForm">
+                Remove reviewers with no comments
+                    <input type="hidden"name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+                    <input type="submit" value="Do it">
+                </form>
 </p></c:otherwise></c:choose>
 
 <c:if test="${! empty rubrics }">
@@ -154,21 +166,22 @@
 	<c:set var="studentRegistration"  value="${studentRegistrationMap[submission.studentRegistrationPK]}"/>
     <c:set var="reviewers" value="${reviewersForSubmission[submission.submissionPK]}"/>
     <c:set var="author" value="${authorForSubmission[submission.submissionPK]}"/>
-    <c:set vat=status" value="$[codeReviewStatus[submission.submissionPK]}"/>
+    <c:set var="status" value="${codeReviewStatus[submission]}"/>
 	
 <tr class="r${counter.index % 2}">
 <td rowspan="${1 + fn:length(reviewers)}"/>
 <a href="${viewCodeReview}" target="codeReview" title="code review">
 <c:out value="${studentRegistration.fullname}"/>
 </a>
-<c:if test="${not empty sections}">
+<c:if test="${not empty studentRegistration.section}">
 <br>section: <c:out value="${studentRegistration.section}"/>
 </c:if>
 <br><a href="${submissionLink}" title="test results"><c:out value="${submission.testSummary}"/></a>
 </td>
 <c:choose>
 <c:when test="${status == 'NOT_STARTED'}">
- <td rowspan="${1 + fn:length(reviewers)}" colspan="${1+cols}">Not started</td>
+<td> </td>
+ <td rowspan="${1 + fn:length(reviewers)}" colspan="${cols}">Not started</td>
 </c:when>
 <c:when test="${author.numComments > 0}">
 <td>responses
