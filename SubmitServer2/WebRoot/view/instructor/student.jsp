@@ -54,6 +54,10 @@
 
                 <c:if test="${user.superUser}">
                     <h2>Superuser actions</h2>
+                    
+                    <c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
+                    <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
+
                     <p>
                     <form method="GET" action="${editStudentUrl}">
                         <input type="hidden" name="studentPK" value="${student.studentPK}" />
@@ -80,8 +84,7 @@
                         </c:forEach>
 
                     </ul>
-                </c:if>
-        </c:when>
+                </c:if></c:when>
         <c:otherwise>
             <h1>
                 <c:out value="${studentRegistration.fullname}" />
