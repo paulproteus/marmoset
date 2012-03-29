@@ -55,16 +55,17 @@
                 <c:if test="${user.superUser}">
                     <h2>Superuser actions</h2>
                     
-                    <c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" />
+                    <c:url var="editStudentUrl" value="/view/admin/editStudent.jsp" >
+                     <c:param name="studentPK" value="${student.studentPK}" />
+                     </c:url>
+                                           
                     <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
 
-                    <p>
-                    <form method="GET" action="${editStudentUrl}">
-                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                        <button type="submit">Edit</button>
+                    <p><a href="${editStudentUrl}">Edit 
                         information for
                         <c:out value="${student.fullname}" />
-                    </form>
+                        </a>
+
                     <p>
                     <form method="post" action="${authenticateAsLink}">
                         <input type="hidden" name="studentPK" value="${student.studentPK}" />
