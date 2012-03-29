@@ -50,6 +50,7 @@ import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
 public class CreateCodeReviewAssignment extends SubmitServerServlet {
+    
     private static boolean nullSafeEquals(Object x, Object y) {
         if (x == y)
             return true;
@@ -115,14 +116,12 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     throw new IllegalArgumentException(
                             "Can only create prototype code reviews");
            
-                assignment = new CodeReviewAssignment(conn,
-                        project.getProjectPK(), description, deadline,
-                        canSeeOthers, anonymous, kind);
                 String of = parser.getStringParameter("of");
                 @Submission.PK
                 int ofPK = Submission.asPK(Integer.parseInt(of));
                 Submission submission = Submission.lookupBySubmissionPK(ofPK,
                         conn);
+                StudentRegistration author = StudentRegistration.lookupBySubmissionPK(ofPK, conn);
                 StudentRegistration reviewer;
                 switch (kind) {
                 case PEER_PROTOTYPE:
@@ -136,6 +135,13 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 default:
                     throw new AssertionError();
                 }
+                if (reviewer.getStudentPK() == author.getStudentPK())
+                    throw new IllegalArgumentException("Reviewer and author for prototype code review must be distinct");
+                
+                assignment = new CodeReviewAssignment(conn,
+                        project.getProjectPK(), description, deadline,
+                        canSeeOthers, anonymous, kind);
+               
                 AssignCodeReviews.reviewOneSubmission(assignment, submission,
                         Collections.singleton(reviewer), conn);
             }
