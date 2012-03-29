@@ -259,55 +259,75 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 				studentPK = userSession.getStudentPK();
 
 
-			if (codeReviewAssignmentPK != null && codeReviewAssignmentPK.intValue() != 0) {
-			    Collection<Submission> submissionsUnderReview = Submission.getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
-			    if (!submissionsUnderReview.isEmpty())  {
-		        Collection<CodeReviewer> codeReviewersForAssignment  = CodeReviewer.lookupByCodeReviewAssignmentPK(codeReviewAssignmentPK, conn);
-		        codeReviewAssignment = CodeReviewAssignment.lookupByPK(codeReviewAssignmentPK, conn);
-                projectPK = codeReviewAssignment.getProjectPK();
-                 
-                
-		        Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();			
-				HashMultimap<Integer, CodeReviewer> reviewersForSubmission =  HashMultimap.create();
-				Map<Integer, CodeReviewer> authorForSubmission = new HashMap<Integer, CodeReviewer>();
-				 
-				for(CodeReviewer  r : codeReviewersForAssignment)  {
-				    if (r.isAuthor()) {
-				        authorForSubmission.put(r.getSubmissionPK(), r);
-				    } else
-				        reviewersForSubmission.put(r.getSubmissionPK(), r);
-				    if (!r.isInstructor() && !r.isAuthor())
-				        studentCodeReviewersForAssignment.add(r);
-				}
-				Map<Submission, CodeReviewSummary.Status> codeReviewStatus = new HashMap<Submission, CodeReviewSummary.Status> ();
-				for(Submission s : submissionsUnderReview) {
-				    boolean reviewerComments = false;
-				    Collection<CodeReviewer> reviewers = reviewersForSubmission.get(s.getSubmissionPK());
-				    if (reviewers != null)
-				        for (CodeReviewer r : reviewers) 
-				            if (!r.isAutomated() && r.getNumComments() > 0) {
-				                reviewerComments = true;
-				                break;
-				            }
-				   CodeReviewer author= authorForSubmission.get(s.getSubmissionPK());
-				   boolean authorComments  =  author != null && author.getNumComments() > 0;
-				   CodeReviewSummary.Status status;
-				   if (!reviewerComments) 
-				       status = authorComments ? CodeReviewSummary.Status.PUBLISHED : CodeReviewSummary.Status.NOT_STARTED;
-				   else
-				       status = authorComments ? CodeReviewSummary.Status.INTERACTIVE : CodeReviewSummary.Status.PUBLISHED;
-				   codeReviewStatus.put(s, status);
-				    
-				}
-				request.setAttribute("codeReviewStatus", codeReviewStatus);
-				request.setAttribute("overallCodeReviewStatus",Ordering.natural().max(codeReviewStatus.values()));
-                
-				request.setAttribute("reviewersForSubmission", reviewersForSubmission.asMap());
-				request.setAttribute("authorForSubmission", authorForSubmission);
-	            request.setAttribute("codeReviewersForAssignment", codeReviewersForAssignment);
-	            request.setAttribute("studentCodeReviewersForAssignment", studentCodeReviewersForAssignment);
-	            request.setAttribute("submissionsUnderReview", submissionsUnderReview);
-			    }
+            if (codeReviewAssignmentPK != null
+                    && codeReviewAssignmentPK.intValue() != 0) {
+                Collection<Submission> submissionsUnderReview = Submission
+                        .getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
+                if (!submissionsUnderReview.isEmpty()) {
+                    Collection<CodeReviewer> codeReviewersForAssignment = CodeReviewer
+                            .lookupByCodeReviewAssignmentPK(
+                                    codeReviewAssignmentPK, conn);
+                    codeReviewAssignment = CodeReviewAssignment.lookupByPK(
+                            codeReviewAssignmentPK, conn);
+                    projectPK = codeReviewAssignment.getProjectPK();
+
+                    Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();
+                    HashMultimap<Integer, CodeReviewer> reviewersForSubmission = HashMultimap
+                            .create();
+                    Map<Integer, CodeReviewer> authorForSubmission = new HashMap<Integer, CodeReviewer>();
+                    for (CodeReviewer r : codeReviewersForAssignment) {
+                        if (r.isAuthor()) {
+                            authorForSubmission.put(r.getSubmissionPK(), r);
+                        } else
+                            reviewersForSubmission.put(r.getSubmissionPK(), r);
+                        if (!r.isInstructor() && !r.isAuthor())
+                            studentCodeReviewersForAssignment.add(r);
+                    }
+                    boolean canRevert = true;
+                    Map<Submission, CodeReviewSummary.Status> codeReviewStatus = new HashMap<Submission, CodeReviewSummary.Status>();
+
+                    for (Submission s : submissionsUnderReview) {
+                        boolean reviewerComments = false;
+                        Collection<CodeReviewer> reviewers = reviewersForSubmission
+                                .get(s.getSubmissionPK());
+                        CodeReviewer author = authorForSubmission.get(s
+                                .getSubmissionPK());
+                        if (reviewers != null)
+                            for (CodeReviewer r : reviewers)
+                                if (!r.isAutomated() && r.getNumComments() > 0) {
+                                    reviewerComments = true;
+                                    if (!isPrototypeReview(r, author))
+                                        canRevert = false;
+                                }
+                        boolean authorComments = author != null
+                                && author.getNumComments() > 0;
+
+                        CodeReviewSummary.Status status;
+                        if (!reviewerComments)
+                            status = authorComments ? CodeReviewSummary.Status.PUBLISHED
+                                    : CodeReviewSummary.Status.NOT_STARTED;
+                        else
+                            status = authorComments ? CodeReviewSummary.Status.INTERACTIVE
+                                    : CodeReviewSummary.Status.PUBLISHED;
+
+                        codeReviewStatus.put(s, status);
+
+                    }
+                    request.setAttribute("canRevert", canRevert);
+                    request.setAttribute("codeReviewStatus", codeReviewStatus);
+                    request.setAttribute("overallCodeReviewStatus", Ordering
+                            .natural().max(codeReviewStatus.values()));
+                    request.setAttribute("reviewersForSubmission",
+                            reviewersForSubmission.asMap());
+                    request.setAttribute("authorForSubmission",
+                            authorForSubmission);
+                    request.setAttribute("codeReviewersForAssignment",
+                            codeReviewersForAssignment);
+                    request.setAttribute("studentCodeReviewersForAssignment",
+                            studentCodeReviewersForAssignment);
+                    request.setAttribute("submissionsUnderReview",
+                            submissionsUnderReview);
+                }
 
 			}
 
@@ -712,6 +732,11 @@ public class ExtractParametersFilter extends SubmitServerFilter {
 		chain.doFilter(request, response);
 	}
 
+	public boolean isPrototypeReview(CodeReviewer reviewer, CodeReviewer author) {
+	    return reviewer.getStudent().isPseudoAccount()
+	            || author.getStudent().isPseudoAccount()
+	            || reviewer.isInstructor() && author.isInstructor();
+	}
 	/**
 	 * Returns a map from projectPKs to studentSubmitStatus records for a given
 	 * student and course. The parameters to this are sort of a hack because
