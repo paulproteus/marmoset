@@ -1,4 +1,3 @@
-
 # Python warmup problem
 # from http://codingbat.com/prob/p173401
 
@@ -7,4 +6,8 @@
 # on vacation. Return True if we sleep in. 
 
 def sleep_in(weekday, vacation):
+  if not weekday or vacation:
+    return True
+  else:
+    return False
 
