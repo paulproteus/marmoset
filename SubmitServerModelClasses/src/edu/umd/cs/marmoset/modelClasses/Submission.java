@@ -2016,6 +2016,8 @@ public class Submission implements ITestSummary<Submission> {
         }
         return result;
     }
+
+  
     /** Returns the set of submission_pk's that have published reviews */
     public static Set<Integer> lookupSubmissionsWithReviews(Project project, StudentRegistration studentRegistration,
             Connection conn) throws SQLException {
