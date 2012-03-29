@@ -487,9 +487,7 @@ public class TestOutcome implements Serializable {
      *  the codeCoverageResults
      * @throws IllegalStateException If this test outcome lacks codeCoverageResults.
 	 */
-	public CodeCoverageResults getCodeCoverageResults()
-	throws IOException
-	{
+	public CodeCoverageResults getCodeCoverageResults() {
         if (codeCoverageResults!=null)
             return codeCoverageResults;
         if (TIMEOUT.equals(getOutcome())) {
@@ -518,7 +516,11 @@ public class TestOutcome implements Serializable {
             System.err.println("Unable to parse XML file containing CodeCoverageResults for " +toConciseString()+
                 ": "+e.getMessage());
             return new CodeCoverageResults();
-	    }
+	    } catch (IOException e) {
+          System.err.println("Unable to parse XML file containing CodeCoverageResults for " +toConciseString()+
+              ": "+e.getMessage());
+          return new CodeCoverageResults();
+      }
 	}
 
 	/**
