@@ -345,6 +345,9 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
     public boolean isInstructor() {
     		return getInstructorLevel() > 0;
     }
+    public boolean isPseudoStudent() {
+        return PSEUDO_STUDENT_CAPABILITY.equals(instructorCapability);
+}
     public boolean isNormalStudent() {
     		return instructorCapability == null && isActive();
     }
