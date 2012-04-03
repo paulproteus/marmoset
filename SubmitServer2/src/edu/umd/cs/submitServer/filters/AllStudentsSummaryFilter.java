@@ -84,7 +84,9 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 					.getAttribute(STUDENT_REGISTRATION_SET);
 			
 			
-
+			StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+			if (!instructor.isInstructor())
+			    throw new ServletException("Not instructor: "  + instructor.getFullname());
 
 			boolean useDefault = false;
 			RequestParser parser = new RequestParser(request,
@@ -176,19 +178,24 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 
 			TreeSet<StudentRegistration> justStudentSubmissions = new TreeSet<StudentRegistration>();
 			TreeSet<StudentRegistration> staffStudentSubmissions = new TreeSet<StudentRegistration>();
+			boolean hasOtherStaffSubmissions = false;
             for(StudentRegistration sr : registrationSet)
 			    if (sr.isNormalStudent()) {
 			        if (section == null || section.equals(sr.getSection())
 			                || section.equals("none") && sr.getSection() == null)
 			                justStudentSubmissions.add(sr);
 			    }
-            else
+            else {
                 staffStudentSubmissions.add(sr);
+                if (!sr.equals(instructor))
+                    hasOtherStaffSubmissions = true;
+            }
 			        
           
 			 request.setAttribute("justStudentSubmissions", justStudentSubmissions);   
 			 request.setAttribute("staffStudentSubmissions", staffStudentSubmissions);   
-			 Map<Integer, StudentSubmitStatus> submitStatusMap = StudentSubmitStatus.lookupAllByProjectPK(project.getProjectPK(), conn);
+			 request.setAttribute("hasOtherStaffSubmissions", hasOtherStaffSubmissions);   
+             Map<Integer, StudentSubmitStatus> submitStatusMap = StudentSubmitStatus.lookupAllByProjectPK(project.getProjectPK(), conn);
              request.setAttribute("submitStatusMap", submitStatusMap);
              
 			if (project.isPair()) {
