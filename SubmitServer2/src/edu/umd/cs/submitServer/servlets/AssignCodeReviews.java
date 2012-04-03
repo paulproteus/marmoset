@@ -209,7 +209,7 @@ public class AssignCodeReviews extends SubmitServerServlet {
                 CodeReviewer.updateOrInsert(conn,
                         assignment.getCodeReviewAssignmentPK(),
                         submission.getSubmissionPK(), reviewerPK, knownAs,
-                        false, false);
+                        false, studentRegistration.isInstructor());
         }
 
     }
