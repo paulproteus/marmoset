@@ -119,7 +119,6 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
             registration.setCourse(course.getCourseName());
             registration.setSection(course.getSection());
             registration.setCourseID(-1);
-
             registration.insert(conn);
         }
         return registration;
@@ -132,71 +131,10 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
         student2.setFirstname(student.getFirstname());
         student2.setCampusUID(student.getCampusUID());
         student2.setLoginName(student.getLoginName() + "-student");
-        student2.setLoginName(Student.PSEUDO_ACCOUNT);
+        student2.setAccountType(Student.PSEUDO_ACCOUNT);
         student2 = student2.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
         return student2;
     }
 
-    @Deprecated
-    private void importStudents(String term, Course course, int courseID,
-            Connection gradesConn, Connection conn) throws SQLException {
-        String query = "SELECT lastName, firstName, uid, directoryID, email, classAccount, role, course, section"
-                + " FROM submitexport "
-                + " WHERE term = ?"
-                + " AND courseID = ?";
-        PreparedStatement stmt = gradesConn.prepareStatement(query);
-        stmt.setString(1, term);
-        stmt.setInt(2, courseID);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            int col = 1;
-            String lastname = rs.getString(col++);
-            String firstname = rs.getString(col++);
-            String campusUID = rs.getString(col++);
-            String loginName = rs.getString(col++);
-            String email = rs.getString(col++);
-            String classAccount = rs.getString(col++);
-            String role = rs.getString(col++);
-            String courseName = rs.getString(col++);
-            String sectionName = rs.getString(col++);
-
-            Student s = Student.insertOrUpdateByUID(campusUID, firstname,
-                    lastname, loginName, null, conn);
-
-            StudentRegistration registration = StudentRegistration
-                    .lookupByStudentPKAndCoursePK(s.getStudentPK(),
-                            course.getCoursePK(), conn);
-
-            if (registration == null) {
-
-                registration = new StudentRegistration();
-                registration.setCoursePK(course.getCoursePK());
-                if (classAccount != null)
-                    registration.setClassAccount(classAccount);
-                else
-                    registration.setClassAccount(loginName);
-
-                registration.setStudentPK(s.getStudentPK());
-                if ("Instructor".equals(role) || "TA".equals(role))
-                    registration
-                            .setInstructorCapability(StudentRegistration.MODIFY_CAPABILITY);
-                else if ("Grader".equals(role))
-
-                    registration
-                            .setInstructorCapability(StudentRegistration.READ_ONLY_CAPABILITY);
-                else
-                    registration.setInstructorCapability(null);
-                registration.setFirstname(s.getFirstname());
-                registration.setLastname(s.getLastname());
-                registration.setCourse(courseName);
-                registration.setSection(sectionName);
-                registration.setCourseID(courseID);
-                registration.insert(conn);
-
-            }
-
-        }
-    }
 
 }
