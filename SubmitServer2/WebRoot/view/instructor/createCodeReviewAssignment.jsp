@@ -114,12 +114,50 @@ li.deleted-rubric {
             <c:out value="${project.projectNumber}" />
         </h1>
 
+
+
+
+
         <p class="sectionDescription">
-            Fill out the following form to create a new code review for project
-            <c:out value="${project.fullTitle}" />
+            Fill out the following form to create a new prototype code review for project
+            <c:out value="${project.fullTitle}" />.
         </p>
     </div>
-<c:url value="/action/instructor/CreateCodeReviewAssignment" var="createAssignmentAction" />
+    
+    <c:choose>
+<c:when test="${user.superUser}">
+<p>You can't create a code review as a superuser; you need to do so using an instructor account
+</p></c:when>
+<c:otherwise>
+
+<c:if test="${empty codeReviewAssignment}">
+<p>
+    Code reviews are initially created as prototypes. For an instructional code review, you will be the
+    only code reviewer. For an peer code review, your pseudo-student account will be assigned to perform
+    the code review. In either case, you pick a submission from one non-student account (either an
+    instructional or pseudo-student account) to review. The reviewer and the author must be
+    different.
+    
+<c:if test="${!hasOtherStaffSubmissions}"> 
+    <c:url var="studentAccountForInstructorLink" value="/action/instructor/StudentAccountForInstructor" />
+<form action="${studentAccountForInstructorLink}" method="post" name="studentAccountForInstructorForm">
+<p>
+    To create a prototype instructional code review, there
+    must be a submission by some non-student account other than your own instructional account.
+    No such submission exists. 
+        <input type="submit" value="Become your pseudo-student">
+    </p>
+
+</form>
+  </c:if>
+
+<p>While the code review is in prototype form, you can try actually doing the code review. You can
+    also add, edit and remove rubrics. When you are happy with the code review, you can assign it, which
+    does the actually assignment of reviewers to submissions. Once a review has been assigned, you can't
+    edit the rubrics or assignments.</p>
+
+</c:if>
+            <c:url value="/action/instructor/CreateCodeReviewAssignment" var="createAssignmentAction" />
 <form action="${createAssignmentAction}" method="POST" id="code-review-creation">
     <input type="hidden" name="coursePK" value="${course.coursePK}" />
     <input type="hidden" name="projectPK" value="${project.projectPK}" />
@@ -132,17 +170,39 @@ li.deleted-rubric {
         <c:if test="${empty codeReviewAssignment}">
             <li>
                 <label>Review kind:</label>
+                  
                 <ul>
-                    <li>
-                        <input type="radio" name="kind" id="instructional-kind" value="instructionalPrototype"
-                        ${ss:checkedOrNull(codeReviewAssignment.type, "instructionalPrototype") } />
+                  <c:choose>
+                    <c:when test="${hasOtherStaffSubmissions}">
+                    
+                    <li><input type="radio" name="kind" id="instructional-kind" value="instructionalPrototype"
+                        ${ss:checkedOrNull(codeReviewAssignment.type, "instructionalPrototype") } 
+                        />
                         <label for="instructional-kind">Instructional</label>
                     </li>
                     <li>
                         <input type="radio" name="kind" id="peer-kind" value="peerPrototype" 
-                        ${ss:checked(codeReviewAssignment.type, "peerPrototype") }/>
+                        ${ss:checked(codeReviewAssignment.type, "peerPrototype") }
+                        />
                         <label for="peer-kind">Peer</label>
                     </li>
+                    </c:when>
+                    <c:otherwise>
+                    <li><input type="radio" name="kind" id="instructional-kind" value="instructionalPrototype"
+                        disabled="disabled"
+                        />
+                        <label for="instructional-kind">Instructional review not available due to lack of appropriate submission to review
+              
+                </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="kind" id="peer-kind" value="peerPrototype" 
+                        checked="checked"
+                        />
+                        <label for="peer-kind">Peer</label>
+                    </li>
+                    </c:otherwise>
+                    </c:choose>
                 </ul>
             </li>
 	    </c:if>
@@ -199,24 +259,61 @@ li.deleted-rubric {
         </ul>
     </fieldset>
     <c:if test="${empty codeReviewAssignment}">
-    <fieldset>
-    <h3>Code to Review</h3>
+    <fieldset id="code-for-instructional-review">
+    <h3>Submission for Prototype Instructional Review</h3>
         <ul class="form-fields">
             <li>
-                <label for="exemplar-submission">Code for prototype review:</label>
-                <select name="of" id="exemplar-submission">
+            <c:choose>
+            <c:when test="${hasOtherStaffSubmissions}">
+            
+                <label for="exemplar-submission">Code for prototype instructional review:</label>
+                <select name="of-instructional" id="exemplar-submission-instructional">
                     <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
+                    <c:if test="${studentRegistration.studentPK != user.studentPK || studentRegistration.pseudoStudent }">
                     <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
                         <c:out value="${studentRegistration.fullname}" />
                     </option>
+                    </c:if>
                     </c:forEach>
                 </select>
                 <p>
-                This will be used for the prototype review only.
+                The code review will initially be created as a prototype, and you will be assigned to review the
+                 submission from the account selected above.
+                
+                </p>
+                </c:when>
+                <c:otherwise>
+                 <p>
+             
+                </p>
+                </c:otherwise>
+                </c:choose>
+            </li>
+        </ul>
+    </fieldset>
+     <fieldset id="code-for-peer-review">
+    <h3>Submission to Review</h3>
+        <ul class="form-fields">
+            <li>
+                <label for="exemplar-submission">Code for prototype peer review:</label>
+                <select name="of-peer" id="exemplar-submission-peer">
+                    <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
+                     <c:if test="${studentRegistration.studentPK != user.studentPK || !studentRegistration.pseudoStudent}">
+                   
+                    <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
+                        <c:out value="${studentRegistration.fullname}" />
+                    </option>
+                    </c:if>
+                    </c:forEach>
+                </select>
+                <p>
+                  The code review will initially be created as a prototype, and your pseudo-student account will be assigned to review the
+                 submission from the account selected above.
                 </p>
             </li>
         </ul>
     </fieldset>
+    
     </c:if>
     <fieldset id="review-rubrics">
     <h3>Rubrics</h3>
@@ -309,17 +406,27 @@ li.deleted-rubric {
         </c:choose>
     </div>
 </form>
-<script type="text/javascript">
+
+
+
+
+
+
+            <script type="text/javascript">
 	function updateForm(kind) {
 		console.log('code review kind: "' + kind + '"');
 		switch (kind) {
 		case "instructionalPrototype":
 			hideItem("anonymity-info");
 			hideItem("visibility-info");
+			hideItem("code-for-peer-review");
+			showItem("code-for-instructional-review");
             break;
 		case "peerPrototype":
 			showItem("anonymity-info");
 			showItem("visibility-info");
+			showItem("code-for-peer-review");
+			hideItem("code-for-instructional-review");
             break;
 		default:
 			console.log("Unknown kind");
@@ -433,6 +540,9 @@ li.deleted-rubric {
 			$("#rubric-count").val(manager.rubricCount);
 		});
 	</script>
+    
+  </c:otherwise>
+  </c:choose>
 
     <ss:footer />
 </body>
