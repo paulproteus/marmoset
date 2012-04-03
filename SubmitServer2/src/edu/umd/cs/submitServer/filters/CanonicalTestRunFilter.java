@@ -63,7 +63,7 @@ public class CanonicalTestRunFilter extends SubmitServerFilter {
 		Project project = (Project) request.getAttribute(PROJECT);
 
 		Connection conn = null;
-		try {
+		if (project != null) try {
 			conn = getConnection();
 			TestSetup testSetup = TestSetup.lookupByTestSetupPK(
 					project.getTestSetupPK(), conn);
