@@ -42,26 +42,8 @@ import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 
-/**
- * @author jspacco
- * 
- */
 public class PrintRubricEvaluationsForDatabase extends SubmitServerServlet {
 
-    /**
-     * The doGet method of the servlet. <br>
-     * 
-     * This method is called when a form has its tag value method equals to get.
-     * 
-     * @param request
-     *            the request send by the client to the server
-     * @param response
-     *            the response send by the server to the client
-     * @throws ServletException
-     *             if an error occurred
-     * @throws IOException
-     *             if an error occurred
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Connection conn = null;
@@ -79,7 +61,8 @@ public class PrintRubricEvaluationsForDatabase extends SubmitServerServlet {
                 String acct = studentRegistrationMap.get(s.getStudentRegistrationPK()).getClassAccount();
                 for (RubricEvaluation e : RubricEvaluation.lookupBySubmissionPK(s.getSubmissionPK(), conn)) {
                     Rubric r = rubricMap.get(e.getRubricPK());
-                    out.printf("%s,%s,%s,%s%n", acct, r.getName(), e.getPoints(), e.getValueAndExplanation(r));
+                    if (r != null)
+                      out.printf("%s,%s,%s,%s%n", acct, r.getName(), e.getPoints(), e.getValueAndExplanation(r));
                 }
             }
             out.flush();
