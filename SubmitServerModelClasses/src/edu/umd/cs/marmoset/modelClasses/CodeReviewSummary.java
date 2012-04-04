@@ -300,7 +300,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	    
 	   for(CodeReviewComment c : allComments) {
 	        if (!c.isDraft()) published = true;
-	        if (c.getCodeReviewerPK() == author.getCodeReviewerPK())
+	        if (author != null && c.getCodeReviewerPK() == author.getCodeReviewerPK())
 	            byAuthor = true;
 	        else
 	            byReviewer = true;
