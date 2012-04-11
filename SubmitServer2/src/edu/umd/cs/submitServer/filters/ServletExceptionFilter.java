@@ -40,11 +40,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
+import edu.umd.cs.submitServer.UserSession;
 
 /**
  * Catches the ServletExceptions and prints them to the response as text.
@@ -151,7 +153,10 @@ public class ServletExceptionFilter extends SubmitServerFilter {
         try {
         String referer = request.getHeader("referer");
         String remoteHost =  SubmitServerFilter.getRemoteHost(request);
-
+        HttpSession session = request.getSession();
+        UserSession userSession = session == null ? null : ((UserSession) session
+                .getAttribute(USER_SESSION));
+    
         String type = null;
         if (logOnlyMessage!= null)
             type = logOnlyMessage;
@@ -165,11 +170,14 @@ public class ServletExceptionFilter extends SubmitServerFilter {
                 message = e.getClass().getSimpleName();
         }
 
+        if (e == null)
+            e = new RuntimeException("No exception provided");
         String requestURI = request.getRequestURI();
         String userAgent = request.getHeader("User-Agent");
+        Integer userPK = userSession != null ? userSession.getStudentPK() : null;
         
-        ServerError.insert(conn,kind, null, null,  null, /* project */ null, 
-                /* submission */ null, /* code */ null, message, type, null, requestURI,
+        ServerError.insert(conn,kind, userPK, null,  null, /* project */ null, 
+                /* submission */ null, /* code */ null, message, type, ServletExceptionFilter.class.getName(), requestURI,
                 request.getQueryString(), remoteHost, referer, userAgent, e);
 
         if (response != null) {

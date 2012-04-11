@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -84,10 +84,11 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 					.getAttribute(STUDENT_REGISTRATION_SET);
 			
 			
-			StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
-			if (!instructor.isInstructor())
-			    throw new ServletException("Not instructor: "  + instructor.getFullname());
-
+			@CheckForNull StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+			if (!instructorCapability(request))
+                throw new ServletException("Not instructor ");
+          
+	        
 			boolean useDefault = false;
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerFilterLog(), strictParameterChecking());
