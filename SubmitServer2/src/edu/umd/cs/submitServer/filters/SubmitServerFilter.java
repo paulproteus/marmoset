@@ -38,6 +38,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Level;
@@ -80,6 +81,12 @@ public abstract class SubmitServerFilter implements Filter, SubmitServerConstant
         return authenticationLog;
     }
 
+    
+    protected boolean instructorCapability(ServletRequest request) {
+        Boolean value = (Boolean) request.getAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY);
+        return value != null && (boolean) value;  
+    }
+            
     /*
      * (non-Javadoc)
      * 
