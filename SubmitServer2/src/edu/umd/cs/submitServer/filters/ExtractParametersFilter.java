@@ -292,7 +292,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                                 .get(s.getSubmissionPK());
                         CodeReviewer author = authorForSubmission.get(s
                                 .getSubmissionPK());
-                        if (reviewers != null)
+                        if (reviewers != null && author != null)
                             for (CodeReviewer r : reviewers)
                                 if (!r.isAutomated() && r.getNumComments() > 0) {
                                     reviewerComments = true;
