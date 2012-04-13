@@ -28,47 +28,55 @@ package edu.umd.cs.buildServer.util;
 
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
+
 /**
  * Wait a fixed amount of time for a process to exit.
  * 
  * @author David Hovemeyer
  */
-public final class ProcessExitMonitor extends Thread {
+public final class ProcessExitMonitor implements Runnable {
     
     private final Logger log;
 	private final Process process;
-	private volatile boolean exited;
+	private volatile boolean exited = false;
+	private volatile boolean shutdown = false;
 	private volatile int exitCode;
 	private final ProcessTree tree;
+	private final Thread thread;
+	
 
 	public ProcessExitMonitor(Process process, Logger logger) {
-		this.setDaemon(true);
+	    thread = new Thread(this, "Process exit monitor");
+		thread.setDaemon(true);
 		this.process = process;
 		this.log = logger;
-		this.exited = false;
 		
-		this.tree = new ProcessTree(logger);
-		this.start();
+		log.debug("Starting exit monitor for pid " + MarmosetUtilities.getPid(process));
+		
+		this.tree = new ProcessTree(process, logger);
+		thread.start();
 	}
 
 
 	@Override
 	public void run() {
 		try {
-		    Thread.sleep(300);
-
-		    tree.computeChildren();
 			this.exitCode = process.waitFor();
-			synchronized (this) {
-				this.exited = true;
-				notifyAll();
-			}
+			this.exited = true;
 		} catch (InterruptedException e) {
+		    log.warn("process exit monitor interrupted");
 		    assert true;
 		} finally {
 		    // no matter how we exit, kill process tree
-		    Untrusted.destroyProcessTree(process, tree, log);
+		    log.debug("Killing process tree");
+		    tree.destroyProcessTree();
+		    this.shutdown = true;
+		    synchronized(this) {
+		        notifyAll();
+		    }
 		}
+		
 	}
 
 	/**
@@ -83,19 +91,34 @@ public final class ProcessExitMonitor extends Thread {
 	 */
     public boolean waitForProcessToExit(long millis) {
         try {
-            if (!exited) {
-                Thread.sleep(100);
-                synchronized (this) {
-                    wait(millis);
+            synchronized (this) {
+                if (!exited && !shutdown) {
+                    log.debug("waiting " + millis + " ms");
+                    this.wait(millis);
+                    log.debug("waiting done");
+                }
+
+            }
+            if (!exited)
+                thread.interrupt();
+
+            synchronized (this) {
+                while (!shutdown) {
+                    log.warn("waiting for shutdown");
+                    this.wait();
                 }
             }
-            if (!exited) 
-                this.interrupt();
         } catch (InterruptedException e) {
-           Thread.currentThread().interrupt();
-        } 
+            log.warn("waitForProcessToExit interrupted");
+            Thread.currentThread().interrupt();
+        }
+
+        log.warn("waitForProcessToExit returning " + exited);
+
         return exited;
-	}
+    }
+    
+    
 
 	/**
 	 * @return Returns the exitCode.

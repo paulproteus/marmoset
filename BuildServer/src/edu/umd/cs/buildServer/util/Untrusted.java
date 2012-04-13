@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
-
 public class Untrusted {
     
     public static Process executeCombiningOutput(File cwd, String... cmd) throws IOException {
@@ -23,27 +21,9 @@ public class Untrusted {
    
     public static void destroyProcessTree(Process process, Logger log)  {
             
-        destroyProcessTree(process, new ProcessTree(log), log);
+        new ProcessTree(process, log).destroyProcessTree();
     }
         
 
-    public static void destroyProcessTree(Process process, ProcessTree tree,  Logger log) {
-        int pid = 0;
-        try {
-            pid = MarmosetUtilities.getPid(process);
-
-            log.info("Killing process tree for " + pid);
-            tree.computeChildren();
-            tree.killProcessTree(pid, 9);
-        } catch (Exception e) {
-            log.warn("Error trying to kill process tree for " + pid, e);
-        }
-
-        finally {
-            // call process.destroy() whether or not "kill -9 -<pid>" worked
-            // in order to maintain proper internal state
-            process.destroy();
-        }
-    }
-
+   
 }

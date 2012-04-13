@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -16,22 +18,30 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-public class ProcessTree {
+import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
+
+public final class ProcessTree {
     
     final Multimap<Integer, Integer> children =  ArrayListMultimap.create();  
+    final Map<Integer, String> info =  new HashMap<Integer, String>();
+    
     final Set<Integer> live = new HashSet<Integer>();
     final Logger log;
     final String user;
+    final Process process;
     
-    public ProcessTree(Logger log)  {
+    public ProcessTree(Process process, Logger log)  {
+        this.process = process;
         this.log = log;
         user = System.getProperty("user.name");
+        computeChildren();
     }
-    void computeChildren()  {
+    
+    private void computeChildren()  {
         live.clear();
         try {
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "x", 
-                        "-o", "pid,ppid,user,state,pcpu,args"});
+        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
+                        "-o", "pid,ppid,pgid,user,state,pcpu,cputime,lstart,args"});
         Process p = b.start();
         
         p.getOutputStream().close();
@@ -41,7 +51,7 @@ public class ProcessTree {
         while (s.hasNext()) {
             String txt = s.nextLine();
             if (!txt.contains(user)) continue;
-            // log.debug(txt);
+//            log.debug(txt);
             try {
                 String fields [] = txt.trim().split(" +");
                 if (fields.length < 2)
@@ -50,6 +60,7 @@ public class ProcessTree {
                 int  ppid = Integer.parseInt(fields[1]);
                 live.add(pid);
                 children.put(ppid, pid);
+                info.put(pid, txt);
             } catch (Exception e) {
                 log.error("Error while building process treee, parsing " + txt, e);
             }
@@ -66,12 +77,12 @@ public class ProcessTree {
             throw new RuntimeException(e);
         }
     }
-    public  void killProcess(int pid, int signal) throws IOException, InterruptedException {
+    private  void killProcess(int pid, int signal) throws IOException, InterruptedException {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill", "-"+signal, Integer.toString(pid)} );
         execute(b);
 
     }
-    public  void killProcess(int pid) throws IOException, InterruptedException {
+    private  void killProcess(int pid) throws IOException, InterruptedException {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill",  Integer.toString(pid)} );
         execute(b);
     }
@@ -81,13 +92,19 @@ public class ProcessTree {
         for(int c : children.get(pid))
             findTree(found, c);
     }
-    public Set<Integer> findTree(int rootPid) {
+    private Set<Integer> findTree(int rootPid) {
         Set<Integer> result = new LinkedHashSet<Integer>();
         findTree(result, rootPid);
         result.retainAll(live);
         return result;
     }
 
+    private Set<Integer> findJvmSubtree() {
+        int rootPid = MarmosetUtilities.getPid();
+        Set<Integer> result = findTree(rootPid);
+        result.remove(rootPid);
+        return result;
+    }
     private void pause(int milliseconds) {
     	try {
     		Thread.sleep(milliseconds);
@@ -96,11 +113,46 @@ public class ProcessTree {
     		Thread.currentThread().interrupt();
     	}
     }
-    public void killProcessTree(int rootPid, int signal) throws IOException {
+    
+    public  void destroyProcessTree() {
+        int pid = MarmosetUtilities.getPid(process);
+        log.info("Killing process tree for " + pid);
+        
+        try {
+            this.computeChildren();
+            this.killProcessTree(pid, 9);
+        } catch (Exception e) {
+            log.warn("Error trying to kill process tree for " + pid, e);
+        } finally {
+            // call process.destroy() whether or not "kill -9 -<pid>" worked
+            // in order to maintain proper internal state
+            process.destroy();
+        }
+        log.info("Done Killing process tree for " + pid);
+        
+    }
+    
+    private void killProcessTree(int rootPid, int signal) throws IOException {
         Set<Integer> result = findTree(rootPid);
+        Set<Integer> subtree = findJvmSubtree();
+        if (!result.equals(subtree)) {
+            log.info("process tree and JVM subtree not the same:");
+            log.info("      root pid: " + rootPid);
+            log.info(info.get(rootPid));
+            log.info("  process tree: " + result);
+            for(Integer pid : result) {
+                log.info(info.get(pid));
+            }
+            log.info("   JVM subtree: " + subtree);
+            log.info("          live: " + live);
+            for(Integer pid : subtree) {
+                log.info(info.get(pid));
+            }
+        }
+   
         if (result.isEmpty()) return;
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
-        while (true) {
+          while (true) {
             killProcesses("-STOP", result);
             pause(100);
             computeChildren();
@@ -129,7 +181,7 @@ public class ProcessTree {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void killProcesses(String signal, Set<Integer> result) throws IOException {
+    private void killProcesses(String signal, Set<Integer> result) throws IOException {
         if (result.isEmpty()) {
             return;
         }
@@ -144,7 +196,7 @@ public class ProcessTree {
             log.warn("exit code from kill " + exitCode);
     }
     
-    void drainToLog(final InputStream in) {
+    private void drainToLog(final InputStream in) {
         Thread t = new Thread( new Runnable() {
             public void run() {
                 try {
