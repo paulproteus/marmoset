@@ -496,6 +496,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 				downloadProjectJarFile(projectSubmission);
 				// log.warn
 
+				if (getDownloadOnly())
+				    return NO_WORK;
+				
 				long started = System.currentTimeMillis();
 				// Now we have the project and the testing jarfile.
 				// Build and test it.
