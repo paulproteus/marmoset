@@ -41,7 +41,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ProjectSubmission;
-import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.diffText.TextDiff;
@@ -159,6 +158,7 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 	 */
 	private void invokeMakeCommand(String makeCommand, String makeFile)
 			throws CompileFailureException, BuilderException {
+	    getLog().info("executing " + makeCommand + " " + makeFile);
 		Process process = null;
 		boolean finished = false;
 		try {
@@ -173,7 +173,6 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
 
 			StringWriter makeOutput = new StringWriter();
-	        
 	        
 	        FutureTask<Void> copyMakeOutput = TextDiff.copyTask("copy make output", new InputStreamReader(
 	                process.getInputStream()), makeOutput, testProperties.getMaxDrainOutputInBytes());

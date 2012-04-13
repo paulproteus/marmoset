@@ -174,7 +174,7 @@
                         <c:param name="projectPK" value="${project.projectPK}" />
                     </c:url> <a href="${projectLink}"> <c:out value="${project.fullTitle}"/> </a></td>
                 <td><c:if test="${not empty project.archivePK}">
-                <input type="checkbox" checked="checked"/>
+                <input type="checkbox" checked="checked" onclicked="return false;"/>
                 </c:if></td>
                 <td><fmt:formatDate value="${project.ontime}" pattern="dd MMM, hh:mm a" /></td>
                 <td>
