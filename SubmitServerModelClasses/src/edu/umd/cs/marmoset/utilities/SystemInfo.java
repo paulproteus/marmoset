@@ -1,6 +1,7 @@
 package edu.umd.cs.marmoset.utilities;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -52,34 +53,18 @@ public class SystemInfo {
 	    return (int) result;
 	}
 	
-	public static void getFreeDiskSpace(PrintWriter out,  boolean verbose) {
-	    try {
-	    ProcessBuilder b = new ProcessBuilder("/bin/df", ".", "/tmp");
-	    Process p = b.start();
-	    p.getOutputStream().close();
-	    BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-	    in.readLine();
-	    HashSet<String> seen = new HashSet<String>();
-	    while(true) {
-	        String s = in.readLine();
-	        if (s == null) break;
-	        String fields []= s.split("[\t ]+");
-	        String fileSystem = fields[0];
-	        if (!seen.add(fileSystem))
-	            continue;
-	        String free = fields[3];
-            long freeSpace = Long.parseLong(free);
-	        if (verbose || freeSpace < 1000000) 
-	                out.printf("%s %d MBytes free, ", fields[0], freeSpace/1024);
-	        }
-	    in.close();
-	    p.getErrorStream().close();
-	    p.destroy();
-	    } catch (Exception e) {
-	        assert true;
+	final static long Mbyte = 1024*1024;
+	final static long Gbyte = 1024*Mbyte;
+	
+	public static void getFreeDiskSpace(PrintWriter out, boolean verbose) {
+	    for(File f :File.listRoots() ) {
+	        long freeSpace = f.getUsableSpace();
+	        long totalSpace = f.getTotalSpace();
+	        if (totalSpace > 10 * Gbyte)
+	            out.printf("%s %d MBytes free, ", f, freeSpace / Mbyte);
 	    }
-	    
 	}
+	
 	public static String getSystemLoad(boolean verbose) {
 		Runtime runtime = Runtime.getRuntime();
 		

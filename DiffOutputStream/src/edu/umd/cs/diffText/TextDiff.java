@@ -178,8 +178,7 @@ public class TextDiff extends StringsWriter {
         }
 
         public TextDiff build() {
-            return new TextDiff(new ArrayDeque<Object>(expect), options);
-
+            return new TextDiff(new ArrayDeque<Object>(expect),  EnumSet.copyOf(options));
         }
 
         /**

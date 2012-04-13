@@ -31,9 +31,12 @@ public abstract class StringsWriter extends OutputStream {
         }
         if (b == '\r' || b == '\n') {
             skipLF = b == '\r';
-            got(buf.toString());
-            line++;
-            buf = new StringBuilder();
+            try {
+                got(buf.toString());
+            } finally {
+                line++;
+                buf = new StringBuilder();
+            }
             return;
         }
         buf.append((char) b);
