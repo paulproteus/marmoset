@@ -26,18 +26,11 @@
  */
 package edu.umd.cs.buildServer.builder;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import edu.umd.cs.buildServer.BuilderException;
 import edu.umd.cs.buildServer.CompileFailureException;
 import edu.umd.cs.buildServer.ProjectSubmission;
-import edu.umd.cs.buildServer.util.CombinedStreamMonitor;
-import edu.umd.cs.buildServer.util.ProcessExitMonitor;
-import edu.umd.cs.buildServer.util.Untrusted;
-import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
 import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
 
