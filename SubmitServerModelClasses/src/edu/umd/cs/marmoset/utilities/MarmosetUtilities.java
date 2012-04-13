@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -277,17 +278,27 @@ public final class MarmosetUtilities
             log.warn("Unable to execute kill -9 -" +pid+ "; now calling process.destroy()");
        	} catch (InterruptedException e) {
             log.error("kill -9 -" +pid+ " process was interrupted!  Now calling process.destroy()");
-        } catch (IllegalAccessException e) {
-            log.error("Illegal field access to PID field; calling process.destroy()", e);
-        } catch (NoSuchFieldException e) {
-            log.error("Cannot find PID field; calling process.destroy()", e);
-        } finally {
+       } finally {
             // call process.destroy() whether or not "kill -9 -<pid>" worked
             // in order to maintain proper internal state
             process.destroy();
         }
     }
 
+    
+    /** returns the PID of the JVM */
+    public static int getPid() {
+       String s =  ManagementFactory.getRuntimeMXBean().getName();
+       int i = s.indexOf("@");
+       if (i < 0)
+           throw new UnsupportedOperationException("Could not extract pid from " + s);
+       String n = s.substring(0,i);
+       try {
+           return Integer.parseInt(n);
+       } catch (Exception e) {
+           throw new UnsupportedOperationException("Could not extract pid from " + s); 
+       }
+    }
     /**
      * Uses reflection to extract the pid, a private field of the private class UNIXProcess.
      * This will fail on any non-Unix platform that doesn't use UNIXProcess.  It may
@@ -295,16 +306,17 @@ public final class MarmosetUtilities
      * reasons.
      * @param process The process
      * @return the pid of this process
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
      */
     public static int getPid(Process process)
-    throws NoSuchFieldException, IllegalAccessException
     {
+        try {
         Class<? extends Process> processClass = process.getClass();
         Field pidField = processClass.getDeclaredField("pid");
         pidField.setAccessible(true);
         return pidField.getInt(process);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String commandToString(List<String> args) {
