@@ -1443,14 +1443,10 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         CodeCoverageResults results=new CodeCoverageResults();
 
         for (TestOutcome outcome : testOutcomes) {
-            try {
-                if (outcome.getTestType().isDynamic() && outcome.getOutcome().equals(TestOutcome.PASSED)) {
-                    results.union(outcome.getCodeCoverageResults());
-                }
-            } catch (IOException e) {
-                // Ignore and keep trying
-                // TODO Log this someplace with a logger
-            }
+
+            if (outcome.getTestType().isDynamic() && outcome.getOutcome().equals(TestOutcome.PASSED)) 
+                results.union(outcome.getCodeCoverageResults());
+
         }
         return results;
     }
