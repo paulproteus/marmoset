@@ -58,7 +58,6 @@ import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.OutputKind;
 import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
-import edu.umd.cs.marmoset.modelClasses.TestProperties;
 
 /**
  * Tester for C, OCaml and Ruby submissions.
@@ -133,6 +132,7 @@ public class CTester extends Tester<ScriptTestProperties> {
        int testTimeoutInSeconds = getTestProperties()
                 .getTestTimeoutInSeconds();
 
+       getLog().debug("Running test " + testCase.getName());
         long processTimeoutMillis = testTimeoutInSeconds * 1000L;
 
         String[] exec = getExecLine(testCase, ExecutableTestCase.Property.EXEC);
