@@ -263,21 +263,15 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			testRunner = Untrusted.execute(
 					testRunnerCWD, javaArgs.toArray(new String[javaArgs.size()]));
 
-			try {
-				int pid = MarmosetUtilities.getPid(testRunner);
-				getLog().debug(
-						"Subprocess for submission "
-								+ getProjectSubmission().getSubmissionPK()
-								+ " for testSetup "
-								+ getProjectSubmission().getTestSetupPK()
-								+ " for " + testType + " " + nextTestNumber
-								+ " " + testMethod + " in testClass "
-								+ testClass + " has pid = " + pid);
-			} catch (IllegalAccessException e) {
-				getLog().debug("Cannot get PID of process: " + e);
-			} catch (NoSuchFieldException e) {
-				getLog().debug("Cannot get PID of process: " + e);
-			}
+                int pid = MarmosetUtilities.getPid(testRunner);
+                getLog().debug(
+                        "Subprocess for submission "
+                                + getProjectSubmission().getSubmissionPK()
+                                + " for testSetup "
+                                + getProjectSubmission().getTestSetupPK()
+                                + " for " + testType + " " + nextTestNumber
+                                + " " + testMethod + " in testClass "
+                                + testClass + " has pid = " + pid);
 
 			isRunning = true;
 
