@@ -60,8 +60,8 @@ public class SystemInfo {
 	    for(File f :File.listRoots() ) {
 	        long freeSpace = f.getUsableSpace();
 	        long totalSpace = f.getTotalSpace();
-	        if (totalSpace > 10 * Gbyte)
-	            out.printf("%s %d MBytes free, ", f, freeSpace / Mbyte);
+	        if (totalSpace > 10 * Gbyte && (freeSpace < 2 * Gbyte || verbose))
+	            out.printf("%,d MBytes free on %s, ", freeSpace / Mbyte, f);
 	    }
 	}
 	
