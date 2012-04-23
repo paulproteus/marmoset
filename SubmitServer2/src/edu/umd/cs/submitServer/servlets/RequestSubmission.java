@@ -165,15 +165,14 @@ public class RequestSubmission extends SubmitServerServlet {
                 } else if (projectNumber != null) {
                     if (allowedCourses.size() != 1)   
                         throw new ServletException("Can only specify a single course when specifying a project number"); 
-                    System.out.printf("Testing project %s%n", projectNumber);
-                    Integer coursePK = allowedCourses.iterator().next();
+                   Integer coursePK = allowedCourses.iterator().next();
                     Project project = Project.lookupByCourseAndProjectNumber(coursePK, projectNumber, conn);
                     kind = Kind.PROJECT_RETEST;
                     if (!Queries.lookupOldestSubmissionForProject(conn, submission, testSetup, project)) {
                         response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, NO_SUBMISSIONS_AVAILABLE_MESSASGE);
                         return;
                     }
-                    System.out.printf("Found submission %d for project %s%n", submission.getSubmissionPK(), projectNumber);
+                    foundSubmissionForBackgroundRetesting = true;
                 } else {
 
                     findSubmission: {
