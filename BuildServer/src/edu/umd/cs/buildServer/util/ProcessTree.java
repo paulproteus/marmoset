@@ -49,7 +49,7 @@ public final class ProcessTree {
         Process p = b.start();
         
         int psPid = MarmosetUtilities.getPid(p);
-        
+        int rootPid = MarmosetUtilities.getPid();
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
         String header = s.nextLine();
@@ -65,7 +65,7 @@ public final class ProcessTree {
                 int pid = Integer.parseInt(fields[0]);
                 int  ppid = Integer.parseInt(fields[1]);
                 int  gpid = Integer.parseInt(fields[2]);
-                if (psPid == pid)
+                if (psPid == pid || rootPid == pid)
                     continue;
                 live.add(pid);
                 children.put(ppid, pid);
