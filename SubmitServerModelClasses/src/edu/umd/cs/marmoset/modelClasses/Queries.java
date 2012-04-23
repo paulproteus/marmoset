@@ -266,6 +266,32 @@ public final class Queries {
 		return getFromPreparedStatement(stmt, submission, testSetup);
 	}
 
+	
+	   public static boolean lookupOldestSubmissionForProject(Connection conn,
+	            Submission submission, TestSetup testSetup,
+	             Project project)
+	            throws SQLException {
+	       
+	       String query = " SELECT "
+	                + Submission.ATTRIBUTES
+	                + ", "
+	                + TestSetup.ATTRIBUTES
+	                + " "
+	                + " FROM submissions, test_setups, projects "
+	                + " WHERE "
+	                + "     submissions.project_pk = projects.project_pk "
+	                + " AND projects.test_setup_pk = test_setups.test_setup_pk "
+	                + " AND projects.project_pk = ? "
+                    + " AND submissions.build_status != ? "
+	                + " ORDER BY submissions.build_request_timestamp  ASC "
+	                + " LIMIT 1 " + " LOCK IN SHARE MODE ";
+
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        setStatement(stmt, project.getProjectPK(), BuildStatus.BROKEN);
+
+	        return getFromPreparedStatement(stmt, submission, testSetup);
+	    }
+	   
 	/**
 	 * Gets the most recent submission that has timed out (i.e. been marked
 	 * "pending" for too long)

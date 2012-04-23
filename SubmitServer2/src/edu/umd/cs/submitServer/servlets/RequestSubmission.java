@@ -50,6 +50,7 @@ import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Queries;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.modelClasses.Queries.RetestPriority;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
@@ -73,7 +74,7 @@ public class RequestSubmission extends SubmitServerServlet {
 
     enum Kind {
         UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP,
-        BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST;
+        BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST, PROJECT_RETEST;
     }
 
     public static void timeDump(StringBuffer buf, Timestamp started, String f, Object... args) {
@@ -107,6 +108,8 @@ public class RequestSubmission extends SubmitServerServlet {
         String load = multipartRequest.getOptionalStringParameter("load");
         if (load == null)
             load = "unknown";
+        String projectNumber = multipartRequest.getOptionalStringParameter("projectNumber");
+         
         Kind kind = Kind.UNKNOWN;
         Queries.RetestPriority foundPriority = null;
         String courses = multipartRequest.getStringParameter("courses");
@@ -159,6 +162,18 @@ public class RequestSubmission extends SubmitServerServlet {
                     } else {
                         kind = Kind.SPECIFIC_REQUEST_NO_TESTSETUP;
                     }
+                } else if (projectNumber != null) {
+                    if (allowedCourses.size() != 1)   
+                        throw new ServletException("Can only specify a single course when specifying a project number"); 
+                    System.out.printf("Testing project %s%n", projectNumber);
+                    Integer coursePK = allowedCourses.iterator().next();
+                    Project project = Project.lookupByCourseAndProjectNumber(coursePK, projectNumber, conn);
+                    kind = Kind.PROJECT_RETEST;
+                    if (!Queries.lookupOldestSubmissionForProject(conn, submission, testSetup, project)) {
+                        response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, NO_SUBMISSIONS_AVAILABLE_MESSASGE);
+                        return;
+                    }
+                    System.out.printf("Found submission %d for project %s%n", submission.getSubmissionPK(), projectNumber);
                 } else {
 
                     findSubmission: {
