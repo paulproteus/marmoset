@@ -44,6 +44,8 @@ public final class ProcessTree {
         try {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
                         "-o", "pid,ppid,pgid,user,state,pcpu,cputime,lstart,args"});
+     
+        
         Process p = b.start();
         
         int psPid = MarmosetUtilities.getPid(p);
@@ -62,6 +64,7 @@ public final class ProcessTree {
                     throw new IllegalStateException("Got " + Arrays.toString(fields));
                 int pid = Integer.parseInt(fields[0]);
                 int  ppid = Integer.parseInt(fields[1]);
+                int  gpid = Integer.parseInt(fields[2]);
                 if (psPid == pid)
                     continue;
                 live.add(pid);
@@ -153,17 +156,21 @@ public final class ProcessTree {
     }
     private void killProcessTree(int rootPid, int signal) throws IOException {
         Set<Integer> result = findTree(rootPid);
+        Set<Integer> unrooted = findTree(1);
+        
         Set<Integer> subtree = findJvmSubtree();
-        boolean differ = !result.equals(subtree);
+        boolean differ = !result.equals(subtree) || !unrooted.isEmpty();
         if (differ || true) {
             if (differ)
             log.info("process tree and JVM subtree not the same:");
             logProcesses("root pid", Collections.singleton(rootPid));
             logProcesses("process tree", result);
+            logProcesses("unrooted", unrooted);
             logProcesses("JVM subtree", subtree);
             logProcesses("live", live);
         }
    
+        result.addAll(unrooted);
         if (result.isEmpty()) return;
         log.info("Halting process tree starting at " + rootPid + " which is " + result);
           while (true) {
