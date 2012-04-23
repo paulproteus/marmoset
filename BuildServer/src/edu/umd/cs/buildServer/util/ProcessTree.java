@@ -178,6 +178,8 @@ public final class ProcessTree {
             pause(100);
             computeChildren();
             Set<Integer> r = findTree(rootPid);
+            Set<Integer> u = findTree(1);
+            r.addAll(u);
             if (r.equals(result))
                 break;
             result = r;
