@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -44,6 +46,8 @@ public final class ProcessTree {
                         "-o", "pid,ppid,pgid,user,state,pcpu,cputime,lstart,args"});
         Process p = b.start();
         
+        int psPid = MarmosetUtilities.getPid(p);
+        
         p.getOutputStream().close();
         Scanner s = new Scanner(p.getInputStream());
         String header = s.nextLine();
@@ -58,6 +62,8 @@ public final class ProcessTree {
                     throw new IllegalStateException("Got " + Arrays.toString(fields));
                 int pid = Integer.parseInt(fields[0]);
                 int  ppid = Integer.parseInt(fields[1]);
+                if (psPid == pid)
+                    continue;
                 live.add(pid);
                 children.put(ppid, pid);
                 info.put(pid, txt);
@@ -132,22 +138,30 @@ public final class ProcessTree {
         
     }
     
+    private void logProcesses(String title, Collection<Integer> pids) {
+        log.info(String.format("%-14s: %s", title, pids));
+        for(Integer pid : pids) 
+            logProcess(pid);
+    }
+    private void logProcess(Integer pid) {
+        String process = info.get(pid);
+        if (process == null) {
+            log.info("no info for pid " + pid);
+            return;
+        }
+        log.info(process);
+    }
     private void killProcessTree(int rootPid, int signal) throws IOException {
         Set<Integer> result = findTree(rootPid);
         Set<Integer> subtree = findJvmSubtree();
-        if (!result.equals(subtree)) {
+        boolean differ = !result.equals(subtree);
+        if (differ || true) {
+            if (differ)
             log.info("process tree and JVM subtree not the same:");
-            log.info("      root pid: " + rootPid);
-            log.info(info.get(rootPid));
-            log.info("  process tree: " + result);
-            for(Integer pid : result) {
-                log.info(info.get(pid));
-            }
-            log.info("   JVM subtree: " + subtree);
-            log.info("          live: " + live);
-            for(Integer pid : subtree) {
-                log.info(info.get(pid));
-            }
+            logProcesses("root pid", Collections.singleton(rootPid));
+            logProcesses("process tree", result);
+            logProcesses("JVM subtree", subtree);
+            logProcesses("live", live);
         }
    
         if (result.isEmpty()) return;
