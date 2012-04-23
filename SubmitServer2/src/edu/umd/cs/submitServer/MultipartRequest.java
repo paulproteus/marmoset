@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.CheckReturnValue;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -175,7 +176,7 @@ public class MultipartRequest {
 	 *
 	 * @return the value of the given parameter, or null if unspecified
 	 */
-	public String getOptionalStringParameter(String name) {
+	public @CheckForNull String getOptionalStringParameter(String name) {
 		String param = (String) parameters.get(name);
 		if (param == null || param.equals("")) {
 			return null;
@@ -194,7 +195,7 @@ public class MultipartRequest {
 	 *            pattern that must match a valid parameter
 	 * @return the parameter if it specified and valid, null otherwise
 	 */
-	private String getOptionalRegexParameter(String name, Pattern p) {
+	private @CheckForNull String getOptionalRegexParameter(String name, Pattern p) {
 		String s = getParameter(name);
 		if (s != null) {
 			s = s.trim();

@@ -168,7 +168,7 @@ public class StudentForUpload {
 	}
 	
 	public static StudentRegistration registerStudent(Course course, Student student,
-			@Nonnull String section,
+			String section,
 			String classAccount, @Capability String capability, Connection conn) throws SQLException {
 		
 		StudentRegistration registration = StudentRegistration
