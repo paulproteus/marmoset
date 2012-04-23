@@ -271,6 +271,12 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		  String supportedCoursePKList 
 		    = getBuildServerConfiguration().getSupportedCourses();
 
+		  String specificProjectNum = getConfig().getOptionalProperty(
+	                DEBUG_SPECIFIC_PROJECT);
+		  String specificCourse = getConfig().getOptionalProperty(
+                  DEBUG_SPECIFIC_COURSE);
+		  if (specificCourse != null)
+		      supportedCoursePKList = specificCourse;
 		
 		String specificSubmission = getConfig().getOptionalProperty(
 				DEBUG_SPECIFIC_SUBMISSION);
@@ -284,6 +290,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		if (specificTestSetup != null) {
 		    method.addParameter("testSetupPK", specificTestSetup);
 		    System.out.printf("Requesting testSetupPK %s%n", specificTestSetup);
+		}
+		
+		if (specificProjectNum != null) {
+		    method.addParameter("projectNumber", specificProjectNum);
 		}
 		
 		method.addParameter("hostname",
@@ -362,7 +372,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         
 		ProjectSubmission<?> projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), submissionPK, testSetupPK,
-				isNewTestSetup, isBackgroundRetest);
+				isNewTestSetup, isBackgroundRetest, kind);
 
 		projectSubmission.setMethod(method);
 
@@ -562,6 +572,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		method.addParameter("load", SystemInfo.getSystemLoad());
 		String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
         method.addParameter("courses", supportedCourses);
+        method.addParameter("kind", projectSubmission.getKind());
         
 
 		
@@ -622,7 +633,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
                 .withDescription(  "use given config file" )
                 .withLongOpt("config")
                 .create( "c");
-        Option downloadOnly = OptionBuilder
+        Option courseKey = OptionBuilder.withArgName( "courseKey" )
+                .hasArg()
+                .withDescription(  "use given course key" )
+                .create( "course");
+     Option downloadOnly = OptionBuilder
                 .withDescription(  "download only" )
                 .withLongOpt("download")
                 .create( "d");
@@ -636,6 +651,12 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
                 .withDescription(  "use the specified test setup" )
                  .withLongOpt( "testSetup")
                 .create( "t");
+        
+        Option projectNum =  OptionBuilder.withArgName( "projectNum" )
+                .hasArg()
+                .withDescription(  "exhaustively retest the specified project" )
+                 .withLongOpt( "projectNum")
+                .create( "p");
          
         Option onceOption = new Option( "o", "once", false, "quit after handling one request" );
         Option logLevel = OptionBuilder.withArgName("logLevel")
@@ -646,6 +667,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         options.addOption(help);
         options.addOption(configFile);
         options.addOption(submission);
+        options.addOption(projectNum);
+        options.addOption(courseKey);
+        
         options.addOption(testSetup);
         options.addOption(onceOption);
         options.addOption(logLevel);
@@ -699,6 +723,18 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             throw new IllegalArgumentException(
                     "You can only specify a specific test setup if you also specify a specific submission");
         }
+        
+        if (line.hasOption("projectNum")) {
+            buildServer.getConfig().setProperty(DEBUG_SPECIFIC_PROJECT,
+                    line.getOptionValue("projectNum"));
+        }
+        
+        if (line.hasOption("course")) {
+            buildServer.getConfig().setProperty(DEBUG_SPECIFIC_COURSE,
+                    line.getOptionValue("course"));
+        }
+            
+    
         if (line.hasOption("logLevel"))
             buildServer.getConfig().setProperty(LOG4J_THRESHOLD,
                     line.getOptionValue(line.getOptionValue("logLevel")));

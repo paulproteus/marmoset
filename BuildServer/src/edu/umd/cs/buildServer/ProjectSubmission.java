@@ -51,12 +51,12 @@ import edu.umd.cs.marmoset.modelClasses.TestPropertyKeys;
  * @author David Hovemeyer
  */
 public class ProjectSubmission<T extends TestProperties> implements ConfigurationKeys, TestPropertyKeys {
-	private BuildServerConfiguration config;
-	private Logger log;
-	private String submissionPK;
-	private String testSetupPK;
-	private String isNewTestSetup;
-	private String isBackgroundRetest;
+	private final BuildServerConfiguration config;
+	private final Logger log;
+	private final String submissionPK;
+	private final String testSetupPK;
+	private final String isNewTestSetup;
+	private final String isBackgroundRetest;
 	/**
 	 * Auxiliary information about the source to be built, such as an md5sum of
 	 * the classfiles and/or the names of student-written tests. So far we don't
@@ -67,11 +67,12 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 	private File zipFile;
 	private File testSetup;
 
-	private TestOutcomeCollection testOutcomeCollection;
+	private final TestOutcomeCollection testOutcomeCollection;
 
 	private HttpMethod method;
 	private T testProperties;
 	private BuilderAndTesterFactory<T> builderAndTesterFactory;
+	private final String kind;
 
 	/**
 	 * Constructor.
@@ -87,11 +88,12 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 	 * @param isNewTestSetup
 	 *            boolean: whether or not the submission is for a new project
 	 *            jarfile being tested with the canonical project solution
+	 * @param kind TODO
 	 * @throws MissingConfigurationPropertyException
 	 */
 	public ProjectSubmission(BuildServerConfiguration config, Logger log,
 			String submissionPK, String projectJarfilePK,
-			String isNewTestSetup, String isBackgroundRetest)
+			String isNewTestSetup, String isBackgroundRetest, String kind)
 			throws MissingConfigurationPropertyException {
 		this.config = config;
 		this.log = log;
@@ -99,6 +101,7 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 		this.testSetupPK = projectJarfilePK;
 		this.isNewTestSetup = isNewTestSetup;
 		this.isBackgroundRetest = isBackgroundRetest;
+		this.kind = kind;
 
 		// Choose a name for the zip file based on
 		// the build directory and the submission PK.
@@ -130,6 +133,9 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 		return log;
 	}
 
+	public String getKind() {
+	    return kind;
+	}
 	/**
 	 * @return Returns the isNewTestSetup value.
 	 */

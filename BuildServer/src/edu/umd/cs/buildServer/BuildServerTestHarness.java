@@ -134,7 +134,7 @@ public class BuildServerTestHarness extends BuildServer {
 		ProjectSubmission <?>projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), "42", // submissionPK
 				"17", // projectJarfilePK
-				"false", "false");
+				"false", "false", kind);
 
 		// Override the Files for the submission zipfile and project jarfile
 		projectSubmission.setZipFile(new File(submissionZipFile)
