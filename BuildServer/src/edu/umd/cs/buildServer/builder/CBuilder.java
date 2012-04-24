@@ -169,6 +169,7 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 				args.add(makeFile);
 			}
 
+			long startTime = System.currentTimeMillis();
 			process = Untrusted.executeCombiningOutput(
 					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
 
@@ -178,7 +179,7 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 	                process.getInputStream()), makeOutput, testProperties.getMaxDrainOutputInBytes());
 	        executor.submit(copyMakeOutput);
 	        
-			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog());
+			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog(), startTime);
            
             long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;
 

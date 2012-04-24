@@ -174,6 +174,7 @@ public class CTester extends Tester<ScriptTestProperties> {
 
         ExecutableTestCase.OutputKind outputKind = testCase.getOutputKind();
         TextDiff output = null;
+        long startTime = System.currentTimeMillis();
         if (outputKind == OutputKind.NONE) {
             output = null;
         } else {
@@ -206,7 +207,7 @@ public class CTester extends Tester<ScriptTestProperties> {
                 executor.submit(saveOutput);
                 executor.submit(drainErr);
                 ProcessExitMonitor referenceExitMonitor = new ProcessExitMonitor(refProcess,
-                        getLog());
+                        getLog(), startTime);
                 boolean done = referenceExitMonitor.waitForProcessToExit(processTimeoutMillis);
                 if (!done)
                     throw new BuilderException("Capture of reference output for " + testCase.getName() 
@@ -250,7 +251,7 @@ public class CTester extends Tester<ScriptTestProperties> {
          
         
         ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
-                getLog());
+                getLog(), startTime);
 
         boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
         testOutcome

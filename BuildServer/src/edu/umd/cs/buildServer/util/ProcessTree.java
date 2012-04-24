@@ -4,16 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -31,19 +33,29 @@ public final class ProcessTree {
     final Logger log;
     final String user;
     final Process process;
+    final long startTime;
     
-    public ProcessTree(Process process, Logger log)  {
+    public ProcessTree(Process process, Logger log, long startTime)  {
         this.process = process;
         this.log = log;
         user = System.getProperty("user.name");
+        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
         computeChildren();
     }
     
+	// example date: Fri Apr 13 00:02:43 2012
+	static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		public SimpleDateFormat initialValue() {
+			return new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy");
+		}
+	};
+
     private void computeChildren()  {
         live.clear();
         try {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
-                        "-o", "pid,ppid,pgid,user,state,pcpu,cputime,lstart,args"});
+                        "-o", "pid,ppid,lstart,user,state,pcpu,cputime,args"});
      
         
         Process p = b.start();
@@ -59,14 +71,13 @@ public final class ProcessTree {
             if (!txt.contains(user)) continue;
 //            log.debug(txt);
             try {
-                String fields [] = txt.trim().split(" +");
-                if (fields.length < 2)
-                    throw new IllegalStateException("Got " + Arrays.toString(fields));
-                int pid = Integer.parseInt(fields[0]);
-                int  ppid = Integer.parseInt(fields[1]);
-                int  gpid = Integer.parseInt(fields[2]);
-                if (psPid == pid || rootPid == pid)
+               int pid = Integer.parseInt(txt.substring(0,5).trim());
+               int ppid = Integer.parseInt(txt.substring(6,11).trim());
+               Date started = DATE_FORMAT.get().parse(txt.substring(12, 36));
+               if (psPid == pid || rootPid == pid)
                     continue;
+               if (started.getTime() < startTime) 
+            	   		continue;
                 live.add(pid);
                 children.put(ppid, pid);
                 info.put(pid, txt);
