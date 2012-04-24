@@ -46,7 +46,7 @@ public final class ProcessExitMonitor implements Runnable {
 	private final Thread thread;
 	
 
-	public ProcessExitMonitor(Process process, Logger logger) {
+	public ProcessExitMonitor(Process process, Logger logger, long startTime) {
 	    thread = new Thread(this, "Process exit monitor");
 		thread.setDaemon(true);
 		this.process = process;
@@ -54,11 +54,14 @@ public final class ProcessExitMonitor implements Runnable {
 		
 		log.debug("Starting exit monitor for pid " + MarmosetUtilities.getPid(process));
 		
-		this.tree = new ProcessTree(process, logger);
+		this.tree = new ProcessTree(process, logger, startTime);
 		thread.start();
 	}
 
 
+	public Process getProcess() {
+		return process;
+	}
 	@Override
 	public void run() {
 		try {
