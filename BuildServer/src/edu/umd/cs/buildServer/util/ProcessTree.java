@@ -232,7 +232,8 @@ public final class ProcessTree {
     
     private void drainToLog(final InputStream in) {
         Thread t = new Thread( new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 try {
                 BufferedReader r = new BufferedReader(new InputStreamReader(in));
 

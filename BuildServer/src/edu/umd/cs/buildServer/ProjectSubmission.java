@@ -224,6 +224,7 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 	 *         submission
 	 * @throws BuilderException
 	 */
+	@SuppressWarnings("unchecked")
 	public BuilderAndTesterFactory<T> createBuilderAndTesterFactory()
 			throws BuilderException {
 		try {

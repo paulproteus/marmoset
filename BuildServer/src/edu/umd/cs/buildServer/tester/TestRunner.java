@@ -336,7 +336,8 @@ public class TestRunner extends BaseTestRunner {
 	  private static void setSystemInOutAndErr(final InputStream input,
 	            final PrintStream oStream, final PrintStream err) {
 	        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-	            public Void run() {
+	            @Override
+				public Void run() {
 	                System.setIn(input);
 	                System.setOut(oStream);
 	                System.setErr(err);
