@@ -39,7 +39,7 @@ public final class ProcessTree {
         this.process = process;
         this.log = log;
         user = System.getProperty("user.name");
-        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
         computeChildren();
     }
     
@@ -76,10 +76,10 @@ public final class ProcessTree {
                 Date started = DATE_FORMAT.get().parse(txt.substring(12, 36));
                 if (psPid == pid || rootPid == pid)
                     continue;
-                if (started.getTime() < startTime)
-                    continue;
-                log.debug("considering " + txt);
-
+                if (started.getTime() < startTime) {
+                    if (ppid != 1) continue;
+                    log.debug("old orphan " + txt);
+                }
                 live.add(pid);
                 children.put(ppid, pid);
                 info.put(pid, txt);
