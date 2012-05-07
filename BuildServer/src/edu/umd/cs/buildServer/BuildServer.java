@@ -311,6 +311,8 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @return true if the server loop should continue, false if not
 	 */
 	protected boolean continueServerLoop() {
+		if (new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown").exists())
+			return false;
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
 				|| config.getOptionalProperty(DEBUG_SPECIFIC_SUBMISSION) != null)
 			return numServerLoopIterations == 0;
