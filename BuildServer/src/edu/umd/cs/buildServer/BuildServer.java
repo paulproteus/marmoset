@@ -316,8 +316,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @return true if the server loop should continue, false if not
 	 */
 	protected boolean continueServerLoop() {
-		if (new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown").exists())
+		File pleaseShutdownFIle = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
+		if (pleaseShutdownFIle.exists()) {
+			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFIle.lastModified()));
 			return false;
+		}
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
 				|| config.getOptionalProperty(DEBUG_SPECIFIC_SUBMISSION) != null)
 			return numServerLoopIterations == 0;
@@ -928,7 +931,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		BufferedReader r = new BufferedReader(new FileReader(pidFile));
 		int oldPid = Integer.parseInt(r.readLine());
 		ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/ps", "xww",
-				"-o", "pid,ppid,lstart,user,state,pcpu,cputime,args" });
+				"-o", "pid,lstart,user,state,pcpu,cputime,args" });
 		String user = System.getProperty("user.name");
 	
 		Process p = b.start();
