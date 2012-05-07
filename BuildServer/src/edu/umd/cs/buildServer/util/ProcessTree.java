@@ -57,8 +57,8 @@ public final class ProcessTree {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
                         "-o", "pid,ppid,lstart,user,state,pcpu,cputime,args"});
      
-        
         Process p = b.start();
+        log.info("started ps");
         
         int psPid = MarmosetUtilities.getPid(p);
         int rootPid = MarmosetUtilities.getPid();
@@ -89,6 +89,8 @@ public final class ProcessTree {
             }
            
         }
+        log.info("finished ps with " + live);
+        
         s.close();
          s = new Scanner(p.getErrorStream());
          while (s.hasNext()) {
@@ -139,7 +141,7 @@ public final class ProcessTree {
     
     public  void destroyProcessTree() {
         int pid = MarmosetUtilities.getPid(process);
-        log.info("Killing process tree for " + pid);
+        log.info("Killing process tree for pid" + pid);
         
         try {
             this.computeChildren();
