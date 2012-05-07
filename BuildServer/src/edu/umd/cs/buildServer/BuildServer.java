@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
@@ -316,9 +317,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @return true if the server loop should continue, false if not
 	 */
 	protected boolean continueServerLoop() {
-		File pleaseShutdownFIle = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
-		if (pleaseShutdownFIle.exists()) {
-			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFIle.lastModified()));
+		File pleaseShutdownFile = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
+		if (pleaseShutdownFile.exists()) {
+			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified() + " by creation of " + pleaseShutdownFile.getAbsolutePath()));
 			return false;
 		}
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
