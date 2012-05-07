@@ -513,13 +513,6 @@ public abstract class BuildServer implements ConfigurationKeys {
 							"", started);
 					result = SUCCESS;
 				} catch (BuilderException e) {
-					// XXX Should a BuilderException be allowed here?
-					// [NAT - 7/Feb/2007] If an error occurs, we should provide
-					// some feedback to the user
-					if (false)
-						if (!projectSubmission.getIsNewTestSetup().equals(
-								"yes"))
-							throw e;
 					// treat as compile error
 					getLog().info(
 							"Submission " + projectSubmission.getSubmissionPK()

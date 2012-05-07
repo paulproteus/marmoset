@@ -550,7 +550,6 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		ClassLoader cl = c.getClassLoader();
 		String classFileName = c.getName().replace('.', '/') + ".class";
 		URL u = cl.getResource(classFileName);
-		File f = null;
 		try {
 			String path = u.toString();
 			if (path.startsWith("jar:")) {
