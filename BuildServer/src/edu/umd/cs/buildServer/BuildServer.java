@@ -319,7 +319,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	protected boolean continueServerLoop() {
 		File pleaseShutdownFile = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
 		if (pleaseShutdownFile.exists()) {
-			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified() + " by creation of " + pleaseShutdownFile.getAbsolutePath()));
+			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified()) + " by creation of " + pleaseShutdownFile.getAbsolutePath());
 			return false;
 		}
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
