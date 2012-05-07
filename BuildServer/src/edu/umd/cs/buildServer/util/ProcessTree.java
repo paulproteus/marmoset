@@ -80,6 +80,7 @@ public final class ProcessTree {
                     if (ppid != 1) continue;
                     log.debug("old orphan " + txt);
                 }
+                log.info(txt);
                 live.add(pid);
                 children.put(ppid, pid);
                 info.put(pid, txt);
