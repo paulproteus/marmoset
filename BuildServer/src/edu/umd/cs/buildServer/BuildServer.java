@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
@@ -316,8 +317,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @return true if the server loop should continue, false if not
 	 */
 	protected boolean continueServerLoop() {
-		if (new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown").exists())
+		File pleaseShutdownFile = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
+		if (pleaseShutdownFile.exists()) {
+			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified() + " by creation of " + pleaseShutdownFile.getAbsolutePath()));
 			return false;
+		}
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
 				|| config.getOptionalProperty(DEBUG_SPECIFIC_SUBMISSION) != null)
 			return numServerLoopIterations == 0;
@@ -928,7 +932,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 		BufferedReader r = new BufferedReader(new FileReader(pidFile));
 		int oldPid = Integer.parseInt(r.readLine());
 		ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/ps", "xww",
-				"-o", "pid,ppid,lstart,user,state,pcpu,cputime,args" });
+				"-o", "pid,lstart,user,state,pcpu,cputime,args" });
 		String user = System.getProperty("user.name");
 	
 		Process p = b.start();
