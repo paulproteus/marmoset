@@ -141,7 +141,7 @@ public final class ProcessTree {
     
     public  void destroyProcessTree() {
         int pid = MarmosetUtilities.getPid(process);
-        log.info("Killing process tree for pid" + pid);
+        log.info("Killing process tree for pid " + pid);
         
         try {
             this.computeChildren();
