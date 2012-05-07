@@ -84,7 +84,8 @@ public class CTester extends Tester<ScriptTestProperties> {
      * @param directoryFinder
      *            DirectoryFinder to locate build and testfiles directories
      */
-    public CTester(ScriptTestProperties testProperties,
+    public CTester(
+            ScriptTestProperties testProperties,
             ProjectSubmission<? extends ScriptTestProperties> projectSubmission,
             DirectoryFinder directoryFinder) {
         super(testProperties, projectSubmission, directoryFinder);
@@ -98,10 +99,11 @@ public class CTester extends Tester<ScriptTestProperties> {
     @Override
     protected void executeTests() throws BuilderException {
         loadTestProperties();
-        for(ExecutableTestCase e : getTestProperties().getExecutableTestCases()) {
+        for (ExecutableTestCase e : getTestProperties()
+                .getExecutableTestCases()) {
             getTestOutcomeCollection().add(executeTest(e));
         }
-     
+
         testsCompleted();
     }
 
@@ -114,228 +116,244 @@ public class CTester extends Tester<ScriptTestProperties> {
         protected WhoClosedMeInputStream(InputStream arg0) {
             super(arg0);
         }
-        
+
         @Override
-		public void close() throws IOException {
+        public void close() throws IOException {
             new RuntimeException("input stream closed at").printStackTrace();
             super.close();
         }
-        
+
     }
-    private TestOutcome executeTest(ExecutableTestCase testCase)  {
+
+    private TestOutcome executeTest(ExecutableTestCase testCase) {
         TestOutcome testOutcome = new TestOutcome();
         testOutcome.setTestNumber(Integer.toString(testCase.getNumber()));
         testOutcome.setTestName(testCase.getName());
         testOutcome.setTestType(testCase.getTestType());
 
         // Record a test outcome.
-       int testTimeoutInSeconds = getTestProperties()
+        int testTimeoutInSeconds = getTestProperties()
                 .getTestTimeoutInSeconds();
 
-       getLog().debug("Running test " + testCase.getName());
+        getLog().debug("Running test " + testCase.getName());
         long processTimeoutMillis = testTimeoutInSeconds * 1000L;
 
         String[] exec = getExecLine(testCase, ExecutableTestCase.Property.EXEC);
         File buildDirectory = getDirectoryFinder().getBuildDirectory();
-       String options = testCase.getProperty(ExecutableTestCase.Property.OPTIONS);
-       EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
-       if (options != null) {
-           for(String oName : options.split("[\\s,]+")) {
-               Option o = Option.valueOfAnyCase(oName);
-               optionsForDiffing.add(o);
-           }
-           
-       }
-
-       
-        try {
-
-        InputStream in;
-        switch (testCase.getInputKind()) {
-        case NONE:
-            in = new DevNullInputStream();
-            break;
-        case FILE:
-            File f = new File(buildDirectory,
-                    testCase.getProperty(ExecutableTestCase.Property.INPUT));
-            if (!readableFile(f))
-                throw new IllegalStateException("No input file " + f);
-
-            in = new FileInputStream(f);
-            break;
-        case STRING:
-            String input = testCase
-                    .getProperty(ExecutableTestCase.Property.INPUT) + "\n";
-            in = new ByteArrayInputStream(input.getBytes());
-            break;
-        default:
-            throw new AssertionError();
-        }
-
-        ExecutableTestCase.OutputKind outputKind = testCase.getOutputKind();
-        TextDiff output = null;
-        long startTime = System.currentTimeMillis();
-        if (outputKind == OutputKind.NONE) {
-            output = null;
-        } else {
-            TextDiff.Builder builder = TextDiff.withOptions(optionsForDiffing);
-            switch (outputKind) {
-            case STRING:
-                builder.expect(testCase
-                        .getProperty(ExecutableTestCase.Property.EXPECTED));
-                break;
-            case FILE:
-                File f = new File(
-                        buildDirectory,
-                        testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
-                if (!readableFile(f))
-                    throw new IllegalStateException("No input file " + f);
-                builder.expect(f);
-                break;
-            case  REFERENCE_IMPL:
-                String[] refExec = getExecLine(testCase, ExecutableTestCase.Property.REFERENCE_EXEC);
-                Process refProcess = Untrusted.execute(buildDirectory,refExec);
-                FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
-                        refProcess.getOutputStream());
-                StringListWriter expectedOutput = new StringListWriter();
-                FutureTask<Void> saveOutput =  TextDiff.copyTask("capture expected output",
-                        refProcess.getInputStream(), expectedOutput, getTestProperties().getMaxDrainOutputInBytes());
-                FutureTask<Void> drainErr = TextDiff.copyTask("drain expected err",
-                        refProcess.getErrorStream(), new DevNullOutputStream());
-              
-                executor.submit(copyInput);
-                executor.submit(saveOutput);
-                executor.submit(drainErr);
-                ProcessExitMonitor referenceExitMonitor = new ProcessExitMonitor(refProcess,
-                        getLog(), startTime);
-                boolean done = referenceExitMonitor.waitForProcessToExit(processTimeoutMillis);
-                if (!done)
-                    throw new BuilderException("Capture of reference output for " + testCase.getName() 
-                            + " timed out");
-                saveOutput.get();
-                copyInput.cancel(true);
-                drainErr.cancel(true);
-                
-                builder.expect(expectedOutput.getStrings());
-                
-                
+        String options = testCase
+                .getProperty(ExecutableTestCase.Property.OPTIONS);
+        EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
+        if (options != null) {
+            for (String oName : options.split("[\\s,]+")) {
+                Option o = Option.valueOfAnyCase(oName);
+                optionsForDiffing.add(o);
             }
 
-            output = builder.build();
-
         }
 
-        long started = System.currentTimeMillis();
-        Process process ;
-        if (output == null) 
-            process = Untrusted.executeCombiningOutput(buildDirectory, exec);
-        else 
-            process = Untrusted.execute(buildDirectory, exec);
-        
-        FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
-                process.getOutputStream());
-        FutureTask<Void> checkOutput = null;
-        
-        StringWriter err = new StringWriter();
-        
-        if (output != null)
-            checkOutput = output.check((process.getInputStream()));
-       
-        FutureTask<Void> copyError = TextDiff.copyTask("copy error", new InputStreamReader(
-               output != null ? process.getErrorStream() : process.getInputStream()), err, getTestProperties().getMaxDrainOutputInBytes());
+        try {
 
-        executor.submit(copyInput);
-        executor.submit(copyError);
-        if (checkOutput != null) 
-            executor.submit(checkOutput);
-         
-        
-        ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
-                getLog(), startTime);
+            InputStream in;
+            switch (testCase.getInputKind()) {
+            case NONE:
+                in = new DevNullInputStream();
+                break;
+            case FILE:
+                File f = new File(buildDirectory,
+                        testCase.getProperty(ExecutableTestCase.Property.INPUT));
+                if (!readableFile(f))
+                    throw new IllegalStateException("No input file " + f);
 
-        boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
-        testOutcome
-        .setExecutionTimeMillis(System.currentTimeMillis() - started);
+                in = new FileInputStream(f);
+                break;
+            case STRING:
+                String input = testCase
+                        .getProperty(ExecutableTestCase.Property.INPUT) + "\n";
+                in = new ByteArrayInputStream(input.getBytes());
+                break;
+            default:
+                throw new AssertionError();
+            }
 
+            ExecutableTestCase.OutputKind outputKind = testCase.getOutputKind();
+            TextDiff output = null;
+            long startTime = System.currentTimeMillis();
+            if (outputKind == OutputKind.NONE) {
+                output = null;
+            } else {
+                TextDiff.Builder builder = TextDiff
+                        .withOptions(optionsForDiffing);
+                switch (outputKind) {
+                case STRING:
+                    builder.expect(testCase
+                            .getProperty(ExecutableTestCase.Property.EXPECTED));
+                    break;
+                case FILE:
+                    File f = new File(
+                            buildDirectory,
+                            testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
+                    if (!readableFile(f))
+                        throw new IllegalStateException("No input file " + f);
+                    builder.expect(f);
+                    break;
+                case REFERENCE_IMPL:
+                    String[] refExec = getExecLine(testCase,
+                            ExecutableTestCase.Property.REFERENCE_EXEC);
+                    Process refProcess = Untrusted.execute(buildDirectory,
+                            refExec);
+                    FutureTask<Void> copyInput = TextDiff.copyTask(
+                            "copy input", in, refProcess.getOutputStream());
+                    StringListWriter expectedOutput = new StringListWriter();
+                    FutureTask<Void> saveOutput = TextDiff.copyTask(
+                            "capture expected output",
+                            refProcess.getInputStream(), expectedOutput,
+                            getTestProperties().getMaxDrainOutputInBytes());
+                    FutureTask<Void> drainErr = TextDiff.copyTask(
+                            "drain expected err", refProcess.getErrorStream(),
+                            new DevNullOutputStream());
 
-        boolean failed = false;
+                    executor.submit(copyInput);
+                    executor.submit(saveOutput);
+                    executor.submit(drainErr);
+                    ProcessExitMonitor referenceExitMonitor = new ProcessExitMonitor(
+                            refProcess, getLog(), startTime);
+                    boolean done = referenceExitMonitor
+                            .waitForProcessToExit(processTimeoutMillis);
+                    if (!done)
+                        throw new BuilderException(
+                                "Capture of reference output for "
+                                        + testCase.getName() + " timed out");
+                    saveOutput.get();
+                    copyInput.cancel(true);
+                    drainErr.cancel(true);
 
-        if (checkOutput != null) 
-            try {
-                checkOutput.get(50, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                checkOutput.cancel(true);
-                if (done)
-                    throw new AssertionError("done but output not ready");
-            } catch (InterruptedException e) {
-                checkOutput.cancel(true);
-                if (done)
-                    throw new AssertionError("done but output not ready");
-            } catch (ExecutionException e) {
-                Throwable t = e.getCause();
-                if (t instanceof AssertionError) {
-                    failed = true;
-                    getLog().debug(
-                            "Test didn't generate expected output: "
-                                    + testOutcome.getShortTestResult());
-                    testOutcome.setOutcome(TestOutcome.FAILED);
-                    String msg = t.getMessage();
-                    int i = msg.indexOf(" at junit.framework.Assert.fail(");
-                    if (i >= 0)
-                        msg = msg.substring(0, i);
-                    testOutcome.setShortTestResult(msg);
+                    builder.expect(expectedOutput.getStrings());
+
+                }
+
+                output = builder.build();
+
+            }
+
+            long started = System.currentTimeMillis();
+            Process process;
+            if (output == null)
+                process = Untrusted
+                        .executeCombiningOutput(buildDirectory, exec);
+            else
+                process = Untrusted.execute(buildDirectory, exec);
+
+            FutureTask<Void> copyInput = TextDiff.copyTask("copy input", in,
+                    process.getOutputStream());
+            FutureTask<Void> checkOutput = null;
+
+            StringWriter err = new StringWriter();
+
+            if (output != null)
+                checkOutput = output.check((process.getInputStream()));
+
+            FutureTask<Void> copyError = TextDiff.copyTask(
+                    "copy error",
+                    new InputStreamReader(output != null ? process
+                            .getErrorStream() : process.getInputStream()), err,
+                    getTestProperties().getMaxDrainOutputInBytes());
+
+            executor.submit(copyInput);
+            executor.submit(copyError);
+            if (checkOutput != null)
+                executor.submit(checkOutput);
+
+            ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process,
+                    getLog(), startTime);
+
+            boolean done = exitMonitor
+                    .waitForProcessToExit(processTimeoutMillis);
+            testOutcome.setExecutionTimeMillis(System.currentTimeMillis()
+                    - started);
+
+            boolean outcomeSet = false;
+
+            if (!done) {
+                outcomeSet = true;
+                getLog().debug("Test timed out");
+                // didn't terminate
+                testOutcome.setOutcome(TestOutcome.TIMEOUT);
+                testOutcome.setShortTestResult("Timed out at "
+                        + TimeUnit.SECONDS.convert(
+                                testOutcome.getExecutionTimeMillis(),
+                                TimeUnit.MILLISECONDS) + " secs");
+            } else if (checkOutput != null)
+                try {
+                    checkOutput.get(50, TimeUnit.MILLISECONDS);
+                } catch (TimeoutException e) {
+                    checkOutput.cancel(true);
+                    if (done)
+                        throw new AssertionError("done but output not ready");
+                } catch (InterruptedException e) {
+                    checkOutput.cancel(true);
+                    if (done)
+                        throw new AssertionError("done but output not ready");
+                } catch (ExecutionException e) {
+                    Throwable t = e.getCause();
+                    if (t instanceof AssertionError) {
+                        outcomeSet = true;
+                        getLog().debug(
+                                "Test didn't generate expected output: "
+                                        + testOutcome.getShortTestResult());
+                        testOutcome.setOutcome(TestOutcome.FAILED);
+                        String msg = t.getMessage();
+                        int i = msg.indexOf(" at junit.framework.Assert.fail(");
+                        if (i >= 0)
+                            msg = msg.substring(0, i);
+                        testOutcome.setShortTestResult(msg);
+                    }
+                }
+
+            err.flush();
+            copyInput.cancel(true);
+            copyError.cancel(true);
+            err.flush();
+
+            String errOutput = err.toString();
+            if (errOutput.length() > 1000) {
+                getLog().debug(
+                        "Error output length is "
+                                + errOutput.length()
+                                + ", max drain is "
+                                + getTestProperties()
+                                        .getMaxDrainOutputInBytes());
+            }
+            testOutcome.setLongTestResultCompressIfNeeded(errOutput);
+            if (testOutcome.isLongTestResultCompressed())
+                getLog().debug("testOutcome.longTestResults is compressed");
+
+            if (!outcomeSet) {
+                int exitCode = exitMonitor.getExitCode();
+                getLog().debug("Process exited with exit code: " + exitCode);
+                if (exitCode == 0) {
+                    testOutcome.setOutcome(TestOutcome.PASSED);
+                    testOutcome.setLongTestResult("");
+                } else {
+                    testOutcome.setOutcome(TestOutcome.ERROR);
+                    testOutcome.setShortTestResult("Test failed");
                 }
             }
 
-        err.flush();
-        copyInput.cancel(true);
-        copyError.cancel(true);
-        err.flush();
-        
-        
-
-        String errOutput = err.toString();
-        if (errOutput.length() > 1000) {
-        		getLog().debug("Error output length is " + errOutput.length() +", max drain is " + getTestProperties().getMaxDrainOutputInBytes());
-        }
-        	testOutcome.setLongTestResultCompressIfNeeded(errOutput);
-        	if (testOutcome.isLongTestResultCompressed())
-        			 getLog().debug("testOutcome.longTestResults is compressed");
-        		 
-        	 
-		if (failed) {
-            // nothing to do
-           
-        } else if (done) {
-            int exitCode = exitMonitor.getExitCode();
-            getLog().debug("Process exited with exit code: " + exitCode);
-            if (exitCode == 0) {
-                testOutcome.setOutcome(TestOutcome.PASSED);
-                testOutcome.setLongTestResult("");
-            } else {
-                testOutcome.setOutcome(TestOutcome.ERROR);
-                testOutcome.setShortTestResult("Test failed");
-            }
-        } else {
-            getLog().debug("Test timed out");
-            // didn't terminate
-            testOutcome.setOutcome(TestOutcome.TIMEOUT);
-            testOutcome.setShortTestResult("Timed out at " + TimeUnit.SECONDS.convert(testOutcome.getExecutionTimeMillis(), TimeUnit.MILLISECONDS) + " secs");
-        }
-        
-        
         } catch (Throwable t) {
-            getLog().error("CTester error",  t );
+            getLog().error("CTester error", t);
             testOutcome.setOutcome(TestOutcome.ERROR);
             testOutcome.setShortTestResult("Build server failure");
-            testOutcome.setLongTestResultCompressIfNeeded(TestRunner.toString(t));
+            testOutcome.setLongTestResultCompressIfNeeded(TestRunner
+                    .toString(t));
         }
-        
-        if (testOutcome.getOutcome().equals(TestOutcome.PASSED)) 
+
+        if (testOutcome.getOutcome().equals(TestOutcome.PASSED))
             getLog().info(testOutcome.getOutcome());
         else
-            getLog().info(testOutcome.getOutcome() + " : " + testOutcome.getShortTestResult());
-        
+            getLog().info(
+                    testOutcome.getOutcome() + " : "
+                            + testOutcome.getShortTestResult());
+
         return testOutcome;
     }
 
@@ -343,9 +361,9 @@ public class CTester extends Tester<ScriptTestProperties> {
      * @param testCase
      * @return
      */
-    public String[] getExecLine(ExecutableTestCase testCase, ExecutableTestCase.Property property) {
-        String exec[] = testCase.getProperty(property)
-                .split("\\s+");
+    public String[] getExecLine(ExecutableTestCase testCase,
+            ExecutableTestCase.Property property) {
+        String exec[] = testCase.getProperty(property).split("\\s+");
 
         exec[0] = checkTestExe(exec[0]);
         return exec;
@@ -366,17 +384,20 @@ public class CTester extends Tester<ScriptTestProperties> {
         File buildDirectory = getDirectoryFinder().getBuildDirectory();
         File exeFile = new File(buildDirectory, exeName);
         try {
-            if (readableFile(exeFile) && exeFile.getCanonicalPath().startsWith(
-                    buildDirectory.getCanonicalPath())) {
+            if (readableFile(exeFile)
+                    && exeFile.getCanonicalPath().startsWith(
+                            buildDirectory.getCanonicalPath())) {
                 // OK, this looks like an executable
                 if (!exeFile.canExecute())
                     exeFile.setExecutable(true);
                 return "./" + exeName;
             }
         } catch (IOException e) {
-            getLog().warn("Could not check executable " + exeFile + " in build directory " + buildDirectory);
+            getLog().warn(
+                    "Could not check executable " + exeFile
+                            + " in build directory " + buildDirectory);
         }
-        
+
         return exeName;
 
     }

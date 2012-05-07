@@ -39,7 +39,7 @@ public final class ProcessTree {
         this.process = process;
         this.log = log;
         user = System.getProperty("user.name");
-        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
         computeChildren();
     }
     
@@ -69,15 +69,17 @@ public final class ProcessTree {
         while (s.hasNext()) {
             String txt = s.nextLine();
             if (!txt.contains(user)) continue;
-//            log.debug(txt);
+
             try {
-               int pid = Integer.parseInt(txt.substring(0,5).trim());
-               int ppid = Integer.parseInt(txt.substring(6,11).trim());
-               Date started = DATE_FORMAT.get().parse(txt.substring(12, 36));
-               if (psPid == pid || rootPid == pid)
+                int pid = Integer.parseInt(txt.substring(0,5).trim());
+                int ppid = Integer.parseInt(txt.substring(6,11).trim());
+                Date started = DATE_FORMAT.get().parse(txt.substring(12, 36));
+                if (psPid == pid || rootPid == pid)
                     continue;
-               if (started.getTime() < startTime) 
-            	   		continue;
+                if (started.getTime() < startTime) {
+                    if (ppid != 1) continue;
+                    log.debug("old orphan " + txt);
+                }
                 live.add(pid);
                 children.put(ppid, pid);
                 info.put(pid, txt);
@@ -171,7 +173,7 @@ public final class ProcessTree {
         
         Set<Integer> subtree = findJvmSubtree();
         boolean differ = !result.equals(subtree) || !unrooted.isEmpty();
-        if (differ || true) {
+        if (differ) {
             if (differ)
             log.info("process tree and JVM subtree not the same:");
             logProcesses("root pid", Collections.singleton(rootPid));
