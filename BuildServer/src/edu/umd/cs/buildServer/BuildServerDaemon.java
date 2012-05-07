@@ -55,6 +55,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.buildServer.util.ServletAppender;
@@ -757,7 +758,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
         try {
             buildServer.executeServerLoop();
-            buildServer.getLog().info("Shutting down");
+            Logger log = buildServer.getLog();
+			if (log != null) 
+				log.info("Shutting down");
             timedSystemExit0();
         } catch (Exception e) {
 
