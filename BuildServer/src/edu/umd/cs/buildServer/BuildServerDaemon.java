@@ -27,14 +27,19 @@
 package edu.umd.cs.buildServer;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.security.SecureRandom;
+import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -62,6 +67,7 @@ import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
 
 /**
@@ -681,8 +687,53 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	    HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp( "java -jar buildserver.jar <options> ", options );
 	}
+	
+	public void markPid() throws Exception {
+		File pidFile = new File(
+				buildServerConfiguration.getBuildServerWorkingDir(), "pid");
+		PrintWriter out = new PrintWriter(new FileWriter(pidFile));
+		out.println(MarmosetUtilities.getPid());
+		out.close();
+		File pleaseShutdownFile = new File(
+				buildServerConfiguration.getBuildServerWorkingDir(), "pleaseShutdown");
+		if (pleaseShutdownFile.exists())
+			pleaseShutdownFile.delete();
+		
+	}
+	public boolean alreadyRunning() throws Exception {
+		File pidFile = new File(
+				buildServerConfiguration.getBuildServerWorkingDir(), "pid");
+		if (!pidFile.exists())
+			return false;
+		BufferedReader r = new BufferedReader(new FileReader(pidFile));
+		int oldPid = Integer.parseInt(r.readLine());
+		ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/ps", "xww",
+				"-o", "pid,ppid,lstart,user,state,pcpu,cputime,args" });
+		String user = System.getProperty("user.name");
+
+		Process p = b.start();
+		Scanner s = new Scanner(p.getInputStream());
+		String header = s.nextLine();
+		// log.trace("ps header: " + header);
+		while (s.hasNext()) {
+			String txt = s.nextLine();
+			if (!txt.contains(user))
+				continue;
+
+			int pid = Integer.parseInt(txt.substring(0, 5).trim());
+			if (pid == oldPid) {
+				System.out.println("BuildServer is already running");
+				System.out.println(txt);
+				return true;
+			}
+		}
+
+		return false;
+
+	}
 	public static void main(String[] args) throws Exception {
-	      CommandLineParser parser = new PosixParser();
+		
+		  CommandLineParser parser = new PosixParser();
 	    Options  options = getOptions();
 	    CommandLine line;
 	    try { line = parser.parse( options, args );
@@ -752,6 +803,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         
        
         buildServer.initConfig();
+        if (buildServer.alreadyRunning())
+          	return;
+        buildServer.markPid();
         try {
             buildServer.executeServerLoop();
             buildServer.getLog().info("Shutting down");
