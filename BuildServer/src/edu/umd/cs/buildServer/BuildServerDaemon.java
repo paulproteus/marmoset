@@ -755,17 +755,17 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         
        
         buildServer.initConfig();
-
+        Logger log = buildServer.getLog();
+		
         try {
             buildServer.executeServerLoop();
-            Logger log = buildServer.getLog();
-			if (log != null) 
+            if (log != null) 
 				log.info("Shutting down");
             timedSystemExit0();
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
-            getBuildServerLog()
-                    .fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
+            if (log != null)
+                    log.fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
                             e);
             e.printStackTrace();
             System.exit(1);
