@@ -338,7 +338,7 @@
 
     <ul>
         <li><a href="${registerPerson}">Register person</a>
-        <li><a href="person.jsp">Update person</a>
+        <li><a href="person.jsp">Become/Update person</a>
     </ul>
     <ss:footer />
 </body>

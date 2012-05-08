@@ -231,7 +231,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
     @Override
 	protected void doWelcome() throws MissingConfigurationPropertyException, IOException {
-        System.out.println("Connecting to submit server");
+        if (!isQuiet()) 
+            System.out.println("Connecting to submit server");
         String url = getWelcomeURL();
         MultipartPostMethod method = new MultipartPostMethod(url);
 
@@ -244,7 +245,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         BuildServer.printURI(getLog(), method);
 
         int responseCode = client.executeMethod(method);
-        System.out.println(method.getResponseBodyAsString());
+        if (!isQuiet()) 
+            System.out.println(method.getResponseBodyAsString());
         if (responseCode != HttpStatus.SC_OK) {
 
             getLog().error("HTTP server returned non-OK response: " + responseCode + ": " + method.getStatusText());
@@ -647,6 +649,11 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
                 .withDescription(  "test the specified submission" )
                   .withLongOpt("submission")
                 .create( "s");
+       
+       Option quiet = OptionBuilder.withDescription(  "no output; no warnings if already running" )
+                 .withLongOpt("quiet")
+               .create( "q");
+     
         Option testSetup = OptionBuilder.withArgName( "testSetupPK" )
                 .hasArg()
                 .withDescription(  "use the specified test setup" )
@@ -731,6 +738,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             buildServer.getConfig().setProperty(DEBUG_SPECIFIC_PROJECT,
                     line.getOptionValue("projectNum"));
         }
+        
+        if (line.hasOption("quiet"))
+            buildServer.setQuiet(true);
         
         if (line.hasOption("course")) {
             buildServer.getConfig().setProperty(DEBUG_SPECIFIC_COURSE,
