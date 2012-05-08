@@ -681,6 +681,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         options.addOption(testSetup);
         options.addOption(onceOption);
         options.addOption(logLevel);
+        options.addOption(quiet);
         options.addOption(downloadOnly);
         return options;
 	}
