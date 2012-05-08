@@ -57,7 +57,17 @@ public final class ProcessTree {
         ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
                         "-o", "pid,ppid,lstart,user,state,pcpu,cputime,args"});
      
-        Process p = b.start();
+        log.info("starting ps");
+        Process p;
+        try {
+        		p = b.start();
+        }catch (RuntimeException t) {
+     	   log.fatal("Unable to start ps", t);
+     	   throw t;
+        } catch (Error t) {
+        	   log.fatal("Unable to start ps", t);
+        	   throw t;
+        }
         log.info("started ps");
         
         int psPid = MarmosetUtilities.getPid(p);
