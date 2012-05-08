@@ -180,6 +180,7 @@ public interface ConfigurationKeys {
     public static final String DEBUG_SPECIFIC_COURSE = DEBUG_PFX
             + "course";
 
+    public static final String SERVER_QUIET = "server.quiet";
     
 	/** Debug property: build specific project */
     public static final String DEBUG_SPECIFIC_PROJECT = DEBUG_PFX

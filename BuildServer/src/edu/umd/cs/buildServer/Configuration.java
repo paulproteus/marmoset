@@ -234,12 +234,7 @@ public class Configuration {
 			throw new IllegalArgumentException("Key " + key
 					+ " is not a debug property");
 
-		String value = getOptionalProperty(key);
-		if (value != null)
-			return Boolean.valueOf(value).booleanValue();
-		else
-			// Debug properties default to false
-			return false;
+		return getOptionalBooleanProperty(key);
 	}
 
 	/**

@@ -910,9 +910,15 @@ public abstract class BuildServer implements ConfigurationKeys {
 	public boolean getDownloadOnly() {
 		return config.getDebugProperty(DOWNLOAD_ONLY);
 	}
+	public boolean isQuiet() {
+        return config.getOptionalBooleanProperty(SERVER_QUIET);
+    }
 	
+	public void setQuiet(boolean quiet) {
+	    config.setProperty(SERVER_QUIET, Boolean.toString(quiet));
+    }
 	public void setDownloadOnly(boolean downloadOnly) {
-		config.setProperty(DOWNLOAD_ONLY, "true");
+		config.setProperty(DOWNLOAD_ONLY, Boolean.toString(downloadOnly));
 	}
 
 	public void markPid() throws Exception {
@@ -965,15 +971,17 @@ public abstract class BuildServer implements ConfigurationKeys {
 	
 			int pid = Integer.parseInt(txt.substring(0, 5).trim());
 			if (pid == oldPid) {
-				System.out.println("BuildServer is already running");
-				System.out.println(txt);
+			    if (!isQuiet()) {
+			        System.out.println("BuildServer is already running");
+			        System.out.println(txt);
+			    }
 				return true;
-			} else {
-			    System.out.println("Previous buildserver pid " + oldPid + " died");
-			    
-			}
+			} 
 		}
-	
+
+	    if (!isQuiet()) {
+	        System.out.println("Previous buildserver pid " + oldPid + " died; had started at " + new Date(pidFile.lastModified()));
+	    }
 		return false;
 	
 	}
