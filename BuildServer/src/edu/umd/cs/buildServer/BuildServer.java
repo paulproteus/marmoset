@@ -266,10 +266,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 	    configureBuildServerForMBeanManagement();
         if (alreadyRunning())
           	return;
+        try {
         markPid();
 		createWorkingDirectories();
 		this.log = createLog(getBuildServerConfiguration(), useServletAppender());
-
+		log.info("BuildServer starting with pid " + MarmosetUtilities.getPid());
 		prepareToExecute();
 
 		String supportedCourseList = getBuildServerConfiguration().getSupportedCourses();
@@ -308,6 +309,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 		}
 
 		getLog().debug("Server loop finished");
+        } finally {
+            getPidFile().delete();
+		}
 	}
 
 	/**
@@ -317,7 +321,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	 * @return true if the server loop should continue, false if not
 	 */
 	protected boolean continueServerLoop() {
-		File pleaseShutdownFile = new File(buildServerConfiguration.getBuildServerWorkingDir(),"pleaseShutdown");
+		File pleaseShutdownFile = getPleaseShutdownFile();
 		if (pleaseShutdownFile.exists()) {
 			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified()) + " by creation of " + pleaseShutdownFile.getAbsolutePath());
 			return false;
@@ -912,21 +916,36 @@ public abstract class BuildServer implements ConfigurationKeys {
 	}
 
 	public void markPid() throws Exception {
-		File pidFile = new File(
-				buildServerConfiguration.getBuildServerWorkingDir(), "pid");
+		File pidFile = getPidFile();
 		PrintWriter out = new PrintWriter(new FileWriter(pidFile));
 		out.println(MarmosetUtilities.getPid());
 		out.close();
-		File pleaseShutdownFile = new File(
-				buildServerConfiguration.getBuildServerWorkingDir(), "pleaseShutdown");
+		File pleaseShutdownFile = getPleaseShutdownFile();
 		if (pleaseShutdownFile.exists())
 			pleaseShutdownFile.delete();
 		
 	}
 
-	public boolean alreadyRunning() throws Exception {
-		File pidFile = new File(
+    /**
+     * @return
+     */
+    public File getPleaseShutdownFile() {
+        File pleaseShutdownFile = new File(
+				buildServerConfiguration.getBuildServerWorkingDir(), "pleaseShutdown");
+        return pleaseShutdownFile;
+    }
+
+    /**
+     * @return
+     */
+    public File getPidFile() {
+        File pidFile = new File(
 				buildServerConfiguration.getBuildServerWorkingDir(), "pid");
+        return pidFile;
+    }
+
+	public boolean alreadyRunning() throws Exception {
+		File pidFile = getPidFile();
 		if (!pidFile.exists())
 			return false;
 		BufferedReader r = new BufferedReader(new FileReader(pidFile));
@@ -949,6 +968,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 				System.out.println("BuildServer is already running");
 				System.out.println(txt);
 				return true;
+			} else {
+			    System.out.println("Previous buildserver pid " + oldPid + " died");
+			    
 			}
 		}
 	

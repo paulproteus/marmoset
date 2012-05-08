@@ -25,108 +25,146 @@ import com.google.common.collect.Multimap;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 
 public final class ProcessTree {
-    
-    final Multimap<Integer, Integer> children =  ArrayListMultimap.create();  
-    final Map<Integer, String> info =  new HashMap<Integer, String>();
-    
+
+    final Multimap<Integer, Integer> children = ArrayListMultimap.create();
+    final Map<Integer, String> info = new HashMap<Integer, String>();
+
     final Set<Integer> live = new HashSet<Integer>();
     final Logger log;
     final String user;
     final Process process;
     final long startTime;
-    
-    public ProcessTree(Process process, Logger log, long startTime)  {
+
+    public ProcessTree(Process process, Logger log, long startTime) {
         this.process = process;
         this.log = log;
         user = System.getProperty("user.name");
-        this.startTime = startTime - TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
+        this.startTime = startTime
+                - TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
         computeChildren();
     }
-    
-	// example date: Fri Apr 13 00:02:43 2012
-	static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-		@Override
-		public SimpleDateFormat initialValue() {
-			return new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy");
-		}
-	};
 
-    private void computeChildren()  {
+    // example date: Fri Apr 13 00:02:43 2012
+    static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        public SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy");
+        }
+    };
+
+    private void computeChildren() {
         live.clear();
         try {
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/ps", "xww", 
-                        "-o", "pid,ppid,lstart,user,state,pcpu,cputime,args"});
-     
-        log.info("starting ps");
-        Process p;
-        try {
-        		p = b.start();
-        }catch (RuntimeException t) {
-     	   log.fatal("Unable to start ps", t);
-     	   throw t;
-        } catch (Error t) {
-        	   log.fatal("Unable to start ps", t);
-        	   throw t;
-        }
-        log.info("started ps");
-        
-        int psPid = MarmosetUtilities.getPid(p);
-        int rootPid = MarmosetUtilities.getPid();
-        p.getOutputStream().close();
-        Scanner s = new Scanner(p.getInputStream());
-        String header = s.nextLine();
-        // log.trace("ps header: " + header);
-        while (s.hasNext()) {
-            String txt = s.nextLine();
-            if (!txt.contains(user)) continue;
+            ProcessBuilder b0 = new ProcessBuilder(new String[] { "/bin/date" });
+            Process p = b0.start();
+            int datePid = MarmosetUtilities.getPid(p);
+            log.info("date has pid " + datePid);
+            p.getOutputStream().close();
+            Scanner s = new Scanner(p.getInputStream());
+            while (s.hasNext()) {
+                String txt = s.nextLine();
+                if (txt == null)
+                    break;
+                log.info("date: " + txt);
 
-            try {
-                int pid = Integer.parseInt(txt.substring(0,5).trim());
-                int ppid = Integer.parseInt(txt.substring(6,11).trim());
-                Date started = DATE_FORMAT.get().parse(txt.substring(12, 36));
-                if (psPid == pid || rootPid == pid)
-                    continue;
-                if (started.getTime() < startTime) {
-                    if (ppid != 1) continue;
-                    log.debug("old orphan " + txt);
-                }
-                log.info(txt);
-                live.add(pid);
-                children.put(ppid, pid);
-                info.put(pid, txt);
-            } catch (Exception e) {
-                log.error("Error while building process treee, parsing " + txt, e);
             }
-           
+            s.close();
+            s = new Scanner(p.getErrorStream());
+            while (s.hasNext()) {
+                log.error(s.nextLine());
+            }
+            s.close();
+            p.destroy();
+        } catch (Throwable e) {
+            log.warn("Unable to run date", e);
         }
-        log.info("finished ps with " + live);
-        
-        s.close();
-         s = new Scanner(p.getErrorStream());
-         while (s.hasNext()) {
-             log.error(s.nextLine());
-         }
-         s.close();
-        p.destroy();
+
+        try {
+            ProcessBuilder b = new ProcessBuilder(
+                    new String[] { "/bin/ps", "xww", "-o",
+                            "pid,ppid,lstart,user,state,pcpu,cputime,args" });
+
+            log.info("starting ps");
+            Process p;
+            try {
+                p = b.start();
+            } catch (RuntimeException t) {
+                log.fatal("Unable to start ps", t);
+                throw t;
+            } catch (Error t) {
+                log.fatal("Unable to start ps", t);
+                throw t;
+            }
+            log.info("started ps");
+
+            int psPid = MarmosetUtilities.getPid(p);
+            int rootPid = MarmosetUtilities.getPid();
+            p.getOutputStream().close();
+            Scanner s = new Scanner(p.getInputStream());
+            String header = s.nextLine();
+            // log.trace("ps header: " + header);
+            while (s.hasNext()) {
+                String txt = s.nextLine();
+                if (!txt.contains(user))
+                    continue;
+
+                try {
+                    int pid = Integer.parseInt(txt.substring(0, 5).trim());
+                    int ppid = Integer.parseInt(txt.substring(6, 11).trim());
+                    Date started = DATE_FORMAT.get().parse(
+                            txt.substring(12, 36));
+                    if (psPid == pid || rootPid == pid)
+                        continue;
+                    if (started.getTime() < startTime) {
+                        if (ppid != 1)
+                            continue;
+                        log.debug("old orphan " + txt);
+                    }
+                    log.info(txt);
+                    live.add(pid);
+                    children.put(ppid, pid);
+                    info.put(pid, txt);
+                } catch (Exception e) {
+                    log.error("Error while building process treee, parsing "
+                            + txt, e);
+                }
+
+            }
+            log.info("finished ps with " + live);
+
+            s.close();
+            s = new Scanner(p.getErrorStream());
+            while (s.hasNext()) {
+                log.error(s.nextLine());
+            }
+            s.close();
+            p.destroy();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    private  void killProcess(int pid, int signal) throws IOException, InterruptedException {
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill", "-"+signal, Integer.toString(pid)} );
+
+    private void killProcess(int pid, int signal) throws IOException,
+            InterruptedException {
+        ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/kill",
+                "-" + signal, Integer.toString(pid) });
         execute(b);
 
     }
-    private  void killProcess(int pid) throws IOException, InterruptedException {
-        ProcessBuilder b = new ProcessBuilder(new String[] {"/bin/kill",  Integer.toString(pid)} );
+
+    private void killProcess(int pid) throws IOException, InterruptedException {
+        ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/kill",
+                Integer.toString(pid) });
         execute(b);
     }
+
     private void findTree(Set<Integer> found, int pid) {
         if (!found.add(pid))
             return;
-        for(int c : children.get(pid))
+        for (int c : children.get(pid))
             findTree(found, c);
     }
+
     private Set<Integer> findTree(int rootPid) {
         Set<Integer> result = new LinkedHashSet<Integer>();
         findTree(result, rootPid);
@@ -140,19 +178,20 @@ public final class ProcessTree {
         result.remove(rootPid);
         return result;
     }
+
     private void pause(int milliseconds) {
-    	try {
-    		Thread.sleep(milliseconds);
-    	} catch (InterruptedException e) {
-    		pause(20);
-    		Thread.currentThread().interrupt();
-    	}
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            pause(20);
+            Thread.currentThread().interrupt();
+        }
     }
-    
-    public  void destroyProcessTree() {
+
+    public void destroyProcessTree() {
         int pid = MarmosetUtilities.getPid(process);
         log.info("Killing process tree for pid " + pid);
-        
+
         try {
             this.computeChildren();
             this.killProcessTree(pid, 9);
@@ -164,14 +203,15 @@ public final class ProcessTree {
             process.destroy();
         }
         log.info("Done Killing process tree for " + pid);
-        
+
     }
-    
+
     private void logProcesses(String title, Collection<Integer> pids) {
         log.info(String.format("%-14s: %s", title, pids));
-        for(Integer pid : pids) 
+        for (Integer pid : pids)
             logProcess(pid);
     }
+
     private void logProcess(Integer pid) {
         String process = info.get(pid);
         if (process == null) {
@@ -180,26 +220,29 @@ public final class ProcessTree {
         }
         log.info(process);
     }
+
     private void killProcessTree(int rootPid, int signal) throws IOException {
         Set<Integer> result = findTree(rootPid);
         Set<Integer> unrooted = findTree(1);
-        
+
         Set<Integer> subtree = findJvmSubtree();
         boolean differ = !result.equals(subtree) || !unrooted.isEmpty();
         if (differ) {
             if (differ)
-            log.info("process tree and JVM subtree not the same:");
+                log.info("process tree and JVM subtree not the same:");
             logProcesses("root pid", Collections.singleton(rootPid));
             logProcesses("process tree", result);
             logProcesses("unrooted", unrooted);
             logProcesses("JVM subtree", subtree);
             logProcesses("live", live);
         }
-   
+
         result.addAll(unrooted);
-        if (result.isEmpty()) return;
-        log.info("Halting process tree starting at " + rootPid + " which is " + result);
-          while (true) {
+        if (result.isEmpty())
+            return;
+        log.info("Halting process tree starting at " + rootPid + " which is "
+                + result);
+        while (true) {
             killProcesses("-STOP", result);
             pause(100);
             computeChildren();
@@ -209,7 +252,8 @@ public final class ProcessTree {
             if (r.equals(result))
                 break;
             result = r;
-            log.info("process tree starting at " + rootPid + " changed to " + result);
+            log.info("process tree starting at " + rootPid + " changed to "
+                    + result);
         }
         killProcesses("-KILL", result);
         pause(1000);
@@ -221,16 +265,18 @@ public final class ProcessTree {
             killProcesses("-KILL", result);
             computeChildren();
             result.retainAll(children.keySet());
-            if (!result.isEmpty()) 
-            	  log.error("super zombie processes: " + result);
+            if (!result.isEmpty())
+                log.error("super zombie processes: " + result);
         }
     }
+
     /**
      * @param result
      * @throws IOException
      * @throws InterruptedException
      */
-    private void killProcesses(String signal, Set<Integer> result) throws IOException {
+    private void killProcesses(String signal, Set<Integer> result)
+            throws IOException {
         if (result.isEmpty()) {
             return;
         }
@@ -244,26 +290,28 @@ public final class ProcessTree {
         if (exitCode != 0)
             log.warn("exit code from kill " + exitCode);
     }
-    
-    private void drainToLog(final InputStream in) {
-        Thread t = new Thread( new Runnable() {
-            @Override
-			public void run() {
-                try {
-                BufferedReader r = new BufferedReader(new InputStreamReader(in));
 
-                while (true) {
-                    String txt = r.readLine();
-                    if (txt == null) return;
-                    log.debug("process generated: " + txt);
-                }
+    private void drainToLog(final InputStream in) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BufferedReader r = new BufferedReader(
+                            new InputStreamReader(in));
+
+                    while (true) {
+                        String txt = r.readLine();
+                        if (txt == null)
+                            return;
+                        log.debug("process generated: " + txt);
+                    }
                 } catch (IOException e) {
                     if (!e.getMessage().equals("Stream closed"))
-                      log.warn("error while draining", e);
-                
-                } finally { 
+                        log.warn("error while draining", e);
+
+                } finally {
                     try {
-                    in.close();
+                        in.close();
                     } catch (IOException e) {
                         assert false;
                     }
@@ -272,30 +320,28 @@ public final class ProcessTree {
         });
         t.setDaemon(true);
         t.start();
-       
-        
+
     }
-    private  int execute(ProcessBuilder b) throws IOException {
+
+    private int execute(ProcessBuilder b) throws IOException {
         b.redirectErrorStream(true);
         Process p = b.start();
         p.getOutputStream().close();
         drainToLog(p.getInputStream());
-		boolean isInterrupted = Thread.interrupted();
-		int exitCode;
-		while (true)
-			try {
-				exitCode = p.waitFor();
-				break;
-			} catch (InterruptedException e) {
-				isInterrupted = true;
-			}
-		p.getInputStream().close();
-		p.destroy();
-		if (isInterrupted)
-			Thread.currentThread().interrupt();
+        boolean isInterrupted = Thread.interrupted();
+        int exitCode;
+        while (true)
+            try {
+                exitCode = p.waitFor();
+                break;
+            } catch (InterruptedException e) {
+                isInterrupted = true;
+            }
+        p.getInputStream().close();
+        p.destroy();
+        if (isInterrupted)
+            Thread.currentThread().interrupt();
         return exitCode;
     }
-        
-   
 
 }
