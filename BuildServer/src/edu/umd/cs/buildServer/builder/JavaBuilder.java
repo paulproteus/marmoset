@@ -49,6 +49,8 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.annotation.Nonnull;
+
 import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
@@ -243,11 +245,13 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		return null;
 	}
 
-	Collection<File> findJavaSourceFiles(File dir) throws IOException {
+	Collection<File> findJavaSourceFiles(@Nonnull File dir) throws IOException {
+	    if (dir == null)
+	        throw new NullPointerException("Null dir");
 	    Collection<File> javaFiles = new TreeSet<File>();
 	    Collection<String> all = new HashSet<String>();
 	    String root = dir.getCanonicalPath();
-	    
+
 	    findJavaSourceFiles(root, dir, javaFiles, all);
 	    return javaFiles;
 	}
@@ -301,7 +305,8 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		// CODE COVERAGE:
 		// Use the programmic interface to Clover to instrument code for
 		// coverage
-		if (generateCodeCoverage && Clover.isAvailable()) {
+		@Nonnull File instSrcDirectory = getProjectSubmission().getInstSrcDirectory();
+        if (generateCodeCoverage && Clover.isAvailable()) {
 			// TODO Put this clover database in the student's build directory
 			// TODO Also clean up this file when we're done with it!
 			String cloverDBPath;
@@ -326,7 +331,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 					"-s",
 					getProjectSubmission().getSrcDirectory().getAbsolutePath(),
 					"-d",
-					getProjectSubmission().getInstSrcDirectory()
+					instSrcDirectory
 							.getAbsolutePath() };
 			String coverageMarkupCmd = " ";
 			for (int ii = 0; ii < cliArgs.length; ii++) {
@@ -387,9 +392,9 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		// // Compile all source files found in submission
 
 		// XXX Code now MUST be in a "src" directory!
-		if (generateCodeCoverage) {
+		if (generateCodeCoverage && Clover.isAvailable() ) {
 		    try {
-                for(File j : findJavaSourceFiles(getProjectSubmission().getInstSrcDirectory())) {
+                for(File j : findJavaSourceFiles(instSrcDirectory)) {
                     args.add(j.getPath());
                 }
             } catch (IOException e) {
