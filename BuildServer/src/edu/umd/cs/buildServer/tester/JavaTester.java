@@ -609,7 +609,7 @@ public class JavaTester extends Tester<JUnitTestProperties> {
 						.listNonCloverClassFilesInDirectory(
 								getProjectSubmission()
 										.getBuildOutputDirectory(),
-								getTestProperties());
+								getTestProperties(), getLog());
 
 				UncoveredMethodFinder finder = new UncoveredMethodFinder();
 				finder.setCodeCoverageResults(publicStudentCoverage);

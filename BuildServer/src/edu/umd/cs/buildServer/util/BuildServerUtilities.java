@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
@@ -82,8 +85,9 @@ public class BuildServerUtilities {
 	}
 
 
-	public static List<File> listNonCloverClassFilesInDirectory(File dir,
-			final JUnitTestProperties testProperties) {
+
+    public static List<File> listNonCloverClassFilesInDirectory(File dir,
+			final JUnitTestProperties testProperties, Logger logger) {
 		List<File> results = new ArrayList<File>();
 		listDirContents(dir, new FileFilter() {
 			@Override
@@ -116,11 +120,12 @@ public class BuildServerUtilities {
 					return true;
 				return false;
 			}
-		}, results);
+		}, results, logger);
 		return results;
 	}
 
-	public static List<File> listClassFilesInDirectory(File dir) {
+
+    public static List<File> listClassFilesInDirectory(File dir, Logger log) {
 		List<File> results = new ArrayList<File>();
 		listDirContents(dir, new FileFilter() {
 			@Override
@@ -129,11 +134,13 @@ public class BuildServerUtilities {
 					return true;
 				return false;
 			}
-		}, results);
+		}, results, log);
 		return results;
 	}
 
-	/**
+
+
+    /**
 	 * Appends all the files in a given directory or its subdirectories that
 	 * match the given filter.
 	 *
@@ -144,14 +151,21 @@ public class BuildServerUtilities {
 	 *            results list
 	 * @param results
 	 *            the list to append the matching files to
+	 * @param log TODO
 	 */
 	private static void listDirContents(File dir, FileFilter filter,
-			List<File> results) {
+			List<File> results, Logger log) {
 		File[] fileArr = dir.listFiles();
+		if (fileArr == null) {
+		    log.log(Level.ERROR, "Unable to list files in " + dir +", exists = " + dir.exists() 
+                    + ", readable = " + dir.canRead()
+                    + ", is dir = " + dir.isDirectory());
+            return;
+        }
 		for (int ii = 0; ii < fileArr.length; ii++) {
 			File file = fileArr[ii];
 			if (file.isDirectory()) {
-				listDirContents(file, filter, results);
+				listDirContents(file, filter, results, log);
 			}
 			if (file.isFile()) {
 				if (filter.accept(file))
