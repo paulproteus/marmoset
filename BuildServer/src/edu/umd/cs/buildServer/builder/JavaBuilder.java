@@ -259,7 +259,13 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 	void findJavaSourceFiles(String root, File dir, Collection<File> javaFiles, Collection<String> all) {
 	    if (dir == null)
             throw new NullPointerException("Null dir");
-        for(File f : dir.listFiles()) {
+        File[] listFiles = dir.listFiles();
+        if (listFiles == null) {
+            getLog().log(Level.ERROR, "Unable to list files in " + dir +", exists = " + dir.exists() 
+                    + ", readable = " + dir.canRead()
+                    + ", is dir = " + dir.isDirectory());
+        }
+        for(File f : listFiles) {
 	        String fullpath;
 	        try {
 	            fullpath = f.getCanonicalPath();
