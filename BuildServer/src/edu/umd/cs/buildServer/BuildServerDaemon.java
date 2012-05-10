@@ -775,8 +775,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         
         PrintStream systemOut = System.out;
         PrintStream systemErr = System.err;
-        System.setOut( new PrintStream(new DevNull()));
-        System.setErr( new PrintStream(new DevNull()));
+        if (buildServer.isQuiet()) {
+            System.setOut(new PrintStream(new DevNull()));
+            System.setErr(new PrintStream(new DevNull()));
+        }
         
         try {
             buildServer.executeServerLoop();
