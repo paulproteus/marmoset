@@ -88,7 +88,7 @@ public class StudentTestFinderRunner implements ISubmissionInspectionStep<JUnitT
 
 		List<File> studentClassFileList = BuildServerUtilities
 				.listClassFilesInDirectory(getProjectSubmission()
-						.getBuildOutputDirectory());
+						.getBuildOutputDirectory(), getLog());
 
 		for (Iterator<File> i = studentClassFileList.iterator(); i.hasNext();) {
 			File classFile = i.next();

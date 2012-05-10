@@ -208,7 +208,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 
 		// get a list of the classfiles
 		List<File> classFileList = BuildServerUtilities
-				.listClassFilesInDirectory(outputDir);
+				.listClassFilesInDirectory(outputDir, getLog());
 
 		for (File file : classFileList) {
 			getLog().trace("classfile to inspect: " + file);
