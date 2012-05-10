@@ -239,8 +239,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 			throw new RuntimeException(e);
 		} catch (MissingConfigurationPropertyException e) {
 			// getLog().warn("Unable to configure (experimental) BuildServerConfiguration object");
-			System.out.println(e);
-			e.printStackTrace();
+			if (!isQuiet()) {
+			    System.out.println(e);
+			    e.printStackTrace();
+			}
+			
 		}
 	}
 

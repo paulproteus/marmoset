@@ -290,11 +290,13 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 		if (specificSubmission != null) {
 			method.addParameter("submissionPK", specificSubmission);
-			System.out.printf("Requesting submissionPK %s%n", specificSubmission);
+			if (!isQuiet())
+			    System.out.printf("Requesting submissionPK %s%n", specificSubmission);
 		}
 		if (specificTestSetup != null) {
 		    method.addParameter("testSetupPK", specificTestSetup);
-		    System.out.printf("Requesting testSetupPK %s%n", specificTestSetup);
+		    if (!isQuiet())
+		        System.out.printf("Requesting testSetupPK %s%n", specificTestSetup);
 		}
 		
 		if (specificProjectNum != null) {
@@ -323,8 +325,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 						"Full error message: "
 								+ method.getResponseBodyAsString());
 				if (responseCode == HttpStatus.SC_BAD_REQUEST) {
-				    System.err.println(msg);
-				    System.out.println(msg);
+				    if (!isQuiet()) {
+				        System.err.println(msg);
+				        System.out.println(msg);
+				    }
 				    System.exit(1);
 				}
 			}
