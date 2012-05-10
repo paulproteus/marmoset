@@ -260,6 +260,11 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 	        } catch (IOException e) {
 	            continue;
 	        }
+	        if (fullpath == null) {
+	            getLog().warn("Got null canonical path for " + f);
+	            continue;
+	        }
+	        
 	        if (!all.add(fullpath))
 	            continue;
 	        if (!fullpath.startsWith(root)) 
