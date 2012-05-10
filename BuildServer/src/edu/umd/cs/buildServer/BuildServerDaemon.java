@@ -58,7 +58,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.umd.cs.buildServer.util.DevNull;
+import edu.umd.cs.buildServer.util.DevNullOutputStream;
 import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
@@ -776,8 +776,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         PrintStream systemOut = System.out;
         PrintStream systemErr = System.err;
         if (buildServer.isQuiet()) {
-            System.setOut(new PrintStream(new DevNull()));
-            System.setErr(new PrintStream(new DevNull()));
+            System.setOut(new PrintStream(new DevNullOutputStream()));
+            System.setErr(new PrintStream(new DevNullOutputStream()));
         }
         
         try {
