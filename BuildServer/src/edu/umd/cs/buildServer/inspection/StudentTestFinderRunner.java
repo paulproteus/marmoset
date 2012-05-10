@@ -131,7 +131,6 @@ public class StudentTestFinderRunner implements ISubmissionInspectionStep<JUnitT
 			outcome.setTestType(TestType.STUDENT);
 			outcome.setTestName(testCase.getMethodName());
 			getTestOutcomeCollection().add(outcome);
-			System.out.println(testCase.getMethodName());
 		}
 	}
 

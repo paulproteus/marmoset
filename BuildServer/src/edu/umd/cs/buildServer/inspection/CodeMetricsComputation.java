@@ -66,16 +66,6 @@ public class CodeMetricsComputation {
 	    final CodeMetricsComputation.Tracker tracker=new CodeMetricsComputation.Tracker();
 	    Visitor v = new EmptyVisitor() {
 
-	        /* (non-Javadoc)
-	         * @see org.apache.bcel.classfile.EmptyVisitor#visitMethod(org.apache.bcel.classfile.Method)
-	         */
-	        @Override
-	        public void visitMethod(Method method)
-	        {
-	            super.visitMethod(method);
-	            //System.out.println("Visit method: " +method.getName());
-	            //tracker.addSize(method.getCode().getLength());
-	        }
 
 	        @Override
 			public void visitCode(Code code)

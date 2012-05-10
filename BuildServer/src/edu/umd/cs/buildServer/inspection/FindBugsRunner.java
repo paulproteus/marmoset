@@ -108,7 +108,6 @@ public class FindBugsRunner extends AbstractFindBugsRunner {
 			buf.append(b.toString(primaryClass));
 		}
 		String description = buf.toString();
-		System.out.println(description);
 		testOutcome.setLongTestResult(description);
 		testOutcome.setDetails(description);
 		return testOutcome;
