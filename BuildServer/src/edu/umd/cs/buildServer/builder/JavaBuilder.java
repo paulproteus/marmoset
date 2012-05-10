@@ -264,6 +264,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
             getLog().log(Level.ERROR, "Unable to list files in " + dir +", exists = " + dir.exists() 
                     + ", readable = " + dir.canRead()
                     + ", is dir = " + dir.isDirectory());
+            return;
         }
         for(File f : listFiles) {
 	        String fullpath;
