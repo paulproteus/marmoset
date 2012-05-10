@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.security.SecureRandom;
 
 import org.apache.commons.cli.CommandLine;
@@ -57,6 +58,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.buildServer.util.DevNull;
 import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.buildServer.util.ServletAppender;
 import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
@@ -767,18 +769,27 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
        
         buildServer.initConfig();
         Logger log = buildServer.getLog();
-		
+        
+        /** Redirect standard out and err to dev null, since clover
+         * writers to standard out and error */
+        
+        PrintStream systemOut = System.out;
+        PrintStream systemErr = System.err;
+        System.setOut( new PrintStream(new DevNull()));
+        System.setErr( new PrintStream(new DevNull()));
+        
         try {
             buildServer.executeServerLoop();
             if (log != null) 
 				log.info("Shutting down");
+            buildServer.getPidFile().delete();
             timedSystemExit0();
         } catch (Throwable e) {
-
+            buildServer.getPidFile().delete();
             if (log != null)
                     log.fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
                             e);
-            e.printStackTrace();
+            e.printStackTrace(systemErr);
             System.exit(1);
         }
     }
