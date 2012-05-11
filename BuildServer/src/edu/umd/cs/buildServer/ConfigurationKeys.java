@@ -191,6 +191,9 @@ public interface ConfigurationKeys {
 	/** Debug property: don't loop, build specific submission */
 	public static final String DEBUG_SPECIFIC_TESTSETUP = DEBUG_PFX
 			+ "testsetup";
+	
+	public static final String DEBUG_SKIP_DOWNLOAD = DEBUG_PFX
+            + "skipDownload";
 
 	/** Turn on java security debug output. */
 	public static final String DEBUG_SECURITY = DEBUG_PFX + "security";

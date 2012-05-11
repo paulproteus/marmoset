@@ -495,6 +495,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 			long start = System.currentTimeMillis();
 			int result;
 			try {
+			    if (getConfig().getBooleanProperty(DEBUG_SKIP_DOWNLOAD)) {
+			        log.warn("Skipping download");
+			    } else {
 				cleanWorkingDirectories();
 
 				log.trace("About to download project");
@@ -513,7 +516,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 				// and the secret tests.
 				downloadProjectJarFile(projectSubmission);
 				// log.warn
-
+			    }
 				if (getDownloadOnly())
 				    return NO_WORK;
 				
