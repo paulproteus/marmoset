@@ -671,7 +671,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
                 .withDescription(  "exhaustively retest the specified project" )
                  .withLongOpt( "projectNum")
                 .create( "p");
-         
+        Option skipDownload =  OptionBuilder.withDescription(  "don't download submission" )
+                .create( "skipDownload");
+      
         Option onceOption = new Option( "o", "once", false, "quit after handling one request" );
         Option logLevel = OptionBuilder.withArgName("logLevel")
                 .hasArg().withDescription("Log4j log level")
@@ -681,6 +683,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         options.addOption(help);
         options.addOption(configFile);
         options.addOption(submission);
+        options.addOption(skipDownload);
+        
         options.addOption(projectNum);
         options.addOption(courseKey);
         
@@ -736,6 +740,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             if (line.hasOption("testSetup"))
                 buildServer.getConfig().setProperty(DEBUG_SPECIFIC_TESTSETUP,
                         line.getOptionValue("testSetup"));
+            if (line.hasOption("skipDownload"))
+                buildServer.getConfig().setProperty(DEBUG_SKIP_DOWNLOAD, "true");
+            
         } else if (line.hasOption("testSetup")) {
             throw new IllegalArgumentException(
                     "You can only specify a specific test setup if you also specify a specific submission");
