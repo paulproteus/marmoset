@@ -33,7 +33,10 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +52,7 @@ import edu.umd.cs.buildServer.ProjectSubmission;
 import edu.umd.cs.buildServer.builder.DirectoryFinder;
 import edu.umd.cs.buildServer.util.DevNullInputStream;
 import edu.umd.cs.buildServer.util.DevNullOutputStream;
+import edu.umd.cs.buildServer.util.LoggingWriter;
 import edu.umd.cs.buildServer.util.ProcessExitMonitor;
 import edu.umd.cs.buildServer.util.Untrusted;
 import edu.umd.cs.diffText.StringListWriter;
@@ -249,14 +253,19 @@ public class CTester extends Tester<ScriptTestProperties> {
 
             StringWriter err = new StringWriter();
 
+            Writer captureError = err;
+            if (false) 
+                captureError = new OutputStreamWriter(new LoggingWriter(new PrintWriter(err), getLog()));
             if (output != null)
                 checkOutput = output.check((process.getInputStream()));
 
-            FutureTask<Void> copyError = TextDiff.copyTask(
+            FutureTask<Void> copyError;
+            copyError = TextDiff.copyTask(
                     "copy error",
                     new InputStreamReader(output != null ? process
-                            .getErrorStream() : process.getInputStream()), err,
+                            .getErrorStream() : process.getInputStream()), captureError,
                     getTestProperties().getMaxDrainOutputInBytes());
+          
 
             executor.submit(copyInput);
             executor.submit(copyError);
