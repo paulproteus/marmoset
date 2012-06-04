@@ -27,7 +27,7 @@ public class ServerError {
 	public enum Kind {
 	    SLOW(600), PAGE_NOT_FOUND(500), BAD_AUTHENTICATION(500), NOT_REGISTERED(500),
 	    BAD_PARAMETERS(500),SUBMIT(500),
-	    EXCEPTION(900), UNKNOWN(600);
+	    EXCEPTION(900), UNKNOWN(600), BUILD_SERVER(900);
 	    Kind(int level) {
 	        this.level = level;
 	    }

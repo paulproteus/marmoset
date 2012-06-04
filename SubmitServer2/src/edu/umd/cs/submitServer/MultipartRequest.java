@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
@@ -163,9 +164,12 @@ public class MultipartRequest {
 	public String getStringParameter(String name)
 			throws InvalidRequiredParameterException {
 		String param = (String) parameters.get(name);
-		if (param == null || param.equals("")) {
+		if (param == null) 
+		    throw new InvalidRequiredParameterException(name
+                    + " is a required parameter and it was not present");
+		if ( param.equals("")) {
 			throw new InvalidRequiredParameterException(name
-					+ " is a required parameter and it was " + param);
+					+ " is a required parameter and it was empty");
 		}
 		return param;
 	}
@@ -506,5 +510,9 @@ public class MultipartRequest {
 					"name was of an invalid form: " + e.toString());
 		}
 		return timestamp;
+	}
+	
+	public Set<String> getParameterNames() {
+	    return  parameters.keySet();
 	}
 }

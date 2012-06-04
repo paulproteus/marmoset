@@ -268,4 +268,11 @@ public class BuildServerTestHarness extends BuildServer {
         // TODO Auto-generated method stub
         
     }
+
+    @Override
+    protected void reportBuildServerDeath(int submissionPK, int testSetupPK,
+            long lastModified, String kind, String load) {
+        // TODO Auto-generated method stub
+        
+    }
 }
