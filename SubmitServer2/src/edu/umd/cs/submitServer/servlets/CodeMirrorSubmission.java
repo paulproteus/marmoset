@@ -67,7 +67,7 @@ public class CodeMirrorSubmission extends SubmitServerServlet {
 
         for (int i = 0; i < num; i++) {
             String fName = parser.getStringParameter("n-" + i);
-            String contents = parser.getStringParameter("f-" + i);
+            String contents = parser.getStringParameter("f-" + i).replaceAll("\r\n", "\n");
             byte[] bytes = contents.getBytes();
 
             ZipEntry zentry = new ZipEntry(fName);
