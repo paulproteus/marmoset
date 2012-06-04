@@ -314,7 +314,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 
 		getLog().debug("Server loop finished");
         } finally {
-            getPidFile().delete();
+            clearMyPidFile();
 		}
 	}
 
@@ -965,6 +965,11 @@ public abstract class BuildServer implements ConfigurationKeys {
 
     public File getCurrentFile() {
         return getFileInWorkingDir("current");
+    }
+    
+    public void clearMyPidFile() {
+        if (getPidFileContents(true) ==  MarmosetUtilities.getPid())
+            getPidFile().delete();
     }
     
     public void writeToCurrentFile(String msg) {
