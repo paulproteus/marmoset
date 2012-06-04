@@ -847,10 +847,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             buildServer.executeServerLoop();
             if (log != null) 
 				log.info("Shutting down");
-            buildServer.getPidFile().delete();
+            System.out.println("Shutting down");
             timedSystemExit0();
         } catch (Throwable e) {
-            buildServer.getPidFile().delete();
+            buildServer.clearMyPidFile();
             if (log != null)
                     log.fatal("BuildServerDaemon got fatal exception; waiting for cron to restart me: ",
                             e);
