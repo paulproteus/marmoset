@@ -34,6 +34,7 @@ import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,9 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.BuildServer;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
@@ -108,6 +111,8 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 			@Submission.PK
 			int submissionPK = Submission.asPK(multipartRequest.getIntParameter("submissionPK"));
 
+			String courses = multipartRequest.getStringParameter("courses");
+	        
 			// Get the testSetupPK
 			int testSetupPK = multipartRequest.getIntParameter("testSetupPK");
 			boolean newTestSetup = multipartRequest
@@ -178,11 +183,55 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 
 			Project project = Project.getByProjectPK(submission.getProjectPK(),
 					conn);
-			TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK,
-					conn);
-			BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost, now, load, submission);
-
 			
+            TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK,
+                    conn);
+            BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost,
+                    now, load, submission);
+
+            Collection<Integer> allowedCourses = Course
+                    .lookupAllPKByBuildserverKey(conn, courses);
+
+            if (allowedCourses.isEmpty()) {
+                ServerError
+                        .insert(conn,
+                                ServerError.Kind.BAD_AUTHENTICATION,
+                                null,
+                                null,
+                                project.getCoursePK(),
+                                project.getProjectPK(),
+                                submission.getSubmissionPK(),
+                                "",
+                                "Build server "
+                                        + testMachine
+                                        + " reporting outcome but does not provide any valid credentials",
+                                "", this.getClass().getSimpleName(), "", "",
+                                remoteHost, "", "", null);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        "Not authorized");
+                return;
+            }
+
+            if (!allowedCourses.contains(project.getCoursePK())) {
+                ServerError
+                        .insert(conn,
+                                ServerError.Kind.BAD_AUTHENTICATION,
+                                null,
+                                null,
+                                project.getCoursePK(),
+                                project.getProjectPK(),
+                                submission.getSubmissionPK(),
+                                "",
+                                "Build server "
+                                        + testMachine
+                                        + " reporting outcome for course it is not authorized to do so",
+                                "", this.getClass().getSimpleName(), "", "",
+                                remoteHost, "", "", null);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        "Not authorized");
+                return;
+            }
+
 			conn.close();
 			// Begin a transaction.
 			// We can set this to a low isolation level because

@@ -526,6 +526,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         method.addParameter("load", SystemInfo.getSystemLoad());
         method.addParameter("kind", kind);
         method.addParameter("lastModified", Long.toString(lastModified));
+        String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
+        method.addParameter("courses", supportedCourses);
+       
 
         try {
             int statusCode = getClient().executeMethod(method);

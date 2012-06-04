@@ -31,11 +31,13 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
@@ -71,11 +73,21 @@ public class ReportBuildServerDeath extends SubmitServerServlet {
 	            if (testMachine == null)
 	                testMachine = "unknown";
 	        String remoteHost =  SubmitServerFilter.getRemoteHost(request);
-	            
+	        String courses = multipartRequest.getStringParameter("courses");
+	        
 	            
 	        
 	        String msg = String.format("Build server %s died while testing %s/%s/%s with load %s", testMachine, submissionPK, testSetupPK, kind, load);
 	        conn = getConnection();
+	        Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+            
+            if (allowedCourses.isEmpty()) {
+                String errorMsg = "host " + testMachine + " from " + remoteHost +"; no courses match " + courses;
+                getSubmitServerServletLog().warn(errorMsg);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "no courses match " + courses);
+                return;
+            }
+
             ServerError.insert(conn, ServerError.Kind.BUILD_SERVER, 
                     null,null,null,null,
                             submissionPK, "", msg,

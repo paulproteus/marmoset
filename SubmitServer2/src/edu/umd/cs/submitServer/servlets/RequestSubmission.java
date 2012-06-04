@@ -140,7 +140,7 @@ public class RequestSubmission extends SubmitServerServlet {
                  if (allowedCourses.isEmpty()) {
                      String msg = "host " + hostname + "; no courses match " + courses;
                      getSubmitServerServletLog().warn(msg);
-                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No courses match " + courses);
                      return;
                  }
 
