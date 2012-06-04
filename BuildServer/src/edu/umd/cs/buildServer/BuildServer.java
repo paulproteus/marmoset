@@ -64,6 +64,7 @@ import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
+import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.marmoset.utilities.TestPropertiesExtractor;
 import edu.umd.cs.marmoset.utilities.ZipExtractorException;
 
@@ -329,6 +330,13 @@ public abstract class BuildServer implements ConfigurationKeys {
 			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified()) + " by creation of " + pleaseShutdownFile.getAbsolutePath());
 			return false;
 		}
+		int pidFileContents = getPidFileContents();
+		if (pidFileContents != MarmosetUtilities.getPid()) {
+		    log.fatal("Pid file contains " + pidFileContents 
+		            + ", doesn't match our pid of " + MarmosetUtilities.getPid());
+            return false;
+        }
+
 		if (config.getDebugProperty(DEBUG_DO_NOT_LOOP)
 				|| config.getOptionalProperty(DEBUG_SPECIFIC_SUBMISSION) != null)
 			return numServerLoopIterations == 0;
@@ -592,7 +600,9 @@ public abstract class BuildServer implements ConfigurationKeys {
 							+ projectSubmission.getZipFile());
 				}
 			}
+			
 
+			writeToCurrentFile("Testing completed ");
 			// Send the test results back to the submit server
 			reportTestResults(projectSubmission);
 
@@ -617,6 +627,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 			if (projectSubmission != null) {
 				releaseConnection(projectSubmission);
 			}
+			getCurrentFile().delete();
 		}
 	}
 
@@ -938,35 +949,64 @@ public abstract class BuildServer implements ConfigurationKeys {
 		
 	}
 
-    /**
-     * @return
-     */
+
+	 public File getFileInWorkingDir(String name) {
+	        return new File(
+	                buildServerConfiguration.getBuildServerWorkingDir(), name);
+	    }
+	
     public File getPleaseShutdownFile() {
-        File pleaseShutdownFile = new File(
-				buildServerConfiguration.getBuildServerWorkingDir(), "pleaseShutdown");
-        return pleaseShutdownFile;
+        return getFileInWorkingDir("pleaseShutdown");
     }
 
-    /**
-     * @return
-     */
     public File getPidFile() {
-        File pidFile = new File(
-				buildServerConfiguration.getBuildServerWorkingDir(), "pid");
-        return pidFile;
+        return getFileInWorkingDir("pid");
     }
 
+    public File getCurrentFile() {
+        return getFileInWorkingDir("current");
+    }
+    
+    public void writeToCurrentFile(String msg) {
+        PrintWriter out = null;
+        try {
+        out = new PrintWriter(new FileWriter(getCurrentFile(), true));
+        out.println(msg);
+        } catch (Exception e) {
+            getLog().error("Error writing " + msg + " to current file", e);
+        } finally {
+          if (out != null)
+              out.close();
+        }
+        
+        
+    }
+    
+    public int getPidFileContents() {
+        File pidFile = getPidFile();
+        if (!pidFile.exists())
+            return -1;
+        try {
+        BufferedReader r = new BufferedReader(new FileReader(pidFile));
+        int oldPid = Integer.parseInt(r.readLine());
+        r.close();
+        return oldPid;
+        } catch (Exception e) {
+            getLog().log(Level.WARN, "Unable to get pid file contents", e);
+            return -2;
+        }
+        
+    }
 	public boolean alreadyRunning() throws Exception {
-		File pidFile = getPidFile();
-		if (!pidFile.exists())
-			return false;
-		BufferedReader r = new BufferedReader(new FileReader(pidFile));
-		int oldPid = Integer.parseInt(r.readLine());
+	    int oldPid = getPidFileContents();
+	    if (oldPid < 0)
+	        return false;
 		ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/ps", "xww",
 				"-o", "pid,lstart,user,state,pcpu,cputime,args" });
 		String user = System.getProperty("user.name");
 	
 		Process p = b.start();
+		try {
 		Scanner s = new Scanner(p.getInputStream());
 		String header = s.nextLine();
 		// log.trace("ps header: " + header);
@@ -984,13 +1024,36 @@ public abstract class BuildServer implements ConfigurationKeys {
 				return true;
 			} 
 		}
-
-	    if (!isQuiet()) {
-	        System.out.println("Previous buildserver pid " + oldPid + " died; had started at " + new Date(pidFile.lastModified()));
+		} finally {
+		    p.destroy();
+		}
+        String msg = "Previous buildserver pid " + oldPid + " died; had started at " + new Date(getPidFile().lastModified());
+         if (!isQuiet()) {
+	        System.out.println(msg);
 	    }
+	    File currentFile = getCurrentFile();
+	    long currentFileLastModified = currentFile.lastModified();
+        if (currentFile.exists() && currentFileLastModified >= getPidFile().lastModified()) {
+	       Scanner scanner = new Scanner(currentFile);
+	       int submissionPK = scanner.nextInt();
+	       int testSetupPK = scanner.nextInt();
+	       scanner.nextLine(); // skip EOL
+	       String kind = scanner.nextLine().trim();
+	       String load = scanner.nextLine().trim();
+	       scanner.close();
+	       reportBuildServerDeath(submissionPK, testSetupPK, currentFileLastModified, kind, load); 
+	    }
+        currentFile.delete();
+        getPidFile().delete();
 		return false;
 	
 	}
-}
 
+
+
+abstract protected void reportBuildServerDeath(
+        int submissionPK, int testSetupPK, long lastModified, String kind, String load)
+      ;
+
+}
 // vim:ts=4

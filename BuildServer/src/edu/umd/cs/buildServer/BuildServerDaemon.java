@@ -31,10 +31,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.SecureRandom;
 
 import org.apache.commons.cli.CommandLine;
@@ -106,6 +108,13 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		client.setConnectionTimeout(5000);
 	}
 
+	
+	
+	private HttpClient getClient() {
+	    if (client == null) 
+	        prepareToExecute();
+	    return client;
+	}
 	/*
 	 * (non-Javadoc)
 	 *
@@ -175,6 +184,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	private String getReportTestResultsURL() {
 		return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_REPORTTESTRESULTS_PATH);
 	}
+	private String getReportBuildServerDeathURL() {
+        return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_REPORTBUILDSERVERDEATH_PATH);
+    }
+
 
 	/**
 	 * Get a required header value. If the header value isn't specified in the
@@ -376,8 +389,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 			servletAppender.setThreshold(Level.INFO);
 
 		String kind = method.getResponseHeader(HttpHeaders.HTTP_KIND_HEADER).getValue();
-		getLog().info(
-                "Got submission " +submissionPK +  ", testSetup " + testSetupPK + ", kind: " + kind);
+		String logMsg = "Got submission " +submissionPK +  ", testSetup " + testSetupPK + ", kind: " + kind;
+		getLog().info(logMsg);
         
 		ProjectSubmission<?> projectSubmission = new ProjectSubmission<TestProperties>(
 				getBuildServerConfiguration(), getLog(), submissionPK, testSetupPK,
@@ -385,6 +398,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 
 		projectSubmission.setMethod(method);
 
+		getCurrentFile().delete();
+		writeToCurrentFile(submissionPK + "\n" + testSetupPK + "\n" + kind + "\n" +  SystemInfo.getSystemLoad() + "\n" + logMsg);
+		
 		return projectSubmission;
 	}
 
@@ -494,6 +510,39 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	}
 
 
+	
+    @Override
+    protected void reportBuildServerDeath(int submissionPK, int testSetupPK,
+            long lastModified, String kind, String load) {
+        String hostname = getBuildServerConfiguration().getHostname();
+
+        MultipartPostMethod method = new MultipartPostMethod(
+                getReportBuildServerDeathURL());
+
+        method.addParameter("submissionPK",Integer.toString(submissionPK));
+        method.addParameter("testSetupPK",Integer.toString(testSetupPK));
+        
+        method.addParameter("testMachine", hostname);
+        method.addParameter("load", SystemInfo.getSystemLoad());
+        method.addParameter("kind", kind);
+        method.addParameter("lastModified", Long.toString(lastModified));
+
+        try {
+            int statusCode = getClient().executeMethod(method);
+
+            if (statusCode != HttpStatus.SC_OK) {
+                System.out.println(
+                        "Error eporting build server death for submissionPK "
+                                + submissionPK + ": status " + statusCode
+                                + ": " + method.getStatusText());
+            System.out.println(method.getResponseBodyAsString());
+            }
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+
+    }
+	       
 	@Override
 	protected void reportTestResults(ProjectSubmission<?> projectSubmission)
 			throws MissingConfigurationPropertyException {
@@ -831,4 +880,6 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 			return rng.nextLong();
 		}
 	}
+
+
 }

@@ -33,10 +33,6 @@ package edu.umd.cs.buildServer;
  * @author David Hovemeyer
  * @author jspacco
  */
-/**
- * @author jspacco
- *
- */
 public interface ConfigurationKeys {
 
 	public static final String SUBMIT_SERVER_URL = "submitURL";	
@@ -54,6 +50,7 @@ public interface ConfigurationKeys {
 	/** URL path to the ReportTestResults servlet on the submit server. */
 	public static final String SUBMIT_SERVER_REPORTTESTRESULTS_PATH = "/buildServer/ReportTestOutcomes";
 
+	public static final String SUBMIT_SERVER_REPORTBUILDSERVERDEATH_PATH = "/buildServer/ReportBuildServerDeath";
 	/**
 	 * URL path to the HandleBuildServerLogMessage servlet on the submit server.
 	 */

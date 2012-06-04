@@ -1042,6 +1042,11 @@
 		<servlet-class> edu.umd.cs.submitServer.servlets.ReportTestOutcomes </servlet-class>
 	</servlet>
 	<servlet>
+        <servlet-name>ReportBuildServerDeath</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.ReportBuildServerDeath </servlet-class>
+    </servlet>
+    
+	<servlet>
 		<servlet-name>UploadTestSetup</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.UploadTestSetup </servlet-class>
 	</servlet>
@@ -1353,6 +1358,10 @@
 		<url-pattern>/buildServer/ReportTestOutcomes</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+        <servlet-name>ReportBuildServerDeath</servlet-name>
+        <url-pattern>/buildServer/ReportBuildServerDeath</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
 		<servlet-name>UploadTestSetup</servlet-name>
 		<url-pattern>/action/instructor/UploadTestSetup </url-pattern>
 	</servlet-mapping>
