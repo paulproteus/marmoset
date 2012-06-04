@@ -330,7 +330,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 			log.fatal("Shutdown requested at " + new Date(pleaseShutdownFile.lastModified()) + " by creation of " + pleaseShutdownFile.getAbsolutePath());
 			return false;
 		}
-		int pidFileContents = getPidFileContents();
+		int pidFileContents = getPidFileContents(true);
 		if (pidFileContents != MarmosetUtilities.getPid()) {
 		    log.fatal("Pid file contains " + pidFileContents 
 		            + ", doesn't match our pid of " + MarmosetUtilities.getPid());
@@ -982,23 +982,26 @@ public abstract class BuildServer implements ConfigurationKeys {
         
     }
     
-    public int getPidFileContents() {
+    public int getPidFileContents(boolean shouldExist) {
         File pidFile = getPidFile();
-        if (!pidFile.exists())
+        if (!pidFile.exists()) {
+            if (shouldExist) 
+                getLog().log(Level.ERROR, "pid file doesn't exist");
             return -1;
+        }
         try {
         BufferedReader r = new BufferedReader(new FileReader(pidFile));
         int oldPid = Integer.parseInt(r.readLine());
         r.close();
         return oldPid;
         } catch (Exception e) {
-            getLog().log(Level.WARN, "Unable to get pid file contents", e);
+            getLog().log(Level.ERROR, "Unable to get pid file contents", e);
             return -2;
         }
         
     }
 	public boolean alreadyRunning() throws Exception {
-	    int oldPid = getPidFileContents();
+	    int oldPid = getPidFileContents(false);
 	    if (oldPid < 0)
 	        return false;
 		ProcessBuilder b = new ProcessBuilder(new String[] { "/bin/ps", "xww",
@@ -1027,13 +1030,13 @@ public abstract class BuildServer implements ConfigurationKeys {
 		} finally {
 		    p.destroy();
 		}
-        String msg = "Previous buildserver pid " + oldPid + " died; had started at " + new Date(getPidFile().lastModified());
-         if (!isQuiet()) {
-	        System.out.println(msg);
-	    }
+        long pidLastModified = getPidFile().lastModified();
+        String msg = "Previous buildserver pid " + oldPid + " died; had started at " + new Date(pidLastModified);
+        
+	    System.out.println(msg);
 	    File currentFile = getCurrentFile();
 	    long currentFileLastModified = currentFile.lastModified();
-        if (currentFile.exists() && currentFileLastModified >= getPidFile().lastModified()) {
+        if (currentFile.exists() && currentFileLastModified >= pidLastModified) {
 	       Scanner scanner = new Scanner(currentFile);
 	       int submissionPK = scanner.nextInt();
 	       int testSetupPK = scanner.nextInt();
@@ -1045,6 +1048,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 	    }
         currentFile.delete();
         getPidFile().delete();
+        System.out.println("Deleting old pid file");
 		return false;
 	
 	}
