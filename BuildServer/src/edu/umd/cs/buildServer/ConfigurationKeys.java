@@ -39,7 +39,7 @@ public interface ConfigurationKeys {
 
 	
 	/** URL path to the RequestProject servlet on the submit server. */
-	public static final String SUBMIT_SERVER_REQUESTPROJECT_PATH = "/buildServer/RequestSubmission";
+	public static final String SUBMIT_SERVER_REQUESTSUBMISSION_PATH = "/buildServer/RequestSubmission";
 	
 	/** URL path to the RequestProject servlet on the submit server. */
     public static final String SUBMIT_SERVER_WELCOME_PATH = "/buildServer/Welcome";

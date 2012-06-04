@@ -173,8 +173,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
     }
 
 
-	private String getRequestProjectURL(){
-		return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_REQUESTPROJECT_PATH);
+	private String getRequestSubmissionURL(){
+		return getBuildServerConfiguration().getServletURL(SUBMIT_SERVER_REQUESTSUBMISSION_PATH);
 	}
 
 	private String getTestSetupURL(){
@@ -282,7 +282,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	protected ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException {
 
-		String url = getRequestProjectURL();
+		String url = getRequestSubmissionURL();
 		MultipartPostMethod method = new MultipartPostMethod(
 				url);		
 
