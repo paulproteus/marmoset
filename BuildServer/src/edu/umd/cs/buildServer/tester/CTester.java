@@ -372,7 +372,7 @@ public class CTester extends Tester<ScriptTestProperties> {
      */
     public String[] getExecLine(ExecutableTestCase testCase,
             ExecutableTestCase.Property property) {
-        String exec[] = testCase.getProperty(property).split("\\s+");
+        String exec[] = testCase.getStrings(property);
 
         exec[0] = checkTestExe(exec[0]);
         return exec;
