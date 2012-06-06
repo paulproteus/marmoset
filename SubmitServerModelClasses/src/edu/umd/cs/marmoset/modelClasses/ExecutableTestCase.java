@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.annotation.CheckForNull;
 
@@ -26,7 +27,7 @@ public class ExecutableTestCase {
             kindDefaults.put(testType, kindOptions);
             int number = 1;
             for (String name : names) {
-                ExecutableTestCase options = new ExecutableTestCase(defaults,
+                ExecutableTestCase options = new ExecutableTestCase(kindOptions,
                         testType, name, number++);
                 if (testCases.containsKey(name))
                     throw new IllegalArgumentException(
@@ -37,7 +38,6 @@ public class ExecutableTestCase {
         }
         try {
             for (String property : testProperties.getPropertyNames()) {
-
                 if (!property.startsWith("test."))
                     continue;
                 String value = testProperties
@@ -45,6 +45,8 @@ public class ExecutableTestCase {
                 String parts[] = property.substring(5).trim().split("\\.");
                 if (parts[0].equals("default") && parts.length == 2) {
                     defaults.set(parts[1], value);
+                } else if (parts.length == 1 && isProperty(parts[0]) ) {
+                    defaults.set(parts[0], value);
                 } else if (parts[0].equals("cases") && parts.length == 3) {
                     TestType testType = TestType.valueOfAnyCase(parts[1]);
                     if (!kindDefaults.containsKey(testType))
@@ -79,15 +81,21 @@ public class ExecutableTestCase {
     };
 
     public enum InputKind {
-        NONE, STRING, FILE
+        NONE, STRING, FILE;
+        public boolean hasValue() {
+            return this == STRING || this == FILE;
+        }
     };
 
     public enum OutputKind {
-        NONE, STRING, FILE, REFERENCE_IMPL
+        NONE, STRING, FILE, REFERENCE_IMPL;
+        public boolean hasValue() {
+            return this == STRING || this == FILE;
+        }
     };
 
     final @CheckForNull
-    ExecutableTestCase defaults;
+    ExecutableTestCase defaults; // null only for defaults
     final TestType testType; // nonnull only for leaf test cases
     final String name;
     final int number;
@@ -160,7 +168,26 @@ public class ExecutableTestCase {
             value = value.replaceAll("&", name);
         return value;
     }
+    
+    public String [] getStrings(Property p) {
+        String value = getProperty(p);
+        if (value == null)
+            throw new NoSuchElementException("No property " + p.toString());
+        if (value.contains("\n") || value.contains("\r"))
+            throw new IllegalStateException("property " + p + " may not contain newlines");
+        return value.split("\\s+");
 
+    }
+
+   static boolean isProperty(String key) {
+        key = key.trim();
+        try {
+            Property.valueOfAnyCase(key);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
     void set(String key, String value) {
         key = key.trim();
         value = value.trim();
