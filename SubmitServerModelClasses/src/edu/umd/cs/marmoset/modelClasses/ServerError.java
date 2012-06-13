@@ -32,6 +32,8 @@ public class ServerError {
 	        this.level = level;
 	    }
 	    final int level;
+	    
+	    @Override
 	    public String toString() {
 	        return name().toLowerCase().replace('_', ' ');
         }

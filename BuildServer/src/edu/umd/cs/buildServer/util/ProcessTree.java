@@ -118,7 +118,8 @@ public final class ProcessTree {
                     if (started.getTime() < startTime) {
                         if (ppid != 1)
                             continue;
-                        log.debug("old orphan " + txt);
+//                        log.debug("old orphan " + txt);
+                        continue;
                     }
                     log.info(txt);
                     live.add(pid);

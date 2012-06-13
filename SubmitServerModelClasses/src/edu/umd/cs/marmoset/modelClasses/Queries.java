@@ -479,6 +479,7 @@ public final class Queries {
 		return getFromPreparedStatement(stmt, submission, testSetup);
 	}
 
+
 	/**
 	 *
 	 * Construct basic equijoin of submissions, test_setups, projects

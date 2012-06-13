@@ -344,6 +344,23 @@ public class TestSetup
 
             }
     
+    
+    public static @CheckForNull TestSetup lookupRecentNonBrokenTestSetupForProject(Connection conn,
+            @Project.PK int projectPK)
+            throws SQLException {
+       
+         String query = " SELECT "
+                + TestSetup.ATTRIBUTES
+                + " FROM  test_setups "
+                + " WHERE test_setups.jarfile_status != ? "
+                + " AND test_setups.project_pk = ? "
+                + " ORDER BY test_setups.date_posted DESC " + " LIMIT 1 ";
+
+        PreparedStatement stmt  = Queries.setStatement(conn, query, TestSetup.BROKEN, projectPK);
+        
+        return getFromPreparedStatement(stmt);
+    }
+    
     private static TestSetup getFromPreparedStatement(PreparedStatement stmt)
     throws SQLException
     {
