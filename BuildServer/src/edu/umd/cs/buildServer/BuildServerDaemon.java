@@ -413,7 +413,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	private String getIsNewTestSetup(MultipartPostMethod method)
 			throws HttpException {
 		return getRequiredHeaderValue(method,
-				HttpHeaders.HTTP_NEW_TEST_SETUP, HttpHeaders.HTTP_NEW_PROJECT_JARFILE);
+				HttpHeaders.HTTP_NEW_TEST_SETUP);
 	}
 
 	/**
@@ -425,7 +425,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	private String getTestSetupPK(MultipartPostMethod method)
 			throws HttpException {
 		return getRequiredHeaderValue(method,
-				HttpHeaders.HTTP_TEST_SETUP_PK_HEADER, HttpHeaders.HTTP_PROJECT_JARFILE_PK_HEADER);
+				HttpHeaders.HTTP_TEST_SETUP_PK_HEADER);
 
 	}
 

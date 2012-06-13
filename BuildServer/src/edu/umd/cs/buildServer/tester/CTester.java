@@ -158,21 +158,32 @@ public class CTester extends Tester<ScriptTestProperties> {
         try {
 
             InputStream in;
+            String inputProperty = testCase.getProperty(ExecutableTestCase.Property.INPUT);
             switch (testCase.getInputKind()) {
             case NONE:
                 in = new DevNullInputStream();
                 break;
             case FILE:
+                boolean optional = false;
+                if (inputProperty.endsWith("?")) {
+                    optional = true;
+                    inputProperty = inputProperty.substring(0, inputProperty.length()-1);
+                }
                 File f = new File(buildDirectory,
-                        testCase.getProperty(ExecutableTestCase.Property.INPUT));
-                if (!readableFile(f))
+                        inputProperty);
+                if (!readableFile(f)) {
+                    if (optional) {
+                        getLog().debug("Optional input file " + f + " not present, using /dev/null for input");
+                        in = new DevNullInputStream();
+                        break;
+                    }
                     throw new IllegalStateException("No input file " + f);
+                }
 
                 in = new FileInputStream(f);
                 break;
             case STRING:
-                String input = testCase
-                        .getProperty(ExecutableTestCase.Property.INPUT) + "\n";
+                String input = inputProperty + "\n";
                 in = new ByteArrayInputStream(input.getBytes());
                 break;
             default:
@@ -198,6 +209,8 @@ public class CTester extends Tester<ScriptTestProperties> {
                             testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
                     if (!readableFile(f))
                         throw new IllegalStateException("No input file " + f);
+                    getLog().debug("Expecting output in file " + f);
+                    
                     builder.expect(f);
                     break;
                 case REFERENCE_IMPL:

@@ -31,11 +31,9 @@ public final class HttpHeaders
 {
     public static final String HTTP_SUBMISSION_PK_HEADER = "X-SubmitServer-Submission_PK";
     public static final String HTTP_TEST_SETUP_PK_HEADER = "X-SubmitServer-TestSetup_PK";
-    @Deprecated
-    public static final String HTTP_PROJECT_JARFILE_PK_HEADER = "X-SubmitServer-ProjectJarfile_PK";
+
     public static final String HTTP_NEW_TEST_SETUP = "X-SubmitServer-NewTestSetup";
-    @Deprecated
-    public static final String HTTP_NEW_PROJECT_JARFILE = "X-SubmitServer-NewProjectJarfile";
+
     public static final String HTTP_BACKGROUND_RETEST = "X-SubmitSever-BackgroundRetest";
     public static final String HTTP_HUH_HEADER = "X-SubmitServer-Huh";
     public static final String HTTP_KIND_HEADER = "X-SubmitServer-Kind";

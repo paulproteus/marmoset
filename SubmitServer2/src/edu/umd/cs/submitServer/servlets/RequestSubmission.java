@@ -145,7 +145,8 @@ public class RequestSubmission extends SubmitServerServlet {
                  }
 
                 if (submissionPK != null) {
-                    submission = Submission.lookupBySubmissionPK(Submission.asPK(Integer.valueOf(submissionPK)), conn);
+                    @Submission.PK Integer subPK = Submission.asPK(Integer.valueOf(submissionPK));
+                    submission = Submission.lookupBySubmissionPK(Submission.asPK(subPK), conn);
                     Project project = Project.lookupByProjectPK(submission.getProjectPK(), conn);
                     if (testSetupPK != null) {
                         testSetup = TestSetup.lookupByTestSetupPK(Integer.valueOf(testSetupPK), conn);
@@ -154,6 +155,8 @@ public class RequestSubmission extends SubmitServerServlet {
                                     + " are for different projects");
                     } else
                         testSetup = TestSetup.lookupByTestSetupPK(project.getTestSetupPK(), conn);
+                    if (testSetup == null)
+                        testSetup = TestSetup.lookupRecentNonBrokenTestSetupForProject(conn, project.getProjectPK());
                     if (testSetup != null) {
                         if (project.getTestSetupPK() == 0)
                             kind = Kind.SPECIFIC_REQUEST_NEW_TESTUP;
