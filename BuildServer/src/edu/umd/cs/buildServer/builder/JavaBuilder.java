@@ -36,19 +36,20 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import junit.framework.TestCase;
@@ -311,6 +312,13 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 	 */
 	private void doCompile(boolean generateCodeCoverage, String... options)
 			throws BuilderException, CompileFailureException {
+	    
+	    // Determine Java -source value to use.
+        @CheckForNull String javaSourceVersion = getTestProperties().getJavaSourceVersion();
+        if (javaSourceVersion != null && javaSourceVersion.length() == 0)
+            javaSourceVersion = null;
+        
+        
 		// CODE COVERAGE:
 		// Use the programmic interface to Clover to instrument code for
 		// coverage
@@ -326,15 +334,17 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 				throw new BuilderException(e);
 			}
 
+			
 			File cloverDB = new File(cloverDBPath);
 			if (cloverDB.exists()) {
 				if (!cloverDB.delete())
 					getLog().warn(
 							"Unable to delete old clover DB at " + cloverDBPath);
 			}
-			String[] cliArgs = {
-					"-source",
-					getTestProperties().getJavaSourceVersion(),
+		
+			String[] cliArgs;
+			if (javaSourceVersion == null)
+			    cliArgs = new String[] {
 					"-i",
 					cloverDBPath,
 					"-s",
@@ -342,6 +352,16 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 					"-d",
 					instSrcDirectory
 							.getAbsolutePath() };
+			else  cliArgs = new String[] {
+		                    "-source",
+		                    javaSourceVersion,
+		                    "-i",
+		                    cloverDBPath,
+		                    "-s",
+		                    getProjectSubmission().getSrcDirectory().getAbsolutePath(),
+		                    "-d",
+		                    instSrcDirectory
+		                            .getAbsolutePath() };
 			String coverageMarkupCmd = " ";
 			for (int ii = 0; ii < cliArgs.length; ii++) {
 				coverageMarkupCmd += cliArgs[ii] + " ";
@@ -368,9 +388,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 					"Could not create compiler output directory ");
 		}
 
-		// Determine Java -source value to use.
-		String javaSourceVersion = getTestProperties().getJavaSourceVersion();
-
+		
 		// Determine the classpath to be used for compiling.
 		StringBuffer cp = new StringBuffer();
 		cp.append(getProjectSubmission().getTestSetup().getAbsolutePath());
@@ -380,7 +398,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 			appendCloverToClassPath(cp);
 
 		// Specify javac command line arguments.
-		LinkedList<String> args = new LinkedList<String>();
+		ArrayList<String> args = new ArrayList<String>();
 		args.add("javac");
 		// Specify classpath
 		args.add("-classpath");
@@ -388,17 +406,17 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		// Generate compiled class files in the output directory
 		args.add("-d");
 		args.add(outputDir.getAbsolutePath());
-		// Specify Java source version.
-		args.add("-source");
-		args.add(javaSourceVersion);
+		if (javaSourceVersion != null) {
+		    // Specify Java source version.
+		    args.add("-source");
+		    args.add(javaSourceVersion);
+		}
 		// add optional args
 		if (options != null) {
 			args.addAll(Arrays.asList(options));
 		}
 		
-		String commonPrefix = null;
-		
-		// // Compile all source files found in submission
+		// Compile all source files found in submission
 
 		// XXX Code now MUST be in a "src" directory!
 		if (generateCodeCoverage && Clover.isAvailable() ) {
@@ -424,9 +442,7 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 			getLog().debug("Javac command: " + buf.toString());
 		}
 
-		// Compile all source files found in submission
-		// args.addAll(getSourceFileList());
-
+		
 		try {
 			Process javac = Untrusted.execute(
 					getDirectoryFinder().getBuildDirectory(), args.toArray(new String[args.size()]));
