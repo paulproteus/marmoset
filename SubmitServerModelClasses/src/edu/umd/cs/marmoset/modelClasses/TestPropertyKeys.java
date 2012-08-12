@@ -44,7 +44,7 @@ public interface TestPropertyKeys {
 	/**
 	 * Default Java source version.
 	 */
-	public static final String DEFAULT_JAVA_SOURCE_VERSION = "1.7";
+	public static final String DEFAULT_JAVA_SOURCE_VERSION = "";
 
 	/**
 	 * Default make utility.
