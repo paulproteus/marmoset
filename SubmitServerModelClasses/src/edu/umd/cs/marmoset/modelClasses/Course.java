@@ -552,10 +552,50 @@ public class Course {
         return getCourseFromPreparedStatement(stmt);
     }
 
+    public static List<Integer> lookupAllPKButByBuildserverKey(Connection conn, String excluded)
+            throws SQLException
+            {
+               
+                excluded = excluded.trim();
+                String k[] = excluded.split("[ ,]");
+
+                PreparedStatement stmt = queryByBuildserverKey(conn, "course_pk", k);
+                ArrayList<Integer> result = new ArrayList<Integer>();
+
+                try {
+                    ResultSet rs = stmt.executeQuery();
+                    while (rs.next()) {
+                        result.add(rs.getInt(1));
+                    }
+                    return result;
+                } finally {
+                    Queries.closeStatement(stmt);
+                }
+            }
+
+
+            public static PreparedStatement queryAllButByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
+                PreparedStatement stmt = null;
+                String query = " SELECT " + attributes + "  FROM courses WHERE ";
+                for (int i = 0; i < k.length; i++) {
+                    if (i > 0)
+                        query += " AND ";
+                    query += " buildserver_key != ? ";
+                }
+
+                stmt = conn.prepareStatement(query);
+                for (int i = 0; i < k.length; i++) {
+                    stmt.setString(i + 1, k[i]);
+                }
+
+                return stmt;
+            }
 
     public static List<Integer> lookupAllPKByBuildserverKey(Connection conn, String keys)
     throws SQLException
     {
+       
+        keys = keys.trim();
         String k[] = keys.split("[ ,]");
 
         PreparedStatement stmt = queryByBuildserverKey(conn, "course_pk", k);
