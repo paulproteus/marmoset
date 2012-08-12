@@ -208,7 +208,7 @@ public class CTester extends Tester<ScriptTestProperties> {
                             buildDirectory,
                             testCase.getProperty(ExecutableTestCase.Property.EXPECTED));
                     if (!readableFile(f))
-                        throw new IllegalStateException("No input file " + f);
+                        throw new IllegalStateException("No file for expected output" + f);
                     getLog().debug("Expecting output in file " + f);
                     
                     builder.expect(f);

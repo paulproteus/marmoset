@@ -258,18 +258,30 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         method.addParameter("load", SystemInfo.getSystemLoad());
 
         BuildServer.printURI(getLog(), method);
-
-        int responseCode = client.executeMethod(method);
-        if (!isQuiet()) 
+        int responseCode;
+        try {
+            responseCode = client.executeMethod(method);
+        } catch (IOException e) {
+            throw new IOException(
+                    "Buildserver unable to connect to submitserver at " + url,
+                    e);
+        }
+        if (!isQuiet())
             System.out.println(method.getResponseBodyAsString());
+
         if (responseCode != HttpStatus.SC_OK) {
 
-            getLog().error("HTTP server returned non-OK response: " + responseCode + ": " + method.getStatusText());
+            getLog().error(
+                    "HTTP server returned non-OK response: " + responseCode
+                            + ": " + method.getStatusText());
             getLog().error(" for URI: " + method.getURI());
-
             getLog().error("Full error message: " + method.getStatusText());
-            throw new IOException(method.getStatusText());
+            throw new IOException(
+                    "Buildserver unable to connect to submitserver at " + url
+                            + ", Status " + responseCode + ": "
+                            + method.getStatusText());
         }
+
     }
     
 	

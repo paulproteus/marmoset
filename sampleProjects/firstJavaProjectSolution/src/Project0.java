@@ -16,5 +16,13 @@ public class Project0 {
 
         return x*x;
     }
+    
+    public static boolean parseBoolean(String s) {
+        switch (s.toLowerCase().trim()) {
+        case "true" : return true;
+        case "false" : return false;
+        default: throw new IllegalArgumentException(s);
+        }
+    }
 
 }

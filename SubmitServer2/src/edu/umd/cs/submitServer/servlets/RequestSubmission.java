@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +51,6 @@ import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Queries;
 import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.marmoset.modelClasses.Queries.RetestPriority;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
@@ -112,7 +112,8 @@ public class RequestSubmission extends SubmitServerServlet {
          
         Kind kind = Kind.UNKNOWN;
         Queries.RetestPriority foundPriority = null;
-        String courses = multipartRequest.getStringParameter("courses");
+        String courses = multipartRequest.getStringParameter("courses").trim();
+        @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
         String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 
         try {
@@ -135,7 +136,12 @@ public class RequestSubmission extends SubmitServerServlet {
             }
             try {
                 conn = getConnection();
-                 Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+                 Collection<Integer> allowedCourses;
+                 if (universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-"))
+                     allowedCourses = Course.lookupAllPKButByBuildserverKey(conn, courses.substring(universalBuilderserver.length()+1));
+                 
+                 else 
+                     allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
                
                  if (allowedCourses.isEmpty()) {
                      String msg = "host " + hostname + "; no courses match " + courses;
