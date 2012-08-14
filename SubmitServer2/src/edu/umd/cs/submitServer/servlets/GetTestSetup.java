@@ -77,7 +77,7 @@ public class GetTestSetup extends SubmitServerServlet {
 			String hostname = multipartRequest.getOptionalStringParameter("hostname");
 		       
 	        String courses = multipartRequest.getStringParameter("courses");
-	        Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+	        Collection<Integer> allowedCourses = RequestSubmission.getCourses(conn, courses);
 	        if (allowedCourses.isEmpty()) {
                 String msg = "host " + hostname + "; no courses match " + courses;
                 getSubmitServerServletLog().warn(msg);

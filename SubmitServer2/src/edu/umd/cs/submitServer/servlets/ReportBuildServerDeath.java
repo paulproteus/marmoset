@@ -37,7 +37,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
@@ -79,7 +78,7 @@ public class ReportBuildServerDeath extends SubmitServerServlet {
 	        
 	        String msg = String.format("Build server %s died while testing %s/%s/%s with load %s", testMachine, submissionPK, testSetupPK, kind, load);
 	        conn = getConnection();
-	        Collection<Integer> allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+	        Collection<Integer> allowedCourses = RequestSubmission.getCourses(conn, courses);
             
             if (allowedCourses.isEmpty()) {
                 String errorMsg = "host " + testMachine + " from " + remoteHost +"; no courses match " + courses;

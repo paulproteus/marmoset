@@ -189,8 +189,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
             BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost,
                     now, load, submission);
 
-            Collection<Integer> allowedCourses = Course
-                    .lookupAllPKByBuildserverKey(conn, courses);
+            Collection<Integer> allowedCourses = RequestSubmission.getCourses(conn, courses);
 
             if (allowedCourses.isEmpty()) {
                 ServerError

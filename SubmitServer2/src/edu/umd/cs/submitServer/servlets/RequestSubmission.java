@@ -113,7 +113,6 @@ public class RequestSubmission extends SubmitServerServlet {
         Kind kind = Kind.UNKNOWN;
         Queries.RetestPriority foundPriority = null;
         String courses = multipartRequest.getStringParameter("courses").trim();
-        @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
         String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 
         try {
@@ -136,12 +135,7 @@ public class RequestSubmission extends SubmitServerServlet {
             }
             try {
                 conn = getConnection();
-                 Collection<Integer> allowedCourses;
-                 if (universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-"))
-                     allowedCourses = Course.lookupAllPKButByBuildserverKey(conn, courses.substring(universalBuilderserver.length()+1));
-                 
-                 else 
-                     allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+                 Collection<Integer> allowedCourses = getCourses(conn, courses);
                
                  if (allowedCourses.isEmpty()) {
                      String msg = "host " + hostname + "; no courses match " + courses;
@@ -342,6 +336,25 @@ public class RequestSubmission extends SubmitServerServlet {
         } finally {
             releaseConnection(conn);
         }
+    }
+
+    /**
+     * @param conn
+     * @param courses
+     * @return
+     * @throws SQLException
+     */
+    public static Collection<Integer> getCourses(Connection conn, String courses)
+            throws SQLException {
+        Collection<Integer> allowedCourses;
+         @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
+         
+         if (universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-"))
+             allowedCourses = Course.lookupAllPKButByBuildserverKey(conn, courses.substring(universalBuilderserver.length()+1));
+         
+         else 
+             allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
+        return allowedCourses;
     }
 
     static final String NO_SUBMISSIONS_AVAILABLE_MESSASGE = "No submissions available";
