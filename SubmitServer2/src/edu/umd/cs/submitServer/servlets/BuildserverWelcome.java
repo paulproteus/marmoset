@@ -62,7 +62,7 @@ public class BuildserverWelcome extends SubmitServerServlet {
         String courses = multipartRequest.getStringParameter("courses");
         try {
             conn = getConnection();
-            Map<String, Course> allowedCourses = Course.lookupAllByBuildserverKey(conn, courses);
+            Map<String, Course> allowedCourses = RequestSubmission.getCourseMap(conn, courses);
 
             response.setContentType("text/plain");
 

@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -355,6 +356,18 @@ public class RequestSubmission extends SubmitServerServlet {
          else 
              allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
         return allowedCourses;
+    }
+
+    public static Map<String, Course> getCourseMap(Connection conn, String courses)
+            throws SQLException {
+         @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
+         
+         if (universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-"))
+              return Course.lookupAllButByBuildserverKey(conn, courses.substring(universalBuilderserver.length()+1));
+         
+         else 
+             return  Course.lookupAllByBuildserverKey(conn, courses);
+
     }
 
     static final String NO_SUBMISSIONS_AVAILABLE_MESSASGE = "No submissions available";

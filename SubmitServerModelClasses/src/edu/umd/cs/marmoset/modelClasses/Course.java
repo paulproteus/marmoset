@@ -632,8 +632,25 @@ public class Course {
         return stmt;
     }
 
+    public static Map<String, Course> lookupAllButByBuildserverKey(Connection conn, String keys) throws SQLException {
+        String k[] = keys.trim().split("[ ,]");
+        PreparedStatement stmt = queryAllButByBuildserverKey(conn, ATTRIBUTES,  k);
+
+        Map<String, Course> result = new TreeMap<String, Course>();
+
+        try {
+
+            for (Course c : getAllFromPreparedStatement(stmt)) {
+                result.put(c.getBuildserverKey(), c);
+            }
+            return result;
+        } finally {
+            Queries.closeStatement(stmt);
+        }
+    }
+    
     public static Map<String, Course> lookupAllByBuildserverKey(Connection conn, String keys) throws SQLException {
-        String k[] = keys.split("[ ,]");
+        String k[] = keys.trim().split("[ ,]");
         PreparedStatement stmt = queryByBuildserverKey(conn, ATTRIBUTES,  k);
 
         Map<String, Course> result = new TreeMap<String, Course>();
