@@ -559,7 +559,7 @@ public class Course {
                 excluded = excluded.trim();
                 String k[] = excluded.split("[ ,]");
 
-                PreparedStatement stmt = queryByBuildserverKey(conn, "course_pk", k);
+                PreparedStatement stmt = queryAllButByBuildserverKey(conn, "course_pk", k);
                 ArrayList<Integer> result = new ArrayList<Integer>();
 
                 try {
@@ -573,10 +573,12 @@ public class Course {
                 }
             }
 
-
-            public static PreparedStatement queryAllButByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
+   
+            private static PreparedStatement queryAllButByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
                 PreparedStatement stmt = null;
-                String query = " SELECT " + attributes + "  FROM courses WHERE ";
+                String query = " SELECT " + attributes + "  FROM courses  ";
+                if (k.length > 0)
+                    query += "WHERE ";
                 for (int i = 0; i < k.length; i++) {
                     if (i > 0)
                         query += " AND ";
@@ -613,7 +615,7 @@ public class Course {
     }
 
 
-    public static PreparedStatement queryByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
+    private static PreparedStatement queryByBuildserverKey(Connection conn, String attributes, String k[]) throws SQLException {
         PreparedStatement stmt = null;
         String query = " SELECT " + attributes + "  FROM courses WHERE ";
         for (int i = 0; i < k.length; i++) {

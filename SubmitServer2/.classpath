@@ -25,7 +25,6 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-log.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/commons-io.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/dom4j-full.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/mysql-connector-java-5.1.13-bin.jar"/>
 	<classpathentry kind="lib" path="lib/annotations.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
@@ -59,5 +58,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/mysql-connector-java-5.1.15-bin.jar"/>
 	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>
