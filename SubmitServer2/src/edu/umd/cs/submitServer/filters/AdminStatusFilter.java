@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -52,9 +53,12 @@ import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class AdminStatusFilter extends SubmitServerFilter {
 
+    private static final WebConfigProperties webProperties = WebConfigProperties.get();
+    
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -104,9 +108,12 @@ public class AdminStatusFilter extends SubmitServerFilter {
 			Set<Course> coursesThatNeedBuildServers = new HashSet<Course>();
 			
 			Collection<BuildServer> buildServers = BuildServer.getAll(conn);
+			@CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
+	         
+	         
 			examineCourses: for(Course course : coursesThatNeedTesting) {
 				for(BuildServer b : buildServers) {
-					if (b.canBuild(course))
+					if (b.canBuild(course, universalBuilderserver))
 						continue examineCourses;
 				}
 				coursesThatNeedBuildServers.add(course);
