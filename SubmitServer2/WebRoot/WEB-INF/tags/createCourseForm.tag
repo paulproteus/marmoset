@@ -61,7 +61,7 @@
     </table>
     </form>
     <ss:script file="jsrender.js" />
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script type="text/javascript">
    		var $my = {
    				sectionInput: $("#section-name-input"),
