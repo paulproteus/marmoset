@@ -215,7 +215,7 @@ label.error {
 
     <ss:footer />
 
-	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <script type="text/javascript">
 					window.$marmoset = {
 						toggleAll : $("#toggle-all"),

@@ -34,13 +34,13 @@
 	title="Assign code review ${codeReviewAssignment.codeReviewAssignmentPK}" />
 <c:url var="jsBase" value="/js" />
 <link
-	href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css"
+	href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css"
 	rel="stylesheet" type="text/css" />
 <script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
 	type="text/javascript"></script>
 <script
-	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"
+	src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"
 	type="text/javascript"></script>
 <link href="${jsBase}/timePicker.css" rel="stylesheet" type="text/css" />
 <script src="${jsBase}/jquery.timePicker.js" type="text/javascript"></script>
