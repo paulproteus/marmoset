@@ -96,7 +96,7 @@ public class AdminStatusFilter extends SubmitServerFilter {
 			Set<Course> coursesThatNeedTesting = new HashSet<Course>();
 			for(Project p : projectList) {
 				buildStatusCount.put(p, p.getBuildStatusCount(conn));
-				if (p.isTested())
+				if (p.isTested() && courseMap.containsKey(p.getCoursePK()))
 					coursesThatNeedTesting.add(courseMap.get(p.getCoursePK()));
 			}
 			

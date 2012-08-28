@@ -46,7 +46,7 @@ public class BuildServer implements Comparable<BuildServer> {
 	}
 
 	public boolean canBuild(Course course, @CheckForNull String universalBuilderserverKey) {
-	    if (courses == null) return false;
+	    if (courses == null || course == null) return false;
 	    String buildserverKey = course.getBuildserverKey();
         if (universalBuilderserverKey != null && courses.startsWith(universalBuilderserverKey +"-"))
 	        return !courses.substring(universalBuilderserverKey.length()+1).contains(buildserverKey);
