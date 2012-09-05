@@ -415,7 +415,8 @@ public class TestRunner extends BaseTestRunner {
 								return true;
 						}
 					} else {
-						if (description.getDisplayName().startsWith(methodName))
+						String displayName = description.getDisplayName();
+						if (displayName.startsWith(methodName + "("))
 							return true;
 					}
 					return false;
