@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -422,11 +423,13 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			// We are running each JUnit test in a separate process
 			// and should always have exactly one testOutcome
 			if (currentOutcomeCollection.size() > 1) {
+			    List<String> tests = new ArrayList<String>(currentOutcomeCollection.size());
 				for (TestOutcome outcome : currentOutcomeCollection) {
 					getLog().debug(
 							"Multiple test outcomes coming back! " + outcome);
+					tests.add(outcome.getShortTestName());
 				}
-				throw new IOException("JUnit tests must be run one at a time!");
+				throw new IOException("JUnit tests must be run one at a time! Got " + tests);
 			} else if (currentOutcomeCollection.isEmpty()) {
 				// TODO put large messages into a messages.properties file
 				String message = "Test "
