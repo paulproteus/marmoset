@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -45,9 +46,12 @@ import edu.umd.cs.marmoset.modelClasses.BuildServer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
+import edu.umd.cs.submitServer.WebConfigProperties;
 
 public class CourseStatusFilter extends SubmitServerFilter {
 
+    private static final WebConfigProperties webProperties = WebConfigProperties.get();
+    
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -56,11 +60,14 @@ public class CourseStatusFilter extends SubmitServerFilter {
 		Course course = (Course) request.getAttribute("course");
 		Map<Project,Map<String,Integer>> buildStatusCount = new HashMap<Project,Map<String,Integer>>();
         List<Project> projectList = (List<Project>) request.getAttribute(PROJECT_LIST);
+        @CheckForNull String universalBuilderserverKey = webProperties.getProperty("buildserver.password.universal");
+        
+        
 		Connection conn = null;
 		try {
 			conn = getConnection();
 			
-			Collection<BuildServer> buildServers = BuildServer.getAll(course, conn);
+			Collection<BuildServer> buildServers = BuildServer.getAll(course, universalBuilderserverKey, conn);
 			request.setAttribute("buildServers", buildServers);
 			request.setAttribute("systemLoad", SystemInfo.getSystemLoad());
 			List<Project> hiddenProjects = Project.lookupAllByCoursePK(course.getCoursePK(), true, conn);

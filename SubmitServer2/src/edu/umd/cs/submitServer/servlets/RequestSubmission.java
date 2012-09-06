@@ -339,12 +339,7 @@ public class RequestSubmission extends SubmitServerServlet {
         }
     }
 
-    /**
-     * @param conn
-     * @param courses
-     * @return
-     * @throws SQLException
-     */
+
     public static Collection<Integer> getCourses(Connection conn, String courses)
             throws SQLException {
         Collection<Integer> allowedCourses;
