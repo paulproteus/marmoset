@@ -168,14 +168,13 @@ public class BuildServer implements Comparable<BuildServer> {
 
 	}
 
-	public static Collection<BuildServer> getAll(Course course, Connection conn)
+	public static Collection<BuildServer> getAll(Course course, String universalBuilderserverKey, Connection conn)
 			throws SQLException {
 		Collection<BuildServer> collection = getAll(conn);
 		Collection<BuildServer> result = new TreeSet<BuildServer>();
 		
 		for (BuildServer bs : collection) {
-			if (bs.courses == null || bs.courses.isEmpty()
-					|| bs.courses.contains(course.getBuildserverKey()))
+		    if (bs.canBuild(course, universalBuilderserverKey))
 				result.add(bs);
 		}
 		return result;
