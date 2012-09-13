@@ -44,9 +44,14 @@
 <ss:header />
 <ss:breadCrumb />
 
-<c:if test="${!project.tested}">
-        <p>Project is upload only</p>
-        </c:if>
+
+<div class="sectionTitle">
+	<h1>Web submission for project <c:out value="${project.projectNumber}"/> in <c:out value="${course.fullname}"/></h1>
+
+	<p class="sectionDescription">
+    <c:out value="${project.description}"/>
+			</p>
+</div>
 
 <c:if test="${project.tested and (project.testSetupPK == 0 or testSetup.jarfileStatus != 'active')}">
 <h2>
@@ -58,15 +63,6 @@ point values to each test case.
 You can still submit your implementation, but the server will not test your
 submission until the project has been activated by the instructor.
 </c:if>
-
-<div class="sectionTitle">
-	<h1>Web submission for project <c:out value="${project.projectNumber}"/> in <c:out value="${course.fullname}"/></h1>
-
-	<p class="sectionDescription">
-    <c:out value="${project.description}"/>
-			</p>
-</div>
-
                     
 <ss:submitProject/>
 <c:choose>
