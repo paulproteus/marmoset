@@ -44,7 +44,11 @@
 <ss:header />
 <ss:breadCrumb />
 
-<c:if test="${project.testSetupPK == 0 or testSetup.jarfileStatus != 'active'}">
+<c:if test="${!project.tested}">
+        <p>Project is upload only</p>
+        </c:if>
+
+<c:if test="${project.tested and (project.testSetupPK == 0 or testSetup.jarfileStatus != 'active')}">
 <h2>
 <font color=red><b>NOTE:</b></font></h2>
 <p>This project is not yet active for automated testing of submissions.  This probably means
