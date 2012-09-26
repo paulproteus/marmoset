@@ -126,7 +126,12 @@ public class JUnitTestCaseFinder implements Iterable<JUnitTestCase> {
 	public void setInspectedClass(String className)
 			throws ClassNotFoundException {
 		initRepository();
+		try {
 		this.inspectedClass = Repository.lookupClass(className);
+		} catch (org.apache.bcel.classfile.ClassFormatException e) {
+		    log.error("Error parsing class " + className , e);
+		    throw new ClassNotFoundException("BCEL is unable to parse class " + className, e);
+		}
 	}
 
 	/**
