@@ -900,7 +900,6 @@ public class TestOutcome implements Serializable {
         } catch (IOException ignore) {
             // Cannot really happen with a stringreader
         }
-        System.err.println("Unable to parse the stack trace for this outcome: " +outcome);
         return null;
     }
 
