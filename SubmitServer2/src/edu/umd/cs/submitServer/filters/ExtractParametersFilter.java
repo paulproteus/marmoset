@@ -263,13 +263,14 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                     && codeReviewAssignmentPK.intValue() != 0) {
                 Collection<Submission> submissionsUnderReview = Submission
                         .getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
+                codeReviewAssignment = CodeReviewAssignment.lookupByPK(
+                        codeReviewAssignmentPK, conn);
+                projectPK = codeReviewAssignment.getProjectPK();
                 if (!submissionsUnderReview.isEmpty()) {
                     Collection<CodeReviewer> codeReviewersForAssignment = CodeReviewer
                             .lookupByCodeReviewAssignmentPK(
                                     codeReviewAssignmentPK, conn);
-                    codeReviewAssignment = CodeReviewAssignment.lookupByPK(
-                            codeReviewAssignmentPK, conn);
-                    projectPK = codeReviewAssignment.getProjectPK();
+                   
 
                     Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();
                     HashMultimap<Integer, CodeReviewer> reviewersForSubmission = HashMultimap
