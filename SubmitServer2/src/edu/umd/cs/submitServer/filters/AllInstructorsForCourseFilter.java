@@ -60,8 +60,10 @@ public class AllInstructorsForCourseFilter extends SubmitServerFilter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		Connection conn = null;
 		Course course = (Course) request.getAttribute(COURSE);
+		String uri = request.getRequestURI();
 		if (course == null)
-		    throw new IllegalArgumentException("No course found");
+		    throw new IllegalArgumentException("No course found for " + uri);
+		
 		try {
 			conn = getConnection();
 

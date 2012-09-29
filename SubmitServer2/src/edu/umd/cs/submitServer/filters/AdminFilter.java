@@ -63,7 +63,6 @@ public class AdminFilter extends SubmitServerFilter {
 				.getAttribute(USER_SESSION);
 
 		if (!userSession.isSuperUser()) {
-			// System.out.println("not super user, sending error");
 			String scrubbedURI = XSSScrubber.scrubbedStr(request
 					.getRequestURI());
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
