@@ -92,6 +92,7 @@ fieldset h3 {
 who does reviews
 what they're reviewing 
 -->
+
 	<c:url var="assignAction" value="/action/instructor/AssignCodeReviews" />
 	<form method="POST" action="${assignAction}">
 		<input type="hidden" name="codeReviewAssignmentPK"
@@ -105,7 +106,7 @@ what they're reviewing
 								test="${codeReviewAssignment.kind == 'INSTRUCTIONAL_PROTOTYPE'}">
 								<option value="instructional"
 									title="Select staff members that divy up all student submissions to review">Instructional</option>
-								<c:if test="${not empty course.sections}">
+								<c:if test="${not empty sections}">
 									<option value="instructionalBySection"
 										title="One staff member does all reviews for each section">Instructional
 										by section</option>
@@ -123,9 +124,9 @@ what they're reviewing
 			     <c:choose>
 			     <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONAL_PROTOTYPE'}">
 			         <li>Choose reviewers:
-						<c:if test="${not empty course.sections}">
+						<c:if test="${not empty sections}">
 								<ul class="reviewer-list" id="sectional-reviewer-list">
-									<c:forEach var="section" items="${course.sections}">
+									<c:forEach var="section" items="${sections}">
 										<li><label for="section-reviewer-${section}"> <c:out
 													value="${section}" />
 										</label> <select name="section-reviewer-${section}"
