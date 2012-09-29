@@ -217,7 +217,7 @@ public class CodeReviewAssignment {
 		this.deadline = resultSet.getTimestamp(startingFrom++);
 		this.otherReviewsVisible = resultSet.getBoolean(startingFrom++);
 		this.anonymous = resultSet.getBoolean(startingFrom++);
-		this.kind = Kind.getByParamValue(resultSet.getString(startingFrom++));
+		this.kind = Kind.valueOf(resultSet.getString(startingFrom++));
 	}
 	
     public void update(Connection conn) throws SQLException {

@@ -331,7 +331,6 @@ public class TestSetup
 
                 PreparedStatement stmt = Queries.setStatement(conn, query, course.getCoursePK());
 
-                System.out.println(stmt);
                 ResultSet rs = stmt.executeQuery();
 
                 Map<Integer,TestSetup> allTestSetups = new  HashMap<Integer,TestSetup>();

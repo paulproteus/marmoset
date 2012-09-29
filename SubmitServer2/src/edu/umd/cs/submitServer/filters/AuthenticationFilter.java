@@ -135,7 +135,6 @@ public class AuthenticationFilter extends SubmitServerFilter {
 
 			response.sendRedirect(login);
 		} else {
-			// System.out.println("AuthenticationFilter chain.doFilter()");
 			Connection conn = null;
 			try {
 				conn = getConnection();
