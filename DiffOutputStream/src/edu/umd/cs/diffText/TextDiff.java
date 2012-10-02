@@ -85,7 +85,8 @@ public class TextDiff extends StringsWriter {
         TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES;
         public static Option valueOfAnyCase(String name) {
             name = name.toUpperCase();
-            if (name.equals("IGNORESCASE"))
+            if (name.equals("IGNORESCASE") || name.equals("IGNORECASE") 
+                    || name.equals("IGNORE_CASE") )
                 return IGNORES_CASE;
             if (name.equals("IGNOREWHITESPACECHANGE"))
                 return IGNORE_WHITESPACE_CHANGE;
