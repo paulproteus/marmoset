@@ -130,32 +130,33 @@ public class CTester extends Tester<ScriptTestProperties> {
     }
 
     private TestOutcome executeTest(ExecutableTestCase testCase) {
+        
         TestOutcome testOutcome = new TestOutcome();
         testOutcome.setTestNumber(Integer.toString(testCase.getNumber()));
         testOutcome.setTestName(testCase.getName());
         testOutcome.setTestType(testCase.getTestType());
 
-        // Record a test outcome.
-        int testTimeoutInSeconds = getTestProperties()
-                .getTestTimeoutInSeconds();
-
-        getLog().debug("Running test " + testCase.getName());
-        long processTimeoutMillis = testTimeoutInSeconds * 1000L;
-
-        String[] exec = getExecLine(testCase, ExecutableTestCase.Property.EXEC);
-        File buildDirectory = getDirectoryFinder().getBuildDirectory();
-        String options = testCase
-                .getProperty(ExecutableTestCase.Property.OPTIONS);
-        EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
-        if (options != null) {
-            for (String oName : options.split("[\\s,]+")) {
-                Option o = Option.valueOfAnyCase(oName);
-                optionsForDiffing.add(o);
-            }
-
-        }
-
         try {
+            // Record a test outcome.
+            int testTimeoutInSeconds = getTestProperties()
+                    .getTestTimeoutInSeconds();
+
+            getLog().debug("Running test " + testCase.getName());
+            long processTimeoutMillis = testTimeoutInSeconds * 1000L;
+
+            String[] exec = getExecLine(testCase,
+                    ExecutableTestCase.Property.EXEC);
+            File buildDirectory = getDirectoryFinder().getBuildDirectory();
+            String options = testCase
+                    .getProperty(ExecutableTestCase.Property.OPTIONS);
+            EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
+            if (options != null) {
+                for (String oName : options.split("[\\s,]+")) {
+                    Option o = Option.valueOfAnyCase(oName);
+                    optionsForDiffing.add(o);
+                }
+
+            }
 
             InputStream in;
             String inputProperty = testCase.getProperty(ExecutableTestCase.Property.INPUT);
