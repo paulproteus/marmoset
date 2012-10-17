@@ -125,6 +125,8 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 			String remoteHost =  SubmitServerFilter.getRemoteHost(request);
 			// Get test machine (if specified)
 			String testMachine = multipartRequest
+                    .getOptionalStringParameter("hostname");
+			if (testMachine == null)  testMachine = multipartRequest
 					.getOptionalStringParameter("testMachine");
 			if (testMachine == null)
 				testMachine = "unknown";
