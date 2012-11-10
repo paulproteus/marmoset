@@ -3,7 +3,8 @@ package edu.umd.cs.submitServer.filters;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,6 +33,18 @@ public class LogErrorFilter extends SubmitServerFilter {
 			String name) {
 		return nullSafeToString(req.getAttribute(name));
 	}
+	
+	public static boolean ignore(String code, String message) {
+	    if (!code.equals("404")) 
+	        return false;
+	    
+	    
+	    if (message.startsWith("/apple-touch-icon"))
+	        return true;
+	    if (message.startsWith("/images/handycons/"))
+	        return true;
+	    return false;
+	}
 
 	public void doFilter(ServletRequest rq, ServletResponse rs,
 			FilterChain chain) throws IOException, ServletException {
@@ -44,12 +57,6 @@ public class LogErrorFilter extends SubmitServerFilter {
 
 			UserSession userSession = (UserSession) session
 					.getAttribute(USER_SESSION);
-			if (false) {
-				Enumeration<String> e = req.getAttributeNames();
-				while (e.hasMoreElements()) {
-					System.out.println(e.nextElement());
-				}
-			}
 
 			@Student.PK Integer userPK = userSession == null ? null : userSession
 					.getStudentPK();
@@ -85,7 +92,8 @@ public class LogErrorFilter extends SubmitServerFilter {
 					"javax.servlet.forward.query_string");
 			if (queryString == null)
 				queryString = req.getQueryString();
-			try {
+			
+			if (!ignore(code, message) )  try {
 			conn = getConnection();
 
 			int errorPK = ServerError.insert(conn,throwable != null ? ServerError.Kind.EXCEPTION 
