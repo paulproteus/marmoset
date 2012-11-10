@@ -93,8 +93,11 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
         boolean canSeeOthers = parser.getCheckbox("canSeeOthers");
        
         Connection conn = null;
+        boolean transactionSuccess = false;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
             CodeReviewAssignment assignment
              = (CodeReviewAssignment) request.getAttribute(CODE_REVIEW_ASSIGNMENT);
@@ -159,13 +162,16 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     + "/view/instructor/codeReviewAssignment.jsp?codeReviewAssignmentPK="
                     + assignment.getCodeReviewAssignmentPK();
             response.sendRedirect(redirectUrl);
+            conn.commit();
+            transactionSuccess = true;
         } catch (InvalidRequiredParameterException e) {
             throw new ServletException(e);
         } catch (SQLException e) {
             handleSQLException(e);
             throw new ServletException(e);
         } finally {
-            releaseConnection(conn);
+            rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
+                    transactionSuccess, request, conn);
         }
     }
 
