@@ -30,7 +30,9 @@ package edu.umd.cs.buildServer;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -81,16 +83,32 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	private int numServerLoopIterations;
 
 	private String cloverDBPath;
+	
+	private long serverDate;
 
+	public long getServerTimestamp() {
+	    return serverDate;
+	}
 	public BuildServerConfiguration() {
+	}
+	
+	
+	public static @Nonnull File getBuildServerJarfile() {
+	    URL location = BuildServerConfiguration.class.getProtectionDomain()
+	            .getCodeSource().getLocation();
+	    File f;
+	    try {
+	        f = new File(location.toURI());
+	    } catch (URISyntaxException e) {
+	        throw new AssertionError("URL syntax invalid: " + location);
+	    }
+	    return f;
 	}
 	
     public static @CheckForNull
     File getBuildServerRootFromCodeSource() {
         try {
-            URL location = BuildServerConfiguration.class.getProtectionDomain()
-                    .getCodeSource().getLocation();
-            File f = new File(location.toURI());
+           File f = getBuildServerJarfile();
            f =  f.getParentFile();
            File lib = new File(f, "lib");
            if (lib.exists()) return f;
@@ -147,6 +165,8 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 				.getRequiredProperty(ConfigurationKeys.SUBMIT_SERVER_URL));
 		  
 		setHostname(getLocalHostName(config));
+		
+		serverDate = getBuildServerJarfile().lastModified();
 		
 		// XXX These properties have been standardized for quite some time and
 		// haven't changed.

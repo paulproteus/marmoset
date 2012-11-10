@@ -252,11 +252,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         MultipartPostMethod method = new MultipartPostMethod(url);
 
        
-        method.addParameter("hostname", getBuildServerConfiguration().getHostname());
-        String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
-        method.addParameter("courses", supportedCourses);
-        method.addParameter("load", SystemInfo.getSystemLoad());
-
+        addCommonParameters(method);
+      
         BuildServer.printURI(getLog(), method);
         int responseCode;
         try {
@@ -328,11 +325,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		    method.addParameter("projectNumber", specificProjectNum);
 		}
 		
-		method.addParameter("hostname",
-				getBuildServerConfiguration().getHostname());
-		method.addParameter("courses", supportedCoursePKList);
-		method.addParameter("load", SystemInfo.getSystemLoad());
-
+		addCommonParameters(method);
+		
 		BuildServer.printURI(getLog(), method);
 
 		int responseCode = client.executeMethod(method);
@@ -521,26 +515,34 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		}
 	}
 
+	protected void addCommonParameters(MultipartPostMethod method) {
+	    String hostname = getBuildServerConfiguration().getHostname();
 
+	    method.addParameter("testMachine", hostname);
+	    method.addParameter("hostname", hostname);
+        
+        method.addParameter("load", SystemInfo.getSystemLoad());
+        String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
+        method.addParameter("courses", supportedCourses);
+        method.addParameter("javaVersion", System.getProperty("java.version"));
+        method.addParameter("serverTimestamp",
+                Long.toString(getBuildServerConfiguration().getServerTimestamp()));
+	}
+	
 	
     @Override
     protected void reportBuildServerDeath(int submissionPK, int testSetupPK,
             long lastModified, String kind, String load) {
-        String hostname = getBuildServerConfiguration().getHostname();
-
+        
         MultipartPostMethod method = new MultipartPostMethod(
                 getReportBuildServerDeathURL());
 
         method.addParameter("submissionPK",Integer.toString(submissionPK));
         method.addParameter("testSetupPK",Integer.toString(testSetupPK));
         
-        method.addParameter("testMachine", hostname);
-        method.addParameter("load", SystemInfo.getSystemLoad());
+        addCommonParameters(method);
         method.addParameter("kind", kind);
         method.addParameter("lastModified", Long.toString(lastModified));
-        String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
-        method.addParameter("courses", supportedCourses);
-       
 
         try {
             int statusCode = getClient().executeMethod(method);
@@ -641,10 +643,9 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		method.addParameter("isBackgroundRetest",
 				projectSubmission.getIsBackgroundRetest());
 		method.addParameter("testMachine", hostname);
-		method.addParameter("hostname", hostname);
-		method.addParameter("load", SystemInfo.getSystemLoad());
-		String supportedCourses = getBuildServerConfiguration().getSupportedCourses();
-        method.addParameter("courses", supportedCourses);
+		
+		addCommonParameters(method);
+		    
         method.addParameter("kind", projectSubmission.getKind());
         
 

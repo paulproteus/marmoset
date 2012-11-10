@@ -68,6 +68,9 @@ public class ReportBuildServerDeath extends SubmitServerServlet {
 			if (load == null)
 				load = "unknown";
 			 String testMachine = multipartRequest
+                     .getOptionalStringParameter("hostname");
+       
+			if (testMachine == null) testMachine = multipartRequest
 	                    .getOptionalStringParameter("testMachine");
 	            if (testMachine == null)
 	                testMachine = "unknown";
