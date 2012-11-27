@@ -54,37 +54,12 @@ public final class ProcessTree {
 
     private void computeChildren() {
         live.clear();
-        try {
-            ProcessBuilder b0 = new ProcessBuilder(new String[] { "/bin/date" });
-            Process p = b0.start();
-            int datePid = MarmosetUtilities.getPid(p);
-            log.info("date has pid " + datePid);
-            p.getOutputStream().close();
-            Scanner s = new Scanner(p.getInputStream());
-            while (s.hasNext()) {
-                String txt = s.nextLine();
-                if (txt == null)
-                    break;
-                log.info("date: " + txt);
-
-            }
-            s.close();
-            s = new Scanner(p.getErrorStream());
-            while (s.hasNext()) {
-                log.error(s.nextLine());
-            }
-            s.close();
-            p.destroy();
-        } catch (Throwable e) {
-            log.warn("Unable to run date", e);
-        }
 
         try {
             ProcessBuilder b = new ProcessBuilder(
                     new String[] { "/bin/ps", "xww", "-o",
                             "pid,ppid,lstart,user,state,pcpu,cputime,args" });
 
-            log.info("starting ps");
             Process p;
             try {
                 p = b.start();
@@ -95,8 +70,7 @@ public final class ProcessTree {
                 log.fatal("Unable to start ps", t);
                 throw t;
             }
-            log.info("started ps");
-
+            
             int psPid = MarmosetUtilities.getPid(p);
             int rootPid = MarmosetUtilities.getPid();
             p.getOutputStream().close();
@@ -121,7 +95,7 @@ public final class ProcessTree {
 //                        log.debug("old orphan " + txt);
                         continue;
                     }
-                    log.info(txt);
+//                    log.info(txt);
                     live.add(pid);
                     children.put(ppid, pid);
                     info.put(pid, txt);
@@ -131,7 +105,7 @@ public final class ProcessTree {
                 }
 
             }
-            log.info("finished ps with " + live);
+//            log.info("finished ps with " + live);
 
             s.close();
             s = new Scanner(p.getErrorStream());
@@ -191,7 +165,7 @@ public final class ProcessTree {
 
     public void destroyProcessTree() {
         int pid = MarmosetUtilities.getPid(process);
-        log.info("Killing process tree for pid " + pid);
+//        log.info("Killing process tree for pid " + pid);
 
         try {
             this.computeChildren();
@@ -203,7 +177,7 @@ public final class ProcessTree {
             // in order to maintain proper internal state
             process.destroy();
         }
-        log.info("Done Killing process tree for " + pid);
+//        log.info("Done Killing process tree for " + pid);
 
     }
 
