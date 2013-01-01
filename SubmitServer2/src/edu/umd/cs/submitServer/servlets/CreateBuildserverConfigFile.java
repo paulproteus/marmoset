@@ -48,6 +48,8 @@ public class CreateBuildserverConfigFile extends SubmitServerServlet {
         UserSession userSession = (UserSession) session.getAttribute(USER_SESSION);
         Student user = (Student) request.getAttribute(USER);
         response.setContentType("text/plain");
+        response.setHeader("Content-Disposition", "attachment; filename=\"config.properties\"");
+       
         PrintWriter out = response.getWriter();
 
         out.printf("# Buildservr config file%n");
