@@ -43,6 +43,9 @@ public class LogErrorFilter extends SubmitServerFilter {
 	        return true;
 	    if (message.startsWith("/images/handycons/"))
 	        return true;
+	    if (message.toLowerCase().contains("translators.html"))
+	        return true;
+	    
 	    return false;
 	}
 
