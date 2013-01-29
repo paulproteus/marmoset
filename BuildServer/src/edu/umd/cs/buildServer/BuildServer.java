@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.management.InstanceAlreadyExistsException;
@@ -64,7 +65,6 @@ import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
-import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.marmoset.utilities.TestPropertiesExtractor;
 import edu.umd.cs.marmoset.utilities.ZipExtractorException;
 
@@ -805,8 +805,18 @@ public abstract class BuildServer implements ConfigurationKeys {
 		}
 
 		// Set test properties in the ProjectSubmission.
-		projectSubmission.setTestProperties(testProperties);
+        projectSubmission.setTestProperties(testProperties);
 
+		// validate required files
+		Set<String> requiredFiles = testProperties.getRequiredFiles();
+		Set<String> providedFiles = projectSubmission.getFilesInSubmission();
+		
+		requiredFiles.removeAll(providedFiles);
+		if (!requiredFiles.isEmpty()) {
+		    throw new CompileFailureException("Missing required files", 
+		            requiredFiles.toString());
+		}
+		
 		// Create a BuilderAndTesterFactory, based on the language specified
 		// in the test properties file
 		BuilderAndTesterFactory<T> builderAndTesterFactory = projectSubmission
