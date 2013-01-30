@@ -168,9 +168,7 @@ result, the submission is flagged as broken.
 			<c:when test="${!testOutcomeCollection.compileSuccessful}">
 				<h2>Compile/Build unsuccessful</h2>
 				<p>
-				<pre>
-					<c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" />
-		</pre>
+				<pre><c:out value="${testOutcomeCollection.buildOutcome.longTestResult}" /></pre>
 			</c:when>
 			<c:otherwise>
 

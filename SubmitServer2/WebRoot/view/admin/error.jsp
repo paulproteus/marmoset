@@ -97,8 +97,7 @@
         <c:if test="${not empty errorField['throwable_as_string'] }">
         <br> throwable:
     <blockquote>
-        <pre><c:out value="${errorField['throwable_as_string']}" />
-       </pre>
+        <pre><c:out value="${errorField['throwable_as_string']}" /></pre>
     </blockquote>
     </c:if>
 
