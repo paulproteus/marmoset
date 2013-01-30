@@ -195,6 +195,8 @@ public class TestProperties {
     }
     
     public Set<String> getRequiredFiles() {
+        if (this.requiredFiles.isEmpty())
+            return Collections.emptySet();
         return new HashSet<String>(this.requiredFiles);
     }
     public boolean isJava() {

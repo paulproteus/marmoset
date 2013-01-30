@@ -813,6 +813,12 @@ public abstract class BuildServer implements ConfigurationKeys {
 		
 		requiredFiles.removeAll(providedFiles);
 		if (!requiredFiles.isEmpty()) {
+		    if (requiredFiles.size() == 1) {
+		        String missingFile = requiredFiles.iterator().next();
+		        throw new CompileFailureException("Missing required file " + missingFile, 
+	                    "");
+		    }
+		        
 		    throw new CompileFailureException("Missing required files", 
 		            requiredFiles.toString());
 		}
