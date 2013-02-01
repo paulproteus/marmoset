@@ -957,8 +957,14 @@ public abstract class BuildServer implements ConfigurationKeys {
 	public void markPid() throws Exception {
 		File pidFile = getPidFile();
 		PrintWriter out = new PrintWriter(new FileWriter(pidFile));
-		out.println(MarmosetUtilities.getPid());
+		int pid = MarmosetUtilities.getPid();
+        out.println(pid);
 		out.close();
+		int pidFromFile = getPidFileContents(true);
+		if (pidFromFile != pid) {
+		    getLog().log(Level.ERROR, "After writing " + pid + " to " + pidFile + " got " + pidFromFile);
+		    throw new RuntimeException("Could not write pid file");
+		}
 		File pleaseShutdownFile = getPleaseShutdownFile();
 		if (pleaseShutdownFile.exists())
 			pleaseShutdownFile.delete();
