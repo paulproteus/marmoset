@@ -960,6 +960,12 @@ public abstract class BuildServer implements ConfigurationKeys {
 		int pid = MarmosetUtilities.getPid();
         out.println(pid);
 		out.close();
+		Thread.sleep(2000);
+		if (!pidFile.exists())
+		    getLog().log(Level.ERROR, "Pid file not created: " + pidFile);
+		else if (!pidFile.canRead())
+		    getLog().log(Level.ERROR, "Pid file cannot be read: " + pidFile);
+		    
 		int pidFromFile = getPidFileContents(true);
 		if (pidFromFile != pid) {
 		    getLog().log(Level.ERROR, "After writing " + pid + " to " + pidFile + " got " + pidFromFile);
