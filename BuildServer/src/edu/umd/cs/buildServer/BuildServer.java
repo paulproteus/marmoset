@@ -313,6 +313,10 @@ public abstract class BuildServer implements ConfigurationKeys {
 		}
 
 		getLog().debug("Server loop finished");
+        } catch (Exception e) {
+            getLog().error("Server loop terminating due to exception", e);
+        } catch (Error e) {
+            getLog().error("Server loop terminating due to error", e);
         } finally {
             clearMyPidFile();
 		}
@@ -996,8 +1000,10 @@ public abstract class BuildServer implements ConfigurationKeys {
     }
     
     public void clearMyPidFile() {
-        if (getPidFileContents(true) ==  MarmosetUtilities.getPid())
+        if (getPidFileContents(true) ==  MarmosetUtilities.getPid()) {
+            getLog().error("Deleting my pid file");
             getPidFile().delete();
+        }
     }
     
     public void writeToCurrentFile(String msg) {
