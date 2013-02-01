@@ -125,6 +125,8 @@ public abstract class BuildServer implements ConfigurationKeys {
 	protected BuildServerConfiguration buildServerConfiguration;
 
 	private Logger log;
+	
+	private boolean deletedPidFile = false;
 
 	/**
 	 * Constructor.
@@ -1000,9 +1002,13 @@ public abstract class BuildServer implements ConfigurationKeys {
     }
     
     public void clearMyPidFile() {
-        if (getPidFileContents(true) ==  MarmosetUtilities.getPid()) {
+        if (!pidFileExists()) {
+            if (!deletedPidFile)
+                getLog().warn("Pid file missing, can't delete");
+        } else if ( getPidFileContents(true) ==  MarmosetUtilities.getPid()) {
             getLog().error("Deleting my pid file");
             getPidFile().delete();
+            deletedPidFile = true;
         }
     }
     
@@ -1021,6 +1027,10 @@ public abstract class BuildServer implements ConfigurationKeys {
         
     }
     
+    public boolean pidFileExists() {
+        File pidFile = getPidFile();
+        return pidFile.exists() && pidFile.canRead();
+    }
     public int getPidFileContents(boolean shouldExist) {
         File pidFile = getPidFile();
         if (!pidFile.exists()) {
