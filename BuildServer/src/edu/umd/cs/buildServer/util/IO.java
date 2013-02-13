@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.io.CopyUtils;
@@ -171,4 +172,14 @@ public abstract class IO {
 			// ignore
 		}
 	}
+	public static void closeSilently(ZipFile... args) {
+        for(ZipFile c : args)
+        if (c != null)
+        try {
+            c.close();
+        } catch (IOException e) {
+            // ignore
+        }
+    }
+	
 }
