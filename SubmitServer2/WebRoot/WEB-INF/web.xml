@@ -31,6 +31,15 @@
 		log all transactions that take longer than some lower bound
 	-->
 	
+		<filter>
+		<filter-name>TestingGroundFilter</filter-name>
+		<filter-class>edu.umd.cs.submitServer.filters.TestingGroundFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>TestingGroundFilter</filter-name>
+		<url-pattern>/test.jsp</url-pattern>
+	</filter-mapping>
+	
 	<filter>
 		<filter-name>MonitorSlowTransactionsFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter</filter-class>

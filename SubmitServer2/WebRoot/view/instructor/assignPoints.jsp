@@ -77,7 +77,7 @@ $(document).ready(change);
     <li> Solution submitted by 
     <c:out value="${studentRegistration.classAccount}"/>
     at <fmt:formatDate value="${submission.submissionTimestamp}" pattern="E',' dd MMM 'at' hh:mm a"/>
-    <c:if test="${testSetup.jarfileStatus == 'failed'}">
+    <c:if test="${testSetup.status == 'FAILED'}">
 					<c:url var="canonicalRunLink"
 						value="/view/instructor/submission.jsp">
 						<c:param name="testRunPK" value="${testSetup.testRunPK}" />

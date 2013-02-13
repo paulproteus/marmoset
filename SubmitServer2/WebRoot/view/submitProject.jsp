@@ -53,7 +53,7 @@
 			</p>
 </div>
 
-<c:if test="${project.tested and (project.testSetupPK == 0 or testSetup.jarfileStatus != 'active')}">
+<c:if test="${project.tested and (project.testSetupPK == 0 or testSetup.status != 'ACTIVE')}">
 <h2>
 <font color=red><b>NOTE:</b></font></h2>
 <p>This project is not yet active for automated testing of submissions.  This probably means
