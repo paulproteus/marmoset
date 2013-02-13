@@ -33,6 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import java.util.Properties;
@@ -59,7 +60,6 @@ import org.apache.log4j.SimpleLayout;
 import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
 import edu.umd.cs.buildServer.util.LoadAverage;
 import edu.umd.cs.buildServer.util.ServletAppender;
-import edu.umd.cs.marmoset.modelClasses.MissingRequiredTestPropertyException;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.OutcomeType;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
@@ -488,154 +488,174 @@ public abstract class BuildServer implements ConfigurationKeys {
 		return logger;
 	}
 
-	/**
-	 * Get a single project from the submit server, and try to build and test
-	 * it.
-	 *
-	 * @return a status code: NO_WORK if there was no work available, SUCCESS if
-	 *         we downloaded, built, and tested a project successfully,
-	 *         COMPILE_ERROR if the project failed to compile, BUILD_ERROR if
-	 *         the project could not be built due to an internal error
-	 */
-	private int doOneRequest() throws MissingConfigurationPropertyException {
+    /**
+     * Get a single project from the submit server, and try to build and test
+     * it.
+     * 
+     * @return a status code: NO_WORK if there was no work available, SUCCESS if
+     *         we downloaded, built, and tested a project successfully,
+     *         COMPILE_ERROR if the project failed to compile, BUILD_ERROR if
+     *         the project could not be built due to an internal error
+     */
+    private int doOneRequest() throws MissingConfigurationPropertyException {
 
-	    ProjectSubmission<?> projectSubmission = null;
-		try {
-			// Get a ProjectSubmission to build and test
-		   projectSubmission  = getProjectSubmission();
-			if (projectSubmission == null)
-				return NO_WORK;
+        ProjectSubmission<?> projectSubmission = null;
+        try {
+            // Get a ProjectSubmission to build and test
+            projectSubmission = getProjectSubmission();
+            if (projectSubmission == null)
+                return NO_WORK;
 
-			long start = System.currentTimeMillis();
-			int result;
-			try {
-			    if (getConfig().getBooleanProperty(DEBUG_SKIP_DOWNLOAD)) {
-			        log.warn("Skipping download");
-			    } else {
-				cleanWorkingDirectories();
+            long start = System.currentTimeMillis();
+            int result;
+            try {
+                if (getConfig().getBooleanProperty(DEBUG_SKIP_DOWNLOAD)) {
+                    log.warn("Skipping download");
+                } else {
+                    cleanWorkingDirectories();
 
-				log.trace("About to download project");
+                    log.trace("About to download project");
 
-				// Read the zip file from the response stream.
-				downloadSubmissionZipFile(projectSubmission);
+                    // Read the zip file from the response stream.
+                    downloadSubmissionZipFile(projectSubmission);
 
-				log.trace("Done downloading project");
+                    log.trace("Done downloading project");
 
-				log.warn("Preparing to  process submission "
-						+ projectSubmission.getSubmissionPK()
-						+ " for test setup "
-						+ projectSubmission.getTestSetupPK());
+                    log.warn("Preparing to  process submission "
+                            + projectSubmission.getSubmissionPK()
+                            + " for test setup "
+                            + projectSubmission.getTestSetupPK());
 
-				// Get the project jar file containing the provided classes
-				// and the secret tests.
-				downloadProjectJarFile(projectSubmission);
-				// log.warn
-			    }
-				if (getDownloadOnly())
-				    return NO_WORK;
-				
-				long started = System.currentTimeMillis();
-				// Now we have the project and the testing jarfile.
-				// Build and test it.
-				try {
-					buildAndTestProject(projectSubmission);
+                    // Get the project jar file containing the provided classes
+                    // and the secret tests.
+                    downloadProjectJarFile(projectSubmission);
+                    // log.warn
+                }
+                if (getDownloadOnly())
+                    return NO_WORK;
 
-					// Building and testing was successful.
-					// ProjectSubmission should have had its public, release,
-					// secret and student
-					// TestOutcomes added.
-					addBuildTestResult(projectSubmission, TestOutcome.PASSED,
-							"", started);
-					result = SUCCESS;
-				} catch (BuilderException e) {
-					// treat as compile error
-					getLog().info(
-							"Submission " + projectSubmission.getSubmissionPK()
-									+ " for test setup "
-									+ projectSubmission.getTestSetupPK()
-									+ " did not build", e);
+                long started = System.currentTimeMillis();
+                // Now we have the project and the testing jarfile.
+                // Build and test it.
+                try {
+                    buildAndTestProject(projectSubmission);
 
-					// Add build test outcome
-					String compilerOutput = e.toString() + "\n";
-					addBuildTestResult(projectSubmission, TestOutcome.FAILED,
-							compilerOutput, started);
+                    // Building and testing was successful.
+                    // ProjectSubmission should have had its public, release,
+                    // secret and student
+                    // TestOutcomes added.
+                    addBuildTestResult(projectSubmission, TestOutcome.PASSED,
+                            "", started);
+                    result = SUCCESS;
+                } catch (BuilderException e) {
+                    // treat as compile error
+                    getLog().info(
+                            "Submission " + projectSubmission.getSubmissionPK()
+                                    + " for test setup "
+                                    + projectSubmission.getTestSetupPK()
+                                    + " did not build", e);
 
-					getLog().warn(
-							"Marking all classes of tests 'could_not_run' for "
-									+ projectSubmission.getSubmissionPK()
-									+ " and test-setup "
-									+ projectSubmission.getTestSetupPK());
-					// Add "cannot build submission" test outcomes for
-					// the dynamic test types
-					for(TestType testType : TestType.DYNAMIC_TEST_TYPES) 
-                        addSpecialFailureTestOutcome(projectSubmission,
-                                testType, "Compiler output:\n" + compilerOutput);
-                        
+                    // Add build test outcome
+                    String compilerOutput = "Building threw builder exception: " + toString(e);
 
-					result = COMPILE_FAILURE;
-				} catch (CompileFailureException e) {
-					// If we couldn't compile, report special testOutcome
-					// stating this fact
-					log.info(
-							"Submission " + projectSubmission.getSubmissionPK()
-									+ " did not compile", e);
+                    getLog().warn(
+                            "Marking all classes of tests 'could_not_run' for "
+                                    + projectSubmission.getSubmissionPK()
+                                    + " and test-setup "
+                                    + projectSubmission.getTestSetupPK());
+                    
+                    buildFailed(projectSubmission, started, compilerOutput);
 
-					// XXX [Nat] If the compile failed because of an
-					// OutOfMemoryError, should we report anything?
+                    result = COMPILE_FAILURE;
+                } catch (CompileFailureException e) {
+                    // If we couldn't compile, report special testOutcome
+                    // stating this fact
+                    log.info(
+                            "Submission " + projectSubmission.getSubmissionPK()
+                                    + " did not compile", e);
 
-					// Add build test outcome
-					String compilerOutput = e.toString() + "\n"
-							+ e.getCompilerOutput();
-					addBuildTestResult(projectSubmission, TestOutcome.FAILED,
-							compilerOutput, started);
+                    // Add build test outcome
+                    String compilerOutput = e.toString() + "\n"
+                            + e.getCompilerOutput();
+                    buildFailed(projectSubmission, started, compilerOutput);
 
-					// Add "cannot build submission" test outcomes for
-					// the dynamic test types
-					for(TestType testType : TestType.DYNAMIC_TEST_TYPES) 
-					    addSpecialFailureTestOutcome(projectSubmission,
-								testType, "Compiler output:\n" + compilerOutput);
+                    result = COMPILE_FAILURE;
 
-					result = COMPILE_FAILURE;
-				}
-			} finally {
-				// Make sure the zip file is cleaned up.
-				if (!getConfig().getDebugProperty(
-						DEBUG_PRESERVE_SUBMISSION_ZIPFILES)
-						&& !projectSubmission.getZipFile().delete()) {
-					log.error("Could not delete submission zipfile "
-							+ projectSubmission.getZipFile());
-				}
-			}
-			
+                } catch (Throwable e) {
+                    // Got a throwable
+                    log.info(
+                            "Submission " + projectSubmission.getSubmissionPK()
+                                    + " threw unexpected exception", e);
 
-			writeToCurrentFile("Testing completed ");
-			// Send the test results back to the submit server
-			reportTestResults(projectSubmission);
+                    // Add build test outcome
+                    String compilerOutput = "Building threw unexpected exception: " + toString(e);
+                    buildFailed(projectSubmission, started, compilerOutput);
 
-			long total = System.currentTimeMillis() - start;
-			log.info("submissionPK " + projectSubmission.getSubmissionPK()
-					+ " took " + (total / 1000) + " seconds to process");
-			return result;
+                    result = COMPILE_FAILURE;
+                }
+            } finally {
+                // Make sure the zip file is cleaned up.
+                if (!getConfig().getDebugProperty(
+                        DEBUG_PRESERVE_SUBMISSION_ZIPFILES)
+                        && !projectSubmission.getZipFile().delete()) {
+                    log.error("Could not delete submission zipfile "
+                            + projectSubmission.getZipFile());
+                }
+            }
 
-		} catch (HttpException e) {
-			log.error("Internal error: BuildServer got HttpException", e);
-			// Assume this wasn't our fault
-			return NO_WORK;
-		} catch (IOException e) {
-			log.error("Internal error: BuildServer got IOException", e);
-			// Assume this is an internal error
-			return BUILD_FAILURE;
-		} catch (BuilderException e) {
-			log.error("Internal error: BuildServer got BuilderException", e);
-			// This is a build failure
-			return BUILD_FAILURE;
-		} finally {
-			if (projectSubmission != null) {
-				releaseConnection(projectSubmission);
-			}
-			getCurrentFile().delete();
-		}
-	}
+            writeToCurrentFile("Testing completed ");
+            // Send the test results back to the submit server
+            reportTestResults(projectSubmission);
+
+            long total = System.currentTimeMillis() - start;
+            log.info("submissionPK " + projectSubmission.getSubmissionPK()
+                    + " took " + (total / 1000) + " seconds to process");
+            return result;
+
+        } catch (HttpException e) {
+            log.error("Internal error: BuildServer got HttpException", e);
+            // Assume this wasn't our fault
+            return NO_WORK;
+        } catch (IOException e) {
+            log.error("Internal error: BuildServer got IOException", e);
+            // Assume this is an internal error
+            return BUILD_FAILURE;
+        } catch (BuilderException e) {
+            log.error("Internal error: BuildServer got BuilderException", e);
+            // This is a build failure
+            return BUILD_FAILURE;
+        } finally {
+            if (projectSubmission != null) {
+                releaseConnection(projectSubmission);
+            }
+            getCurrentFile().delete();
+        }
+    }
+    
+    String toString(Throwable e) {
+        StringWriter w = new StringWriter();
+        PrintWriter pw = new PrintWriter(w);
+        e.printStackTrace(pw);
+        pw.close();
+        return w.toString();
+    }
+
+    /**
+     * @param projectSubmission
+     * @param started
+     * @param compilerOutput
+     */
+    public void buildFailed(ProjectSubmission<?> projectSubmission,
+            long started, String compilerOutput) {
+        addBuildTestResult(projectSubmission, TestOutcome.FAILED,
+                compilerOutput, started);
+        
+        // Add "cannot build submission" test outcomes for
+        // the dynamic test types
+        for (TestType testType : TestType.DYNAMIC_TEST_TYPES)
+            addSpecialFailureTestOutcome(projectSubmission,
+                    testType, "Compiler output:\n" + compilerOutput);
+    }
 
 	/**
 	 * Ensure build and testfiles directories are completely empty before we
@@ -796,19 +816,20 @@ public abstract class BuildServer implements ConfigurationKeys {
 			throw new BuilderException(e);
 		}
 
-		// We absolutely have to have test.properties
-		if (!testPropertiesExtractor.extractedTestProperties())
-			throw new BuilderException(
-					"Test setup did not contain test.properties");
+        // We absolutely have to have test.properties
+        if (!testPropertiesExtractor.extractedTestProperties())
+            throw new BuilderException(
+                    "Test setup did not contain test.properties");
 
-		// Load test.properties
-		File testPropertiesFile = new File(buildDirectory, "test.properties");
-		T testProperties;
-		try {
-		    testProperties =  (T) TestProperties.load(testPropertiesFile);
-		} catch (MissingRequiredTestPropertyException e) {
-			throw new BuilderException(e.getMessage(), e);
-		}
+        T testProperties;
+        try {
+            // Load test.properties
+            File testPropertiesFile = new File(buildDirectory,
+                    "test.properties");
+            testProperties = (T) TestProperties.load(testPropertiesFile);
+        } catch (Exception e) {
+            throw new BuilderException(e.getMessage(), e);
+        }
 
 		// Set test properties in the ProjectSubmission.
         projectSubmission.setTestProperties(testProperties);
