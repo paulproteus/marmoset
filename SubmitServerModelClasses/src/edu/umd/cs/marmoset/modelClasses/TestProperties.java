@@ -39,9 +39,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.annotation.CheckForNull;
 
 import edu.umd.cs.marmoset.utilities.FileNames;
 
@@ -67,9 +72,10 @@ public class TestProperties {
 
     protected final Framework framework;
     protected final Properties testProperties;
-
+   
     // Shared
     private int testTimeoutInSeconds;
+    protected Set<String> requiredFiles;
 
     private int maxDrainOutputInBytes;
     private String ldLibraryPath;
@@ -167,6 +173,7 @@ public class TestProperties {
         setLdLibraryPath(getOptionalStringProperty(LD_LIBRARY_PATH));
         setTestTimeoutInSeconds(getOptionalIntegerProperty(TEST_TIMEOUT,
                 DEFAULT_PROCESS_TIMEOUT));
+        setRequiredFiles(getOptionalStringProperty(TestPropertyKeys.REQUIRED_FILES));
     }
 
     protected void setProperty(String name, String value) {
@@ -176,6 +183,22 @@ public class TestProperties {
             testProperties.remove(name);
     }
 
+    protected void setRequiredFiles(@CheckForNull String requiredFiles) {
+        if (requiredFiles == null) {
+            this.requiredFiles = Collections.emptySet();
+            return;
+        }
+        this.requiredFiles = new HashSet<String>();
+        for(String file : requiredFiles.split(",")) {
+            this.requiredFiles.add(file.trim());
+        }
+    }
+    
+    public Set<String> getRequiredFiles() {
+        if (this.requiredFiles.isEmpty())
+            return Collections.emptySet();
+        return new HashSet<String>(this.requiredFiles);
+    }
     public boolean isJava() {
         return getLanguage().equalsIgnoreCase(JAVA);
     }

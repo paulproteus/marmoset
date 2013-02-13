@@ -51,10 +51,8 @@
 				</td>
 
 				<td class="description">
-				<%--<pre>--%>
 					<c:out
 					value="${warning.longTestResult}" />
-				<%--</pre>--%>
 					</td>
 				<td class="description">${warning.exceptionClassName}</td>
 				<td><a href="${ss:webProperty('findbugsDescriptionURL')}#${warning.testName}">${warning.testName}</a></td>
@@ -108,9 +106,7 @@
 
 		<c:out value="${test.shortTestResult}" /></td>
 		<td class="description">
-		<%--<pre>--%>
 			<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
-		<%--</pre>--%>
 		</td>
 	</tr>
 	</c:forEach>
@@ -145,9 +141,7 @@
 			<td>${test.shortTestName}</td>
 			<td class="description"><c:out value="${test.shortTestResult}" /></td>
 			<td class="description">
-			<%--<pre>--%>
 				<c:out value="${ss:hotlink(test, viewLink)}" escapeXml="false"/>
-			<%--</pre>--%>
 			</td>
 		</tr>
 	</c:forEach>

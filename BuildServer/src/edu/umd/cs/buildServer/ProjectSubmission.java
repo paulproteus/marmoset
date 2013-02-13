@@ -27,6 +27,13 @@
 package edu.umd.cs.buildServer;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.log4j.Logger;
@@ -35,6 +42,7 @@ import edu.umd.cs.buildServer.builder.BuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.CBuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.JavaBuilderAndTesterFactory;
 import edu.umd.cs.buildServer.builder.ScriptBuilderAndTesterFactory;
+import edu.umd.cs.buildServer.util.IO;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
 import edu.umd.cs.marmoset.modelClasses.JUnitTestProperties;
 import edu.umd.cs.marmoset.modelClasses.MakeTestProperties;
@@ -166,6 +174,22 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 		return zipFile;
 	}
 
+	
+    public Set<String> getFilesInSubmission() throws IOException {
+        HashSet<String> result = new HashSet<String>();
+        ZipFile z = null;
+        try {
+            z = new ZipFile(getZipFile());
+            Enumeration<? extends ZipEntry> e = z.entries();
+            while (e.hasMoreElements()) {
+                ZipEntry entry = e.nextElement();
+                result.add(entry.getName());
+            }
+        } finally {
+            IO.closeSilently(z);
+        }
+        return result;
+    }
 	/**
 	 * Get the File storing the project jar file.
 	 *

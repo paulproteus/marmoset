@@ -180,7 +180,7 @@ public class TestOutcome implements Serializable {
 	private String testName;
 	private String shortTestResult = "";
 	private String longTestResult="";
-	private String exceptionClassName;
+	private /* @DottedClassName */ String exceptionClassName;
 	private Object details;
     private CoverageLevel coarsestCoverageLevel=CoverageLevel.NONE;
     private boolean exceptionSourceCoveredElsewhere;

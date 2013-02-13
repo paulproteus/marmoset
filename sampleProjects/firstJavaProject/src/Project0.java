@@ -14,7 +14,11 @@ public class Project0 {
 
     public static int square(int x) {
 
-        return 0;
+        /**
+         * You need to replace the throw statement with your implementation of
+         * the method.
+         */
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
 }

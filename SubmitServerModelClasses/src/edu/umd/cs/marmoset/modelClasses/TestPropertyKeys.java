@@ -74,6 +74,8 @@ public interface TestPropertyKeys {
     public static final String[] BUILD_TIMEOUT =
             {"build.timeout"};
 
+    
+    public static final String  REQUIRED_FILES = "files.required";
 	/**
 	 * Property names to specify max number of bytes to be read from
 	 * a test process.
