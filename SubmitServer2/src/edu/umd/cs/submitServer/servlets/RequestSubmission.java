@@ -287,7 +287,7 @@ public class RequestSubmission extends SubmitServerServlet {
                     // datePosted
                     // date_posted is a horrible name, this is the field I'm
                     // using for timeouts
-                    testSetup.setJarfileStatus(TestSetup.PENDING);
+                    testSetup.setStatus(TestSetup.Status.PENDING);
                     testSetup.setDatePosted(new Timestamp(System.currentTimeMillis()));
                     testSetup.update(conn);
                 } else

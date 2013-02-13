@@ -156,13 +156,13 @@ public class AssignPoints extends SubmitServerServlet {
 				}
 
 				testSetup.setVersion(currentTestingSetup.getVersion() + 1);
-				currentTestingSetup.setJarfileStatus(TestSetup.INACTIVE);
+				currentTestingSetup.setStatus(TestSetup.Status.INACTIVE);
 				currentTestingSetup.update(conn);
 				LogEntry.activeNewTestSetup(conn, course, project, comment == null ? project.getTitle() + " testing updated" : comment,
 						studentLink);
 			}
 			testSetup.setComment(comment);
-			testSetup.setJarfileStatus(TestSetup.ACTIVE);
+			testSetup.setStatus(TestSetup.Status.ACTIVE);
 			project.setTestSetupPK(testSetup.getTestSetupPK());
 			testSetup.update(conn);
 			project.update(conn);

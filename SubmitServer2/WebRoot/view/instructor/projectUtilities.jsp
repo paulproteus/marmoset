@@ -213,9 +213,9 @@ jQuery(document).ready(function ($) {
 			</tr>
 			<c:forEach var="testSetup" items="${allTestSetups}"
 						varStatus="counter">
-				<c:if test="${testSetup.jarfileStatus != 'broken'}">
+				<c:if test="${testSetup.status != 'BROKEN'}">
 				<c:choose>
-					<c:when test="${testSetup.jarfileStatus == 'active'}">
+					<c:when test="${testSetup.status == 'ACTIVE'}">
 					<tr class="highlight">
 					
 								</c:when>
@@ -224,7 +224,7 @@ jQuery(document).ready(function ($) {
 					
 								</c:otherwise>
 				</c:choose>
-					<td><c:if test="${testSetup.jarfileStatus == 'tested' || testSetup.jarfileStatus == 'inactive'}">
+					<td><c:if test="${testSetup.status == 'TESTED' || testSetup.status == 'INACTIVE'}">
 					${testSetup.version}
 					</c:if>
 					</td>
@@ -237,36 +237,36 @@ jQuery(document).ready(function ($) {
 
 					<td>
 					<c:choose>
-						<c:when test="${testSetup.jarfileStatus != 'new' && testSetup.jarfileStatus != 'pending'}">
+						<c:when test="${testSetup.status != 'NEW' && testSetup.status != 'PENDING'}">
 
 							<c:url var="canonicalRunLink"
 											value="/view/instructor/submission.jsp">
 								<c:param name="testRunPK" value="${testSetup.testRunPK}" />
 							</c:url>
-							<a href="${canonicalRunLink}">${testSetup.jarfileStatus}</a>
+							<a href="${canonicalRunLink}">${testSetup.status}</a>
 						</c:when>
-						<c:otherwise>${testSetup.jarfileStatus}</c:otherwise>
+						<c:otherwise>${testSetup.status}</c:otherwise>
 					</c:choose>
 					</td>
 
 					<td>
 					<c:choose>
-						<c:when test="${testSetup.jarfileStatus == 'tested'}">
+						<c:when test="${testSetup.status == 'TESTED'}">
 							<c:url var="assignPointsLink"
 											value="/view/instructor/assignPoints.jsp">
 								<c:param name="testRunPK" value="${testSetup.testRunPK}" />
 							</c:url>
 							<a href="${assignPointsLink}">assign points</a>
 						</c:when>
-						<c:when test="${testSetup.jarfileStatus == 'active' && instructorActionCapability}">
+						<c:when test="${testSetup.status == 'ACTIVE' && instructorActionCapability}">
 							<c:url var="deactivateLink"
 											value="/action/instructor/ChangeTestSetupStatus">
 								<c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
-								<c:param name="jarfileStatus" value="inactive" />
+								<c:param name="status" value="inactive" />
 							</c:url>
 							<a href="${deactivateLink}">inactivate</a>
 						</c:when>
-						<c:when test="${testSetup.jarfileStatus == 'failed'}">
+						<c:when test="${testSetup.status == 'FAILED'}">
                             <c:url var="assignPointsLink"
                                             value="/view/instructor/assignPoints.jsp">
                                 <c:param name="testRunPK" value="${testSetup.testRunPK}" />
@@ -275,10 +275,10 @@ jQuery(document).ready(function ($) {
                         </c:when>
 						
 						<%--
-						<c:when test="${testSetup.jarfileStatus == 'inactive'}">
+						<c:when test="${testSetup.status == 'INACTIVE'}">
 							<c:url var="activateLink" value="/action/instructor/ChangeTestSetupStatus">
 								<c:param name="testSetupPK" value="${testSetup.testSetupPK}"/>
-								<c:param name="jarfileStatus" value="active"/>
+								<c:param name="status" value="active"/>
 							</c:url>
 							<a href="${activateLink}">activate</a>
 						</c:when>
@@ -287,21 +287,21 @@ jQuery(document).ready(function ($) {
 					</td>
 
 					<td>
-						<c:if test="${testSetup.jarfileStatus != 'active' and testSetup.jarfileStatus != 'inactive'}">
+						<c:if test="${testSetup.status != 'ACTIVE' and testSetup.status != 'INACTIVE'}">
 						<c:url var="markBrokenLink"
 										value="/action/instructor/ChangeTestSetupStatus">
 							<c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
-							<c:param name="jarfileStatus" value="broken" />
+							<c:param name="status" value="broken" />
 						</c:url>
 						<a href="${markBrokenLink}"> mark broken </a>
 						</c:if>
 					</td>
                     <td>
-                        <c:if test="${testSetup.jarfileStatus == 'failed' or testSetup.jarfileStatus == 'pending'}">
+                        <c:if test="${testSetup.status == 'FAILED' or testSetup.status == 'PENDING'}">
                         <c:url var="retestLink"
                                         value="/action/instructor/ChangeTestSetupStatus">
                             <c:param name="testSetupPK" value="${testSetup.testSetupPK}" />
-                            <c:param name="jarfileStatus" value="new" />
+                            <c:param name="status" value="new" />
                         </c:url>
                         <a href="${retestLink}"> retest </a>
                         </c:if>

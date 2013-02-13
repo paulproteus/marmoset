@@ -49,7 +49,7 @@ public class TestSetup
 {
     private Integer testSetupPK; // non-NULL, autoincrement
     private int projectPK = 0; // non-NULL
-    private String jarfileStatus=NEW;
+    private Status status=Status.NEW;
     private int version=0;
     private Timestamp datePosted;
     private String comment;
@@ -84,14 +84,19 @@ public class TestSetup
 
     /** Fully-qualified attributes for test_setups table. */
     public static final String ATTRIBUTES = Queries.getAttributeList(TABLE_NAME, ATTRIBUTE_NAME_LIST);
-    public static final String NEW = "new";
-    public static final String PENDING = "pending";
-    public static final String FAILED = "failed";
-    public static final String TESTED = "tested";
-    public static final String ACTIVE = "active";
-    public static final String INACTIVE = "inactive";
-    public static final String BROKEN = "broken";
 
+	public enum Status {
+		NEW, PENDING, FAILED, TESTED, ACTIVE, INACTIVE, BROKEN;
+
+		public static Status valueOfAnyCase(String name) {
+			return valueOf(name.toUpperCase());
+		}
+
+		@Override
+		public String toString() {
+			return name().toLowerCase();
+		}
+	};
 
 	public void setArchiveForUpload(byte[] bytes)
 	{
@@ -161,25 +166,32 @@ public class TestSetup
         this.projectPK = projectPK;
     }
     
-    public boolean hasJarFileStatus(String ... anyOf) {
-        for(String s : anyOf)
-            if (jarfileStatus.equals(s))
+    public boolean hasStatus(TestSetup.Status ... anyOf) {
+        for(TestSetup.Status s : anyOf)
+            if (status.equals(s))
                 return true;
         return false;
     }
     /**
-     * @return Returns the jarfileStatus.
+     * @return Returns the status.
      */
-    public String getJarfileStatus()
+    public Status getStatus()
     {
-        return jarfileStatus;
+        return status;
     }
     /**
-     * @param jarfileStatus The jarfileStatus to set.
+     * @param status The status to set.
      */
-    public void setJarfileStatus(String jarfileStatus)
+    public void setStatus(String status)
     {
-        this.jarfileStatus = jarfileStatus;
+        this.status = Status.valueOfAnyCase(status);
+    }
+    /**
+     * @param status The status to set.
+     */
+    public void setStatus(Status status)
+    {
+        this.status = status;
     }
     /**
      * @return Returns the version.
@@ -256,7 +268,7 @@ public class TestSetup
     {
         setTestSetupPK(rs.getInt(startingFrom++));
         setProjectPK(rs.getInt(startingFrom++));
-        setJarfileStatus(rs.getString(startingFrom++));
+        setStatus(rs.getString(startingFrom++));
         setVersion(rs.getInt(startingFrom++));
         setDatePosted(rs.getTimestamp(startingFrom++));
         setComment(rs.getString(startingFrom++));
@@ -355,7 +367,7 @@ public class TestSetup
                 + " AND test_setups.project_pk = ? "
                 + " ORDER BY test_setups.date_posted DESC " + " LIMIT 1 ";
 
-        PreparedStatement stmt  = Queries.setStatement(conn, query, TestSetup.BROKEN, projectPK);
+        PreparedStatement stmt  = Queries.setStatement(conn, query, TestSetup.Status.BROKEN.toString(), projectPK);
         
         return getFromPreparedStatement(stmt);
     }
@@ -454,11 +466,11 @@ public class TestSetup
         try {
             // update statement
             stmt = conn.prepareStatement(update);
-            stmt.setString(1, NEW );
+            stmt.setString(1, Status.NEW.toString() );
             // where clause
-            stmt.setString(2, PENDING );
-            stmt.setString(3, TESTED );
-            stmt.setString(4, FAILED);
+            stmt.setString(2, Status.PENDING.toString() );
+            stmt.setString(3, Status.TESTED.toString() );
+            stmt.setString(4, Status.FAILED.toString() );
             SqlUtilities.setInteger(stmt, 5, projectPK);
 
             stmt.executeUpdate();
@@ -471,7 +483,7 @@ public class TestSetup
     throws SQLException
     {
         stmt.setInt(index++, getProjectPK());
-        stmt.setString(index++, getJarfileStatus());
+        stmt.setString(index++, getStatus().toString());
         stmt.setInt(index++, getVersion());
         stmt.setTimestamp(index++, getDatePosted());
         stmt.setString(index++, getComment());

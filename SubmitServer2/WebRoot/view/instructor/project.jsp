@@ -195,7 +195,7 @@ uploaded submissions. <a href="${projectBaselineLink}">Create baseline</a>.
 		<a title="zip/jar file to upload"><input type="file" name="file"
 				size=40></a> <input type="submit" value="Upload"></c:if></form>
 		</c:when>
-		<c:when test="${testSetup != null && testSetup.jarfileStatus == 'active'}">
+		<c:when test="${testSetup != null && testSetup.status == 'ACTIVE'}">
 			<c:url var="canonicalRunLink" value="/view/instructor/submission.jsp">
 				<c:param name="testRunPK" value="${testSetup.testRunPK}" />
 			</c:url>
