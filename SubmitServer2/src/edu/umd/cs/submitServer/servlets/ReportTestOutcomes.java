@@ -432,12 +432,12 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 						|| testOutcomeCollection
 								.getCouldNotRunAnyCardinalTests()) {
 					// If any tests have failed, then set status to failed
-					testSetup.setJarfileStatus(TestSetup.FAILED);
+					testSetup.setStatus(TestSetup.Status.FAILED);
 				} else {
 					// TODO count num tests passed and set build/public/release
 					// stats
 					// set status to OK for this jarfile
-					testSetup.setJarfileStatus(TestSetup.TESTED);
+					testSetup.setStatus(TestSetup.Status.TESTED);
 
 				}
 				// update pending project_jarfile to reflect the changes just

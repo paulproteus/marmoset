@@ -472,8 +472,8 @@ public final class Queries {
 				+ " LOCK IN SHARE MODE ";
 
 		PreparedStatement stmt = conn.prepareStatement(query);
-		stmt.setString(1, TestSetup.NEW);
-		stmt.setString(2, TestSetup.PENDING);
+		stmt.setString(1, TestSetup.Status.NEW.toString());
+		stmt.setString(2, TestSetup.Status.PENDING.toString());
 		stmt.setTimestamp(3, buildTimeout);
 
 		return getFromPreparedStatement(stmt, submission, testSetup);

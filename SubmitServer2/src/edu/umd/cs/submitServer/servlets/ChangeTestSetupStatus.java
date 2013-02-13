@@ -58,7 +58,7 @@ public class ChangeTestSetupStatus extends SubmitServerServlet {
 			Project project = (Project) request.getAttribute("project");
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerServletLog(), strictParameterChecking());
-			String jarfileStatus = parser.getCheckedParameter("jarfileStatus");
+			String status = parser.getCheckedParameter("status");
 
 			conn.setAutoCommit(false);
 			/*
@@ -72,27 +72,27 @@ public class ChangeTestSetupStatus extends SubmitServerServlet {
 			 */
 			conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
-			if (jarfileStatus.equals(TestSetup.INACTIVE)) {
+			if (status.equals(TestSetup.Status.INACTIVE)) {
 				// Can only mark something INACTIVE that was previously ACTIVE
-				if (testSetup.hasJarFileStatus(TestSetup.ACTIVE)) {
-					testSetup.setJarfileStatus(TestSetup.INACTIVE);
+				if (testSetup.hasStatus(TestSetup.Status.ACTIVE)) {
+					testSetup.setStatus(TestSetup.Status.INACTIVE);
 					testSetup.update(conn);
 					project.setTestSetupPK(0);
 					project.update(conn);
 				}
-			} else if (jarfileStatus.equals(TestSetup.BROKEN)
-					&& testSetup.hasJarFileStatus(TestSetup.FAILED, TestSetup.TESTED, TestSetup.INACTIVE, 
-					        TestSetup.PENDING, TestSetup.NEW)) {
+			} else if (status.equals(TestSetup.Status.BROKEN)
+					&& testSetup.hasStatus(TestSetup.Status.FAILED, TestSetup.Status.TESTED, TestSetup.Status.INACTIVE, 
+					        TestSetup.Status.PENDING, TestSetup.Status.NEW)) {
 				// Can mark broken only if current state is:
 				// FAILED, TESTED, INACTIVE, or PENDING
 				// If you mark something BROKEN that was pending, it might
 				// re-appear
 				// if the buildserver was stalled.
-				testSetup.setJarfileStatus(jarfileStatus);
+				testSetup.setStatus(status);
 				testSetup.update(conn);
-			} else if (jarfileStatus.equals(TestSetup.NEW)
-                    && testSetup.hasJarFileStatus(TestSetup.FAILED, TestSetup.TESTED, TestSetup.PENDING)) {
-                testSetup.setJarfileStatus(jarfileStatus);
+			} else if (status.equals(TestSetup.Status.NEW)
+                    && testSetup.hasStatus(TestSetup.Status.FAILED, TestSetup.Status.TESTED, TestSetup.Status.PENDING)) {
+                testSetup.setStatus(status);
                 testSetup.update(conn);
             }
 

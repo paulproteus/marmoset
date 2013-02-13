@@ -91,7 +91,7 @@ public final class MarmosetPatterns {
         addPattern("firstname", null);
         addPattern("gender", null);
         addPattern("highSchoolCountry", null);
-        addPattern("jarfileStatus", null);
+        addPattern("status", null);
         addPattern("lastname", null);
         addPattern("longTestResult", null);
         addPattern("oneTimePassword", null);
