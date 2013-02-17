@@ -39,10 +39,7 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,22 +48,14 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.Nonnull;
-
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewComment;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewThread;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
-import edu.umd.cs.marmoset.utilities.Charsets;
 import edu.umd.cs.marmoset.utilities.FileNames;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
-import edu.umd.cs.marmoset.utilities.XSSScrubber;
 
 /**
  * Render a sourcefile from a Submission as HTML.

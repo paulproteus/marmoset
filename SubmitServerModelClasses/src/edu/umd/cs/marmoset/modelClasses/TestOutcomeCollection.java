@@ -1066,7 +1066,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         int count=0;
         for (int ii=0; ii < outcomeArr.length; ii++)
         {
-            count += countOutcomes(outcomeArr[ii]);
+            count += countOutcomes(TestOutcome.asOutcomeType(outcomeArr[ii]));
         }
         return count;
     }

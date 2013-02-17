@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import net.customware.gwt.dispatch.client.DispatchAsync;
 
-import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.drop.DropController;
 import com.google.common.collect.Maps;

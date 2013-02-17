@@ -952,15 +952,16 @@ public class Project implements Serializable {
 
 
     public void updateCachedArchive(byte[] bytes, Connection conn)
-    throws SQLException
-    {
-        if (archivePK == null) throw new NullPointerException("archivePK not yet");
-    	cachedArchive = bytes;
-        Archive.updateBytesInArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK, cachedArchive, conn);
-    }
+    throws SQLException {
+		if (archivePK == null)
+			throw new NullPointerException("archivePK not known yet");
+		cachedArchive = bytes;
+		Archive.updateBytesInArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK,
+				cachedArchive, conn);
+	}
     /**
      * Does this project have an archive cached as bytes ready for upload to the database?
-     * @return true if this project has a cached archive of starter files, false otherewise
+     * @return true if this project has a cached archive of starter files, false otherwise
      */
     public boolean getHasCachedArchive()
     {

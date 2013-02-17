@@ -60,7 +60,6 @@ import com.ice.tar.TarInputStream;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.marmoset.utilities.FixZip;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;

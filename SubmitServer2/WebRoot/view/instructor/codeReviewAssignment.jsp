@@ -76,11 +76,14 @@
 </c:url>
 <p><a href="${assignReviews}">Assign reviews</a></p>
 </c:when>
-<c:when test="${overallCodeReviewStatus == 'NOT_STARTED'}">
-<c:url var="unassignReviews" value="/view/instructor/unassignCodeReviews.jsp" >
-    <c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
-</c:url>
-<p>Code review activated, no reviews started. <a href="${unassignReviews}">Revert to prototype review</a></p>
+<c:when test="${canRevertCodeReview}">
+<c:url var="unassignReviews" value="/action/instructor/UnassignCodeReview" />
+
+<p>Code review activated, no reviews started. 
+<form method="POST" action="${unassignReviews}">
+                            <input type="hidden" name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
+                                type="submit" value="Revert to prototype review" />
+                        </form>
 </c:when>
 <c:otherwise>
 <c:url var="PrintRubricEvaluationsForDatabase" value="/data/instructor/PrintRubricEvaluationsForDatabase">

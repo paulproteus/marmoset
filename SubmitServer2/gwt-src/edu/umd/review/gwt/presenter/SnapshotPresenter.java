@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import javax.inject.Provider;
 
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.shared.ResettableEventBus;

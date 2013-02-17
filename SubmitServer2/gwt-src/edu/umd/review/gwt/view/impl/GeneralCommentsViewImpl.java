@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-import edu.umd.review.gwt.CodeReviewResources;
 import edu.umd.review.gwt.CodeReviewStyle;
 import edu.umd.review.gwt.view.GeneralCommentsView;
 import edu.umd.review.gwt.view.ThreadView;

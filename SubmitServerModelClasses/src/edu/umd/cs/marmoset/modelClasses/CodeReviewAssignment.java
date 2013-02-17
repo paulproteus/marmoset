@@ -45,7 +45,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 public class CodeReviewAssignment {
     
     public enum Kind {
-        INSTRUCTIONAL, INSTRUCTIONAL_BY_SECTION, PEER, PEER_BY_SECTION, EXEMPLAR,
+        INSTRUCTIONAL, INSTRUCTIONAL_BY_SECTION,  PEER, PEER_BY_SECTION, EXEMPLAR,
         INSTRUCTIONAL_PROTOTYPE, PEER_PROTOTYPE;
         
         public boolean isPrototype() {

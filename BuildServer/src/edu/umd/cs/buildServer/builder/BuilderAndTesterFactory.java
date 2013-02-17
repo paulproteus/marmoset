@@ -247,7 +247,8 @@ public abstract class BuilderAndTesterFactory<T extends TestProperties> {
 	                            + "ISubmissionInspectionStep");
 	            return;
 	        }
-	        ISubmissionInspectionStep<T> inspectionStep = (ISubmissionInspectionStep<T>) inspectionObj;
+	        @SuppressWarnings("unchecked")
+			ISubmissionInspectionStep<T> inspectionStep = (ISubmissionInspectionStep<T>) inspectionObj;
 	        inspectionStep.setProjectSubmission(projectSubmission);
 	        inspectionStep.execute();
 	        projectSubmission.getTestOutcomeCollection().addAll(

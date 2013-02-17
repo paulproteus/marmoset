@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
@@ -31,7 +30,6 @@ import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
-import edu.umd.cs.marmoset.utilities.TextUtilities;
 import edu.umd.cs.submitServer.SubmitServerDatabaseProperties;
 import edu.umd.review.gwt.rpc.dto.CheckboxEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.CheckboxRubricDto;

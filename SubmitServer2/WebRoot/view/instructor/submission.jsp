@@ -161,8 +161,6 @@ result, the submission is flagged as broken.
 						<p>No test setup
 					</c:if>
 
-					
-				</ul>
 			</c:when>
 
 			<c:when test="${!testOutcomeCollection.compileSuccessful}">

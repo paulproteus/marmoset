@@ -23,7 +23,6 @@ import edu.umd.review.common.action.PublishAction;
 import edu.umd.review.common.action.VoidResult;
 import edu.umd.review.gwt.ClientConstants;
 import edu.umd.review.gwt.GwtUtils;
-import edu.umd.review.gwt.event.PublishEvent;
 import edu.umd.review.gwt.rpc.dto.CommentDto;
 import edu.umd.review.gwt.rpc.dto.RubricEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.ThreadDto;

@@ -313,7 +313,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
         }
         return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor(), false);
 	}
-
+	
 	public static @Nonnull CodeReviewer lookupOrAddReviewer(Connection conn,  Submission submission,
            StudentRegistration commenter) throws SQLException {
 	    

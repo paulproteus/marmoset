@@ -104,23 +104,36 @@ public class AssignCodeReviews extends SubmitServerServlet {
                 break;
             }
             case INSTRUCTIONAL_BY_SECTION: {
+            		ArrayList<Integer> instructorReviewers = instructorReviewers(request);
+                
                 SortedSet<String> sections = (SortedSet<String>) request
                         .getAttribute(SECTIONS);
                 SortedMap<String, SortedSet<StudentRegistration>> sectionMap = (SortedMap<String, SortedSet<StudentRegistration>>) request
                         .getAttribute(SECTION_MAP);
-                Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request
-                        .getAttribute("lastSubmission");
-                for (String section : sections) {
-                    @Student.PK
-                    int sectionReviewerPK = Student.asPK(parser
-                            .getIntParameter("section-reviewer-" + section));
-                    System.out.println("Reviewer for section " + section
-                            + " is " + sectionReviewerPK);
-                    assignReviewerOfStudentCode(assignment, lastSubmissionMap,
-                            sectionMap.get(section), sectionReviewerPK, conn);
-                }
-                break;
+               
+				Map<Integer, Submission> lastSubmissionMap = (Map<Integer, Submission>) request
+						.getAttribute("lastSubmission");
+				for (String section : sections) {
+					SortedSet<StudentRegistration> studentsInSection = sectionMap
+							.get(section);
+
+					String sectionReviewer = parser
+							.getOptionalCheckedParameter("section-reviewer-" + section);
+					if (sectionReviewer != null && sectionReviewer.length() > 0) {
+						@Student.PK
+						int sectionReviewerPK = Student.asPK(Integer.parseInt(sectionReviewer));
+						assignReviewerOfStudentCode(assignment,
+								lastSubmissionMap, studentsInSection,
+								sectionReviewerPK, conn);
+					} else {
+						assignReviewersOfStudentCode(assignment,
+								lastSubmissionMap, studentsInSection, 1,
+								instructorReviewers, true, conn);
+					}
+				}
+				break;
             }
+           
             case PEER_BY_SECTION: {
 
                 int numReviewersPerSubmission = parser
@@ -290,9 +303,6 @@ public class AssignCodeReviews extends SubmitServerServlet {
                         && reviewers.contains(roster.get(pos)))
                     pos++;
                 if (pos >= roster.size()) {
-                    System.out.printf("Can only find %d of %d reviewers%n",
-                            reviewers.size(), numReviewersPerSubmission);
-                    System.out.println("reviewers are: " + reviewers);
                     break;
                 }
                 @Student.PK

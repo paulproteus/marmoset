@@ -21,7 +21,6 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.review.MarmosetDaoService;
 import edu.umd.cs.submitServer.UserSession;
 import edu.umd.review.gwt.rpc.dto.ReviewerDto;
-import edu.umd.review.server.dao.ReviewDao;
 
 public class CodeReviewFilter extends SubmitServerFilter {
 
