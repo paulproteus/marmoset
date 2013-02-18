@@ -121,7 +121,7 @@
 <input type="checkbox" checked="checked"  readonly="readonly">
 </c:when>
  <c:when test="${rubric.presentation == 'DROPDOWN' }">
- <select name="r" ">
+ <select name="r">
   <c:forEach var="e" items="${rubric.dataAsMap}" >
   <option> <c:out value="${e}"/></option>
   </c:forEach>
@@ -143,8 +143,14 @@
 <c:set var="evaluations" value=""/>
 <table>
 <tr>
-<th>Author<th>Reviewer
+<th>Author
+<c:if test="${not empty sections}">
+<th>Section</th>
+</c:if>
+<th>Reviewer
+<c:if test="${!canRevertCodeReview}">
 <th colspan="${cols}">reviews</th>
+</c:if>
 </tr>
 <c:forEach var="submission" items="${submissionsUnderReview}" varStatus="counter">
 
@@ -170,17 +176,42 @@
     <c:set var="reviewers" value="${reviewersForSubmission[submission.submissionPK]}"/>
     <c:set var="author" value="${authorForSubmission[submission.submissionPK]}"/>
     <c:set var="status" value="${codeReviewStatus[submission]}"/>
-	
+
+<c:choose>
+				<c:when test="${canRevertCodeReview}">
+					<tr class="r${counter.index % 2}">
+						<td rowspan="${fn:length(reviewers)}"><a
+							href="${viewCodeReview}" target="codeReview" title="code review">
+								<c:out value="${studentRegistration.fullname}" />
+						</a></td>
+						<c:if test="${not empty sections}">
+							<td rowspan="${fn:length(reviewers)}"><c:out
+									value="${studentRegistration.section}" /></td>
+						</c:if>
+
+						<c:forEach var="codeReviewer" items="${reviewers}"
+							varStatus="counter2">
+
+							<c:if test="${counter2.index > 0}">
+								<tr class="r${counter.index % 2}">
+							</c:if>
+							<td><c:out value="${codeReviewer.name}" /></td>
+						</c:forEach>
+				</c:when>
+				
+				
+				<c:otherwise>
 <tr class="r${counter.index % 2}">
-<td rowspan="${1 + fn:length(reviewers)}"/>
+<td rowspan="${1 + fn:length(reviewers)}">
 <a href="${viewCodeReview}" target="codeReview" title="code review">
 <c:out value="${studentRegistration.fullname}"/>
 </a>
-<c:if test="${not empty studentRegistration.section}">
-<br>section: <c:out value="${studentRegistration.section}"/>
-</c:if>
 <br><a href="${submissionLink}" title="test results"><c:out value="${submission.testSummary}"/></a>
 </td>
+<c:if test="${not empty sections}">
+<td rowspan="${fn:length(reviewers)}">
+<c:out value="${studentRegistration.section}"/></td>
+</c:if>
 <c:choose>
 <c:when test="${status == 'NOT_STARTED'}">
 <td> </td>
@@ -233,7 +264,8 @@
   </c:choose>
   </tr>
   </c:forEach>
-
+</c:otherwise>
+</c:choose>
 </c:forEach>
 </table>
 
