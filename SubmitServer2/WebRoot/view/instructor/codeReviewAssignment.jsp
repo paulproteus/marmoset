@@ -76,12 +76,28 @@
 	</div>
 
 	<c:if test="${codeReviewAssignment.byStudents}">
-		<p>Student identities are anonymous:
-			${codeReviewAssignment.anonymous}
-		<p>Reviewers can see comments from other reviewers:
-			${codeReviewAssignment.otherReviewsVisible}</p>
+		<h2>Options</h2>
+		<ul>
+			<c:choose>
+				<c:when test="${codeReviewAssignment.anonymous}">
+					<li>Student identities are anonymous</li>
+				</c:when>
+				<c:otherwise>
+					<li>Student identities are shown</li>
+				</c:otherwise>
+			</c:choose>
+			<c:choose>
+				<c:when test="${codeReviewAssignment.otherReviewsVisible}">
+					<li>Reviewers can see comments from other reviewers</li>
+				</c:when>
+				<c:otherwise>
+					<li>Comments from other reviewers are hidden</li>
+				</c:otherwise>
+			</c:choose>
+		</ul>
 	</c:if>
 
+	<h2>Actions</h2>
 	<ul>
 		<c:choose>
 			<c:when test="${codeReviewAssignment.prototype}">
@@ -148,10 +164,10 @@
 						value="/action/instructor/RemoveCodeReviewers" />
 					<form action="${reviewCodeReviewers}" method="post"
 						name="removeCodeReviewersForm">
-						Remove reviewers with no comments <input type="hidden"
+						 <input type="hidden"
 							name="codeReviewAssignmentPK"
 							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
-							type="submit" value="Do it">
+							type="submit" value="Remove reviewers with no comments">
 					</form></li>
 			</c:otherwise>
 		</c:choose>
@@ -261,7 +277,7 @@
 						<a href="${submissionLink}" title="test results"><c:out
 									value="${submission.testSummary}" /></a></td>
 						<c:if test="${not empty sections}">
-							<td rowspan="${fn:length(reviewers)}"><c:out
+							<td rowspan="${1+fn:length(reviewers)}"><c:out
 									value="${studentRegistration.section}" /></td>
 						</c:if>
 						<c:choose>
