@@ -82,73 +82,81 @@
 			${codeReviewAssignment.otherReviewsVisible}</p>
 	</c:if>
 
-	<c:choose>
-		<c:when test="${codeReviewAssignment.prototype}">
-			<c:url var="editAssignment"
-				value="/view/instructor/createCodeReviewAssignment.jsp">
-				<c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
-			</c:url>
-			<p>
-				<a href="${editAssignment}">Edit assignment</a>
-			</p>
-			<c:url var="assignReviews"
-				value="/view/instructor/assignCodeReviews.jsp">
-				<c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
-			</c:url>
-			<p>
-				<a href="${assignReviews}">Assign reviews</a>
-			</p>
-		</c:when>
-		<c:when test="${canRevertCodeReview}">
-			<c:url var="unassignReviews"
-				value="/action/instructor/UnassignCodeReview" />
+	<ul>
+		<c:choose>
+			<c:when test="${codeReviewAssignment.prototype}">
+				<li>Prototype code review
+				
+				<c:url var="editAssignment"
+						value="/view/instructor/createCodeReviewAssignment.jsp">
+						<c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
+					</c:url>
+				<li><a href="${editAssignment}">Edit assignment</a></li>
 
-			<p>Code review activated, no reviews started.
-			<form method="POST" action="${unassignReviews}">
-				<input type="hidden" name="codeReviewAssignmentPK"
-					value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
-					type="submit" value="Revert to prototype review" />
-			</form>
-		</c:when>
-		<c:otherwise>
-			<c:url var="PrintRubricEvaluationsForDatabase"
-				value="/data/instructor/PrintRubricEvaluationsForDatabase">
-				<c:param name="codeReviewAssignmentPK"
-					value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-			</c:url>
-			<c:url var="PrintRubricsForDatabase"
-				value="/data/instructor/PrintRubricsForDatabase">
-				<c:param name="codeReviewAssignmentPK"
-					value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-			</c:url>
+				<c:url var="assignReviews"
+					value="/view/instructor/assignCodeReviews.jsp">
+					<c:param name="codeReviewAssignmentPK">${codeReviewAssignment.codeReviewAssignmentPK}</c:param>
+				</c:url>
+				<li><a href="${assignReviews}">Assign reviews</a></li>
 
-			<c:url var="assignReviews"
-				value="/view/instructor/assignCodeReviews.jsp">
-				<c:param name="codeReviewAssignmentPK"
-					value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-				<c:param name="projectPK" value="${codeReviewAssignment.projectPK}" />
-				<c:param name="coursePK" value="${course.coursePK}" />
-			</c:url>
-			<p>
-				<a href="${PrintRubricsForDatabase}">List rubrics in CSV format
-					for upload to grades server</a>
-			<p>
-				<a href="${PrintRubricEvaluationsForDatabase}">List rubric
-					evaluations in CSV format for upload to grades server</a>
-			</p>
-			<p>
-				<c:url var="removeCodeReviewers"
-					value="/action/instructor/RemoveCodeReviewers" />
-			<form action="${reviewCodeReviewers}" method="post"
-				name="removeCodeReviewersForm">
-				Remove reviewers with no comments <input type="hidden"
-					name="codeReviewAssignmentPK"
-					value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
-					type="submit" value="Do it">
-			</form>
-			</p>
-		</c:otherwise>
-	</c:choose>
+				<c:url var="deleteAssignment"
+					value="/action/instructor/DeleteCodeReview" />
+				<li><form action="${deleteAssignment}" method="post"
+						name="deleteAssignmentForm">
+						<input type="hidden" name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
+							type="submit" value="Delete code review">
+					</form></li>
+			</c:when>
+			
+			<c:when test="${canRevertCodeReview}">
+				<c:url var="unassignReviews"
+					value="/action/instructor/UnassignCodeReview" />
+
+				<li>Code review activated, no reviews started.
+				<li><form method="POST" action="${unassignReviews}">
+						<input type="hidden" name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
+							type="submit" value="Revert to prototype review" />
+					</form></li>
+			</c:when>
+			<c:otherwise>
+			<li>Code review started
+				<c:url var="PrintRubricEvaluationsForDatabase"
+					value="/data/instructor/PrintRubricEvaluationsForDatabase">
+					<c:param name="codeReviewAssignmentPK"
+						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+				</c:url>
+				<c:url var="PrintRubricsForDatabase"
+					value="/data/instructor/PrintRubricsForDatabase">
+					<c:param name="codeReviewAssignmentPK"
+						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+				</c:url>
+
+				<c:url var="assignReviews"
+					value="/view/instructor/assignCodeReviews.jsp">
+					<c:param name="codeReviewAssignmentPK"
+						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+					<c:param name="projectPK" value="${codeReviewAssignment.projectPK}" />
+					<c:param name="coursePK" value="${course.coursePK}" />
+				</c:url>
+				<li><a href="${PrintRubricsForDatabase}">List rubrics in
+						CSV format for upload to grades server</a>
+				<li><a href="${PrintRubricEvaluationsForDatabase}">List
+						rubric evaluations in CSV format for upload to grades server</a></li>
+				<li><c:url var="removeCodeReviewers"
+						value="/action/instructor/RemoveCodeReviewers" />
+					<form action="${reviewCodeReviewers}" method="post"
+						name="removeCodeReviewersForm">
+						Remove reviewers with no comments <input type="hidden"
+							name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
+							type="submit" value="Do it">
+					</form></li>
+			</c:otherwise>
+		</c:choose>
+	</ul>
+
 
 	<c:if test="${! empty rubrics }">
 		<h2>Rubrics</h2>

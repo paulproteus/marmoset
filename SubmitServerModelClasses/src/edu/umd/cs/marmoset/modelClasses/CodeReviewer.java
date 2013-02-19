@@ -387,6 +387,20 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
                 Queries.closeStatement(query);
             }
         }
+	   public static int numActiveReviewers(Connection conn, 
+               CodeReviewAssignment assignment)  throws SQLException {
+            String u = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE code_review_assignment_pk = ? "
+                    + " AND last_update is not NULL";
+            PreparedStatement query = Queries.setStatement(conn, u,  assignment.getCodeReviewAssignmentPK());
+            try {
+                ResultSet rs = query.executeQuery();
+                if (rs.next())
+                return rs.getInt(1);
+                return 0;
+            } finally {
+                Queries.closeStatement(query);
+            }
+        }
 	   public static int numInactiveReviewers(Connection conn, 
                Submission submission)  throws SQLException {
             String u = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE "

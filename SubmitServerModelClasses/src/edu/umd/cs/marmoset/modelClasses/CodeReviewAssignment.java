@@ -220,6 +220,34 @@ public class CodeReviewAssignment {
 		this.kind = Kind.valueOf(resultSet.getString(startingFrom++));
 	}
 	
+	
+	public void delete(Connection conn) throws SQLException {
+		int activeReviewers = CodeReviewer.numActiveReviewers(conn, this);
+		if (activeReviewers > 0)
+			throw new IllegalStateException("Can't delete code review with active reviewers");
+		CodeReviewer.deleteInactiveReviewers(conn, this);
+		String cmd = "DELETE FROM " + Rubric.TABLE_NAME
+				+ " WHERE code_review_assignment_pk = ?";
+
+		PreparedStatement stmt = conn.prepareStatement(cmd);
+		try {
+			Queries.setStatement(stmt, codeReviewAssignmentPK);
+			stmt.execute();
+		} finally {
+			stmt.close();
+		}
+		cmd = "DELETE FROM " + CodeReviewAssignment.TABLE_NAME
+				+ " WHERE code_review_assignment_pk = ?";
+
+		stmt = conn.prepareStatement(cmd);
+		try {
+			Queries.setStatement(stmt, codeReviewAssignmentPK);
+			stmt.execute();
+		} finally {
+			stmt.close();
+		}
+
+	}
     public void update(Connection conn) throws SQLException {
         String whereClause = " WHERE code_review_assignment_pk = ? ";
 
