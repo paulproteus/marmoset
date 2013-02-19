@@ -14,6 +14,8 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
 
+import edu.umd.cs.marmoset.modelClasses.CodeReviewThread;
+
 /**
  * DTO for a thread. A thread belongs to a single file, and has 0 or more published comments, and 0
  * or 1 draft comments.
@@ -21,7 +23,7 @@ import com.google.gwt.core.client.GWT;
  * @author rwsims@umd.edu (Ryan W Sims)
  */
 public class ThreadDto implements Result, Comparable<ThreadDto> {
-  private /* @CodeReviewThread.PK */ int id;
+  private  @CodeReviewThread.PK  int id;
   private String file;
   private int line;
   private long timestamp;
@@ -39,14 +41,14 @@ public class ThreadDto implements Result, Comparable<ThreadDto> {
     this.line = 0xdeadbeef;
   }
 
-  public ThreadDto(/* @CodeReviewThread.PK  */ int id, String file, int line, boolean needsResponse) {
+  public ThreadDto( @CodeReviewThread.PK  int id, String file, int line, boolean needsResponse) {
     this.id = id;
     this.file = file;
     this.line = line;
     this.needsResponse = needsResponse;
   }
 
-  public  /* @CodeReviewThread.PK */ int getId() {
+  public   @CodeReviewThread.PK  int getId() {
     return id;
   }
 

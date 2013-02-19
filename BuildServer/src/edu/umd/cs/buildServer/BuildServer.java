@@ -1097,6 +1097,7 @@ public abstract class BuildServer implements ConfigurationKeys {
 				return true;
 			} 
 		}
+		s.close();
 		} finally {
 		    p.destroy();
 		}

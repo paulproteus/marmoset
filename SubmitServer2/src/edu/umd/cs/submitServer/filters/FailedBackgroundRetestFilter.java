@@ -42,7 +42,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
@@ -50,7 +49,6 @@ import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestRun;
 import edu.umd.cs.submitServer.SubmitServerConstants;
-import edu.umd.cs.submitServer.UserSession;
 
 /**
  * FailedBackgroundRetestFilter

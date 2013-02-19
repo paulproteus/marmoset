@@ -41,6 +41,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -202,6 +203,11 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
         if (t2 == null) return -1;
         return t1.compareTo(t2);
             
+    }
+    
+    @SuppressFBWarnings("NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR")
+    public StudentRegistration() {
+    	
     }
 	public static final String TABLE_NAME = "student_registration";
     private @StudentRegistration.PK int studentRegistrationPK; // autoincrement

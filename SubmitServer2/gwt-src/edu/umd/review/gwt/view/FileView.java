@@ -1,6 +1,5 @@
 package edu.umd.review.gwt.view;
 
-import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.drop.DropController;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.ImplementedBy;

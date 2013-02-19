@@ -1,9 +1,7 @@
 package edu.umd.review.gwt.view.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;

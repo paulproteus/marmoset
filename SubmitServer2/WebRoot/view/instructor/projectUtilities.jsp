@@ -161,7 +161,7 @@ jQuery(document).ready(function ($) {
                                 <input type="submit" value="Submit" title="Any instructor can upload a canonical submission through this interface; you do not need to own the canonical account (and have the password) to make a canonical submission through this web interface.">
                                 <input type="file" required="required"
 										name="file" size=40 title="zip/jar file to upload"/>
-								</a>
+								
 								
 								</td>
 							</tr>
@@ -203,12 +203,8 @@ jQuery(document).ready(function ($) {
 
 				<th>activate/<br>inactivate</th>
 
-				<th title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup<br> broken.</a>
-                <th>Retest</a>
-
-
-				</th>
-
+				<th title="Broken test-setups are never retested. Not usually necessary for test-setups marked 'failed'.">Mark test-setup<br> broken.</th>
+                <th>Retest</th>
 				<th>Download</th>
 			</tr>
 			<c:forEach var="testSetup" items="${allTestSetups}"

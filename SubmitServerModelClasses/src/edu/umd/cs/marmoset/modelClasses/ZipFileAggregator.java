@@ -179,7 +179,6 @@ public class ZipFileAggregator {
 				// Create output entry
 				ZipEntry outputEntry = new ZipEntry(dirName + "/");
 				outputEntry.setTime(time);
-				zipOutput.putNextEntry(outputEntry);
 				zipOutput.closeEntry();
 			}
 

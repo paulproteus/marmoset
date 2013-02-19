@@ -38,6 +38,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -115,6 +116,14 @@ public class Student  implements Comparable<Student> {
           - STUDENT_SUFFIX.length());
     return loginName;
   }
+  
+  public  String getLoginSuffix() {
+      if (loginName.endsWith(ADMIN_SUFFIX))
+          return ADMIN_SUFFIX;
+      if (loginName.endsWith(STUDENT_SUFFIX))
+          return STUDENT_SUFFIX;
+      return "";
+    }
 
   public boolean hasLoginSuffix() {
 
@@ -179,8 +188,16 @@ public class Student  implements Comparable<Student> {
   /**
    * @param campusUID The loginName to set.
    */
-  public void setLoginName(String loginName) {
+  public boolean setLoginName(String loginName) {
+    if (loginName.equals(this.loginName))
+        return false;
+    if (this.loginName != null && hasLoginSuffix()) {
+        loginName = loginName + getLoginSuffix();
+        if (loginName.equals(this.loginName))
+            return false;
+    }
     this.loginName = loginName;
+    return true;
   }
   /**
    * @return Returns the uid.
@@ -205,10 +222,13 @@ public class Student  implements Comparable<Student> {
   /**
    * @param firstname The firstname to set.
    */
-  public void setFirstname(String firstname) {
+  public boolean setFirstname(String firstname) {
     if (FAKE_NAMES)
-      return;
+      return false;
+    if (Objects.nullSafeEquals(firstname, this.firstname))
+        return false;
     this.firstname = firstname;
+    return true;
   }
   /**
    * @return Returns the lastname.
@@ -222,10 +242,13 @@ public class Student  implements Comparable<Student> {
   /**
    * @param lastname The lastname to set.
    */
-  public void setLastname(String lastname) {
+  public boolean setLastname(String lastname) {
     if (FAKE_NAMES)
-      return;
+      return false;
+    if (Objects.nullSafeEquals(lastname, this.lastname))
+        return false;
     this.lastname = lastname;
+    return true;
   }
   public String getFullname() {
     if (FAKE_NAMES)
@@ -288,9 +311,16 @@ public class Student  implements Comparable<Student> {
         }
     return email;
   }
-  public void setEmail(String email) {
-    this.email = email;
-  }
+
+    public boolean setEmail(String email) {
+        if (FAKE_NAMES)
+            return false;
+        if (Objects.nullSafeEquals(email, this.email))
+            return false;
+        this.email = email;
+        return true;
+    }
+    
   public boolean getHasPicture() {
     if (FAKE_NAMES)
       return false;

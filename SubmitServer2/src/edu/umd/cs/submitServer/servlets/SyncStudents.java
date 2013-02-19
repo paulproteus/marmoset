@@ -50,14 +50,19 @@ public class SyncStudents extends GradeServerInterfaceServlet {
 		Connection gradesConn = null;
 		Connection conn = null;
 		response.setContentType("text/plain");
+		
 		try {
 			conn = getConnection();
 			gradesConn = getGradesConnection();
 			PrintWriter writer = response.getWriter();
 			if (true) {
+			    int counter = 0;
 				Map<Integer, Student> allStudents = Student.lookupAll(conn);
 				for (Student student : allStudents.values()) {
 					syncStudent(writer, student, gradesConn, conn);
+					counter++;
+					if (counter % 40 == 0)
+					    writer.flush();
 				}
 			}
 			writer.flush();
@@ -85,71 +90,70 @@ public class SyncStudents extends GradeServerInterfaceServlet {
 
 	}
 
-	private void syncStudent(PrintWriter writer, Student student, Connection gradesConn,
-			Connection conn) throws SQLException {
-		{
-			String query = "SELECT lastName, firstName, nickname, directoryID, email"
+    private void syncStudent(PrintWriter writer, Student student,
+            Connection gradesConn, Connection conn) throws SQLException {
+        {
+            String query = "SELECT lastName, firstName, nickname, directoryID, email"
 
-				+ " FROM submitexport " + " WHERE uid = ? LIMIT 1";
-		PreparedStatement stmt = gradesConn.prepareStatement(query);
-		stmt.setString(1, student.getCampusUID());
+                    + " FROM submitexport " + " WHERE uid = ? LIMIT 1";
+            PreparedStatement stmt = gradesConn.prepareStatement(query);
+            stmt.setString(1, student.getCampusUID());
 
-		ResultSet rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
-		if (rs.next()) {
-			int col = 1;
-			String lastname = rs.getString(col++);
-			String firstname = rs.getString(col++);
-			String nickname = rs.getString(col++);
+            if (rs.next()) {
+                int col = 1;
+                String lastname = rs.getString(col++);
+                String firstname = rs.getString(col++);
+                String nickname = rs.getString(col++);
 
-			firstname = ImportCourse.getEffectiveFirstname(firstname, nickname);
-			
-			String loginName = rs.getString(col++);
-			String email = rs.getString(col++);
+                firstname = ImportCourse.getEffectiveFirstname(firstname,
+                        nickname);
 
-				boolean same = lastname.equals(student.getLastname())
-						&& firstname.equals(student.getFirstname())
-						&& (student.hasLoginSuffix() || loginName
-								.equals(student.getLoginName()))
-						&& email.equals(student.getEmail());
-				if (!same) {
-					student.setLastname(lastname);
-					student.setFirstname(firstname);
-					if (!student.hasLoginSuffix())
-						student.setLoginName(loginName);
-					student.setEmail(email);
-					writer.printf("Updated %s %s%n", firstname, lastname);
-				}
-				loadStudentPicture(student, gradesConn, conn);
+                String loginName = rs.getString(col++);
+                String email = rs.getString(col++);
 
-				student.update(conn);
-		}
-		rs.close();
+                boolean updated = false;
+                
+                updated |= student.setLastname(lastname);
+                updated |= student.setFirstname(firstname);
+                updated |= student.setEmail(email);
+                updated |= student.setLoginName(loginName);
+                if (updated) 
+                    writer.printf("Updated %s %s%n", firstname, lastname);
+                
+            }
+            rs.close();
 
-		stmt.close();
-		}
+            stmt.close();
+        }
 
+    }
 
-	}
+    public static boolean loadStudentPicture(Student student,
+            Connection gradesConn, Connection conn) throws SQLException {
+        String query = "SELECT type, image" + " FROM photos "
+                + " WHERE uid = ? LIMIT 1";
 
-	public static  boolean loadStudentPicture(Student student, Connection gradesConn,
-			Connection conn) throws SQLException {
-		String query = "SELECT type, image" + " FROM photos "
-				+ " WHERE uid = ? LIMIT 1";
+        PreparedStatement stmt = gradesConn.prepareStatement(query);
+        stmt.setString(1, student.getCampusUID());
+        try {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String type = rs.getString(1);
+                Blob blob = rs.getBlob(2);
+                StudentPicture.insertOrUpdate(conn, student, type, blob);
+                student.setHasPicture(true);
+                rs.close();
+                stmt.close();
+                return true;
+            }
+            rs.close();
+            return false;
+        } finally {
+            stmt.close();
+        }
 
-		PreparedStatement stmt = gradesConn.prepareStatement(query);
-		stmt.setString(1, student.getCampusUID());
-		ResultSet rs = stmt.executeQuery();
-		if (rs.next()) {
-			String type = rs.getString(1);
-			Blob blob = rs.getBlob(2);
-			StudentPicture.insertOrUpdate(conn, student, type, blob);
-			student.setHasPicture(true);
-
-		}
-		rs.close();
-		stmt.close();
-		return student.getHasPicture();
-	}
+    }
 
 }

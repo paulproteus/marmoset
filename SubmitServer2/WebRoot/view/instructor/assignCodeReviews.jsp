@@ -123,14 +123,18 @@ what they're reviewing
 				</select></li>
 			     <c:choose>
 			     <c:when test="${codeReviewAssignment.kind == 'INSTRUCTIONAL_PROTOTYPE'}">
-			         <li>Choose reviewers:
-						<c:if test="${not empty sections}">
-								<ul class="reviewer-list" id="sectional-reviewer-list">
+			      	<c:if test="${not empty sections}">
+			      	   <li  id="sectional-reviewer-list">Reviewers for specific sections:
+					
+								<ul class="reviewer-list">
 									<c:forEach var="section" items="${sections}">
 										<li><label for="section-reviewer-${section}"> <c:out
 													value="${section}" />
 										</label> <select name="section-reviewer-${section}"
 											id="section-reviewer-${section}">
+											<option value="">
+															Use general reviewer(s)
+														</option>
 												<c:forEach var="studentRegistration"
 													items="${courseInstructors}">
 													<c:if
@@ -143,7 +147,9 @@ what they're reviewing
 										</select></li>
 									</c:forEach>
 								</ul>
+								</li>
 						</c:if>
+						<li>General Reviewers:
 							<ul class="reviewer-list" id="global-reviewer-list">
 								<c:forEach var="studentRegistration"
 									items="${courseInstructors}">
@@ -212,7 +218,7 @@ what they're reviewing
 			switch (kind) {
 			case 'instructionalBySection':
 				$sectionalReviewers.slideDown();
-				$globalReviewers.slideUp();
+				$globalReviewers.slideDown();
 				break;
 			case 'instructional':
 				$sectionalReviewers.slideUp();

@@ -32,8 +32,8 @@
 
 <ss:head title="Superuser testing ground" />
 <body>
-<p>XFF:  <%= request.getHeader("X-Forwarded-For") %>
-<p>Remote addr:  <%= request.getRemoteAddr() %>
-<p>Remote host:  <%= request.getRemoteHost() %>
+<p>XFF:  <c:out value="${header['X-Forwarded-For']}"/>
+<p>Remote addr: <c:out value="${pageContext.request.remoteAddr}" /> 
+<p>Remote host:  <c:out value="${pageContext.request.remoteHost}" />
 </body>
 </html>

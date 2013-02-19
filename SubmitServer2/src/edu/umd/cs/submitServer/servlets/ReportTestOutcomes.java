@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cs.marmoset.modelClasses.BuildServer;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
-import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
@@ -590,8 +589,11 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 			if (newOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN)) {
 				getFailedBackgroundRetestLog().warn(
 						newOutcome.getOutcome() + " result for submissionPK "
-								+ submissionPK + " and testSetupPK "
-								+ testSetupPK);
+								+ submissionPK + ", testSetupPK "
+								+ testSetupPK
+								+ " and test " + newOutcome.getTestType() 
+								+ newOutcome.getTestNumber() +" : " + newOutcome.getTestName()
+								);
 				return null;
 			}
 		}

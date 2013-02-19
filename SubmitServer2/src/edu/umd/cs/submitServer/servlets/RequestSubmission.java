@@ -183,9 +183,15 @@ public class RequestSubmission extends SubmitServerServlet {
 
                         foundNewTestSetup = Queries.lookupNewTestSetup(conn, submission, testSetup, allowedCourses,
                                 MAX_BUILD_DURATION_MINUTES);
-                        kind = Kind.NEW_TEST_SETUP;
-                        if (foundNewTestSetup)
+                        if (foundNewTestSetup && submission.getNumPendingBuildRequests() > 3) {
+                            submission.setBuildStatus(Submission.BuildStatus.BROKEN);
+                            submission.update(conn);
+                            foundNewTestSetup = false;
+                        }
+                        if (foundNewTestSetup)  {
+                            kind = Kind.NEW_TEST_SETUP;
                             break findSubmission;
+                        }
 
                         for (Queries.RetestPriority priority : Queries.RetestPriority.values()) {
 

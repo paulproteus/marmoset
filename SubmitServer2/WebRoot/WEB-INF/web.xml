@@ -996,6 +996,14 @@
         <url-pattern>/action/instructor/RemoveCodeReviewers</url-pattern>
     </servlet-mapping>
     
+<servlet>
+        <servlet-name>UnassignCodeReview</servlet-name>
+        <servlet-class>edu.umd.cs.submitServer.servlets.UnassignCodeReview</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UnassignCodeReview</servlet-name>
+        <url-pattern>/action/instructor/UnassignCodeReview</url-pattern>
+    </servlet-mapping>
     
     
 	<servlet>

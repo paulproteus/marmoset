@@ -313,7 +313,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
         }
         return new CodeReviewer(conn, assignment == null ? 0 : assignment.getCodeReviewAssignmentPK(), submissionPK, studentPK, authorKnownAs, true, sr.isInstructor(), false);
 	}
-
+	
 	public static @Nonnull CodeReviewer lookupOrAddReviewer(Connection conn,  Submission submission,
            StudentRegistration commenter) throws SQLException {
 	    
@@ -420,7 +420,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
                         String.format("Existing codeReviewer %d has inconsistent isInstructor value of %s for reviewer %d",
                                 result.getCodeReviewerPK(), result.isInstructor,
                                 studentPK));
-            if (result.codeReviewAssignmentPK == 0) {
+            if (codeReviewAssignmentPK != 0) {
                 result.codeReviewAssignmentPK = codeReviewAssignmentPK;
                 String u = "UPDATE  " + TABLE_NAME + " SET code_review_assignment_pk = ? "
                         + " WHERE code_reviewer_pk = ?";
