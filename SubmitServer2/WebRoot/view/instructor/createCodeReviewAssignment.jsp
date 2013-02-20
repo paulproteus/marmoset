@@ -108,23 +108,38 @@ li.deleted-rubric {
     <ss:header />
     <ss:instructorBreadCrumb />
 
-    <div class="sectionTitle">
-        <h1>
-            New Code Review for project
-            <c:out value="${project.projectNumber}" />
-        </h1>
+	<div class="sectionTitle">
+		<c:choose>
+			<c:when test="${empty codeReviewAssignment}">
 
+				<h1>
+					New Code Review for project
+					<c:out value="${project.projectNumber}" />
+				</h1>
 
+				<p class="sectionDescription">
+					Fill out the following form to create a new prototype code review
+					for project
+					<c:out value="${project.fullTitle}" />
+					.
+				</p>
 
+			</c:when>
+			<c:otherwise>
+				<h1>
+					Edit existing Code Review for project
+					<c:out value="${project.projectNumber}" />
+				</h1>
+				<p class="sectionDescription">
+					Update your prototype code review for project
+					<c:out value="${project.fullTitle}" />
+					.
+			</c:otherwise>
+		</c:choose>
 
+	</div>
 
-        <p class="sectionDescription">
-            Fill out the following form to create a new prototype code review for project
-            <c:out value="${project.fullTitle}" />.
-        </p>
-    </div>
-    
-    <c:choose>
+	<c:choose>
 <c:when test="${user.superUser}">
 <p>You can't create a code review as a superuser; you need to do so using an instructor account
 </p></c:when>
@@ -229,28 +244,39 @@ li.deleted-rubric {
 	            value="${deadlineTime}"/>
 	        </li>
 	        <c:if test="${empty codeReviewAssignment || codeReviewAssignment.kind == 'PEER_PROTOTYPE'}">
+	        
+	        <c:set var="anonymous" value="${!empty codeReviewAssignment && codeReviewAssignment.anonymous}"/>
             <li id="anonymity-info">
                 <label>Anonymous:</label>
                     <ul>
                         <li>
-                            <input type="radio" name="anonymous" value="true" id="yes-anonymous"/>
+                            <input type="radio" name="anonymous" value="true" id="yes-anonymous" 
+                              ${ss:isChecked(anonymous)} />
                             <label for="yes-anonymous">Yes</label>
                         </li>
                         <li>
-                            <input type="radio" name="anonymous" value="false" id="no-anonymous" checked="checked"/>
+                            <input type="radio" name="anonymous" value="false" id="no-anonymous" 
+                             ${ss:isChecked(!anonymous)}
+                              />
                             <label for="no-anonymous">No</label>
                         </li>
                     </ul>
             </li>
+            
+             <c:set var="hidden" value="${!empty codeReviewAssignment && !codeReviewAssignment.otherReviewsVisible}"/>
+            
             <li id="visibility-info">
                 <label>Other reviewers' comments:</label>
                      <ul>
                         <li>
-                            <input type="radio" name="canSeeOthers" value="true" id="can-see-others"/>
+                            <input type="radio" name="canSeeOthers" value="true" id="can-see-others"
+                            ${ss:isChecked(!hidden)} 
+                            />
                             <label for="can-see-others">Visible</label>
                         </li>
                         <li>
-                            <input type="radio" name="canSeeOthers" value="false" id="cant-see-others" checked="checked"/>
+                            <input type="radio" name="canSeeOthers" value="false" id="cant-see-others"  
+                            ${ss:isChecked(hidden)} />
                             <label for="cant-see-others">Hidden</label>
                         </li>
                     </ul>
