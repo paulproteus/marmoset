@@ -187,15 +187,16 @@
 						</c:when>
 						<c:when test="${rubric.presentation == 'DROPDOWN' }">
 							<select name="r">
-								<c:forEach var="e" items="${rubric.dataAsMap}">
-									<option>
-										<c:out value="${e}" />
-									</option>
+								<c:forEach var="data" items="${rubric.dataAsMap}">
+			                        <option>
+				                        <c:out value="${data.key}" /> [<c:out value="${data.value}" />]
+			                        </option>
 								</c:forEach>
 							</select>
 						</c:when>
-					</c:choose> <c:out value="${rubric.name}" /> : <c:out
-						value="${rubric.description}" />
+					</c:choose> <c:out value="${rubric.name}" /> 
+					<c:if test="${not empty rubric.description}">: <c:out
+						value="${rubric.description}" /></c:if>
 			</c:forEach>
 		</ul>
 	</c:if>
@@ -246,12 +247,20 @@
 			<c:set var="status" value="${codeReviewStatus[submission]}" />
 
 			<c:choose>
-				<c:when test="${canRevertCodeReview}">
+				<c:when test="${canRevertCodeReview || status == 'NOT_STARTED'}">
 					<tr class="r${counter.index % 2}">
 						<td rowspan="${fn:length(reviewers)}"><a
 							href="${viewCodeReview}" target="codeReview" title="code review">
 								<c:out value="${studentRegistration.fullname}" />
-						</a></td>
+						</a>
+						<c:if test="${!canRevertCodeReview}">
+						<br>
+						<a href="${submissionLink}" title="test results"><c:out
+									value="${submission.testSummary}" /></a>
+									</c:if>
+									</td>
+									
+									
 						<c:if test="${not empty sections}">
 							<td rowspan="${fn:length(reviewers)}"><c:out
 									value="${studentRegistration.section}" /></td>
@@ -264,6 +273,9 @@
 								<tr class="r${counter.index % 2}">
 							</c:if>
 							<td><c:out value="${codeReviewer.name}" /></td>
+							<c:if test="${!canRevertCodeReview && counter2.index == 0}">
+							<td colspan="${cols}" rowspan="${fn:length(reviewers)}"/>
+							</c:if>
 						</c:forEach>
 				</c:when>
 
@@ -281,13 +293,8 @@
 									value="${studentRegistration.section}" /></td>
 						</c:if>
 						<c:choose>
-							<c:when test="${status == 'NOT_STARTED'}">
-								<td></td>
-								<td rowspan="${1 + fn:length(reviewers)}" colspan="${cols}">Not
-									started</td>
-							</c:when>
 							<c:when test="${author.numComments > 0}">
-								<td>responses
+								<td>author
 								<td><c:out value="${author.numComments}" /></td>
 								<td><fmt:formatDate value="${author.lastUpdate}"
 										pattern="dd MMM, hh:mm a" /></td>
@@ -296,7 +303,7 @@
 								</c:if>
 							</c:when>
 							<c:otherwise>
-								<td colspan="${1+cols}"></td>
+								<td colspan="${1+cols}" class="description">no response from author</td>
 							</c:otherwise>
 						</c:choose>
 					</tr>
@@ -310,7 +317,7 @@
 							</c:if>
 
 							<c:choose>
-								<c:when test="${status == 'NOT_STARTED'}">
+								<c:when test="${status == 'NOT_STARTED'}"><td>foo
 								</c:when>
 								<c:when
 									test="${codeReviewer.numComments > 0 || ! empty evaluations}">
