@@ -395,7 +395,7 @@ li.deleted-rubric {
                     <input type="hidden" name="${prefix}-value" id="${prefix}-hidden" value="${rubric.data}"/>
                     <select id="${prefix}-select">
                     <c:forEach var="data" items="${rubric.dataAsMap}">
-                        <option>${data.key} [${data.value}]</option>
+                        <option><c:out value="${data.key}" /> [<c:out value="${data.value}" />]</option>
                     </c:forEach>
                     </select>
                     <button id="${prefix}-edit-button" type="button">edit dropdown</button>
