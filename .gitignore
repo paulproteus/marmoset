@@ -53,3 +53,6 @@ sampleProjects/javaWarmupSolution/bin
 SubmitServer2/extras/
 SubmitServerModelClasses/.settings/
 SubmitServerModelClasses/src/META-INF/
+BuildServer/config.properties
+BuildServer/lib/diffOutputStream.jar
+SubmitServer2/WebRoot/WEB-INF/lib/gwt-servlet.jar

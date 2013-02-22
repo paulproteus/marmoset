@@ -18,6 +18,7 @@
 	<property name="unpacked.dir" value="unpackedLibraries"/>	
 	
 	<path id="modelClasses.classpath">
+		<pathelement location="lib/annotations.jar"/>
 		<pathelement location="lib/dbunit.jar"/>
 		<pathelement location="lib/dom4j-full.jar"/>
 		<pathelement location="lib/mail.jar"/>

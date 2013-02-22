@@ -39,7 +39,6 @@ import edu.umd.review.gwt.rpc.dto.FileDto;
 import edu.umd.review.gwt.rpc.dto.RubricDto;
 import edu.umd.review.gwt.rpc.dto.RubricEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.RubricEvaluationDto.Status;
-import edu.umd.review.gwt.rpc.dto.ThreadDto;
 import edu.umd.review.gwt.view.TrayFileView;
 import edu.umd.review.gwt.view.TrayView;
 

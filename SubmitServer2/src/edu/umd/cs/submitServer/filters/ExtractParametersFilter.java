@@ -314,7 +314,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                         codeReviewStatus.put(s, status);
 
                     }
-                    request.setAttribute("canRevert", canRevert);
+                    request.setAttribute("canRevertCodeReview", canRevert);
                     request.setAttribute("codeReviewStatus", codeReviewStatus);
                     request.setAttribute("overallCodeReviewStatus", Ordering
                             .natural().max(codeReviewStatus.values()));

@@ -8,7 +8,6 @@ import org.apache.bcel.classfile.Code;
 import org.apache.bcel.classfile.DescendingVisitor;
 import org.apache.bcel.classfile.EmptyVisitor;
 import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
 import org.apache.bcel.classfile.Visitor;
 import org.apache.bcel.util.ClassPath;
 import org.apache.bcel.util.SyntheticRepository;

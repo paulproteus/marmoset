@@ -38,6 +38,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -224,7 +225,7 @@ public class Student  implements Comparable<Student> {
   public boolean setFirstname(String firstname) {
     if (FAKE_NAMES)
       return false;
-    if (firstname.equals(this.firstname))
+    if (Objects.nullSafeEquals(firstname, this.firstname))
         return false;
     this.firstname = firstname;
     return true;
@@ -244,7 +245,7 @@ public class Student  implements Comparable<Student> {
   public boolean setLastname(String lastname) {
     if (FAKE_NAMES)
       return false;
-    if (lastname.equals(this.lastname))
+    if (Objects.nullSafeEquals(lastname, this.lastname))
         return false;
     this.lastname = lastname;
     return true;
@@ -314,7 +315,7 @@ public class Student  implements Comparable<Student> {
     public boolean setEmail(String email) {
         if (FAKE_NAMES)
             return false;
-        if (email.equals(this.email))
+        if (Objects.nullSafeEquals(email, this.email))
             return false;
         this.email = email;
         return true;

@@ -71,7 +71,7 @@ public class RegisterOneStudent extends SubmitServerServlet {
 			            .getOptionalCheckedParameter("capability");
 			    String section = "";
 	               
-			    if ("".equals(capability) || "student".equals("capability")) {
+			    if (capability == null || "".equals(capability) || "student".equals("capability")) {
 			        capability = null;
 			        section = parser.getOptionalCheckedParameter("section");
 			    }

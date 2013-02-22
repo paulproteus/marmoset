@@ -37,8 +37,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.Strings;
-
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
 

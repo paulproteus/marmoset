@@ -58,7 +58,7 @@ public class ChangeTestSetupStatus extends SubmitServerServlet {
 			Project project = (Project) request.getAttribute("project");
 			RequestParser parser = new RequestParser(request,
 					getSubmitServerServletLog(), strictParameterChecking());
-			String status = parser.getCheckedParameter("status");
+			TestSetup.Status status = TestSetup.Status.valueOfAnyCase(parser.getCheckedParameter("status"));
 
 			conn.setAutoCommit(false);
 			/*

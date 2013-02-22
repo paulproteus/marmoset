@@ -32,7 +32,6 @@ import edu.umd.review.common.CommonConstants;
 import edu.umd.review.common.action.GetFilesAction;
 import edu.umd.review.common.action.GetFilesAction.Result;
 import edu.umd.review.gwt.event.PublishAllEvent;
-import edu.umd.review.gwt.event.PublishEvent;
 import edu.umd.review.gwt.gin.ReviewGinjector;
 import edu.umd.review.gwt.view.PublishDraftsView;
 import edu.umd.review.gwt.view.SnapshotView;
