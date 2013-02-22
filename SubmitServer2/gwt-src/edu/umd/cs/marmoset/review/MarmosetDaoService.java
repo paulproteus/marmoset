@@ -1,6 +1,9 @@
 package edu.umd.cs.marmoset.review;
 
 import java.io.IOException;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,6 +17,8 @@ import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.meta.TypeQualifier;
+import javax.annotation.meta.When;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -47,14 +52,24 @@ import edu.umd.review.gwt.rpc.dto.RubricEvaluationDto.Status;
 import edu.umd.review.gwt.rpc.dto.ThreadDto;
 import edu.umd.review.server.dao.ReviewDao;
 
+
 public class MarmosetDaoService implements ReviewDao {
 
+	@Documented
+	@TypeQualifier(applicableTo = CharSequence.class)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface UniqueReviewerName {
+
+	    When when() default When.ALWAYS;
+	}
+
+	
   final CodeReviewer reviewer;
 
   final Submission submission;
   final Student student;
 
-  final String nameOfReviewer;
+  final @UniqueReviewerName String nameOfReviewer;
   final boolean isAuthor;
   final Project project;
   CodeReviewer codeAuthor;
@@ -87,7 +102,7 @@ public class MarmosetDaoService implements ReviewDao {
         return submission.getProjectPK();
     }
 
-  private final String authorName;
+  private final @UniqueReviewerName String authorName;
   public MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer thisReviewer) {
 
     this.database = database;
