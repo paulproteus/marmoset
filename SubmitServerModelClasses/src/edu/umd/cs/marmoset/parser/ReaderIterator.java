@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import edu.umd.cs.marmoset.utilities.Charsets;
 
@@ -45,6 +46,8 @@ public class ReaderIterator implements Iterator<String> {
 	@Override
 	public String next() {
 		String result = nextLine;
+		if (result == null)
+			throw new NoSuchElementException();
 		nextLine = null;
 		return result;
 	}

@@ -75,8 +75,6 @@ public class DisplayProperties {
         for (Map.Entry<String, List<String>> e : sourceContents.entrySet()) {
             String filename = e.getKey();
             FileProperties p = properties.get(filename);
-            if (p == null) {
-            }
             if (p == null || !p.isHidden())
                 sorted.put(filename, e.getValue());
         }
