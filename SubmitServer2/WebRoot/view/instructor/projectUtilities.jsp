@@ -239,9 +239,9 @@ jQuery(document).ready(function ($) {
 											value="/view/instructor/submission.jsp">
 								<c:param name="testRunPK" value="${testSetup.testRunPK}" />
 							</c:url>
-							<a href="${canonicalRunLink}">${testSetup.status}</a>
+							<a href="${canonicalRunLink}">${testSetup.status.toString()}</a>
 						</c:when>
-						<c:otherwise>${testSetup.status}</c:otherwise>
+						<c:otherwise>${testSetup.statu.toString()}</c:otherwise>
 					</c:choose>
 					</td>
 
