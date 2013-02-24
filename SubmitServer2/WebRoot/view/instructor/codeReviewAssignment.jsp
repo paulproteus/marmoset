@@ -272,7 +272,7 @@
 							<c:if test="${counter2.index > 0}">
 								<tr class="r${counter.index % 2}">
 							</c:if>
-							<td><c:out value="${codeReviewer.name}" /></td>
+							<td><c:out value="${codeReviewer.nameForInstructor}" /></td>
 							<c:if test="${!canRevertCodeReview && counter2.index == 0}">
 							<td colspan="${cols}" rowspan="${fn:length(reviewers)}"/>
 							</c:if>
@@ -310,14 +310,14 @@
 					<c:forEach var="codeReviewer" items="${reviewers}">
 
 						<tr class="r${counter.index % 2}">
-							<td><c:out value="${codeReviewer.name}" /></td>
+							<td><c:out value="${codeReviewer.nameForInstructor}" /></td>
 							<c:if test="${! empty rubrics}">
 								<c:set var="evaluations"
 									value="${ss:evaluationsForReviewer(codeReviewer, connection)}" />
 							</c:if>
 
 							<c:choose>
-								<c:when test="${status == 'NOT_STARTED'}"><td>foo
+								<c:when test="${status == 'NOT_STARTED'}"><td>
 								</c:when>
 								<c:when
 									test="${codeReviewer.numComments > 0 || ! empty evaluations}">
@@ -332,7 +332,7 @@
 													<c:set var="r" value="${rubricMap[e.rubricPK]}" />
 													<c:out value="${e.value}" />
 													<c:out value="${r.name}" />.
-   <c:out value="${e.explanation}" />
+   													<c:out value="${e.explanation}" />
 													<br>
 												</c:if>
 											</c:forEach></td>
@@ -349,6 +349,51 @@
 		</c:forEach>
 	</table>
 
+	<h2>Review status</h2>
+	<table>
+		<tr>
+			<th>Reviewer
+			<th>Author
+			<th>Comments
+			<th>Last update</th>
+		</tr>
+		<c:forEach var="entry" items="${reviewsByStudent}" varStatus="counter">
+			<c:set var="student" value="${entry.key}" />
+			<c:set var="reviews" value="${entry.value}" />
+			<tr class="r${counter.index % 2}">
+				<td rowspan="${fn:length(reviews)}"><c:out
+						value="${student.fullname}" /></td>
+
+				<c:forEach var="review" items="${reviews}" varStatus="counter2">
+					<c:set var="submission" value="${review.submission}" />
+					<c:set var="author"
+						value="${authorForSubmission[submission.submissionPK]}" />
+					<c:set var="status" value="${codeReviewStatus[submission]}" />
+					<c:url var="viewCodeReview" value="/view/codeReview/index.jsp">
+						<c:param name="submissionPK" value="${submission.submissionPK}" />
+					</c:url>
+
+
+					<c:if test="${counter2.index > 0}">
+						<tr class="r${counter.index % 2}">
+					</c:if>
+
+					<td><a href="${viewCodeReview}"><c:out
+								value="${author.student.fullname}" /></a> <c:choose>
+							<c:when test="${review.numComments > 0}">
+								<td><c:out value="${review.numComments}" /></td>
+								<td><fmt:formatDate value="${review.lastUpdate}"
+										pattern="dd MMM, hh:mm a" /></td>
+
+							</c:when>
+							<c:otherwise>
+								<td colspan="2" />
+							</c:otherwise>
+						</c:choose>
+
+		</c:forEach>
+		</c:forEach>
+	</table>
 
 	<ss:footer />
 </body>

@@ -206,14 +206,25 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
     }
 	
 	public String getName() {
-	    if (Student.FAKE_NAMES)
-            return FakeNames.getFullname(studentPK);
 	    
 		if (knownAs.length() > 0)
 			return knownAs;
 		
+		if (Student.FAKE_NAMES)
+            return FakeNames.getFullname(studentPK);
+	    
 		if (student == null)
 		    throw new IllegalStateException("No student record for CodeReviewer " + codeReviewerPK + ", student " + studentPK);
+		return student.getFullname();
+	}
+	
+	public String getNameForInstructor() {
+		if (student == null)
+		    throw new IllegalStateException("No student record for CodeReviewer " + codeReviewerPK + ", student " + studentPK);
+		
+		if (knownAs.length() > 0)
+			return String.format("%s (%s)", student.getFullname(), knownAs);
+		
 		return student.getFullname();
 	}
 
