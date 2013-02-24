@@ -275,6 +275,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                     Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();
                     HashMultimap<Integer, CodeReviewer> reviewersForSubmission = HashMultimap
                             .create();
+                    HashMultimap<Student, CodeReviewer> reviewsByStudent = HashMultimap
+                            .create();
                     Map<Integer, CodeReviewer> authorForSubmission = new HashMap<Integer, CodeReviewer>();
                     for (CodeReviewer r : codeReviewersForAssignment) {
                         if (r.isAuthor()) {
@@ -283,6 +285,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                             reviewersForSubmission.put(r.getSubmissionPK(), r);
                         if (!r.isInstructor() && !r.isAuthor())
                             studentCodeReviewersForAssignment.add(r);
+                        if (!r.isAuthor())
+                        	  reviewsByStudent.put(r.getStudent(), r);
                     }
                     boolean canRevert = true;
                     Map<Submission, CodeReviewSummary.Status> codeReviewStatus = new HashMap<Submission, CodeReviewSummary.Status>();
@@ -320,7 +324,9 @@ public class ExtractParametersFilter extends SubmitServerFilter {
                             .natural().max(codeReviewStatus.values()));
                     request.setAttribute("reviewersForSubmission",
                             reviewersForSubmission.asMap());
-                    request.setAttribute("authorForSubmission",
+                    request.setAttribute("reviewsByStudent",
+                            reviewsByStudent.asMap());
+                   request.setAttribute("authorForSubmission",
                             authorForSubmission);
                     request.setAttribute("codeReviewersForAssignment",
                             codeReviewersForAssignment);
