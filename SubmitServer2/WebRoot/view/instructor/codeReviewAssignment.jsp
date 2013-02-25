@@ -40,35 +40,36 @@
 
 	<div class="sectionTitle">
 		<h2>
-			Code Review for project
+		<c:choose>
+				<c:when test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL'}">
+					Instructional code review
+				</c:when>
+				<c:when
+					test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL_BY_SECTION'}">
+					Instructional code review by section
+				</c:when>
+				<c:when test="${codeReviewAssignment.kind eq 'PEER'}">
+					Peer code review
+				</c:when>
+				<c:when test="${codeReviewAssignment.kind eq 'PEER_BY_SECTION'}">
+					Peer code review by section
+				</c:when>
+				<c:when test="${codeReviewAssignment.kind eq 'EXEMPLAR'}">
+					Exemplar/example code review
+				</c:when>
+				<c:otherwise>
+					<c:out value="${codeReviewAssignment.kind}" />
+						Code review
+				</c:otherwise>
+			</c:choose>
+			for project
 			<c:out value="${project.fullTitle}" />
 		</h2>
 		<p>
 			<c:out value="${codeReviewAssignment.description}" />
-			<c:choose>
-				<c:when test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL'}">
-					<p>Instructional code review</p>
-				</c:when>
-				<c:when
-					test="${codeReviewAssignment.kind == 'INSTRUCTIONAL_BY_SECTION'}">
-					<p>Instructional code review by section</p>
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'PEER'}">
-					<p>Peer code review</p>
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'PEER_BY_SECTION'}">
-					<p>Peer code review by section</p>
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'EXEMPLAR'}">
-					<p>Exemplar/example code review</p>
-				</c:when>
-				<c:otherwise>
-					<p>
-						Code review of type
-						<c:out value="${codeReviewAssignment.kind}" />
-					</p>
-				</c:otherwise>
-			</c:choose>
+			
+			
+			
 		<p>
 			Due
 			<fmt:formatDate value="${codeReviewAssignment.deadline}"
@@ -201,7 +202,11 @@
 		</ul>
 	</c:if>
 
-	<h2>Submissions being reviewed</h2>
+ <h2><a href="javascript:toggle('submissionList')" title="Click to toggle display of submissions" id="submissions"> <c:out
+                value="${fn:length(submissionsUnderReview)}" /> Submissions being reviewed
+        </a>
+    </h2>
+	 <div id="submissionList" style="display: none">
 
 	<c:set var="cols" value="2" />
 	<c:if test="${not empty rubrics}">
@@ -210,7 +215,7 @@
 	<c:set var="evaluations" value="" />
 	<table>
 		<tr>
-			<th>Author <c:if test="${not empty sections}">
+			<th>Code Author <c:if test="${not empty sections}">
 					<th>Section</th>
 				</c:if>
 			<th>Reviewer <c:if test="${!canRevertCodeReview}">
@@ -348,8 +353,14 @@
 			</c:choose>
 		</c:forEach>
 	</table>
+	</div>
 
-	<h2>Review status</h2>
+ <h2><a href="javascript:toggle('reviewersList')" title="Click to toggle display of reviewers" id="reviewers"> <c:out
+                value="${fn:length(reviewsByStudent)}" /> Reviewers
+        </a>
+    </h2>
+	 <div id="reviewersList" style="display: none">
+
 	<table>
 		<tr>
 			<th>Reviewer
@@ -394,6 +405,7 @@
 		</c:forEach>
 		</c:forEach>
 	</table>
+	</div>
 
 	<ss:footer />
 </body>
