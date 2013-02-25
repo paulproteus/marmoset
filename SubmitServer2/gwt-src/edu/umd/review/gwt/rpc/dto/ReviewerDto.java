@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
 
 /**
  * Data object for transferring information about the logger-in user.
@@ -11,28 +12,32 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
  * @author rwsims@umd.edu (Ryan W Sims)
  */
 public class ReviewerDto implements IsSerializable {
-  private String username;
+  private @UniqueReviewerName String username;
   private String key;
   private @CodeReviewer.PK int codeReviewerPK;
   private @Submission.PK int submissionPK;
   private boolean isAuthor = false;
 
+  
+  public static @UniqueReviewerName String asUniqueReviewerName(String name) {
+	  return name;
+  }
   /** @deprecated GWT use only. */
   @Deprecated
   @SuppressWarnings("unused")
   private ReviewerDto() {
-    this.username = "0xdeadbeef";
+    this.username = asUniqueReviewerName("0xdeadbeef");
     this.key = "0xdeadbeef";
   }
 
   /**
    * @deprecated Use {@link #ReviewerDto(String,int,int,String)} instead
    */
-  public ReviewerDto(String username, String key) {
+  public ReviewerDto(@UniqueReviewerName String username, String key) {
     this(username, 0xdeadbeef, 0xdeadbeef, key);
   }
 
-  public ReviewerDto(String username, @CodeReviewer.PK int codeReviewerPK, @Submission.PK int submissionPK, String key) {
+  public ReviewerDto(@UniqueReviewerName String username, @CodeReviewer.PK int codeReviewerPK, @Submission.PK int submissionPK, String key) {
     this.username = username;
     this.key = key;
     this.codeReviewerPK = codeReviewerPK;

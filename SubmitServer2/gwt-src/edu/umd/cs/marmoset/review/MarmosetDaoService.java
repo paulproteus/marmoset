@@ -1,9 +1,6 @@
 package edu.umd.cs.marmoset.review;
 
 import java.io.IOException;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -17,8 +14,6 @@ import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifier;
-import javax.annotation.meta.When;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -55,15 +50,6 @@ import edu.umd.review.server.dao.ReviewDao;
 
 public class MarmosetDaoService implements ReviewDao {
 
-	@Documented
-	@TypeQualifier(applicableTo = CharSequence.class)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface UniqueReviewerName {
-
-	    When when() default When.ALWAYS;
-	}
-
-	
   final CodeReviewer reviewer;
 
   final Submission submission;
@@ -103,30 +89,41 @@ public class MarmosetDaoService implements ReviewDao {
     }
 
   private final @UniqueReviewerName String authorName;
+  
+  private @UniqueReviewerName String getAuthorName(Connection conn) throws SQLException {
+	  if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
+          StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
+          return  authorAsStudent.getFullname();
+      } else
+          return  codeAuthor.getName();
+  }
+  
+  private @UniqueReviewerName String getUniqueName(CodeReviewer r) {
+	  return r.getName();
+  }
+  
   public MarmosetDaoService(SubmitServerDatabaseProperties database, CodeReviewer thisReviewer) {
 
+	if (thisReviewer == null)
+		throw new NullPointerException("No reviewer");
     this.database = database;
     Connection conn = null;
     try {
       conn = getConnection();
-     
+      
       this.reviewer = thisReviewer;
       this.submission = reviewer.getSubmission();
       this.student = reviewer.getStudent();
-      nameOfReviewer = reviewer.getName();
+      nameOfReviewer = getUniqueName(reviewer);
       isAuthor = reviewer.isAuthor();
+      
       CodeReviewSummary summary = getSummary();
       this.project = summary.getProject();
       this.requestReviewOnPublish = summary.isNeedsPublishToRequestHelp();
       
       this.codeAuthor = summary.getAuthor();
 
-
-      if (isAuthor || codeAuthor == null || reviewer.isInstructor()) {
-          StudentRegistration authorAsStudent = StudentRegistration.lookupByStudentRegistrationPK(submission.getStudentRegistrationPK(), conn);
-          authorName=  authorAsStudent.getFullname();
-      } else
-          authorName =  codeAuthor.getName();
+      authorName =  getAuthorName(conn);
 
       DisplayProperties fileProperties = new DisplayProperties();
       
@@ -234,6 +231,8 @@ public class MarmosetDaoService implements ReviewDao {
     try {
       conn = getConnection();
 
+      if (reviewer == null)
+    	  	throw new IllegalStateException("No reviewer");
       CodeReviewSummary s = new CodeReviewSummary(conn, reviewer);
       summary = s;
       return s;
@@ -288,7 +287,7 @@ public class MarmosetDaoService implements ReviewDao {
 
        for (CodeReviewComment c : summary.getComments(t)) {
          CodeReviewer student = reviewers.get(c.getCodeReviewerPK());
-         String name = student.getName();
+         @UniqueReviewerName String name = getUniqueName(student);
          CommentDto comment = new CommentDto(c.getCodeReviewCommentPK(),
              id, name);
          comment.setContents(c.getComment());
@@ -425,7 +424,7 @@ public class MarmosetDaoService implements ReviewDao {
     int threadPK = thread.getCodeReviewThreadPK();
     boolean canEdit = evaluation.getCodeReviewerPK() == reviewer.getCodeReviewerPK();
     CodeReviewer evaluationAuthor = getSummary().getCodeReviewerMap().get(evaluation.getCodeReviewerPK());
-    String authorName = evaluationAuthor != null ? evaluationAuthor.getName() : "?";
+    @UniqueReviewerName String authorName = evaluationAuthor != null ? getUniqueName(evaluationAuthor) : ReviewerDto.asUniqueReviewerName("?");
     RubricEvaluationDto dto;
     switch (preso) {
       case DROPDOWN:

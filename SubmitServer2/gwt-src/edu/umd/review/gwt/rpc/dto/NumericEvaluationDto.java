@@ -3,6 +3,7 @@ package edu.umd.review.gwt.rpc.dto;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewThread;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
 
 /**
  * @author Ryan W Sims (rwsims@umd.edu)
@@ -20,7 +21,7 @@ public class NumericEvaluationDto extends RubricEvaluationDto {
 	public NumericEvaluationDto(NumericRubricDto rubric,
 	                            @RubricEvaluation.PK int rubricEvaluationPK,
 	                            @CodeReviewer.PK int authorPK,
-	                            String authorName,
+	                            @UniqueReviewerName String authorName,
 	                            @CodeReviewThread.PK int threadid,
 	                            boolean editable, Status status) {
 		super(rubric, rubricEvaluationPK, authorPK, authorName, threadid, editable, status);

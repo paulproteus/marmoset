@@ -9,6 +9,7 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewThread;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
 
 /**
  * Abstract base class for all rubric score DTOs. A rubric score is associated with a single thread.
@@ -41,7 +42,7 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
   private int points;
   private Status status;
   private @CodeReviewer.PK int authorPK;
-  private String authorName;
+  private @UniqueReviewerName String authorName;
 
   /** @deprecated GWT use only. */
   @Deprecated
@@ -52,7 +53,7 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
   public RubricEvaluationDto(RubricDto rubric,
                              @RubricEvaluation.PK int rubricEvaluationPK,
                              @CodeReviewer.PK int authorPK,
-                             String authorName,
+                             @UniqueReviewerName String authorName,
                              @CodeReviewThread.PK int threadid,
                              boolean editable,
                              Status status) {
@@ -87,7 +88,7 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
     return authorPK;
   }
 
-  public String getAuthorName() {
+  public @UniqueReviewerName String getAuthorName() {
       return authorName;
   }
 

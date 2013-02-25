@@ -2,6 +2,8 @@ package edu.umd.review.gwt.view.impl;
 
 import java.util.Set;
 
+import org.cobogw.gwt.user.client.ui.Rating;
+
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,6 +17,7 @@ import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,6 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
 import edu.umd.review.gwt.ClientConstants;
 import edu.umd.review.gwt.rpc.dto.CommentDto;
 import edu.umd.review.gwt.rpc.dto.FileDto;
@@ -106,18 +110,25 @@ public class TrayViewImpl extends Composite implements TrayView, Window.ClosingH
   public void insertAuthors(FileDto file) {
     for (ThreadDto thread : file.getThreads()) {
       for (CommentDto comment : thread.getPublishedComments()) {
-        String author = comment.getAuthor();
+    	    @UniqueReviewerName String author = comment.getAuthor();
         authorSet.add(author);
       }
     }
     authorPanel.clear();
-    for (String author : authorSet) {
-      Label l = new Label(author);
-      l.addStyleName(colorFactory.getColor(author));
-      authorPanel.add(l);
+    for (@UniqueReviewerName String author : authorSet) {
+     authorPanel.add(getAuthorWidget(author));
     }
   }
 
+  private Widget getAuthorWidget(@UniqueReviewerName String authorName) {
+	  
+	  Label l = new Label(authorName);
+	  HorizontalPanel panel = new HorizontalPanel();
+	  panel.add(l);
+	  Rating rating = new Rating();
+	  panel.add(rating);
+      return panel;
+  }
   @Override
   public void setUnpublished(boolean visible) {
     unpublishedLabel.setVisible(visible);

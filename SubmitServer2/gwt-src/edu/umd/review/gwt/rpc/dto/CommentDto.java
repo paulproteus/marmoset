@@ -7,6 +7,8 @@ import net.customware.gwt.dispatch.shared.Result;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.primitives.Longs;
 
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
+
 /**
  * DTO for comments, whether published or drafts.
  *
@@ -17,7 +19,7 @@ public class CommentDto implements Result, Comparable<CommentDto> {
   private int id;
   private int threadId;
   private long timestamp;
-  private String author;
+  private @UniqueReviewerName String author;
   private boolean acknowledgement;
   private boolean draft;
   private String contents;
@@ -31,7 +33,7 @@ public class CommentDto implements Result, Comparable<CommentDto> {
     this.author = "__NO_AUTHOR__";
   }
 
-  public CommentDto(int id, int threadId, String author) {
+  public CommentDto(int id, int threadId, @UniqueReviewerName String author) {
     this.id = id;
     this.threadId = threadId;
     this.author = author;
@@ -74,7 +76,7 @@ public class CommentDto implements Result, Comparable<CommentDto> {
     return threadId;
   }
 
-  public String getAuthor() {
+  public @UniqueReviewerName String getAuthor() {
     return author;
   }
 

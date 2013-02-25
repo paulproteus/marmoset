@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import edu.umd.cs.marmoset.review.UniqueReviewerName;
 import edu.umd.review.gwt.AuthorColors;
 import edu.umd.review.gwt.CodeReviewResources;
 
@@ -29,14 +30,14 @@ public class AuthorColorFactory {
     colorList.add(colors.color5());
   }
 
-  public static int getNextColor() {
+  private static int getNextColor() {
       int result = nextColor;
       nextColor = (nextColor + 1) % colorList.size();
       return result;
 
   }
 
-  public String getColor(String author) {
+  public String getColor(@UniqueReviewerName String author) {
     String color = authorColors.get(author);
     if (color == null) {
       color = colorList.get(getNextColor());
