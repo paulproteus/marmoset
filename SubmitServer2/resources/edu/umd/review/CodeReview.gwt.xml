@@ -6,6 +6,7 @@
   <inherits name='com.google.gwt.user.theme.standard.Standard' />
   <inherits name="com.google.gwt.resources.Resources" />
   <inherits name="com.google.gwt.junit.JUnit" />
+  <inherits name='org.cobogw.gwt.user.User' />
   <source path="gwt">
     <exclude name="**/TestUtils.java" />
     <exclude name="**/*JavaTest.java" />
