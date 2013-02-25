@@ -40,11 +40,6 @@ public class CodeReviewFilter extends SubmitServerFilter {
         Connection conn = null;
         try {
 
-            /** I want a FindBugs warning here about passing in null for conn */
-            if (false)
-                StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
-                    course.getCoursePK(), conn);
-
             conn = getConnection();
 
             if (reviewer == null) {
