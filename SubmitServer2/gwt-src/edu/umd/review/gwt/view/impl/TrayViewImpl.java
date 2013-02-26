@@ -1,6 +1,10 @@
 package edu.umd.review.gwt.view.impl;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
 
 import org.cobogw.gwt.user.client.ui.Rating;
 
@@ -8,6 +12,8 @@ import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -17,6 +23,7 @@ import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -67,6 +74,7 @@ public class TrayViewImpl extends Composite implements TrayView, Window.ClosingH
   private final Set<String> authorSet = Sets.newTreeSet();
   private final Provider<TrayFileView> fileViewProvider;
   private final ScrollManager scrollManager;
+  private boolean isAuthor;
 
   @Inject
   public TrayViewImpl(Provider<TrayFileView> fileViewProvider, ScrollManager scrollManager) {
@@ -107,28 +115,51 @@ public class TrayViewImpl extends Composite implements TrayView, Window.ClosingH
   }
 
   @Override
-  public void insertAuthors(FileDto file) {
-    for (ThreadDto thread : file.getThreads()) {
-      for (CommentDto comment : thread.getPublishedComments()) {
-    	    @UniqueReviewerName String author = comment.getAuthor();
-        authorSet.add(author);
+  public void insertAuthors(boolean isAuthor, Collection<? extends FileDto> files, Map<String, Integer> ratings) {
+    this.isAuthor = isAuthor;
+    authorSet.clear();
+    for (FileDto file : files)
+      for (ThreadDto thread : file.getThreads()) {
+        for (CommentDto comment : thread.getPublishedComments()) {
+          @UniqueReviewerName String author = comment.getAuthor();
+          authorSet.add(author);
+        }
       }
-    }
     authorPanel.clear();
+
     for (@UniqueReviewerName String author : authorSet) {
-     authorPanel.add(getAuthorWidget(author));
+      authorPanel.add(getAuthorWidget(author, ratings.get(author)));
     }
+
   }
 
-  private Widget getAuthorWidget(@UniqueReviewerName String authorName) {
-	  
-	  Label l = new Label(authorName);
-	  HorizontalPanel panel = new HorizontalPanel();
-	  panel.add(l);
-	  Rating rating = new Rating();
-	  panel.add(rating);
-      return panel;
+  private Widget getAuthorWidget(final @UniqueReviewerName String authorName, @CheckForNull Integer r) {
+    Label l = new Label(authorName);
+    String color = colorFactory.getColor(authorName);
+    l.addStyleName(color);
+    HorizontalPanel panel = new HorizontalPanel();
+    panel.add(l);
+    panel.setSpacing(5);
+    panel.setStyleName(color);
+    panel.setWidth("100%");
+    if (r != null) {
+
+      Rating rating = new Rating(r, 5);
+      if (isAuthor)
+        rating.addValueChangeHandler(new ValueChangeHandler<Integer>() {
+          public void onValueChange(ValueChangeEvent<Integer> event) {
+            presenter.rateReviewer(authorName, event.getValue());
+          }
+        });
+      else
+        rating.setReadOnly(true);
+      panel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+      panel.add(rating);
+    }
+
+    return panel;
   }
+
   @Override
   public void setUnpublished(boolean visible) {
     unpublishedLabel.setVisible(visible);

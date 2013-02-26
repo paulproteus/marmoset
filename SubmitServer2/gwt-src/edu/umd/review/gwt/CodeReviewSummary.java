@@ -27,6 +27,10 @@ public final class CodeReviewSummary extends JavaScriptObject {
   private final native String backlinkUrl() /*-{
     return this.backlinkUrl;
   }-*/;
+  
+  public final native boolean isAuthor() /*-{
+  return this.isAuthor;
+}-*/;
 
   public void setBacklink(Anchor backlink) {
     String text = backlinkText();

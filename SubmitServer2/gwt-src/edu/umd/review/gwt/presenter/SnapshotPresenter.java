@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
+import edu.umd.review.common.action.GetCodeReviewAction;
 import edu.umd.review.gwt.PresenterFactory;
 import edu.umd.review.gwt.event.HotkeyHandler;
 import edu.umd.review.gwt.event.SessionExpiryEvent;
@@ -51,10 +52,10 @@ public class SnapshotPresenter extends AbstractPresenter implements SnapshotView
 
   @Inject
   SnapshotPresenter(@Assisted SnapshotView view, EventBus eventBus,
-      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted Collection<? extends FileDto> files,
+      PresenterFactory presenterFactory, HotkeyHandler hotkey, @Assisted GetCodeReviewAction.Result result,
       Provider<GeneralCommentsView.Presenter> generalCommentsPresenterProvider) {
     this.view = view;
-    this.files = files;
+    this.files = result.getFiles();
     this.presenterFactory = presenterFactory;
     this.hotkey = hotkey;
     this.generalCommmentsPresenterProvider = generalCommentsPresenterProvider;

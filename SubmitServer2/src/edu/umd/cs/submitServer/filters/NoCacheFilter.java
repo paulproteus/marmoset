@@ -40,8 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author pugh
  * 
- *         TODO To change the template for this generated type comment go to
- *         Window - Preferences - Java - Code Style - Code Templates
  */
 public class NoCacheFilter implements Filter {
 

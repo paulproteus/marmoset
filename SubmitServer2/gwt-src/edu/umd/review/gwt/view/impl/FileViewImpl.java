@@ -97,7 +97,7 @@ public class FileViewImpl extends Composite implements FileView {
       return;
     }
     if (linesToShow[0] > 0) {
-        // Many lines elided.
+        // Initial lines lines elided.
         int dist = linesToShow[0];
         codeGrid.setWidget(row, 1, makeElidedLabel(dist));
         codeGrid.getRowFormatter().setStylePrimaryName(row, "elided-code-label");

@@ -2,6 +2,7 @@ package edu.umd.review.gwt;
 
 import java.util.Collection;
 
+import edu.umd.review.common.action.GetCodeReviewAction;
 import edu.umd.review.gwt.rpc.dto.CheckboxEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.CheckboxRubricDto;
 import edu.umd.review.gwt.rpc.dto.CommentDto;
@@ -30,10 +31,10 @@ import edu.umd.review.gwt.view.TrayView;
  *
  */
 public interface PresenterFactory {
-  TrayView.Presenter makeTrayPresenter(TrayView view, Collection<? extends FileDto> files);
+  TrayView.Presenter makeTrayPresenter(TrayView view, CodeReviewSummary summary, GetCodeReviewAction.Result codeReview);
   DraftView.Presenter makeDraftPresenter(DraftView view, ThreadDto thread, CommentDto draft);
   ThreadView.Presenter makeThreadPresenter(ThreadView view, ThreadDto thread);
-  SnapshotView.Presenter makeSnapshotPresenter(SnapshotView view, Collection<? extends FileDto> collection);
+  SnapshotView.Presenter makeSnapshotPresenter(SnapshotView view,  GetCodeReviewAction.Result codeReview);
   FileView.Presenter makeFilePresenter(FileView view, FileDto file);
   TrayFileView.Presenter makeTrayFilePresenter(TrayFileView view, FileDto file);
   TrayThreadView.Presenter makeTrayThreadPresenter(TrayThreadView view, ThreadDto thread);

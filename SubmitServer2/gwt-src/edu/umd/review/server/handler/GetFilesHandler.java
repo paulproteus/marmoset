@@ -8,10 +8,11 @@ import net.customware.gwt.dispatch.shared.DispatchException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import edu.umd.review.common.action.GetFilesAction;
-import edu.umd.review.common.action.GetFilesAction.Result;
+import edu.umd.review.common.action.GetCodeReviewAction;
+import edu.umd.review.common.action.GetCodeReviewAction.Result;
+import edu.umd.review.server.dao.ReviewDao;
 
-public class GetFilesHandler extends AbstractDaoHandler<GetFilesAction, GetFilesAction.Result> {
+public class GetFilesHandler extends AbstractDaoHandler<GetCodeReviewAction, GetCodeReviewAction.Result> {
 
   @Inject
   GetFilesHandler(Provider<HttpServletRequest> requestProvider) {
@@ -19,12 +20,13 @@ public class GetFilesHandler extends AbstractDaoHandler<GetFilesAction, GetFiles
   }
 
   @Override
-  public Result execute(GetFilesAction action, ExecutionContext context) throws DispatchException {
-    return new GetFilesAction.Result(getDao().getFiles());
+  public Result execute(GetCodeReviewAction action, ExecutionContext context) throws DispatchException {
+    ReviewDao dao = getDao();
+	return new GetCodeReviewAction.Result(dao.getFiles(), dao.getRatings());
   }
 
   @Override
-  public Class<GetFilesAction> getActionType() {
-    return GetFilesAction.class;
+  public Class<GetCodeReviewAction> getActionType() {
+    return GetCodeReviewAction.class;
   }
 }

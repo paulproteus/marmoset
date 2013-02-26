@@ -29,8 +29,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.umd.review.common.CommonConstants;
-import edu.umd.review.common.action.GetFilesAction;
-import edu.umd.review.common.action.GetFilesAction.Result;
+import edu.umd.review.common.action.GetCodeReviewAction;
+import edu.umd.review.common.action.GetCodeReviewAction.Result;
 import edu.umd.review.gwt.event.PublishAllEvent;
 import edu.umd.review.gwt.gin.ReviewGinjector;
 import edu.umd.review.gwt.view.PublishDraftsView;
@@ -123,7 +123,7 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
 
   private void loadSubmission() {
     contentPanel.setWidget(snapshotView);
-    dispatch.execute(new GetFilesAction(), new AsyncCallback<GetFilesAction.Result>() {
+    dispatch.execute(new GetCodeReviewAction(), new AsyncCallback<GetCodeReviewAction.Result>() {
       @Override
       public void onFailure(Throwable caught) {
         GwtUtils.wrapAndThrow(caught);
@@ -135,13 +135,13 @@ public class CodeReview extends Composite implements EntryPoint, ValueChangeHand
            trayPresenter.finish();
            trayPresenter = null;
          }
-         trayPresenter = presenterFactory.makeTrayPresenter(trayView, result.getFiles());
+         trayPresenter = presenterFactory.makeTrayPresenter(trayView, getSummary(), result);
          trayPresenter.start();
          if (snapshotPresenter != null) {
            snapshotPresenter.finish();
            snapshotPresenter = null;
          }
-         snapshotPresenter = presenterFactory.makeSnapshotPresenter(snapshotView, result.getFiles());
+         snapshotPresenter = presenterFactory.makeSnapshotPresenter(snapshotView, result);
          snapshotPresenter.start();
       }
     });

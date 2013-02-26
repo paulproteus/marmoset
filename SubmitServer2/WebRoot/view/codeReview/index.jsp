@@ -72,6 +72,7 @@
 		"subtitle" : '${subtitle}',
 		"backlinkText" : '${reviewBacklinkText}',
 		"backlinkUrl" : '${reviewBacklinkUrl}',
+		"isAuthor" : ${reviewDao.reviewer.author}
 	};
 </script>
 

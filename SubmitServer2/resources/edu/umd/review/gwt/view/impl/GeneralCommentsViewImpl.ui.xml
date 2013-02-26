@@ -14,8 +14,9 @@
 		<g:InlineLabel styleName="{codeReviewStyle.sectionHeader}">General Comments</g:InlineLabel>
 		<g:Anchor styleName="{codeReviewStyle.actionLink}"
 			addStyleNames="{localstyle.newThreadLink}" ui:field="newThreadLink">
-			Start new thread
-		</g:Anchor>
+			Start new general thread
+		</g:Anchor> 
+		<g:InlineLabel>&nbsp;(to start a thread associated with a line of code, double click on that line)</g:InlineLabel>
 		<g:FlowPanel ui:field="threadPanel">
 		</g:FlowPanel>
 	</g:FlowPanel>

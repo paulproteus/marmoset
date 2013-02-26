@@ -65,6 +65,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		private boolean isAuthor = false;
 		private boolean isInstructor = false;
 		private boolean isAutomated = false;
+		
 		private String knownAs = "";
 		
 		public Builder(Connection conn, @Submission.PK int submission) {
@@ -129,9 +130,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		"is_author",
 		"is_instructor",
 		"last_update",
+		"last_seen",
 		"num_comments",
 		"known_as",
-		"is_automated"
+		"is_automated",
+		"rating",
+		"rating_comment"
 	};
 
 	/**
@@ -167,9 +171,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	private final  @Student.PK int studentPK;
 	private final boolean isAuthor;
 	private @Nonnull String knownAs;
-	private Timestamp lastUpdate = null;
+	private @CheckForNull Timestamp lastUpdate = null;
+	private @CheckForNull Timestamp lastSeen = null;
 	private final boolean isInstructor;
 	private final boolean isAutomated;
+	private int rating;
+	private @CheckForNull String ratingComment;
 	
 	public boolean isAutomated() {
 		return isAutomated;
@@ -179,7 +186,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		return isInstructor;
 	}
 
-	public Timestamp getLastUpdate() {
+	public @CheckForNull Timestamp getLastUpdate() {
 		return lastUpdate;
 	}
 
@@ -252,6 +259,26 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		return submissionPK;
 	}
 
+	public @CheckForNull  Timestamp getLastSeen() {
+		if (lastSeen == null)
+			return getLastUpdate(); // Only useful for legacy code reviewer records
+		return lastSeen;
+	}
+	public void setLastSeen(Timestamp lastSeen) {
+		this.lastSeen = lastSeen;
+	}
+	public int getRating() {
+		return rating;
+	}
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
+	public @CheckForNull String getRatingComment() {
+		return ratingComment;
+	}
+	public void setRatingComment(String ratingComment) {
+		this.ratingComment = ratingComment;
+	}
 	public Submission getSubmission() {
 		return submission;
 	}
@@ -263,6 +290,33 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		return student;
 	}
 
+	public void updateRating(Connection conn) throws SQLException {
+		String query = "UPDATE  " + TABLE_NAME
+				+ " SET rating = ?, rating_comment = ? "
+				+ " WHERE code_reviewer_pk = ?";
+		PreparedStatement stmt = conn.prepareStatement(query);
+		try {
+			Queries.setStatement(stmt, rating, ratingComment, codeReviewerPK);
+			stmt.executeUpdate();
+		} finally {
+			stmt.close();
+		}
+	}
+	
+	public void markAsViewed(Connection conn) throws SQLException {
+		String query = "UPDATE  " + TABLE_NAME
+				+ " SET last_seen = ? "
+				+ " WHERE code_reviewer_pk = ?";
+		lastSeen = new Timestamp(System.currentTimeMillis());
+		PreparedStatement stmt = conn.prepareStatement(query);
+		try {
+			Queries.setStatement(stmt, lastSeen, codeReviewerPK);
+			stmt.executeUpdate();
+		} finally {
+			stmt.close();
+		}
+	}
+	
 	public void addComments(Connection conn, int num, Timestamp now) throws SQLException {
 	    if (num == 0)
 	        return;
@@ -502,9 +556,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	        stmt.setBoolean(col++, isAuthor);
 	        stmt.setBoolean(col++, isInstructor);
 	        stmt.setTime(col++, null);
+	        stmt.setTime(col++, null);
 	        stmt.setInt(col++, 0);
 	        stmt.setString(col++, knownAs);
 	        stmt.setBoolean(col++, isAutomated);
+	        stmt.setInt(col++, 0);
+	        stmt.setString(col++, null);
 	        stmt.executeUpdate();
 
 	        this.codeReviewerPK = CodeReviewer.asPK(Queries.getGeneratedPrimaryKey(stmt));
@@ -525,9 +582,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		this.isAuthor = resultSet.getBoolean(startingFrom++);
 		this.isInstructor = resultSet.getBoolean(startingFrom++);
 		this.lastUpdate = resultSet.getTimestamp(startingFrom++);
+		this.lastSeen = resultSet.getTimestamp(startingFrom++);
 		this.numComments = resultSet.getInt(startingFrom++);
 		this.knownAs = resultSet.getString(startingFrom++);
 		this.isAutomated = resultSet.getBoolean(startingFrom++);
+		this.rating = resultSet.getInt(startingFrom++);
+		this.ratingComment = resultSet.getString(startingFrom++);
 	}
 	public  CodeReviewer(ResultSet resultSet, int startingFrom, Connection conn)
 	throws SQLException

@@ -244,6 +244,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	public Map<Integer,CodeReviewer> getCodeReviewerMap() {
 		return Collections.unmodifiableMap(reviewers);
 	}
+	
+
 	public Map<Integer,CodeReviewThread> getThreadMap() {
 		return Collections.unmodifiableMap(threads);
 	}

@@ -3,6 +3,7 @@ package edu.umd.cs.submitServer.filters;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -73,6 +74,8 @@ public class CodeReviewFilter extends SubmitServerFilter {
                     request.setAttribute(NEXT_CODE_REVIEW, next);
             }
 
+            
+            reviewer.markAsViewed(conn);
             MarmosetDaoService dao = new MarmosetDaoService(submitServerDatabaseProperties, reviewer);
             ReviewerDto reviewerDto = dao.getReviewer();
             session.setAttribute(reviewerDto.getKey(), dao);

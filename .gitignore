@@ -1,4 +1,6 @@
 SubmitServer2/WebRoot/resources/buildserver.zip
+SubmitServer2/compiledJspClasses
+SubmitServer2/compiledJspSrc
 sampleProjects/*/submission.zip
 sampleProjects/*/test-setup.zip
 sampleProjects/*/doc/

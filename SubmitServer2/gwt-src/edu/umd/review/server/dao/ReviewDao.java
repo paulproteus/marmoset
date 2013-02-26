@@ -89,4 +89,10 @@ public interface ReviewDao {
 
   /** Delete a score, removing the association between a rubric and a thread. */
   void deleteRubricScore(RubricEvaluationDto score);
+
+  String getAuthorName();
+  
+  Map<String, Integer> getRatings();
+
+  void rateReviewer(String reviewerName, int rating);
 }

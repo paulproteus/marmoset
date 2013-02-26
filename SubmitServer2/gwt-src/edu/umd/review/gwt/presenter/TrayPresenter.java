@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.customware.gwt.dispatch.client.DispatchAsync;
@@ -20,10 +21,13 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
+import edu.umd.review.common.action.GetCodeReviewAction;
 import edu.umd.review.common.action.GetUnscoredRubrics;
+import edu.umd.review.common.action.RateReviewerAction;
 import edu.umd.review.common.action.GetUnscoredRubrics.Result;
 import edu.umd.review.common.action.PublishAllAction;
 import edu.umd.review.common.action.VoidResult;
+import edu.umd.review.gwt.CodeReviewSummary;
 import edu.umd.review.gwt.GwtUtils;
 import edu.umd.review.gwt.PresenterFactory;
 import edu.umd.review.gwt.event.DiscardCommentEvent;
@@ -62,9 +66,10 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
   private final Map<String, TrayFileView.Presenter> filePresenters = Maps.newTreeMap();
   private final ResettableEventBus eventBusWrapper;
   private final DispatchAsync dispatch;
-
+  private Map<String, Integer> ratings;
   private int draftCount = 0;
   private boolean expired = false;
+  private boolean isAuthor = false;
 
   private SortedSet<RubricDto> unscoredRubrics = Sets.newTreeSet();
   private SortedSet<RubricEvaluationDto> scoredEvaluations = Sets.newTreeSet();
@@ -75,8 +80,11 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
                        PickupDragController dragController,
                        PresenterFactory presenterFactory,
                        EventBus eventBus,
-                       @Assisted Collection<? extends FileDto> files) {
-    this.files = files;
+                       @Assisted CodeReviewSummary summary, 
+                       @Assisted GetCodeReviewAction.Result result) {
+    this.files = result.getFiles();
+    this.ratings = result.getRatings();
+    this.isAuthor = summary.isAuthor();
     this.view = trayView;
     this.presenterFactory = presenterFactory;
     this.eventBus = eventBus;
@@ -98,8 +106,9 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
     eventBusWrapper.addHandler(EvaluationSavedEvent.TYPE, this);
     eventBusWrapper.addHandler(SessionExpiryEvent.getType(), this);
     draftCount = 0;
+    
+    view.insertAuthors(isAuthor, files, ratings);
     for (FileDto file : files) {
-      view.insertAuthors(file);
       TrayFileView fileView = view.insertFile(null);
       TrayFileView.Presenter presenter = presenterFactory.makeTrayFilePresenter(fileView, file);
       presenter.start();
@@ -233,4 +242,21 @@ public class TrayPresenter extends AbstractPresenter implements TrayView.Present
   public void onSessionExpiry(SessionExpiryEvent event) {
     expired = true;
   }
+
+	@Override
+	public void rateReviewer(String reviewer, int rating) {
+		dispatch.execute(new RateReviewerAction(reviewer, rating),
+				new AsyncCallback<VoidResult>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						throw GwtUtils.wrapAndThrow(caught);
+					}
+
+					@Override
+					public void onSuccess(VoidResult result) {
+
+					}
+				});
+
+	}
 }

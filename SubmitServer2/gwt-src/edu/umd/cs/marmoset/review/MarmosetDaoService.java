@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -184,7 +186,45 @@ public class MarmosetDaoService implements ReviewDao {
   public String getAuthorName() {
       return authorName;
   }
+  
+	public Map<String, Integer> getRatings() {
+		if (!reviewer.isAuthor() && !reviewer.isInstructor()) return Collections.emptyMap();
+		CodeReviewSummary summary = getSummary();
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		for(CodeReviewer r : summary.getReviewers()) {
+			if (r.isAuthor() || r.isAutomated()) continue;
+			if (r.getStudentPK() == reviewer.getStudentPK()) continue;
+			result.put(getUniqueName(r), r.getRating());
+		}
+		return result;
+	}
    
+  @Override
+  public void rateReviewer(@UniqueReviewerName String reviewerName, int rating) {
+    if (!reviewer.isAuthor())
+      throw new IllegalStateException("Only authors can rate reviewers");
+    for (CodeReviewer r : getSummary().getReviewers()) {
+      if (reviewerName.equals(getUniqueName(r))) {
+        r.setRating(rating);
+        Connection conn = null;
+        try {
+          conn = getConnection();
+          r.updateRating(conn);
+          return;
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        } finally {
+          release(conn);
+        }
+
+      }
+
+    }
+    throw new RuntimeException("Could not find reviewer '" + reviewerName + "' to rate");
+
+  }
+	
+	
   /**
    * Return a BitSet with one bit for every line in a file, where a set bit indicates a thread is
    * present on that line.
@@ -682,4 +722,6 @@ public class MarmosetDaoService implements ReviewDao {
       release(conn);
     }
   }
+
+  
 }

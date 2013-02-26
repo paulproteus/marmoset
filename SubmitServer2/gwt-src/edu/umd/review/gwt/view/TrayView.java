@@ -1,5 +1,8 @@
 package edu.umd.review.gwt.view;
 
+import java.util.Collection;
+import java.util.Map;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.ImplementedBy;
@@ -33,10 +36,8 @@ public interface TrayView extends IsWidget {
    */
   TrayFileView insertFile(TrayFileView before);
 
-  /**
-   * Add a colored indicator for each author with a comment in {@code file}.
-   */
-  void insertAuthors(FileDto file);
+
+  void insertAuthors(boolean isAuthor, Collection<? extends FileDto> files, Map<String, Integer> ratings);
 
   void setUnpublished(boolean visible);
 
@@ -56,6 +57,7 @@ public interface TrayView extends IsWidget {
   @ImplementedBy(TrayPresenter.class)
   interface Presenter extends IsPresenter {
     void publishAllDrafts();
+    void rateReviewer(String reviewer, int rating);
 
     /**
      * Return a message to display on closing, or null if closing should go ahead without

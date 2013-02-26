@@ -26,3 +26,11 @@ ALTER TABLE  `courses` ADD  `help_requests_allowed` TINYINT( 1 ) NOT NULL DEFAUL
 # Changed 3/29/2012
 
 ALTER TABLE  `test_outcomes` CHANGE  `exception_class_name`  `exception_class_name` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+
+# change 2/25/2013
+
+ALTER TABLE  `code_reviewer` ADD  `last_seen` DATETIME NULL DEFAULT NULL COMMENT  'last time this reviewer examined the code review' AFTER  `last_update`;
+ALTER TABLE  `code_reviewer` ADD  `rating` INT NOT NULL DEFAULT  '0' COMMENT  'Rating of reviewer by author (1-5)';
+ALTER TABLE  `code_reviewer` ADD  `rating_comment` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT  'Comments from author explaining the rating they gave a reviewer';
+
+
