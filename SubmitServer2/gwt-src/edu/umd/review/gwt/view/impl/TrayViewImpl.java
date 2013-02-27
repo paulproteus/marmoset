@@ -144,15 +144,26 @@ public class TrayViewImpl extends Composite implements TrayView, Window.ClosingH
     panel.setWidth("100%");
     if (r != null) {
 
-      Rating rating = new Rating(r, 5);
-      if (isAuthor)
+      boolean unrated = r.intValue() == 0;
+      final Rating rating = new Rating(r, 5);
+      if (isAuthor) {
+        if (unrated)
+          rating.setTitle("Please rate this reviewer");
+        else
+          rating.setTitle("Click to change your rating");
         rating.addValueChangeHandler(new ValueChangeHandler<Integer>() {
           public void onValueChange(ValueChangeEvent<Integer> event) {
+            rating.setTitle("Click to change your rating");
             presenter.rateReviewer(authorName, event.getValue());
           }
         });
-      else
+      } else {
+        if (unrated)
+          rating.setTitle("Not rated");
+        else
+          rating.setTitle("Author's rating of this reviewer");
         rating.setReadOnly(true);
+      }
       panel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
       panel.add(rating);
     }
