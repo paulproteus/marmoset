@@ -15,6 +15,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 import javax.annotation.CheckForNull;
@@ -293,7 +294,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	
 	public Status getStatus() {
 	    
-	    if (allComments.isEmpty() && rubricEvaluations.isEmpty())
+		if (allComments.isEmpty() && rubricEvaluations.isEmpty())
 	        return Status.NOT_STARTED;
 	
 	    boolean published = false;
@@ -324,37 +325,55 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return reviewers.get(c.getCodeReviewerPK());
 	}
 
-    public boolean isNeedsResponse(CodeReviewThread t) {
+	public @CheckForNull CodeReviewComment lastNonDraftComment(NavigableSet<CodeReviewComment> comments) {
+	       
+		 for (CodeReviewComment c : comments.descendingSet()) 
+	            if (!c.isDraft() && isVisible(c))
+	                return c;
+		 return null;
+	}
+	
+	public boolean isTimely(CodeReviewComment c) {
+		if (assignment == null) 
+			return true;
+		Timestamp deadline = assignment.getDeadline();
+		if (c.isBy(author))
+			deadline = new Timestamp(deadline.getTime() + TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS));
+			
+		return c.getModified().compareTo(deadline) < 0;
+	}
+	public boolean isNeedsResponse(CodeReviewThread t) {
         NavigableSet<CodeReviewComment> comments = getComments(t);
         if (comments.isEmpty()) {
             if (t.getRubricEvaluationPK() == 0)
                 throw new IllegalStateException("thread " + t.getCodeReviewThreadPK() + " is empty");
             return viewerIsAuthor();
         }
-
-        for (CodeReviewComment last : comments.descendingSet()) {
-            if (last.isDraft())
-                continue;
-            if (last.isAck())
-                return false;
-            if (last.isBy(viewerAsReviewer))
-                return false;
-            if (viewerIsAuthor())
-                return true;
-            // viewer is code reviewer. Needs to respond if comment is from
-            // author and thread was either started by review or by
-            // author and review is instructor
-            if (last.isBy(author)) {
-                @CodeReviewer.PK
-                int startedBy = t.getCreatedBy();
-                if (startedBy == viewerAsReviewer.getCodeReviewerPK())
-                    return true;
-                if (startedBy == author.getCodeReviewerPK() && viewerAsReviewer.isInstructor())
-                    return true;
-            }
-            return false;
-        }
-        return false;
+        CodeReviewComment last = lastNonDraftComment(comments);
+        
+		if (last == null)
+			return false;
+		if (last.isAck())
+			return false;
+		if (last.isBy(viewerAsReviewer))
+			return false;
+		if (!isTimely(last))
+			return false;
+		if (viewerIsAuthor())
+			return true;
+		// viewer is code reviewer. Needs to respond if comment is from
+		// author and thread was either started by reviewer or by
+		// author and review is instructor
+		if (last.isBy(author)) {
+			@CodeReviewer.PK
+			int startedBy = t.getCreatedBy();
+			if (startedBy == viewerAsReviewer.getCodeReviewerPK())
+				return true;
+			if (startedBy == author.getCodeReviewerPK()
+					&& viewerAsReviewer.isInstructor())
+				return true;
+		}
+		return false;
     }
     /**
      * @return
