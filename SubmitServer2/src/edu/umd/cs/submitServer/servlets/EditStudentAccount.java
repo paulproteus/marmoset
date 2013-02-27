@@ -39,8 +39,10 @@ public class EditStudentAccount extends SubmitServerServlet {
 			
 			switch (action) {
 				case UPDATE:
-					student.setFirstname(require("firstname", req));
-					student.setLastname(require("lastname", req));
+        String firstName = require("firstname", req);
+        student.setFirstname(firstName);
+        String lastName = require("lastname", req);
+        student.setLastname(lastName);
 					student.setLoginName(require("login", req));
 					student.setEmail(require("email", req));
 					student.update(conn);

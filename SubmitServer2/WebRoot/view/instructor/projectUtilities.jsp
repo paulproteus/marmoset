@@ -22,7 +22,7 @@
 
 --%>
 
-<%@ page  pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -241,7 +241,7 @@ jQuery(document).ready(function ($) {
 							</c:url>
 							<a href="${canonicalRunLink}">${testSetup.status.toString()}</a>
 						</c:when>
-						<c:otherwise>${testSetup.statu.toString()}</c:otherwise>
+						<c:otherwise>${testSetup.status.toString()}</c:otherwise>
 					</c:choose>
 					</td>
 

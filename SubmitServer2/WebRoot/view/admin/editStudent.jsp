@@ -22,8 +22,7 @@
 
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 <c:if test="${!user.canImportCourses}">
@@ -45,7 +44,7 @@ form li.required label {font-weight: bold;}
 <ss:instructorBreadCrumb />
 <h1>Edit student account for <c:out value="${student.fullname}"/></h1>
 <c:url value="/action/admin/EditStudentAccount" var="actionUrl" />
-<form action="${actionUrl}" method="POST" id="edit-form">
+<form action="${actionUrl}" method="POST" id="edit-form"  accept-charset="utf-8">
 <input type="hidden" name="studentPK" value="${student.studentPK}" />
 		<ul>
 			<li class="required">

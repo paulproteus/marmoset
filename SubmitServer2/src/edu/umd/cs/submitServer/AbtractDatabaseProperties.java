@@ -41,20 +41,22 @@ public abstract class AbtractDatabaseProperties {
 		String options = webProperties.getRequiredProperty(databaseOptions);
 
 
-		if ("ssl".equals(options))
-			options = "verifyServerCertificate=false"+
-			"&useSSL=true"+
-			"&requireSSL=true";
-		if (name != null) {
-			// allow database name in URL to be overridden
-			int index = url.lastIndexOf('/');
-			if (index >= 0)
-				url = url.substring(0, index + 1)+  databaseName;
-			else
-				url = url + "/" + databaseName;
-		}
-		if (options != null && options.length() > 0)
-			url = url + "?" + options;
+    if ("ssl".equals(options))
+      options = "verifyServerCertificate=false" + "&useSSL=true" + "&requireSSL=true";
+    if (options.isEmpty())
+      options = "characterEncoding=utf8&characterSetResults=utf8";
+    else
+      options += "&characterEncoding=utf8&characterSetResults=utf8";
+    if (name != null) {
+      // allow database name in URL to be overridden
+      int index = url.lastIndexOf('/');
+      if (index >= 0)
+        url = url.substring(0, index + 1) + databaseName;
+      else
+        url = url + "/" + databaseName;
+    }
+    if (options.length() > 0)
+      url = url + "?" + options;
 
 		this.databaseURL = url;
 		this.databaseUser =  webProperties.getRequiredProperty(databaseUser);

@@ -22,7 +22,7 @@
 
 --%>
 
-
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -206,7 +206,11 @@
                 value="${fn:length(submissionsUnderReview)}" /> Submissions being reviewed
         </a>
     </h2>
-	 <div id="submissionList" style="display: none">
+    <c:set var="initialStyle" value="display: none"/>
+    <c:if test="${fn:length(submissionsUnderReview) < 4}">
+     <c:set var="initialStyle" value="display: inline"/>
+     </c:if>
+	 <div id="submissionList" style="${initialStyle}">
 
 	<c:set var="cols" value="2" />
 	<c:if test="${not empty rubrics}">
@@ -308,7 +312,8 @@
 								</c:if>
 							</c:when>
 							<c:otherwise>
-								<td colspan="${1+cols}" class="description">no response from author</td>
+								<td>author
+								<td colspan="${cols}" class="description">no response</td>
 							</c:otherwise>
 						</c:choose>
 					</tr>
@@ -359,7 +364,13 @@
                 value="${fn:length(reviewsByStudent)}" /> Reviewers
         </a>
     </h2>
-	 <div id="reviewersList" style="display: none">
+     <c:set var="initialStyle" value="display: none"/>
+    <c:if test="${fn:length(reviewsByStudent) < 4}">
+     <c:set var="initialStyle" value="display: inline"/>
+     </c:if>
+	 <div id="reviewersList" style="${initialStyle}">
+    
+	
 
 	<table>
 		<tr>

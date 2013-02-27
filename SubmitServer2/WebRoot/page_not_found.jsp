@@ -22,6 +22,7 @@
 
 --%>
 
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page isErrorPage="true" language="java"%>
 <%@ page import="edu.umd.cs.submitServer.UserSession"%>
 <%@ page import="edu.umd.cs.submitServer.servlets.SubmitServerServlet"%>

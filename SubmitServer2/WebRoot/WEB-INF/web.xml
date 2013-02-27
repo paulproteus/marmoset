@@ -31,6 +31,20 @@
 		log all transactions that take longer than some lower bound
 	-->
 	
+	 <filter>
+      <filter-name>SetCharacterEncodingFilter</filter-name>
+      <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+      <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+      </init-param>
+    </filter>
+    <filter-mapping>
+      <filter-name>SetCharacterEncodingFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    
 		<filter>
 		<filter-name>TestingGroundFilter</filter-name>
 		<filter-class>edu.umd.cs.submitServer.filters.TestingGroundFilter</filter-class>
@@ -932,6 +946,10 @@
     <servlet-mapping>
         <servlet-name>Echo</servlet-name>
         <url-pattern>/view/echo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Echo</servlet-name>
+        <url-pattern>/echo</url-pattern>
     </servlet-mapping>
     
 	<servlet>

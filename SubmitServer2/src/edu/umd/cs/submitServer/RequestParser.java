@@ -315,7 +315,8 @@ public class RequestParser {
 		Timestamp ontime = getTimestampParameter("ontime");
 		project.setOntime(ontime);
 		project.setLate(getOptionalTimestampParameter("late", ontime));
-		project.setTitle(getCheckedParameter("title"));
+		String title = getCheckedParameter("title");
+    project.setTitle(title);
 	    project.setUrl(getOptionalCheckedParameter("url"));
 	    project.setDescription(getOptionalCheckedParameter("description"));
 	    Integer diffAgainst = Project.asPK(getOptionalInteger("diffAgainst"));

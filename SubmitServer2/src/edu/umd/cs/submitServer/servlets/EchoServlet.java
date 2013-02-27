@@ -13,22 +13,29 @@ public class EchoServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    public void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws IOException {
+      doGet(req, resp);
+    }
+
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.setContentType("text/plain");
+        resp.setCharacterEncoding("UTF-8");
+        
         PrintWriter out = resp.getWriter();
 
-        out.println("URI:" + req.getRequestURI());
-        out.println("URL:" + req.getRequestURL().toString());
-        out.println("request scheme " + req.getScheme());
-        out.println("request protocol " + req.getProtocol());
-
-        out.println("request name " + req.getServerName());
-        out.println("request port " + req.getServerPort());
-        out.println("remote host " + req.getRemoteHost());
+        out.println("      URI:" + req.getRequestURI());
+        out.println("      URL:" + req.getRequestURL().toString());
+        out.println("   scheme: " + req.getScheme());
+        out.println(" protocol: " + req.getProtocol());
+        out.println("   method: " + req.getMethod());
+        out.println("     name: " + req.getServerName());
+        out.println("     port: " + req.getServerPort());
+        out.println("     host: " + req.getRemoteHost());
+        out.println("  charset: " + req.getCharacterEncoding());
+        out.println("     type: " + req.getContentType());
         
-        
-
         String auth = req.getAuthType();
         if (auth != null) 
             out.println("auth type " + auth);
@@ -52,7 +59,21 @@ public class EchoServlet extends HttpServlet {
 
             while (i.hasMoreElements()) {
                 String n = i.nextElement();
-                out.println("  " + n + ": " + req.getParameter(n));
+                String value = req.getParameter(n);
+                out.println("  " + n + ": " + value);
+                if (n.equals("title")) {
+                  byte b[] = value.getBytes();
+                  for(int j = 0; j < b.length; j++) {
+                    int c = b[j] & 0xff;
+                    if (c <= 127)
+                      out.print(" " + (char)c);
+                    else 
+                      out.printf("%2x", c);
+                    
+                  }
+                  out.println();
+                  
+                }
             }
         }
 
