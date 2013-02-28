@@ -33,12 +33,25 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
   public enum Status { NOT_STARTED, DRAFT, PUBLISHED, INTERACTIVE };
 
-  final @Nonnull Submission submission;
-  final @Nonnull  Project project;
-  final @Nonnull  Student viewerAsStudent;
-  final @Nonnull CodeReviewer viewerAsReviewer;
-  final @CheckForNull CodeReviewer author;
-  final @CheckForNull CodeReviewAssignment assignment; /** assignment is null if this is an ad-hoc review */
+  /* Per viewer information */
+	final @Nonnull
+	Student viewerAsStudent;
+	final @Nonnull
+	CodeReviewer viewerAsReviewer;
+	boolean anyUnpublishedDraftsByViewer;
+	boolean anyPublishedDraftsByViewer;
+	Map<Integer, Rubric> rubricsUnevaluatedByViewer = new HashMap<Integer, Rubric>();
+
+	 /* Per submission information */
+	final @Nonnull
+	Submission submission;
+	final @Nonnull
+	Project project;
+	final @CheckForNull
+	CodeReviewer author;
+	final @CheckForNull
+	CodeReviewAssignment assignment;
+	/** assignment is null if this is an ad-hoc review */
 
 	/**
 	 * Map from codeReviewerPK to CodeReviewer
@@ -52,20 +65,16 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	/**
 	 * Map from threadPK to sorted set of comments
 	 */
-	final Map<Integer, NavigableSet<CodeReviewComment>> comments
-	= new HashMap<Integer, NavigableSet<CodeReviewComment>>();
+	final Map<Integer, NavigableSet<CodeReviewComment>> comments = new HashMap<Integer, NavigableSet<CodeReviewComment>>();
 
 	final Set<CodeReviewComment> allComments = new TreeSet<CodeReviewComment>();
-	boolean anyUnpublishedDrafts;
-	boolean anyPublishedDraftsByViewer;
 	final boolean isRequestForHelp;
 
 	/** map from rubricPK to Rubric */
-	Map<Integer,Rubric> rubrics = new HashMap<Integer,Rubric>();
-	Map<Integer,Rubric> unevaluatedRubrics = new HashMap<Integer,Rubric>();
+	Map<Integer, Rubric> rubrics = new HashMap<Integer, Rubric>();
 	/** Map from threadPK to RubricEvaluation */
-	Map<Integer,RubricEvaluation> rubricEvaluations = new HashMap<Integer,RubricEvaluation>();
-
+	Map<Integer, RubricEvaluation> rubricEvaluations = new HashMap<Integer, RubricEvaluation>();
+	
 	public CodeReviewSummary(Connection conn, CodeReviewer reviewer) throws SQLException {
 		this(conn, reviewer.getSubmission(), reviewer.getStudent(), reviewer);
 	}
@@ -117,7 +126,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			allComments.add(c);
 			if (isAuthor(c)) {
 			if (c.isDraft())
-				anyUnpublishedDrafts = true;
+				anyUnpublishedDraftsByViewer = true;
 			else
 			    anyPublishedDraftsByViewer = true;
 			}
@@ -129,7 +138,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			    rubrics.put(r.getRubricPK(), r);
 			        
 		if (!isReviewerIsTheAuthor())
-	      unevaluatedRubrics.putAll(rubrics);
+	      rubricsUnevaluatedByViewer.putAll(rubrics);
 	
         for (RubricEvaluation e : RubricEvaluation.lookupBySubmissionPK(submission.getSubmissionPK(), conn))
             if (isVisible(e)) {
@@ -150,9 +159,9 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
                 if (e.getCodeReviewerPK() == reviewer.getCodeReviewerPK()) {
                     if (e.getStatus().equals("LIVE"))
-                        unevaluatedRubrics.remove(e.getRubricPK());
+                        rubricsUnevaluatedByViewer.remove(e.getRubricPK());
                     else if (e.getStatus().equals("NEW") || e.getStatus().equals("DRAFT"))
-                        anyUnpublishedDrafts = true;
+                        anyUnpublishedDraftsByViewer = true;
                 }
             }
 		threadsWithContent.addAll(rubricEvaluations.keySet());
@@ -207,7 +216,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public boolean getAnyUnpublishedDraftsByViewer() {
-		return anyUnpublishedDrafts;
+		return anyUnpublishedDraftsByViewer;
 	}
 	public boolean isNeedsPublishToRequestHelp() {
 	    boolean result = !viewerAsReviewer.isInstructor()
@@ -590,7 +599,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public Collection<Rubric> getUnassignedRubrics() {
-		return unevaluatedRubrics.values();
+		return rubricsUnevaluatedByViewer.values();
 	}
 
 	@CheckForNull
