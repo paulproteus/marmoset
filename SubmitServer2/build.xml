@@ -286,17 +286,22 @@
 
   <target name="clean">
     <!-- Delete the ${dist} directory tree -->
+    <delete dir=".gwt"/>
     <delete dir="compiledJspClasses"/>
     <delete dir="compiledJspSrc"/>
     <delete dir="${dist}"/>
-    <mkdir dir="${dist}" />
+    <delete dir="WebRoot/gwt-unitCache"/>
     <delete dir="WebRoot/WEB-INF/classes"/>
     <mkdir dir="WebRoot/WEB-INF/classes"/>
     <delete dir="WebRoot/WEB-INF/deploy"/>
     <mkdir dir="WebRoot/WEB-INF/deploy"/>
     <delete dir="WebRoot/codereview"/>
     <mkdir dir="WebRoot/codereview"/>
+    <delete file="bugs.xml"/>
+    <delete file="WebRoot/resources/buildserver.zip"/>
+    <delete file="WebRoot/WEB-INF/lib/gwt-servlet.jar"/>
     <delete file="WebRoot/WEB-INF/lib/modelClasses.jar"/>
+    <echo message="Clean"/>
   </target>
 
   <target name="clean.production.dir">
