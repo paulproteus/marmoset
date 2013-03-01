@@ -31,6 +31,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,12 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 			  request.setAttribute("requestsForHelp", requestsForHelp.keySet());
 			  request.setAttribute("requestsForHelpTimestamp", requestsForHelp);
 		     }
-			Collection<CodeReviewer> myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
+			Collection<CodeReviewer> myReviews;
+			if (submission != null)
+			  myReviews = Collections.singleton(CodeReviewer.lookupBySubmissionAndStudentPK(submission.getSubmissionPK(), 
+			      userSession.getStudentPK(), conn));
+			      else
+			        myReviews = CodeReviewer.lookupByStudentPK(userSession.getStudentPK(), conn);
 			
 			Collection<CodeReviewSummary> reviewsOfMyCode = new TreeSet<CodeReviewSummary>();
 			Collection<CodeReviewSummary> myAssignments = new TreeSet<CodeReviewSummary>();

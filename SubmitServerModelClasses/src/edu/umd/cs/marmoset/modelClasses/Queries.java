@@ -435,7 +435,7 @@ public final class Queries {
 	 *
 	 * @param conn
 	 * @param submission
-	 * @param project
+	 * @param info.project
 	 * @param course
 	 * @param studentRegistration
 	 * @param testSetup

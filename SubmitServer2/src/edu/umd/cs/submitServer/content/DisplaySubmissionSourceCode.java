@@ -225,7 +225,7 @@ public class DisplaySubmissionSourceCode {
      *
      * @param conn
      *            the database connection
-     * @param submission
+     * @param info.submission
      *            the Submission
      * @param project TODO
      * @param codeCoverageResults

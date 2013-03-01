@@ -76,33 +76,14 @@
 				pattern="dd MMM, hh:mm a" />
 	</div>
 
-	<c:if test="${codeReviewAssignment.byStudents}">
-		<h2>Options</h2>
-		<ul>
-			<c:choose>
-				<c:when test="${codeReviewAssignment.anonymous}">
-					<li>Student identities are anonymous</li>
-				</c:when>
-				<c:otherwise>
-					<li>Student identities are shown</li>
-				</c:otherwise>
-			</c:choose>
-			<c:choose>
-				<c:when test="${codeReviewAssignment.otherReviewsVisible}">
-					<li>Reviewers can see comments from other reviewers</li>
-				</c:when>
-				<c:otherwise>
-					<li>Comments from other reviewers are hidden</li>
-				</c:otherwise>
-			</c:choose>
-		</ul>
-	</c:if>
 
-	<h2>Actions</h2>
-	<ul>
+
+
+
 		<c:choose>
 			<c:when test="${codeReviewAssignment.prototype}">
-				<li>Prototype code review
+				<h2>Prototype code review</h2>
+				<ul>
 				
 				<c:url var="editAssignment"
 						value="/view/instructor/createCodeReviewAssignment.jsp">
@@ -124,21 +105,27 @@
 							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
 							type="submit" value="Delete code review">
 					</form></li>
+					</ul>
 			</c:when>
 			
 			<c:when test="${canRevertCodeReview}">
+			<h2>Code review activated, no reviews started</h2>
+			<ul>
 				<c:url var="unassignReviews"
 					value="/action/instructor/UnassignCodeReview" />
 
-				<li>Code review activated, no reviews started.
 				<li><form method="POST" action="${unassignReviews}">
 						<input type="hidden" name="codeReviewAssignmentPK"
 							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
 							type="submit" value="Revert to prototype review" />
 					</form></li>
+					</ul>
 			</c:when>
 			<c:otherwise>
-			<li>Code review started
+			<h2>Code review started</h2>
+			<ul>
+			
+				<c:if test="${! empty rubrics }">
 				<c:url var="PrintRubricEvaluationsForDatabase"
 					value="/data/instructor/PrintRubricEvaluationsForDatabase">
 					<c:param name="codeReviewAssignmentPK"
@@ -150,17 +137,12 @@
 						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
 				</c:url>
 
-				<c:url var="assignReviews"
-					value="/view/instructor/assignCodeReviews.jsp">
-					<c:param name="codeReviewAssignmentPK"
-						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-					<c:param name="projectPK" value="${codeReviewAssignment.projectPK}" />
-					<c:param name="coursePK" value="${course.coursePK}" />
-				</c:url>
+				
 				<li><a href="${PrintRubricsForDatabase}">List rubrics in
 						CSV format for upload to grades server</a>
 				<li><a href="${PrintRubricEvaluationsForDatabase}">List
 						rubric evaluations in CSV format for upload to grades server</a></li>
+						</c:if>
 				<li><c:url var="removeCodeReviewers"
 						value="/action/instructor/RemoveCodeReviewers" />
 					<form action="${reviewCodeReviewers}" method="post"
@@ -170,10 +152,31 @@
 							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
 							type="submit" value="Remove reviewers with no comments">
 					</form></li>
+					</ul>
 			</c:otherwise>
 		</c:choose>
-	</ul>
 
+	<c:if test="${codeReviewAssignment.byStudents}">
+		<h2>Options</h2>
+		<ul>
+			<c:choose>
+				<c:when test="${codeReviewAssignment.anonymous}">
+					<li>Student identities are anonymous</li>
+				</c:when>
+				<c:otherwise>
+					<li>Student identities are shown</li>
+				</c:otherwise>
+			</c:choose>
+			<c:choose>
+				<c:when test="${codeReviewAssignment.otherReviewsVisible}">
+					<li>Reviewers can see comments from other reviewers</li>
+				</c:when>
+				<c:otherwise>
+					<li>Comments from other reviewers are hidden</li>
+				</c:otherwise>
+			</c:choose>
+		</ul>
+	</c:if>
 
 	<c:if test="${! empty rubrics }">
 		<h2>Rubrics</h2>
@@ -219,11 +222,13 @@
 	<c:set var="evaluations" value="" />
 	<table>
 		<tr>
-			<th>Code Author <c:if test="${not empty sections}">
+			<th>Code Author <th>Response<br>needed
+			<c:if test="${not empty sections}">
 					<th>Section</th>
 				</c:if>
 			<th>Reviewer <c:if test="${!canRevertCodeReview}">
-					<th colspan="${cols}">reviews</th>
+					<th colspan="${cols}">comments</th>
+					<th >response<br>needed</th>
 				</c:if>
 		</tr>
 		<c:forEach var="submission" items="${submissionsUnderReview}"
@@ -253,6 +258,8 @@
 				value="${reviewersForSubmission[submission.submissionPK]}" />
 			<c:set var="author"
 				value="${authorForSubmission[submission.submissionPK]}" />
+				<c:set var="authorSummary" value="${codeReviewSummary[author]}"/>
+						
 			<c:set var="status" value="${codeReviewStatus[submission]}" />
 
 			<c:choose>
@@ -266,7 +273,9 @@
 						<br>
 						<a href="${submissionLink}" title="test results"><c:out
 									value="${submission.testSummary}" /></a>
-									</c:if>
+									</c:if></td>
+									
+									<td rowspan="${fn:length(reviewers)}"><c:if test="${authorSummary.needsResponse}">yes</c:if>
 									</td>
 									
 									
@@ -283,7 +292,7 @@
 							</c:if>
 							<td><c:out value="${codeReviewer.nameForInstructor}" /></td>
 							<c:if test="${!canRevertCodeReview && counter2.index == 0}">
-							<td colspan="${cols}" rowspan="${fn:length(reviewers)}"/>
+							<td colspan="${cols+1}" rowspan="${fn:length(reviewers)}"/>
 							</c:if>
 						</c:forEach>
 				</c:when>
@@ -291,35 +300,25 @@
 
 				<c:otherwise>
 					<tr class="r${counter.index % 2}">
-						<td rowspan="${1 + fn:length(reviewers)}"><a
+						<td rowspan="${fn:length(reviewers)}"><a
 							href="${viewCodeReview}" target="codeReview" title="code review">
 								<c:out value="${studentRegistration.fullname}" />
 						</a> <br>
 						<a href="${submissionLink}" title="test results"><c:out
 									value="${submission.testSummary}" /></a></td>
+									<td rowspan="${fn:length(reviewers)}"><c:if test="${authorSummary.needsResponse}">yes</c:if>
+									
 						<c:if test="${not empty sections}">
-							<td rowspan="${1+fn:length(reviewers)}"><c:out
+							<td rowspan="${fn:length(reviewers)}"><c:out
 									value="${studentRegistration.section}" /></td>
 						</c:if>
-						<c:choose>
-							<c:when test="${author.numComments > 0}">
-								<td>author
-								<td><c:out value="${author.numComments}" /></td>
-								<td><fmt:formatDate value="${author.lastUpdate}"
-										pattern="dd MMM, hh:mm a" /></td>
-								<c:if test="${! empty rubrics}">
-									<td></td>
-								</c:if>
-							</c:when>
-							<c:otherwise>
-								<td>author
-								<td colspan="${cols}" class="description">no response</td>
-							</c:otherwise>
-						</c:choose>
-					</tr>
-					<c:forEach var="codeReviewer" items="${reviewers}">
+						
+					<c:forEach var="codeReviewer" items="${reviewers}" varStatus="counter2">
 
+						<c:set var="summary" value="${codeReviewSummary[codeReviewer]}"/>
+						<c:if test="${counter2.index > 0}">
 						<tr class="r${counter.index % 2}">
+						</c:if>
 							<td><c:out value="${codeReviewer.nameForInstructor}" /></td>
 							<c:if test="${! empty rubrics}">
 								<c:set var="evaluations"
@@ -334,7 +333,7 @@
 									<td><c:out value="${codeReviewer.numComments}" /></td>
 									<td><fmt:formatDate value="${codeReviewer.lastUpdate}"
 											pattern="dd MMM, hh:mm a" /></td>
-
+									
 									<c:if test="${! empty rubrics}">
 										<td class="description"><c:forEach var="e"
 												items="${evaluations}">
@@ -347,12 +346,14 @@
 												</c:if>
 											</c:forEach></td>
 									</c:if>
+									<td><c:if test="${summary.needsResponse}">yes</c:if>
+
+									
 								</c:when>
 								<c:otherwise>
-									<td colspan="${cols}" />
+									<td colspan="${cols+1}" />
 								</c:otherwise>
 							</c:choose>
-						</tr>
 					</c:forEach>
 				</c:otherwise>
 			</c:choose>
@@ -378,6 +379,7 @@
 			<th>Author
 			<th>Comments
 			<th>Last update</th>
+			<th>Response<br>needed
 		</tr>
 		<c:forEach var="entry" items="${reviewsByStudent}" varStatus="counter">
 			<c:set var="student" value="${entry.key}" />
@@ -391,6 +393,8 @@
 					<c:set var="author"
 						value="${authorForSubmission[submission.submissionPK]}" />
 					<c:set var="status" value="${codeReviewStatus[submission]}" />
+					<c:set var="summary" value="${codeReviewSummary[review]}"/>
+						
 					<c:url var="viewCodeReview" value="/view/codeReview/index.jsp">
 						<c:param name="submissionPK" value="${submission.submissionPK}" />
 					</c:url>
@@ -406,10 +410,10 @@
 								<td><c:out value="${review.numComments}" /></td>
 								<td><fmt:formatDate value="${review.lastUpdate}"
 										pattern="dd MMM, hh:mm a" /></td>
-
+								<td><c:if test="${summary.needsResponse}">yes</c:if>
 							</c:when>
 							<c:otherwise>
-								<td colspan="2" />
+								<td colspan="3" />
 							</c:otherwise>
 						</c:choose>
 

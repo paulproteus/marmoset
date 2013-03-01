@@ -29,11 +29,145 @@ import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 /** Provide a summary of a code review */
 public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
+	public static class Info {
+		@Nonnull
+		public final Submission submission;
+		@Nonnull
+		public final Project project;
+		@CheckForNull
+		public final CodeReviewer author;
+		@CheckForNull
+		public final CodeReviewAssignment assignment;
+		/** map from rubricPK to Rubric */
+		public final Map<Integer, Rubric> rubrics = new HashMap<Integer, Rubric>();
+		public final Collection<RubricEvaluation> allRubricEvaluations;
+		public final Collection<CodeReviewComment> allComments;
+		public final Collection<CodeReviewThread> allThreads;
+		public final boolean isRequestForHelp;
+		/**
+		 * Map from codeReviewerPK to CodeReviewer
+		 */
+		public final Map<Integer, CodeReviewer> reviewers = new HashMap<Integer, CodeReviewer>();
+
+		public Info(Connection conn, Submission submission, @CheckForNull CodeReviewAssignment assignment) throws SQLException {
+			if (submission == null)
+				throw new NullPointerException("No submission");
+			if (assignment != null && assignment.getProjectPK() != submission.getProjectPK())
+				throw new IllegalArgumentException();
+			this.submission = submission;
+			this.project = Project.getByProjectPK(submission.getProjectPK(), conn);
+			this.author = CodeReviewer.lookupAuthorBySubmission(
+					submission.getSubmissionPK(), conn);
+
+			this.assignment = assignment;
+			this.isRequestForHelp = submission.isHelpRequested(conn);
+			
+			if (!hasFindbugsReviewer(conn)) {
+				createFindbugsThreads(conn, submission);
+			}
+			
+			for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
+				this.reviewers.put(r.getCodeReviewerPK(), r);
+			}
+		    this.allThreads = CodeReviewThread.lookupBySubmissionPK(submission.getSubmissionPK(), conn);
+		    this.allComments = CodeReviewComment.lookupBySubmissionPK(submission.getSubmissionPK(), conn);
+		    this.allRubricEvaluations = RubricEvaluation.lookupBySubmissionPK(submission.getSubmissionPK(), conn);
+		    if (this.assignment != null)  {
+				for(Rubric r : Rubric.lookupByAssignment(this.assignment.getCodeReviewAssignmentPK(), conn)) 
+				    this.rubrics.put(r.getRubricPK(), r);
+			}
+		    for(RubricEvaluation eval : this.allRubricEvaluations) 
+		    		if (!this.rubrics.containsKey(eval.getRubricPK())) {
+		    			Rubric r = Rubric.lookupByPK(eval.getRubricPK(), conn);
+		    			this.rubrics.put(r.getRubricPK(), r);
+		    }
+
+
+		}
+	    private boolean hasFindbugsReviewer(Connection conn) throws SQLException {
+	        PreparedStatement st = conn.prepareStatement("SELECT * FROM code_reviewer " + "WHERE is_automated = 1 AND known_as = ? "
+	                + "AND submission_pk = ?");
+	        try {
+	            Queries.setStatement(st, "FindBugs", this.submission.getSubmissionPK());
+	            ResultSet rs = st.executeQuery();
+	            return rs.next();
+	        } finally {
+	            st.close();
+	        }
+	    }
+
+	    /** 
+		 * Create threads for all the FindBugs warnings for the submission.
+		 * 
+		 */
+		private void createFindbugsThreads( Connection conn, Submission submission) {
+		    
+	        Integer testRunPK = submission.getCurrentTestRunPK();
+	        if (testRunPK == null)
+	            return;
+	        PreparedStatement findbugsOutcomes = null;
+	        try {
+	             findbugsOutcomes
+	            = conn.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
+	                    + "WHERE test_run_pk = ? AND test_type = ?");
+	          
+	            Queries.setStatement(findbugsOutcomes, testRunPK, FINDBUGS_TEST_TYPE);
+	            ResultSet rs = findbugsOutcomes.executeQuery();
+	            if (!rs.next())
+	                return;
+	            CodeReviewer findbugsReviewer = createFindbugsReviewer(conn);
+	            byte [] submissionBytes = submission.downloadArchive(conn);
+	            SortedSet<String> filenames 
+	              = TextUtilities.scanTextFileNamesInZip(submissionBytes);
+	            TestRun run = TestRun.lookupByTestRunPK(testRunPK, conn);
+	            Timestamp now = run.getTestTimestamp();
+	            int count = 0;
+	            do {
+	                String location = rs.getString("short_test_result");
+	                Preconditions.checkState(!Strings.isNullOrEmpty(location), "Invalid findbugs location");
+	                System.out.println(location);
+	                Matcher m = TestOutcome.FINDBUGS_LOCATION_REGEX.matcher(location);
+	                if (!m.matches()) {
+	                    System.out.println("skipping " + location);
+	                    continue;
+	                }
+	                String file = m.group(1);
+	                String fullpath = getFullPath(filenames, file);
+	                if (fullpath == null)
+	                    continue;
+	                // lines are 0-indexed in thread objects.
+	                int line = m.groupCount() == 1 ? 0 : Integer.parseInt(m.group(2)) - 1;
+	                CodeReviewThread thread = new CodeReviewThread(conn, submission.getSubmissionPK(), fullpath, line, now,
+	                        findbugsReviewer.getCodeReviewerPK());
+
+	                String commentText = rs.getString("long_test_result");
+	                CodeReviewComment c = new CodeReviewComment(thread, findbugsReviewer, commentText, now, false, conn);
+	                count++;
+	                System.out.println("Added comment " + c.getCodeReviewCommentPK());
+	            } while (rs.next());
+	            findbugsReviewer.addComments(conn, count, now);
+	        } catch (Exception e) {
+	            assert true;
+	        } finally {
+	            Queries.closeStatement(findbugsOutcomes);
+	        }
+
+	    }
+		
+	    private CodeReviewer createFindbugsReviewer(Connection conn) throws SQLException {
+	        CodeReviewer.Builder builder = new CodeReviewer.Builder(conn, this.submission.getSubmissionPK());
+	        builder.setAutomated("FindBugs");
+	        return builder.build();
+	    }
+		
+	    
+	}
 	private static final String FINDBUGS_TEST_TYPE = "findbugs";
 
   public enum Status { NOT_STARTED, DRAFT, PUBLISHED, INTERACTIVE };
 
-  /* Per viewer information */
+	final @Nonnull Info info;
+	/* Per viewer information */
 	final @Nonnull
 	Student viewerAsStudent;
 	final @Nonnull
@@ -41,23 +175,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	boolean anyUnpublishedDraftsByViewer;
 	boolean anyPublishedDraftsByViewer;
 	Map<Integer, Rubric> rubricsUnevaluatedByViewer = new HashMap<Integer, Rubric>();
-
-	 /* Per submission information */
-	final @Nonnull
-	Submission submission;
-	final @Nonnull
-	Project project;
-	final @CheckForNull
-	CodeReviewer author;
-	final @CheckForNull
-	CodeReviewAssignment assignment;
-	/** assignment is null if this is an ad-hoc review */
-
-	/**
-	 * Map from codeReviewerPK to CodeReviewer
-	 */
-	final Map<Integer, CodeReviewer> reviewers = new HashMap<Integer, CodeReviewer>();
-
+	
 	/**
 	 * Map from threadPK to CodeReviewThread
 	 */
@@ -67,53 +185,55 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	 */
 	final Map<Integer, NavigableSet<CodeReviewComment>> comments = new HashMap<Integer, NavigableSet<CodeReviewComment>>();
 
-	final Set<CodeReviewComment> allComments = new TreeSet<CodeReviewComment>();
-	final boolean isRequestForHelp;
+	final Set<CodeReviewComment> allVisibleComments = new TreeSet<CodeReviewComment>();
 
-	/** map from rubricPK to Rubric */
-	Map<Integer, Rubric> rubrics = new HashMap<Integer, Rubric>();
 	/** Map from threadPK to RubricEvaluation */
 	Map<Integer, RubricEvaluation> rubricEvaluations = new HashMap<Integer, RubricEvaluation>();
-	
+		
 	public CodeReviewSummary(Connection conn, CodeReviewer reviewer) throws SQLException {
 		this(conn, reviewer.getSubmission(), reviewer.getStudent(), reviewer);
 	}
 	private CodeReviewSummary(Connection conn, Submission submission, Student student, CodeReviewer reviewer) throws SQLException {
+		this(new Info(conn, submission, reviewer.getCodeReviewAssignment()), student, reviewer);
+	}
+	public CodeReviewSummary(Info info,   CodeReviewer reviewer) throws SQLException {
+		 this(info, reviewer.getStudent(), reviewer);
+	}
+	public CodeReviewSummary(Info info,  Student student, CodeReviewer reviewer) throws SQLException {
+        if (reviewer == null)
+      	  throw new NullPointerException("No code reviewer");
 	    if (student == null)
             throw new NullPointerException("No student " + reviewer.getStudentPK() 
                     + " for code reviewer " + reviewer.getCodeReviewerPK());
-        if (submission == null)
-            throw new NullPointerException("No submission " + reviewer.getSubmissionPK() 
-                    + " for code reviewer " + reviewer.getCodeReviewerPK());
-        
-        this.submission = submission;
-		this.viewerAsStudent = student;
+
+		if (reviewer.getStudentPK() != student.getStudentPK())
+			throw new IllegalArgumentException("PK for student of "
+					+ student.getStudentPK()
+					+ " doesn't match PK for reviewer of "
+					+ reviewer.getStudentPK());
+
+		if (reviewer.getSubmissionPK() != info.submission.getSubmissionPK())
+			throw new IllegalArgumentException();
+		if (info.assignment != null
+				&& info.assignment.getCodeReviewAssignmentPK() != reviewer
+						.getCodeReviewAssignmentPK())
+			throw new IllegalArgumentException();
+	 	   
+        this.info = info;
+        this.viewerAsStudent = student;
 		this.viewerAsReviewer = reviewer;
-		this.project = Project.getByProjectPK(submission.getProjectPK(), conn);
-
-		if (project == null)
-		    throw new NullPointerException("No project " + submission.getProjectPK() 
-                    + " for submission" + submission.getProjectPK());
 		
-		this.author = CodeReviewer.lookupAuthorBySubmission(
-				submission.getSubmissionPK(), conn);
-
-		this.assignment = reviewer.getCodeReviewAssignment();
-		this.isRequestForHelp = submission.isHelpRequested(conn);
+		if (info.project == null)
+		    throw new NullPointerException("No project " + info.submission.getProjectPK() 
+                    + " for submission" + info.submission.getProjectPK());
 		
-		if (!hasFindbugsReviewer(conn)) {
-			createFindbugsThreads(conn, submission);
-		}
 		
-		for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
-			reviewers.put(r.getCodeReviewerPK(), r);
-		}
-	    for(CodeReviewThread t : CodeReviewThread.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) 
+		for(CodeReviewThread t : info.allThreads) 
 	        if (isVisible(t)) {
 	          threads.put(t.getCodeReviewThreadPK(), t);
 	      }
 
-		for(CodeReviewComment c : CodeReviewComment.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
+		for(CodeReviewComment c : info.allComments) {
 			int threadPK = c.getCodeReviewThreadPK();
 			if (!threads.containsKey(threadPK) || !isVisible(c))
 				continue;
@@ -123,7 +243,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				comments.put(threadPK, cs);
 			}
 			cs.add(c);
-			allComments.add(c);
+			allVisibleComments.add(c);
 			if (isAuthor(c)) {
 			if (c.isDraft())
 				anyUnpublishedDraftsByViewer = true;
@@ -131,16 +251,16 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			    anyPublishedDraftsByViewer = true;
 			}
 		}
+		
 		Set<Integer> threadsWithContent = new HashSet<Integer>(comments.keySet());
-
-		if (assignment != null) 
-			for(Rubric r : Rubric.lookupByAssignment(assignment.getCodeReviewAssignmentPK(), conn)) 
-			    rubrics.put(r.getRubricPK(), r);
 			        
-		if (!isReviewerIsTheAuthor())
-	      rubricsUnevaluatedByViewer.putAll(rubrics);
+		if (!isReviewerIsTheAuthor() && info.assignment != null) {
+			for(Rubric r : info.rubrics.values())
+				if (r.getCodeReviewAssignmentPK() == info.assignment.getCodeReviewAssignmentPK())
+					rubricsUnevaluatedByViewer.put(r.getRubricPK(), r);
+		}
 	
-        for (RubricEvaluation e : RubricEvaluation.lookupBySubmissionPK(submission.getSubmissionPK(), conn))
+        for (RubricEvaluation e : info.allRubricEvaluations)
             if (isVisible(e)) {
                 int threadPK = e.getCodeReviewThreadPK();
                 assert threads.containsKey(threadPK);
@@ -150,12 +270,6 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
                     comments.put(threadPK, cs);
                 }
                 rubricEvaluations.put(threadPK, e);
-                @Rubric.PK int rubricPK = e.getRubricPK();
-                if (!rubrics.containsKey(rubricPK)) {
-                    Rubric r = Rubric.lookupByPK(rubricPK, conn);
-                    rubrics.put(rubricPK, r);
-                    
-                }
 
                 if (e.getCodeReviewerPK() == reviewer.getCodeReviewerPK()) {
                     if (e.getStatus().equals("LIVE"))
@@ -173,39 +287,39 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public boolean isReviewerIsTheAuthor() {
-	    return author != null && author.equals(viewerAsReviewer);
+	    return info.author != null && info.author.equals(viewerAsReviewer);
 	}
 	private boolean isDebug() {
 		return false;
 	}
 
 	public Project getProject() {
-		return project;
+		return info.project;
 	}
 
 	public Student getViewer() {
 		return viewerAsStudent;
 	}
 	public CodeReviewer getAuthor() {
-		return author;
+		return info.author;
 	}
 
 	public Submission getSubmission() {
-		return submission;
+		return info.submission;
 	}
 
 	public @Submission.PK int getSubmissionPK() {
-		return submission.getSubmissionPK();
+		return info.submission.getSubmissionPK();
 	}
 
 	public String getDescription() {
-		if (assignment == null)
+		if (info.assignment == null)
 			return "ad-hoc";
-		return assignment.getDescription();
+		return info.assignment.getDescription();
 	}
 
 	public CodeReviewAssignment getAssignment() {
-		return assignment;
+		return info.assignment;
 	}
 
 	public CodeReviewer getCodeReviewer() {
@@ -232,7 +346,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	          reviewers.size() > 1;
 	}
 	public boolean isRequestForHelp() {
-	    return isRequestForHelp;
+	    return info.isRequestForHelp;
 	}
 	public boolean isTimely() {
 	    if (viewerAsStudent == null)
@@ -242,8 +356,8 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		if (getAnyUnpublishedDraftsByViewer())
 			return true;
 		Date now = new Date();
-		if (assignment != null && (author == null || viewerAsStudent.getStudentPK() != author.getStudentPK())) {
-			if (assignment.getDeadline().after(now))
+		if (info.assignment != null && (info.author == null || viewerAsStudent.getStudentPK() != info.author.getStudentPK())) {
+			if (info.assignment.getDeadline().after(now))
 				return true;
 			if (getNumCommentsByViewer() == 0)
 				return true;
@@ -252,7 +366,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public Map<Integer,CodeReviewer> getCodeReviewerMap() {
-		return Collections.unmodifiableMap(reviewers);
+		return Collections.unmodifiableMap(info.reviewers);
 	}
 	
 
@@ -303,16 +417,16 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	
 	public Status getStatus() {
 	    
-		if (allComments.isEmpty() && rubricEvaluations.isEmpty())
+		if (allVisibleComments.isEmpty() && rubricEvaluations.isEmpty())
 	        return Status.NOT_STARTED;
 	
 	    boolean published = false;
 	    boolean byAuthor = false;
 	    boolean byReviewer = false;
 	    
-	   for(CodeReviewComment c : allComments) {
+	   for(CodeReviewComment c : allVisibleComments) {
 	        if (!c.isDraft()) published = true;
-	        if (author != null && c.getCodeReviewerPK() == author.getCodeReviewerPK())
+	        if (info.author != null && c.getCodeReviewerPK() == info.author.getCodeReviewerPK())
 	            byAuthor = true;
 	        else
 	            byReviewer = true;
@@ -331,7 +445,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	private CodeReviewer getAuthor(CodeReviewComment c) {
-		return reviewers.get(c.getCodeReviewerPK());
+		return info.reviewers.get(c.getCodeReviewerPK());
 	}
 
 	public @CheckForNull CodeReviewComment lastNonDraftComment(NavigableSet<CodeReviewComment> comments) {
@@ -343,10 +457,10 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 	
 	public boolean isTimely(CodeReviewComment c) {
-		if (assignment == null) 
+		if (info.assignment == null) 
 			return true;
-		Timestamp deadline = assignment.getDeadline();
-		if (c.isBy(author))
+		Timestamp deadline = info.assignment.getDeadline();
+		if (c.isBy(info.author))
 			deadline = new Timestamp(deadline.getTime() + TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS));
 			
 		return c.getModified().compareTo(deadline) < 0;
@@ -373,12 +487,12 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		// viewer is code reviewer. Needs to respond if comment is from
 		// author and thread was either started by reviewer or by
 		// author and review is instructor
-		if (last.isBy(author)) {
+		if (last.isBy(info.author)) {
 			@CodeReviewer.PK
 			int startedBy = t.getCreatedBy();
 			if (startedBy == viewerAsReviewer.getCodeReviewerPK())
 				return true;
-			if (startedBy == author.getCodeReviewerPK()
+			if (startedBy == info.author.getCodeReviewerPK()
 					&& viewerAsReviewer.isInstructor())
 				return true;
 		}
@@ -388,7 +502,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
      * @return
      */
     public boolean viewerIsAuthor() {
-        return author != null && viewerAsReviewer.getCodeReviewerPK() == author.getCodeReviewerPK();
+        return info.author != null && viewerAsReviewer.getCodeReviewerPK() == info.author.getCodeReviewerPK();
     }
 
 	public boolean isNeedsResponse() {
@@ -426,7 +540,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
 	public int getNumComments() {
 		int count = 0;
-		for(CodeReviewComment c : allComments)
+		for(CodeReviewComment c : allVisibleComments)
 			if (!c.isJustAck() && !c.isDraft())
 				count++;
 		for(RubricEvaluation e : rubricEvaluations.values()) {
@@ -437,7 +551,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 	public int getNumCommentsByViewer() {
 		int count = 0;
-		for(CodeReviewComment c : allComments)
+		for(CodeReviewComment c : allVisibleComments)
 			if (byViewer(c) && !c.isJustAck() && !c.isDraft())
                 count++;
         for (RubricEvaluation e : rubricEvaluations.values())
@@ -447,7 +561,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 	public int getNumCommentsByOthers() {
 		int count = 0;
-		for(CodeReviewComment c : allComments)
+		for(CodeReviewComment c : allVisibleComments)
 			if (!byViewer(c) && !c.isJustAck() && !c.isDraft())
 				count++;
         for (RubricEvaluation e : rubricEvaluations.values())
@@ -490,10 +604,10 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
     }
 
     private boolean matchingAssignment(@CodeReviewer.PK int codeReviewerPK) {
-        if (assignment == null)
+        if (info.assignment == null)
             return true;
-        CodeReviewer commentAuthor = reviewers.get(codeReviewerPK);
-        return commentAuthor.getCodeReviewAssignmentPK() == assignment.getCodeReviewAssignmentPK();
+        CodeReviewer commentAuthor = info.reviewers.get(codeReviewerPK);
+        return commentAuthor.getCodeReviewAssignmentPK() == info.assignment.getCodeReviewAssignmentPK();
     }
     
  
@@ -503,9 +617,9 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
             return true;
         if (viewerAsReviewer.isOmniscient())
                  return true;
-        if (author != null &&  author.getStudentPK() == viewerAsStudent.getStudentPK())
+        if (info.author != null &&  info.author.getStudentPK() == viewerAsStudent.getStudentPK())
                 return true;
-        if (assignment != null && assignment.isOtherReviewsVisible() && matchingAssignment(codeReviewerPK))
+        if (info.assignment != null && info.assignment.isOtherReviewsVisible() && matchingAssignment(codeReviewerPK))
              return true;
         return false;
 
@@ -528,7 +642,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	}
 
 	public Collection<CodeReviewer> getReviewers() {
-		return reviewers.values();
+		return info.reviewers.values();
 	}
 
 	private long getTimestamp() {
@@ -607,28 +721,11 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return rubricEvaluations.get(t.getCodeReviewThreadPK());
 	}
 	public Rubric getRubric(@Rubric.PK int rubricPK) {
-		return rubrics.get(rubricPK);
+		return info.rubrics.get(rubricPK);
 	}
 
 
-    private boolean hasFindbugsReviewer(Connection conn) throws SQLException {
-        PreparedStatement st = conn.prepareStatement("SELECT * FROM code_reviewer " + "WHERE is_automated = 1 AND known_as = ? "
-                + "AND submission_pk = ?");
-        try {
-            Queries.setStatement(st, "FindBugs", submission.getSubmissionPK());
-            ResultSet rs = st.executeQuery();
-            return rs.next();
-        } finally {
-            st.close();
-        }
-    }
 
-    private CodeReviewer createFindbugsReviewer(Connection conn) throws SQLException {
-        CodeReviewer.Builder builder = new CodeReviewer.Builder(conn, submission.getSubmissionPK());
-        builder.setAutomated("FindBugs");
-        return builder.build();
-    }
-	
     public static @CheckForNull String getFullPath(Collection<String> fullPaths, String name) {
         String result = null;
         for(String s : fullPaths) {
@@ -639,67 +736,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
         }
         return result;
     }
-	/** 
-	 * Create threads for all the FindBugs warnings for the submission.
-	 * 
-	 * @param conn
-	 * @param submission TODO
-	 * @return
-	 * @throws SQLException
-	 */
-	private void createFindbugsThreads( Connection conn, Submission submission) {
-	    
-        Integer testRunPK = submission.getCurrentTestRunPK();
-        if (testRunPK == null)
-            return;
-        PreparedStatement findbugsOutcomes = null;
-        try {
-             findbugsOutcomes
-            = conn.prepareStatement("SELECT test_outcomes.* FROM test_outcomes "
-                    + "WHERE test_run_pk = ? AND test_type = ?");
-          
-            Queries.setStatement(findbugsOutcomes, testRunPK, FINDBUGS_TEST_TYPE);
-            ResultSet rs = findbugsOutcomes.executeQuery();
-            if (!rs.next())
-                return;
-            CodeReviewer findbugsReviewer = createFindbugsReviewer(conn);
-            byte [] submissionBytes = submission.downloadArchive(conn);
-            SortedSet<String> filenames 
-              = TextUtilities.scanTextFileNamesInZip(submissionBytes);
-            TestRun run = TestRun.lookupByTestRunPK(testRunPK, conn);
-            Timestamp now = run.getTestTimestamp();
-            int count = 0;
-            do {
-                String location = rs.getString("short_test_result");
-                Preconditions.checkState(!Strings.isNullOrEmpty(location), "Invalid findbugs location");
-                System.out.println(location);
-                Matcher m = TestOutcome.FINDBUGS_LOCATION_REGEX.matcher(location);
-                if (!m.matches()) {
-                    System.out.println("skipping " + location);
-                    continue;
-                }
-                String file = m.group(1);
-                String fullpath = getFullPath(filenames, file);
-                if (fullpath == null)
-                    continue;
-                // lines are 0-indexed in thread objects.
-                int line = m.groupCount() == 1 ? 0 : Integer.parseInt(m.group(2)) - 1;
-                CodeReviewThread thread = new CodeReviewThread(conn, submission.getSubmissionPK(), fullpath, line, now,
-                        findbugsReviewer.getCodeReviewerPK());
-
-                String commentText = rs.getString("long_test_result");
-                CodeReviewComment c = new CodeReviewComment(thread, findbugsReviewer, commentText, now, false, conn);
-                count++;
-                System.out.println("Added comment " + c.getCodeReviewCommentPK());
-            } while (rs.next());
-            findbugsReviewer.addComments(conn, count, now);
-        } catch (Exception e) {
-            assert true;
-        } finally {
-            Queries.closeStatement(findbugsOutcomes);
-        }
-
-    }
+	
 	
 	@Override
 	public int compareTo(CodeReviewSummary that) {
