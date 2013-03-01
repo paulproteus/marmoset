@@ -290,7 +290,7 @@
     <delete dir="compiledJspClasses"/>
     <delete dir="compiledJspSrc"/>
     <delete dir="${dist}"/>
-    <delete dir="WebRoot/gwt-unitCache"/>
+    <delete dir="gwt-unitCache"/>
     <delete dir="WebRoot/WEB-INF/classes"/>
     <mkdir dir="WebRoot/WEB-INF/classes"/>
     <delete dir="WebRoot/WEB-INF/deploy"/>
