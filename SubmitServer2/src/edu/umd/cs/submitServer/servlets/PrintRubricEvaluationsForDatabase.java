@@ -37,6 +37,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
@@ -44,11 +46,14 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 
 public class PrintRubricEvaluationsForDatabase extends SubmitServerServlet {
 
+   
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Connection conn = null;
         response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
+        CSVWriter writer = new CSVWriter(out);
         Collection<Submission> submissionsUnderReview = (Collection<Submission>) request.getAttribute("submissionsUnderReview");
         Map<Integer, StudentRegistration> studentRegistrationMap = (Map<Integer, StudentRegistration>) request
                 .getAttribute("studentRegistrationMap");
@@ -62,11 +67,12 @@ public class PrintRubricEvaluationsForDatabase extends SubmitServerServlet {
                 for (RubricEvaluation e : RubricEvaluation.lookupBySubmissionPK(s.getSubmissionPK(), conn)) {
                     Rubric r = rubricMap.get(e.getRubricPK());
                     if (r != null)
-                      out.printf("%s,%s,%s,%s%n", acct, r.getName(), e.getPoints(), e.getValueAndExplanation(r));
+                      
+                      write(writer, acct, r.getName(), e.getPoints(), e.getValueAndExplanation(r));
                 }
             }
-            out.flush();
-            out.close();
+            writer.flush();
+            writer.close();
         } catch (SQLException e) {
             handleSQLException(e);
             throw new ServletException(e);

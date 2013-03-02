@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import sun.nio.cs.ext.ISCII91;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -166,14 +168,14 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 
   public enum Status { NOT_STARTED, DRAFT, PUBLISHED, INTERACTIVE };
 
-	final @Nonnull Info info;
+	 final @Nonnull Info info;
 	/* Per viewer information */
 	final @Nonnull
 	Student viewerAsStudent;
 	final @Nonnull
 	CodeReviewer viewerAsReviewer;
 	boolean anyUnpublishedDraftsByViewer;
-	boolean anyPublishedDraftsByViewer;
+	boolean anyPublishedCommentsByViewer;
 	Map<Integer, Rubric> rubricsUnevaluatedByViewer = new HashMap<Integer, Rubric>();
 	
 	/**
@@ -248,7 +250,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			if (c.isDraft())
 				anyUnpublishedDraftsByViewer = true;
 			else
-			    anyPublishedDraftsByViewer = true;
+			    anyPublishedCommentsByViewer = true;
 			}
 		}
 		
@@ -286,6 +288,9 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		}  
 	}
 
+	public Info getInfo() {
+		return info;
+	}
 	public boolean isReviewerIsTheAuthor() {
 	    return info.author != null && info.author.equals(viewerAsReviewer);
 	}
@@ -341,13 +346,17 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
     }
 	public boolean isActive() {
 	    Set<Integer> reviewers = getCodeReviewerMap().keySet();
-	    return isReviewerIsTheAuthor() && anyPublishedDraftsByViewer
+	    return isReviewerIsTheAuthor() && anyPublishedCommentsByViewer
 	            ||
 	          reviewers.size() > 1;
+	}
+	public boolean isAnyPublishedCommentsByViewer() {
+		return anyPublishedCommentsByViewer;
 	}
 	public boolean isRequestForHelp() {
 	    return info.isRequestForHelp;
 	}
+
 	public boolean isTimely() {
 	    if (viewerAsStudent == null)
 	        return false;

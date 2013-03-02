@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
@@ -336,4 +338,15 @@ public abstract class SubmitServerServlet extends HttpServlet implements
         if (comment == null || comment.length() == 0) return;
         out.println("# " +  stripNewlines(comment));
     }
+	
+	 protected static  void write(CSVWriter writer, Object... values) {
+     String [] s = new String[values.length];
+     for(int i = 0; i < values.length; i++) {
+       if (values[i] == null)
+         s[i] = "null";
+       else
+         s[i] = values[i].toString();
+     }
+     writer.writeNext(s);
+   }
 }

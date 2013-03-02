@@ -44,20 +44,6 @@ import edu.umd.cs.marmoset.modelClasses.Rubric;
  */
 public class PrintRubricsForDatabase extends SubmitServerServlet {
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to get.
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -67,6 +53,7 @@ public class PrintRubricsForDatabase extends SubmitServerServlet {
 			Collection<Rubric> rubrics =  (Collection<Rubric>) request.getAttribute("rubrics");
 
 			response.setContentType("text/plain");
+			response.setCharacterEncoding("UTF-8");
 			PrintWriter out = response.getWriter();
 			for(Rubric r : rubrics) {
 			    out.println(r.getName() + ","

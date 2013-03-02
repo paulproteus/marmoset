@@ -37,7 +37,7 @@ public class CodeReviewAssignmentFilter extends SubmitServerFilter {
 
     final CodeReviewAssignment codeReviewAssignment = (CodeReviewAssignment) request
         .getAttribute(CODE_REVIEW_ASSIGNMENT);
-
+    
     Connection conn = null;
     try {
 
@@ -52,14 +52,17 @@ public class CodeReviewAssignmentFilter extends SubmitServerFilter {
             codeReviewAssignmentPK, conn);
 
         Map<Submission, CodeReviewSummary.Info> info = new HashMap<Submission, CodeReviewSummary.Info>();
+        boolean hasRubrics = false;
         for (Submission s : submissionsUnderReview) {
-          info.put(s, new CodeReviewSummary.Info(conn, s, codeReviewAssignment));
+          CodeReviewSummary.Info thisInfo = new CodeReviewSummary.Info(conn, s, codeReviewAssignment);
+          if (!thisInfo.rubrics.isEmpty())
+            hasRubrics = true;
+          info.put(s, thisInfo);
         }
         Map<CodeReviewer, CodeReviewSummary> summary = new HashMap<CodeReviewer, CodeReviewSummary>();
         for (CodeReviewer r : codeReviewersForAssignment) {
           summary.put(r, new CodeReviewSummary(info.get(r.getSubmission()), r));
         }
-
         Collection<CodeReviewer> studentCodeReviewersForAssignment = new ArrayList<CodeReviewer>();
         HashMultimap<Integer, CodeReviewer> reviewersForSubmission = HashMultimap.create();
         HashMultimap<Student, CodeReviewer> reviewsByStudent = HashMultimap.create();
@@ -99,6 +102,8 @@ public class CodeReviewAssignmentFilter extends SubmitServerFilter {
           codeReviewStatus.put(s, status);
 
         }
+        request.setAttribute("hasRubrics", hasRubrics);
+        
         request.setAttribute("canRevertCodeReview", canRevert);
         request.setAttribute("codeReviewSummary", summary);
         request.setAttribute("codeReviewStatus", codeReviewStatus);

@@ -55,6 +55,7 @@ public class PrintGradesForAllSubmissionsAdjustedByBackgroundRetests extends
 					.getAttribute("studentRegistrationMap");
 
 			response.setContentType("text/plain");
+	    response.setCharacterEncoding("UTF-8");
 			String filename = "project-" + project.getProjectNumber()
 					+ "-grades.csv";
 			Util.setAttachmentHeaders(response, filename);

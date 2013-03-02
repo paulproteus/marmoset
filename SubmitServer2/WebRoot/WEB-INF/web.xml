@@ -356,7 +356,11 @@
         <filter-name>CodeReviewAssignmentFilter</filter-name>
         <url-pattern>/view/instructor/codeReviewAssignment.jsp</url-pattern>
     </filter-mapping>
-
+    <filter-mapping>
+        <filter-name>CodeReviewAssignmentFilter</filter-name>
+        <url-pattern>/data/instructor/PrintCodeReviewAssignmentGrades</url-pattern>
+    </filter-mapping>
+	
 	<filter>
 		<filter-name>InstructorFilter</filter-name>
 		<filter-class> edu.umd.cs.submitServer.filters.InstructorFilter </filter-class>
@@ -1162,6 +1166,14 @@
 		<servlet-class>edu.umd.cs.submitServer.servlets.PrintRubricsForDatabase</servlet-class>
 	</servlet>
 
+<servlet>
+		<servlet-name>PrintCodeReviewAssignmentGrades</servlet-name>
+		<servlet-class>edu.umd.cs.submitServer.servlets.PrintCodeReviewAssignmentGrades</servlet-class>
+	</servlet>
+
+
+
+
 
 	<servlet>
 		<servlet-name>TestResultHistory</servlet-name>
@@ -1460,6 +1472,12 @@
 		<servlet-name>PrintGrades</servlet-name>
 		<url-pattern>/data/instructor/PrintGrades</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>PrintCodeReviewAssignmentGrades</servlet-name>
+		<url-pattern>/data/instructor/PrintCodeReviewAssignmentGrades</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>PrintTestDetailsForDatabase</servlet-name>
 		<url-pattern>/data/instructor/PrintTestDetailsForDatabase</url-pattern>
