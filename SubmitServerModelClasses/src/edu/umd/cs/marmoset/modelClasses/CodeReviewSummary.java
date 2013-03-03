@@ -298,6 +298,20 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		return false;
 	}
 
+	public boolean isAllReviewersRatedByAuthor() {
+		for(CodeReviewer r : info.reviewers.values()) {
+			if (r.isAuthor() || r.isAutomated()) continue;
+			if (r.getRating() != 0) continue;
+			for(CodeReviewComment c : allVisibleComments)
+					if (c.getCodeReviewerPK() == r.getCodeReviewerPK()) continue;
+
+		        for (RubricEvaluation e : rubricEvaluations.values())
+		        		if (e.getCodeReviewerPK() == r.getCodeReviewerPK()) continue;
+				return false;
+		}
+		return true;
+	}
+	
 	public Project getProject() {
 		return info.project;
 	}

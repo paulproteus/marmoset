@@ -45,9 +45,24 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 public class CodeReviewAssignment {
     
     public enum Kind {
-        INSTRUCTIONAL, INSTRUCTIONAL_BY_SECTION,  PEER, PEER_BY_SECTION, EXEMPLAR,
-        INSTRUCTIONAL_PROTOTYPE, PEER_PROTOTYPE;
+        INSTRUCTIONAL("Instructional code review"), 
+        INSTRUCTIONAL_BY_SECTION("Instructional code review by section"),  
+        PEER("Peer code review"),
+        PEER_BY_SECTION("Peer code review by section"),
+        EXEMPLAR("Exemplar/example review"),
+        INSTRUCTIONAL_PROTOTYPE("Instructional prototype"), 
+        PEER_PROTOTYPE("Peer review prototype");
+        					
+        private Kind(String description) {
+			this.description = description;
+		}
         
+        final String description;
+        
+        
+		public String getDescription() {
+        	return description;
+        }
         public boolean isPrototype() {
             return this == INSTRUCTIONAL_PROTOTYPE || this == PEER_PROTOTYPE;
         }

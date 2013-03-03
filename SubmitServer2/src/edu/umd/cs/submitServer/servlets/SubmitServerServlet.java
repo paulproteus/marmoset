@@ -28,6 +28,7 @@
  */
 package edu.umd.cs.submitServer.servlets;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,6 +39,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -339,6 +341,14 @@ public abstract class SubmitServerServlet extends HttpServlet implements
         out.println("# " +  stripNewlines(comment));
     }
 	
+	protected CSVWriter getCSVWriter(HttpServletResponse response) throws IOException {
+    response.setContentType("text/plain");
+    response.setCharacterEncoding("UTF-8");
+    PrintWriter out = response.getWriter();
+    CSVWriter writer = new CSVWriter(out);
+    return writer;
+  }
+	
 	 protected static  void write(CSVWriter writer, Object... values) {
      String [] s = new String[values.length];
      for(int i = 0; i < values.length; i++) {
@@ -347,6 +357,6 @@ public abstract class SubmitServerServlet extends HttpServlet implements
        else
          s[i] = values[i].toString();
      }
-     writer.writeNext(s);
+     writer.writeNext(s, false);
    }
 }

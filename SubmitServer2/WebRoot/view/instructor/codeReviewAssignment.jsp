@@ -40,28 +40,7 @@
 
 	<div class="sectionTitle">
 		<h2>
-		<c:choose>
-				<c:when test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL'}">
-					Instructional code review
-				</c:when>
-				<c:when
-					test="${codeReviewAssignment.kind eq 'INSTRUCTIONAL_BY_SECTION'}">
-					Instructional code review by section
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'PEER'}">
-					Peer code review
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'PEER_BY_SECTION'}">
-					Peer code review by section
-				</c:when>
-				<c:when test="${codeReviewAssignment.kind eq 'EXEMPLAR'}">
-					Exemplar/example code review
-				</c:when>
-				<c:otherwise>
-					<c:out value="${codeReviewAssignment.kind}" />
-						Code review
-				</c:otherwise>
-			</c:choose>
+		<c:out value="${codeReviewAssignment.kind.description}" />
 			for project
 			<c:out value="${project.fullTitle}" />
 		</h2>
@@ -121,40 +100,49 @@
 					</form></li>
 					</ul>
 			</c:when>
-			<c:otherwise>
+		<c:otherwise>
 			<h2>Code review started</h2>
 			<ul>
-			
-				<c:if test="${! empty rubrics }">
-				<c:url var="PrintRubricEvaluationsForDatabase"
-					value="/data/instructor/PrintRubricEvaluationsForDatabase">
-					<c:param name="codeReviewAssignmentPK"
-						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-				</c:url>
-				<c:url var="PrintRubricsForDatabase"
-					value="/data/instructor/PrintRubricsForDatabase">
-					<c:param name="codeReviewAssignmentPK"
-						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-				</c:url>
 
-				
-				<li><a href="${PrintRubricsForDatabase}">List rubrics in
-						CSV format for upload to grades server</a>
-				<li><a href="${PrintRubricEvaluationsForDatabase}">List
-						rubric evaluations in CSV format for upload to grades server</a></li>
-						</c:if>
+				<c:url var="PrintCodeReviewAssignmentGrades"
+					value="/data/instructor/PrintCodeReviewAssignmentGrades">
+					<c:param name="codeReviewAssignmentPK"
+						value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+				</c:url>
+				<li><a href="${PrintCodeReviewAssignmentGrades}">Print code
+						review assignment grades</a></li>
+
+				<c:if test="${! empty rubrics }">
+					<c:url var="PrintRubricEvaluationsForDatabase"
+						value="/data/instructor/PrintRubricEvaluationsForDatabase">
+						<c:param name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+					</c:url>
+					<c:url var="PrintRubricsForDatabase"
+						value="/data/instructor/PrintRubricsForDatabase">
+						<c:param name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+					</c:url>
+
+
+					<li><a href="${PrintRubricsForDatabase}">List rubrics in
+							CSV format for upload to grades server</a>
+					<li><a href="${PrintRubricEvaluationsForDatabase}">List
+							rubric evaluations in CSV format for upload to grades server</a></li>
+				</c:if>
 				<li><c:url var="removeCodeReviewers"
 						value="/action/instructor/RemoveCodeReviewers" />
 					<form action="${reviewCodeReviewers}" method="post"
 						name="removeCodeReviewersForm">
-						 <input type="hidden"
-							name="codeReviewAssignmentPK"
-							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> <input
-							type="submit" value="Remove reviewers with no comments">
+						<input type="hidden" name="codeReviewAssignmentPK"
+							value="${codeReviewAssignment.codeReviewAssignmentPK}" /> 
+							Remove reviewers with no comments<input
+							
+							type="submit" value="Do it">
 					</form></li>
-					</ul>
-			</c:otherwise>
-		</c:choose>
+			</ul>
+		</c:otherwise>
+	</c:choose>
 
 	<c:if test="${codeReviewAssignment.byStudents}">
 		<h2>Options</h2>

@@ -50,10 +50,7 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    Connection conn = null;
-    response.setContentType("text/plain");
-    response.setCharacterEncoding("UTF-8");
-    PrintWriter out = response.getWriter();
+    CSVWriter writer = getCSVWriter(response);
     Project project = (Project) request.getAttribute("project");
     Set<StudentRegistration> registrationSet = (Set<StudentRegistration>) request
         .getAttribute("studentRegistrationSet");
@@ -74,12 +71,16 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
 
     Collection<CodeReviewer> authors = ((Map<Integer, CodeReviewer>) request.getAttribute("authorForSubmission"))
         .values();
-    CSVWriter writer = new CSVWriter(out);
-
+    
     HashMultimap<Integer, CodeReviewer> authorsByStudentPK = HashMultimap.create();
     for (CodeReviewer author : authors) {
       authorsByStudentPK.put(author.getStudentPK(), author);
     }
+    
+    response.getWriter().printf("# %s for project %s%n", codeReviewAssignment.getKind().getDescription(),
+        project.getFullTitle());
+   if (codeReviewAssignment.getDescription().length() > 0)
+     response.getWriter().printf("# %s%n", codeReviewAssignment.getDescription());
     for (StudentRegistration sr : registrationSet) {
       if (sr.isInstructor() == codeReviewAssignment.isByStudents())
         continue;
@@ -91,14 +92,14 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
 
       int rubricsEvaluated = 0;
       int commentsMade = 0;
-      int responded = 0;
+      int responseNeeded = 0;
       int total = 0;
       if (reviews != null)
         for (CodeReviewer r : reviews) {
           CodeReviewSummary s = summary.get(r);
           total++;
-          if (!s.isNeedsResponse())
-            responded++;
+          if (s.isNeedsResponse())
+            responseNeeded++;
 
           if (s.isAnyPublishedCommentsByViewer())
             commentsMade++;
@@ -108,6 +109,7 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
         }
 
       int authorResponded = 0;
+      int authorRated = 0;
       int authorTotal = 0;
 
       if (authorByStudentPK != null)
@@ -117,44 +119,51 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
             continue;
           if (!s.isNeedsResponse())
             authorResponded++;
+          if (s.isAllReviewersRatedByAuthor())
+            authorRated++;
           authorTotal++;
         }
 
-      writer.flush();
-      out.printf("%d %d %d  %d %d%n", commentsMade, responded, total, authorResponded, authorTotal);
       if (total > 0) {
         if (commentsMade == total)
           write(writer, sr.getClassAccount(), "Comments", 1, "");
         else if (commentsMade > 0)
           write(writer, sr.getClassAccount(), "Comments", 0,
               String.format("Comments made on only %d/%d reviews", commentsMade, total));
-        else
-          write(writer, sr.getClassAccount(), "Comments", 0, "No comments made");
+
+        
         if (hasRubrics) {
           if (rubricsEvaluated == total)
 
             write(writer, sr.getClassAccount(), "Rubrics", 1, "");
           else if (rubricsEvaluated > 0)
             write(writer, sr.getClassAccount(), "Rubrics", 0,
-                String.format("Rubrics full evaluated on only %d/%d reviews", rubricsEvaluated, total));
-          write(writer, sr.getClassAccount(), "Rubrics", 0, "No rubrics evaluated");
+                String.format("Rubrics fully evaluated on only %d/%d reviews", rubricsEvaluated, total));
+          
         }
-        if (commentsMade == 0 && rubricsEvaluated == 0)
-          write(writer, sr.getClassAccount(), "Reviewer Responses", 0, "No reviews performed");
-        else if (responded == total)
+        if (commentsMade == 0 && rubricsEvaluated == 0) {
+        } else if (responseNeeded == 0)
           write(writer, sr.getClassAccount(), "Reviewer Responses", 1, "");
         else
           write(writer, sr.getClassAccount(), "Reviewer Responses", 0,
-              String.format("Only ack'd or responded to author on %d/%d reviews", authorResponded, authorTotal));
+              String.format("Needs to ack or responded to author on %d reviews", responseNeeded));
       }
 
       if (authorTotal == 0)
         write(writer, sr.getClassAccount(), "Author Responses", 1, "No reviews to respond to");
       else if (authorResponded == authorTotal)
         write(writer, sr.getClassAccount(), "Author Responses", 1, "");
-      else
+      else if (authorResponded > 0)
         write(writer, sr.getClassAccount(), "Author Responses", 0,
             String.format("Only ack'd or responded to %d/%d reviews", authorResponded, authorTotal));
+
+      if (authorTotal == 0)
+        write(writer, sr.getClassAccount(), "Reviewers rated", 1, "No reviewers to rate");
+      else if (authorRated == authorTotal)
+        write(writer, sr.getClassAccount(), "Reviewers rated", 1, "");
+      else if (authorRated > 0)
+        write(writer, sr.getClassAccount(), "Reviewers rated", 0,
+            String.format("Only rated %d/%d reviewers", authorRated, authorTotal));
 
 
     }
@@ -162,4 +171,6 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
     writer.close();
 
   }
+
+  
 }
