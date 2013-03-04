@@ -86,6 +86,10 @@ public class PrintCodeReviewAssignmentGrades extends SubmitServerServlet {
         continue;
       if (sr.isPseudoStudent())
         continue;
+      if (!sr.isActive()) {
+        writer.flush();
+        response.getWriter().printf("# %s is inactive%n", sr.getClassAccount());
+      }
 
       Collection<CodeReviewer> reviews = reviewsByStudentPK.get(sr.getStudentPK());
       Collection<CodeReviewer> authorByStudentPK = authorsByStudentPK.get(sr.getStudentPK());
