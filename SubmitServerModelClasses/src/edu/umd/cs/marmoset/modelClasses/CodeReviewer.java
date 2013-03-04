@@ -758,10 +758,12 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 	public static int countActiveReviews(StudentRegistration sr, Connection conn)
 			throws SQLException {
 		String query = " SELECT COUNT(*) " 
-			+ " FROM  " + TABLE_NAME + " , " + Project.TABLE_NAME 
+			+ " FROM  " + TABLE_NAME + " , " + CodeReviewAssignment.TABLE_NAME + " , " + Project.TABLE_NAME 
 				+ " WHERE " + TABLE_NAME + ".student_pk = ? " 
 				+ " AND " + TABLE_NAME + ".last_update is not NULL " 
-			    + " AND " + TABLE_NAME + ".project_pk = " + Project.TABLE_NAME + ".project_pk" 
+				+ " AND " + TABLE_NAME + ".code_review_assignment_pk = " 
+				     +  CodeReviewAssignment.TABLE_NAME + ".code_review_assignment_pk"
+			    + " AND " + CodeReviewAssignment.TABLE_NAME + ".project_pk = " + Project.TABLE_NAME + ".project_pk" 
 				+ " AND " + Project.TABLE_NAME + ".course_pk = ?";
 
 		PreparedStatement stmt = conn.prepareStatement(query);

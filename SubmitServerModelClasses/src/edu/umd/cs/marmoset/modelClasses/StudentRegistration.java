@@ -813,11 +813,11 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 			this.update(conn);
 			return false;
 		}
-		if (Submission.countSubmissions(this, conn) > 0) {
-			dropped = true;
-			this.update(conn);
+		if (Submission.countSubmissions(this, conn) > 0 
+				|| CodeReviewer.countActiveReviews(this, conn) > 0) {
 			return false;
 		}
+
 		String delete = "DELETE FROM " + TABLE_NAME + " WHERE student_registration_pk = ?";
 		System.out.println("Deleting " + getFullname() + " from " + course);
 		PreparedStatement stmt = Queries.setStatement(conn, delete, studentRegistrationPK);

@@ -42,6 +42,7 @@ import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.UserSession;
 import edu.umd.cs.submitServer.WebConfigProperties;
 
@@ -241,9 +242,16 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				if (registration.isDropped()) {
 					if (registration.delete(conn)) {
 					  out.printf("  Previously noted as dropped, deleting %s%n", s.getFullname());
-	          
-					} else
-						out.printf("  %s has submissions, leaving as dropped (not deleting)%n", s.getFullname());
+					} else {
+					  int submissions = Submission.countSubmissions(registration, conn);
+					  int reviews = CodeReviewer.countActiveReviews(registration, conn);
+					  
+            if (reviews == 0)
+              out.printf("  %s has %d submissions, leaving as dropped (not deleting)%n", s.getFullname(), submissions);
+            else
+              out.printf("  %s has %d submissions and %d code reviews, leaving as dropped (not deleting)%n",
+                  s.getFullname(), submissions, reviews);
+					}
 				} else {
 					out.printf("  marking %s as dropped%n", s.getFullname());
 					registration.setDropped(true);
@@ -255,6 +263,9 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 					out.printf("  marking %s as inactive%n", s.getFullname());
 				}
 			}
+			
+			assert !dropped;
+			
 			registration.setDropped(dropped);
 			registration.setInactive(inactive);
 

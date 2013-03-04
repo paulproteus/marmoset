@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.Multiset;
 
@@ -55,23 +58,10 @@ public class TestingGroundServlet extends SubmitServerServlet {
 		try {
 		    conn = getConnection();
 		    
-		    Timestamp since = new Timestamp(System.currentTimeMillis() 
-		            - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
-		    
-		    
-		    List<ServerError> errors = ServerError.recentErrors(10, since, conn);
-		    for(ServerError e : errors) {
-		        out.printf("%20s %s%n", e.getWhen(), e.getMessage());
-		    }
-		    out.println();
-	           
-		    Multiset<Date> dates = Submission.lookupSubmissionTimes(since, conn);
-		    out.println(dates.uniqueKeys().size() + " unique times");
-		    for(Map.Entry<Date, Integer> e : dates.entrySet()) {
-		        out.printf("%5d %s%n", e.getValue(), e.getKey());
-		    }
-		    out.flush();
-		    
+		   for(StudentRegistration sr :  (Collection<StudentRegistration>) request.getAttribute("studentRegistrationCollection")) {
+		     int reviewCount = CodeReviewer.countActiveReviews(sr, conn);
+		     out.printf("%3d %s%n", reviewCount, sr.getFullname());
+		   }
 		}  catch (SQLException e) {
             throw new ServletException(e);
         } finally {
