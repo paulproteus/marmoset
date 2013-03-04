@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
@@ -238,37 +239,36 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				isNew = true;
 			} else if (dropped) {
 				if (registration.isDropped()) {
-					out.printf("  Previously noted as dropped, deleting %s%n", s.getFullname());
 					if (registration.delete(conn)) {
-						out.printf("  deleted%n");
+					  out.printf("  Previously noted as dropped, deleting %s%n", s.getFullname());
+	          
 					} else
-						out.printf("  has submissions, not deleting %s%n", s.getFullname());
+						out.printf("  %s has submissions, leaving as dropped (not deleting)%n", s.getFullname());
 				} else {
 					out.printf("  marking %s as dropped%n", s.getFullname());
 					registration.setDropped(true);
 					registration.update(conn);
 				}
-
 				continue;
 			} else if (inactive) {
 				if (!registration.isInactive()) {
 					out.printf("  marking %s as inactive%n", s.getFullname());
-
 				}
-
-
 			}
 			registration.setDropped(dropped);
 			registration.setInactive(inactive);
 
 			registration.setCoursePK(course.getCoursePK());
 			registration.setClassAccount(classAccount);
+			
+			int reviewCount = CodeReviewer.countActiveReviews(registration, conn);
+			if (reviewCount > 0)
+			  out.printf(" %d code reviews for %s%n", reviewCount, registration.getFullname());
 
 			if ("Instructor".equals(role) || "TA".equals(role))
 				registration
 						.setInstructorCapability(StudentRegistration.MODIFY_CAPABILITY);
 			else if ("Grader".equals(role))
-
 				registration
 						.setInstructorCapability(StudentRegistration.READ_ONLY_CAPABILITY);
 			else {

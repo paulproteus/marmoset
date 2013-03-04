@@ -44,6 +44,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import edu.umd.cs.marmoset.utilities.SqlUtilities;
+
 
 /**
  * A CodeReviewer is a person in the role of commenting on a specific submission.
@@ -753,6 +755,23 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		}
 	}
 	
+	public static int countActiveReviews(StudentRegistration sr, Connection conn)
+			throws SQLException {
+		String query = " SELECT COUNT(*) " 
+			+ " FROM  " + TABLE_NAME + " , " + Project.TABLE_NAME 
+				+ " WHERE " + TABLE_NAME + ".student_pk = ? " 
+				+ " AND " + TABLE_NAME + ".last_update is not NULL " 
+			    + " AND " + TABLE_NAME + ".project_pk = " + Project.TABLE_NAME + ".project_pk" 
+				+ " AND " + Project.TABLE_NAME + ".course_pk = ?";
+
+		PreparedStatement stmt = conn.prepareStatement(query);
+		Queries.setStatement(stmt, sr.getStudentPK(), sr.getCoursePK());
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next())
+			return rs.getInt(1);
+		return 0;
+	        }
+	    
 	public @CheckForNull @CodeReviewer.PK Integer getNext(Connection conn) throws SQLException {
 	    if (codeReviewAssignmentPK == 0)
 	        return null;
