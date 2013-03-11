@@ -324,16 +324,21 @@
 		<filter-name>ExtractParametersFilter</filter-name>
 		<url-pattern>/data/*</url-pattern>
 	</filter-mapping>
-	<filter-mapping>
-		<filter-name>ExtractParametersFilter</filter-name>
-		<url-pattern>/feed/*</url-pattern>
-	</filter-mapping>
+	
 	<filter-mapping>
 		<filter-name>ExtractParametersFilter</filter-name>
 		<url-pattern>/admin/Fixup</url-pattern>
 	</filter-mapping>
 
-
+    <!-- ExtractParametersFilter -->
+	<filter>
+		<filter-name>FeedFilter</filter-name>
+		<filter-class> edu.umd.cs.submitServer.filters.FeedFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>FeedFilter</filter-name>
+		<url-pattern>/feed/*</url-pattern>
+	</filter-mapping>
   <filter>
        <filter-name>MyCourseOverviewFilter</filter-name>
         <filter-class> edu.umd.cs.submitServer.filters.MyCourseOverviewFilter </filter-class>
@@ -1362,7 +1367,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CourseCalendar</servlet-name>
-		<url-pattern>/feed/courseCalendar</url-pattern>
+		<url-pattern>/feed/CourseCalendar</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Logout</servlet-name>

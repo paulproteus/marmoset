@@ -54,17 +54,18 @@ public class CourseCalendar extends SubmitServerServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String uidBase = request.getServerName() +"/" +  request.getContextPath() + "/cCalendar";
+		String uidBase = request.getServerName() +"/" +  request.getContextPath() + "/cCalendar-";
 		Course course = (Course) request.getAttribute(COURSE);
 		List<Project> projects = (List<Project>) request.getAttribute(PROJECT_LIST);
 
 		ServletOutputStream sout = response.getOutputStream();
+		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/calendar");
 
 		SimpleDateFormat df = new SimpleDateFormat(DATEFORMATZ);
 		SimpleDateFormat timezoneoffset = new SimpleDateFormat(DATEFORMATTZOFFSET);
 
-		Writer out = new OutputStreamWriter(sout);
+		Writer out = new OutputStreamWriter(sout, "UTF-8");
 
 		writeEscaped(out,"BEGIN","VCALENDAR");
 		writeEscaped(out,"VERSION","2.0");
@@ -73,9 +74,11 @@ public class CourseCalendar extends SubmitServerServlet {
 		writeEscaped(out,"X-WR-CALNAME",course.getCourseName());
 		for(Project p : projects) {
 
+		  if (!p.getVisibleToStudents())
+		    continue;
 			writeEscaped(out,"BEGIN","VEVENT");
 			writeEscaped(out,"UID",uidBase + p.getProjectPK());
-			writeEscaped(out,"SUMMARY",  course.getCourseName() + " project " + p.getProjectNumber()
+			writeEscaped(out,"SUMMARY;CHARSET=UTF-8",  course.getCourseName() + " project " + p.getProjectNumber()
 						+ ": " + p.getTitle());
 			Date dueDate = new Date(p.getOntime().getTime());
 			writeEscaped(out,"DTSTART", df.format(dueDate));
@@ -85,7 +88,7 @@ public class CourseCalendar extends SubmitServerServlet {
 			String link = getContextLink(request) + getProjectLinkForStudent(p);
 			writeEscaped(out,"URL;VALUE=URI", link);
 			if (p.getDescription() != null)
-				writeEscaped(out, "DESCRIPTION", p.getDescription());
+				writeEscaped(out, "DESCRIPTION;CHARSET=UTF-8", p.getDescription());
 			writeEscaped(out,"END","VEVENT");
 
 		}

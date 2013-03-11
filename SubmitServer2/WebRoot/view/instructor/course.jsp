@@ -570,6 +570,14 @@ jQuery(document).ready(function ($) {
         </table>
     </c:if>
     
+     <h2>Feeds</h2>
+     <c:url var="courseCalendarLink" value="/feed/CourseCalendar">
+                            <c:param name="coursePK" value="${course.coursePK}" />
+                        </c:url>
+    <ul><li><a href="${courseCalendarLink}">Course calendar link</a> (iCalendar .ics format: 
+    subscribe in iCal, Google calendar, Outlook)
+    </ul>
+    
     <ss:footer />
 	<script type="text/javascript">
     window.$marmoset = {

@@ -105,6 +105,7 @@ public interface SubmitServerConstants {
 	public static final String STUDENT_REGISTRATION = "studentRegistration";
 	public static final String STUDENT_SUBMIT_STATUS = "studentSubmitStatus";
 	public static final String COURSE_PK = "coursePK";
+	public static final String PROJECT_PK = "projectPK";
 	public static final String SORT_KEY = "sortKey";
 	public static final String SOURCE_FILE_LIST = "sourceFileList";
 	public static final String SUBMISSION_LIST = "submissionList";
