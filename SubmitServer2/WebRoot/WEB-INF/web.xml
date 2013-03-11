@@ -112,6 +112,16 @@
 		<url-pattern>/buildServer/*</url-pattern>
 	</filter-mapping>
 
+    <filter>
+        <filter-name>LogErrorFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.LogErrorFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>LogErrorFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+	<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+	
 	<!--
 		MultipartRequestFilter
 	-->
@@ -1795,15 +1805,7 @@
       <url-pattern>/view/instructor/course.jsp</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>LogErrorFilter</filter-name>
-        <filter-class> edu.umd.cs.submitServer.filters.LogErrorFilter </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>LogErrorFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-	<dispatcher>ERROR</dispatcher>
-	</filter-mapping>
+   
 
     <filter>
         <filter-name>AdminStatusFilter</filter-name>
