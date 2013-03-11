@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -423,8 +424,6 @@ public class TextDiff extends StringsWriter {
                         } catch (Exception e) {
                             // ignore exceptions that happen while reading, but
                             // treat them as EOF
-                            System.err.println("Error in " + name);
-                            e.printStackTrace();
                             sz = -1;
                         }
                         if (sz < 0) {
