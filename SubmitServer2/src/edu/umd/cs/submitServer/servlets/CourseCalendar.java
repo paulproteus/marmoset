@@ -50,20 +50,7 @@ public class CourseCalendar extends SubmitServerServlet {
 	private static final String DATEFORMAT = "yyyyMMdd'T'HHmmss"; // NOI18N
 	private static final String DATEFORMATTZOFFSET = "Z"; // NOI18N
 
-	/**
-	 * The doGet method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to get.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
+
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -80,8 +67,10 @@ public class CourseCalendar extends SubmitServerServlet {
 		Writer out = new OutputStreamWriter(sout);
 
 		writeEscaped(out,"BEGIN","VCALENDAR");
-		writeEscaped(out,"X-WR-CALNAME",course.getCourseName());
 		writeEscaped(out,"VERSION","2.0");
+		writeEscaped(out,"PRODID","Marmoset");
+    
+		writeEscaped(out,"X-WR-CALNAME",course.getCourseName());
 		for(Project p : projects) {
 
 			writeEscaped(out,"BEGIN","VEVENT");
