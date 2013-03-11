@@ -22,9 +22,7 @@
  */
 
 /*
- * Created on Jan 25, 2005
- *
- * @author jspacco
+ * Created on Mar 5, 2005
  */
 package edu.umd.cs.submitServer.servlets;
 
@@ -36,51 +34,42 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.cs.marmoset.modelClasses.Course;
-import edu.umd.cs.marmoset.modelClasses.LogEntry;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
-/**
- * @author jspacco
- *
- */
-public class MakeProjectVisible extends SubmitServerServlet {
 
+public class ForkProject extends SubmitServerServlet {
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		Project project = (Project) request.getAttribute("project");
-		Course course = (Course) request.getAttribute("course");
-		RequestParser parser = new RequestParser(request,
-				getSubmitServerServletLog(), strictParameterChecking());
-		boolean newValue = parser.getOptionalBooleanParameter("newValue", !project.getVisibleToStudents());
-		
-
-		// toggle project visibility
-		project.setVisibleToStudents(newValue);
-		Connection conn = null;
-
-
-		try {
-			conn = getConnection();
-			project.update(conn);
-			if (project.getVisibleToStudents())
-				LogEntry.projectMadeVisible(conn, course, project,
-					 "/view/project.jsp?projectPK="
-					+ project.getProjectPK() );
-
-		} catch (SQLException e) {
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
-		String redirectUrl = request.getContextPath()
-				+ "/view/instructor/projectUtilities.jsp?projectPK="
-				+ project.getProjectPK();
-		response.sendRedirect(redirectUrl);
+	  Project project = (Project) request.getAttribute("project");
+    
+	  boolean transactionSuccess = false;
+	  Connection conn = null;
+	  Project fork;
+    try {
+      conn = getConnection();
+      conn.setAutoCommit(false);
+      conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			
+      fork = project.fork(conn);
+      conn.commit();
+      transactionSuccess = true;
+			
+    } catch (SQLException e) {
+      handleSQLException(e);
+      throw new ServletException(e);
+    } finally {
+      rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
+          transactionSuccess, request, conn);
+    }
+    String redirectUrl = request.getContextPath()
+        + "/view/instructor/updateProject.jsp?projectPK="
+        + fork.getProjectPK();
+    response.sendRedirect(redirectUrl);
 	}
 
 }

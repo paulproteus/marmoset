@@ -437,6 +437,16 @@ any server based compilation and testing
 		(includes the currently active test-setup, canonical, the project starter files (if any),
 		and the project settings).</a></p></li>
 
+<c:url var="forkProjectLink" value="/action/instructor/ForkProject"/>
+	<li><p>
+<form id="forkProjectForm" action="${forkProjectLink}"
+				 method="POST"><input
+				type="hidden" name="projectPK" value="${project.projectPK}">
+		Fork project - create a new project starting from information for this project
+		 <input type="submit" value="Fork"></form>
+		</li>
+
+	
 	<li><p>
 		<c:url var="createDotSubmitFileLink" value="/data/instructor/CreateDotSubmitFile">
 			<c:param name="projectPK" value="${project.projectPK}"/>

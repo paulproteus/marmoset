@@ -45,7 +45,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  * @author jspacco
  *
  */
-public class TestSetup
+public class TestSetup implements Cloneable
 {
     private Integer testSetupPK; // non-NULL, autoincrement
     private int projectPK = 0; // non-NULL
@@ -251,6 +251,23 @@ public class TestSetup
             return "#" + version;
         return "#" + version +": " + comment;
     }
+    
+    @Override
+   	protected TestSetup clone() {
+    	TestSetup result;
+   		try {
+   			result = (TestSetup) super.clone();
+   		} catch (CloneNotSupportedException e) {
+   			throw new AssertionError();
+   		}
+       	result.testSetupPK = 0;
+       	result.testRunPK = 0;
+       	result.version = 0;
+       	result.status = Status.NEW;
+       	
+       	return result;
+       }
+    
     /**
      * Fetches a TestSetup row from the database using the given ResultSet
      * starting at the given index.
@@ -407,10 +424,13 @@ public class TestSetup
         try {
             stmt = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
 
-            if (cachedArchive == null)
-                throw new IllegalStateException("there is no archive for upload, you should call setArchiveForUpload first");
-            setArchivePK(Archive.uploadBytesToArchive("test_setup_archives", cachedArchive, conn));
-
+			if (archivePK == null) {
+				if (cachedArchive == null)
+					throw new IllegalStateException(
+							"there is no archive for upload, you should call setArchiveForUpload first");
+				setArchivePK(Archive.uploadBytesToArchive(
+						"test_setup_archives", cachedArchive, conn));
+			}
             int index=1;
             putValues(stmt, index);
 

@@ -39,100 +39,120 @@ import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 
 public class StudentAccountForInstructor extends SubmitServerServlet {
 
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Connection conn = null;
-        @CheckForNull
-        Course course = (Course) request.getAttribute(COURSE);
-        Student user = (Student) request.getAttribute(USER);
-        Student student = (Student) request.getAttribute(STUDENT);
+    Connection conn = null;
+    @CheckForNull
+    Course course = (Course) request.getAttribute(COURSE);
+    Student user = (Student) request.getAttribute(USER);
+    Student student = (Student) request.getAttribute(STUDENT);
 
-        if (!student.getCanImportCourses())
-            throw new IllegalArgumentException();
-        StudentRegistration instructor = (StudentRegistration) request
-                .getAttribute(STUDENT_REGISTRATION);
-        if (course != null) {
-            
-            if (instructor.getStudentPK() != user.getStudentPK())
-                throw new IllegalArgumentException();
-            if (!instructor.isInstructorModifiy())
-                throw new IllegalArgumentException();
-        }
-        try {
-            conn = getConnection();
+    if (!student.getCanImportCourses())
+      throw new IllegalArgumentException();
+    StudentRegistration instructor = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+    if (course != null) {
 
-            Student student2 = createOrFindPseudoStudent(conn, student);
-            String redirectUrl = request.getContextPath() + "/view/index.jsp";
-            if (course != null) {
-                createOrFindPseudoStudentRegistrationFromPseudoStudent(conn, course, instructor,
-                        student2);
-                redirectUrl = request.getContextPath()
-                        + "/view/course.jsp?coursePK=" + course.getCoursePK();
-            };
+      if (instructor.getStudentPK() != user.getStudentPK())
+        throw new IllegalArgumentException();
+      if (!instructor.isInstructorModifiy())
+        throw new IllegalArgumentException();
+    }
+    try {
+      conn = getConnection();
 
-            HttpSession session = request.getSession(false);
+      Student student2 = createOrFindPseudoStudent(conn, student);
+      String redirectUrl = request.getContextPath() + "/view/index.jsp";
+      if (course != null) {
+        createOrFindPseudoStudentRegistrationFromPseudoStudent(conn, course, instructor, student2);
+        redirectUrl = request.getContextPath() + "/view/course.jsp?coursePK=" + course.getCoursePK();
+      }
+      ;
 
-            session.invalidate();
-            session = request.getSession(true);
+      HttpSession session = request.getSession(false);
 
-            PerformLogin.setUserSession(session, student2, conn);
+      session.invalidate();
+      session = request.getSession(true);
 
-            response.sendRedirect(redirectUrl);
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        } finally {
-            releaseConnection(conn);
+      PerformLogin.setUserSession(session, student2, conn);
 
-        }
+      response.sendRedirect(redirectUrl);
+    } catch (SQLException e) {
+      throw new ServletException(e);
+    } finally {
+      releaseConnection(conn);
 
     }
 
-    public static StudentRegistration createOrFindPseudoStudentRegistration(Connection conn,
-            Course course, StudentRegistration instructor, Student student)
-            throws SQLException {
-        Student student2 = createOrFindPseudoStudent(conn, student);
-        return createOrFindPseudoStudentRegistrationFromPseudoStudent(conn, course, instructor, student2);
-        
-    }
- 
-    private static StudentRegistration createOrFindPseudoStudentRegistrationFromPseudoStudent(Connection conn,
-            Course course, StudentRegistration instructor, Student student2)
-            throws SQLException {
-        StudentRegistration registration = StudentRegistration
-                .lookupByStudentPKAndCoursePK(student2.getStudentPK(),
-                        course.getCoursePK(), conn);
-        if (registration == null) {
-            registration = new StudentRegistration();
-            registration.setStudentPK(student2.getStudentPK());
-            registration.setCoursePK(course.getCoursePK());
-            registration.setClassAccount(instructor.getClassAccount()
-                    + "-student");
+  }
 
-            registration
-                    .setInstructorCapability(StudentRegistration.PSEUDO_STUDENT_CAPABILITY);
-            registration.setFirstname(student2.getFirstname());
-            registration.setLastname(student2.getLastname());
-            registration.setCourse(course.getCourseName());
-            registration.setSection(course.getSection());
-            registration.setCourseID(-1);
-            registration.insert(conn);
-        }
-        return registration;
-    }
+  public static StudentRegistration createOrFindPseudoStudentRegistration(Connection conn, Course course,
+      StudentRegistration instructor, Student student) throws SQLException {
+    if (!instructor.isInstructor())
+      throw new IllegalArgumentException();
+    Student pseudoStudent = createOrFindPseudoStudent(conn, student);
+    return createOrFindPseudoStudentRegistrationFromPseudoStudent(conn, course, instructor, pseudoStudent);
+  }
 
-    private static  Student createOrFindPseudoStudent(Connection conn, Student student)
-            throws SQLException {
-        Student student2 = new Student();
-        student2.setLastname(student.getLastname());
-        student2.setFirstname(student.getFirstname());
-        student2.setCampusUID(student.getCampusUID());
-        student2.setLoginName(student.getLoginName() + "-student");
-        student2.setAccountType(Student.PSEUDO_ACCOUNT);
-        student2 = student2.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
-        return student2;
-    }
+  public static @CheckForNull
+  StudentRegistration findPseudoStudentRegistration(Connection conn, Course course, Student student)
+      throws SQLException {
+    Student pseudoStudent = findPseudoStudent(conn, student);
+    if (pseudoStudent == null)
+      return null;
+    return findPseudoStudentRegistrationFromPseudoStudent(conn, course, pseudoStudent);
+  }
 
+  private static @CheckForNull
+  StudentRegistration findPseudoStudentRegistrationFromPseudoStudent(Connection conn, Course course, Student student)
+      throws SQLException {
+    return StudentRegistration.lookupByStudentPKAndCoursePK(student.getStudentPK(), course.getCoursePK(), conn);
+
+  }
+
+  private static StudentRegistration createOrFindPseudoStudentRegistrationFromPseudoStudent(Connection conn,
+      Course course, StudentRegistration instructor, Student student) throws SQLException {
+    if (!instructor.isInstructor())
+      throw new IllegalArgumentException();
+    
+    StudentRegistration registration = StudentRegistration.lookupByStudentPKAndCoursePK(student.getStudentPK(),
+        course.getCoursePK(), conn);
+    if (registration == null) {
+      registration = new StudentRegistration();
+      registration.setStudentPK(student.getStudentPK());
+      registration.setCoursePK(course.getCoursePK());
+      registration.setClassAccount(instructor.getClassAccount() + "-student");
+
+      registration.setInstructorCapability(StudentRegistration.PSEUDO_STUDENT_CAPABILITY);
+      registration.setFirstname(student.getFirstname());
+      registration.setLastname(student.getLastname());
+      registration.setCourse(course.getCourseName());
+      registration.setSection(course.getSection());
+      registration.setCourseID(-1);
+      registration.insert(conn);
+    }
+    return registration;
+  }
+
+  private static Student createOrFindPseudoStudent(Connection conn, Student student) throws SQLException {
+    if (student.isPseudoAccount() || student.isSuperUser() || student.isTeamAccount())
+      throw new IllegalArgumentException();
+    Student pseudoStudent = new Student();
+    pseudoStudent.setLastname(student.getLastname());
+    pseudoStudent.setFirstname(student.getFirstname());
+    pseudoStudent.setCampusUID(student.getCampusUID());
+    pseudoStudent.setLoginName(student.getLoginName() + "-student");
+    pseudoStudent.setAccountType(Student.PSEUDO_ACCOUNT);
+    pseudoStudent = pseudoStudent.insertOrUpdateCheckingLoginNameAndCampusUID(conn);
+    return pseudoStudent;
+  }
+
+  private static @CheckForNull
+  Student findPseudoStudent(Connection conn, Student student) throws SQLException {
+    if (student.isPseudoAccount() || student.isSuperUser() || student.isTeamAccount())
+      return null;
+    return Student.lookupByLoginNameAndCampusUID(student.getLoginName() + "-student", student.getCampusUID(), conn);
+
+  }
 
 }

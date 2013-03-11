@@ -196,12 +196,9 @@ what they're reviewing
 					</select></li>
 			</c:if>
 			</ul>
-		</fieldset>
-		<fieldset>
-			<h3>Warning!</h3>
-			<p>Assigning a review is irreversible, and the review cannot be
-				edited once it is assigned.</p>
-			<div style="text-align: right">
+
+			
+			<div style="text-align: center">
 				<button id="assign-reviews">Assign</button>
 			</div>
 		</fieldset>

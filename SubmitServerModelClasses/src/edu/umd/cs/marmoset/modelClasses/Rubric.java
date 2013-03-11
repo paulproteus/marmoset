@@ -201,6 +201,22 @@ public class Rubric {
       stmt.close();
     }
   }
+  public static int countByAssignment( @CodeReviewAssignment.PK int codeReviewAssignmentPK,
+	      Connection conn) throws SQLException {
+	    String query = "SELECT COUNT(*) FROM " + TABLE_NAME
+	        + " WHERE code_review_assignment_pk = ? ";
+
+	    PreparedStatement stmt = conn.prepareStatement(query);
+	    try {
+	      stmt.setInt(1, codeReviewAssignmentPK);
+	      ResultSet rs = stmt.executeQuery();
+          if (rs.next())
+          return rs.getInt(1);
+          return 0;
+	    } finally {
+	      stmt.close();
+	    }
+	  }
 
   public static Collection<Rubric> lookupBySubmission(@Submission.PK int submissionPK, Connection conn)
   throws SQLException {

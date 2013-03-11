@@ -75,6 +75,7 @@ public interface SubmitServerConstants {
 	public static final String REVIEWER = "reviewer";
 	public static final String COURSE_INSTRUCTORS = "courseInstructors";
 	public static final String COURSE_IDS = "courseIds";
+	public static final String PSEUDO_STUDENT_REGISTRATION = "pseudoStudentRegistration";
 
 	public static final String USER = "user";
 	public static final String USER_SESSION = "userSession";

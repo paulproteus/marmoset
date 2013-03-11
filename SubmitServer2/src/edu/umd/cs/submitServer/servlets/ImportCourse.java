@@ -272,10 +272,6 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			registration.setCoursePK(course.getCoursePK());
 			registration.setClassAccount(classAccount);
 			
-			int reviewCount = CodeReviewer.countActiveReviews(registration, conn);
-			if (reviewCount > 0)
-			  out.printf(" %d code reviews for %s%n", reviewCount, registration.getFullname());
-
 			if ("Instructor".equals(role) || "TA".equals(role))
 				registration
 						.setInstructorCapability(StudentRegistration.MODIFY_CAPABILITY);

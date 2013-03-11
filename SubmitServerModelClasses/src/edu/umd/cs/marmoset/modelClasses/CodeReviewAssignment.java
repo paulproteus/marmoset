@@ -113,7 +113,7 @@ public class CodeReviewAssignment {
             "description",
             "deadline",
             "other_reviews_visible",
-            "anonymous", "kind"
+            "anonymous", "kind", "visible_to_students"
 	};
 
 	/**
@@ -128,6 +128,7 @@ public class CodeReviewAssignment {
 	private Timestamp deadline;
 	private  boolean otherReviewsVisible;
 	private  boolean anonymous;
+	private  boolean visibleToStudents;
 	private  Kind kind;
 
 	public Kind getKind() {
@@ -143,6 +144,12 @@ public class CodeReviewAssignment {
 	public boolean isByStudents() {
         return kind.isByStudents();
     }
+	public boolean isVisibleToStudents() {
+		return visibleToStudents && !kind.isPrototype();
+	}
+	public void setVisibleToStudents(boolean visibleToStudents) {
+		this.visibleToStudents = visibleToStudents;
+	}
 	public Timestamp getDeadline() {
 		return deadline;
 	}
@@ -195,6 +202,7 @@ public class CodeReviewAssignment {
 	    this.deadline = deadline;
 	    this.anonymous = anonymous;
 	    this.kind = kind;
+	    this.visibleToStudents = false;
 	    PreparedStatement stmt = null;
 	    try {
 	        stmt = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
@@ -219,6 +227,7 @@ public class CodeReviewAssignment {
         stmt.setBoolean(col++, isOtherReviewsVisible());
         stmt.setBoolean(col++, isAnonymous());
         stmt.setString(col++, kind.name());
+        stmt.setBoolean(col++, visibleToStudents);
         return col;
     }
 
@@ -233,6 +242,7 @@ public class CodeReviewAssignment {
 		this.otherReviewsVisible = resultSet.getBoolean(startingFrom++);
 		this.anonymous = resultSet.getBoolean(startingFrom++);
 		this.kind = Kind.valueOf(resultSet.getString(startingFrom++));
+		this.visibleToStudents = resultSet.getBoolean(startingFrom++);
 	}
 	
 	

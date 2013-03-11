@@ -40,6 +40,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -70,7 +71,7 @@ import edu.umd.cs.submitServer.policy.ChooseLastSubmissionPolicy;
  * @author daveho
  * @author jspacco
  */
-public class Project implements Serializable {
+public class Project implements Serializable, Cloneable {
     @Documented
     @TypeQualifier(applicableTo = Integer.class)
     @Retention(RetentionPolicy.RUNTIME)
@@ -996,7 +997,54 @@ public class Project implements Serializable {
         return Archive.downloadBytesFromArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK, conn);
     }
 
-    public void exportProject(Connection conn, OutputStream out)
+	@Override
+	protected Project clone() {
+		Project result;
+		try {
+			result = (Project) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
+		result.projectPK = 0;
+		return result;
+	}
+
+	public Project fork(Connection conn) throws SQLException {
+		Project fork = this.clone();
+		fork.setVisibleToStudents(false);
+		fork.setTitle("Fork of " + this.getTitle());
+		fork.setProjectNumber(this.getProjectNumber() + "-fork");
+		fork.insert(conn);
+		TestSetup currentTestSetup = TestSetup.lookupByTestSetupPK(getTestSetupPK(),
+				conn);
+		
+		Collection<Submission> canonicalSubmissions = Submission
+				.lookupAllByStudentRegistrationPKAndProjectPK(
+						this.getCanonicalStudentRegistrationPK(),
+						this.getProjectPK(), conn);
+		int number = 1;
+		for (Submission s : canonicalSubmissions) {
+			if (s.getBuildStatus() == BuildStatus.BROKEN)
+				continue;
+			if (s.isCurrent(currentTestSetup) || s.isBaseline(fork)) {
+				Submission f = s.fork();
+				f.setSubmissionNumber(number++);
+				f.setProjectPK(fork.getProjectPK());
+				f.insert(conn);
+			}
+		}
+		if (currentTestSetup != null) {
+		TestSetup testSetup = currentTestSetup.clone();
+		testSetup.setProjectPK(fork.getProjectPK());
+		testSetup.insert(conn);
+		fork.setTestSetupPK(testSetup.getTestSetupPK());
+		}
+
+		fork.update(conn);
+
+		return fork;
+	}
+	public void exportProject(Connection conn, OutputStream out)
     throws SQLException, IOException
     {
         ZipOutputStream zipOutputStream=new ZipOutputStream(out);

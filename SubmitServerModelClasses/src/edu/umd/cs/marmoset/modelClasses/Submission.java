@@ -69,7 +69,7 @@ import edu.umd.cs.marmoset.utilities.TextUtilities;
  * @author jspacco
  *
  */
-public class Submission implements ITestSummary<Submission> {
+public class Submission implements ITestSummary<Submission>, Cloneable {
 	public static final String SUBMISSION_ARCHIVES = "submission_archives";
 
 	@Documented
@@ -128,6 +128,27 @@ public class Submission implements ITestSummary<Submission> {
 	// Value if the submission test machine is not known
 	public static final String UNKNOWN_TEST_MACHINE = "unknown";
 
+	
+	Submission fork() {
+	
+		try {
+			Submission result = (Submission) super.clone();
+			result.submissionPK = 0;
+			result.submissionNumber = 0;
+			result.buildStatus = BuildStatus.NEW;
+			result.numPendingBuildRequests = 0;
+			result.numSuccessfulBackgroundRetests = 0;
+			result.numFailedBackgroundRetests = 0;
+			result.numChangedLines = -1;
+			result.numTestRuns = 0;
+			result.currentTestRunPK = null;
+			
+			return result;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
+		
+	}
 	// XXX these defaults correspond to the database defaults!
 	private @Submission.PK Integer submissionPK; // not NULL, autoincrement
 	private @StudentRegistration.PK int studentRegistrationPK = 0; 
@@ -154,7 +175,7 @@ public class Submission implements ITestSummary<Submission> {
     private int valueSecretTestsPassed;
     private int numFindBugsWarnings;
     private int numChangedLines = -1; // -1 means unknown
-	private Integer archivePK; // may be NULL
+	private @CheckForNull Integer archivePK; // may be NULL
 	/**
 	 * This is a write-only field.  Users can set a byte array as the cached archive
 	 * for upload, but they can only retrieve the archive via the
@@ -600,7 +621,10 @@ public class Submission implements ITestSummary<Submission> {
     public void updateCachedArchive(Connection conn)
     throws SQLException
     {
-        Archive.updateBytesInArchive(SUBMISSION_ARCHIVES, archivePK, cachedArchive, conn);
+		if (archivePK != null && archivePK.intValue() != 0)
+          Archive.updateBytesInArchive(SUBMISSION_ARCHIVES, archivePK, cachedArchive, conn);
+		else
+			archivePK = uploadCachedArchive(conn);
     }
 	/**
 	 * Does this submission have an archive cached as bytes ready for upload to the database?
@@ -811,6 +835,11 @@ public class Submission implements ITestSummary<Submission> {
 	    return rs.getInt("student_submit_status.extension");
 	}
 
+	
+	public void insert(Connection conn, byte [] archive) throws SQLException {
+		 setArchiveForUpload(archive);
+         insert(conn);
+	}
 	/**
 	 * If a submission with
 	 * @param conn
@@ -820,7 +849,7 @@ public class Submission implements ITestSummary<Submission> {
 	throws SQLException
 	{
 	    String insert = Queries.makeInsertStatement(ATTRIBUTE_NAME_LIST.length, ATTRIBUTES, TABLE_NAME);
-        if (getArchivePK() == 0 && !hasCachedArchive())
+        if (!hasArchive() && !hasCachedArchive())
             throw new IllegalStateException("there is no archive for upload, you should call setArchiveForUpload first");
 
         conn.setAutoCommit(false);
@@ -1057,10 +1086,15 @@ public class Submission implements ITestSummary<Submission> {
         return null;
     }
 
+    public boolean hasArchive()
+    {
+        return archivePK != null && archivePK.intValue() != 0;
+    }
+    
     /**
      * @return Returns the archivePK.
      */
-    public Integer getArchivePK()
+    public @CheckForNull Integer getArchivePK()
     {
         return archivePK;
     }
@@ -1790,10 +1824,7 @@ public class Submission implements ITestSummary<Submission> {
             // This is DirectSubmissionUpload
             submission.setSubmitClient("directSubmissionUpload");
 
-            // set the byte array as the archive
-            submission.setArchiveForUpload(bytesForUpload);
-
-            submission.insert(conn);
+            submission.insert(conn, bytesForUpload);
             conn.commit();
             transactionSuccess = true;
             return submission;
@@ -1860,10 +1891,7 @@ public class Submission implements ITestSummary<Submission> {
 				cvstagTimestamp, submitClientTool, submitClientVersion,
 				submissionTimestamp, conn);
 
-        // set the byte array as the archive
-        submission.setArchiveForUpload(bytesForUpload);
-
-        submission.insert(conn);
+        submission.insert(conn, bytesForUpload);
         return submission;
     }
     /**
@@ -2198,7 +2226,29 @@ public class Submission implements ITestSummary<Submission> {
           }
       }
       
-	  public static Map<Submission,Timestamp> lookupAllActiveHelpRequests(
+	  /**
+	 * @param currentTestSetup
+	 * @return
+	 */
+	protected boolean isCurrent(TestSetup currentTestSetup) {
+		if ( currentTestSetup == null ||  getCurrentTestRunPK() == null)
+			return false;
+		Integer testRunPK = currentTestSetup.getTestRunPK();
+		if (testRunPK == null)
+			return false;
+		return  testRunPK.equals(
+			getCurrentTestRunPK());
+	}
+	/**
+	 * @param fork
+	 * @return
+	 */
+	protected boolean isBaseline(Project fork) {
+		if (fork.getArchivePK() == null || getArchivePK() == null)
+			return false;
+		return fork.getArchivePK().equals(getArchivePK());
+	}
+	public static Map<Submission,Timestamp> lookupAllActiveHelpRequests(
 	            int coursePK,
 	            Connection conn)
 	    throws SQLException

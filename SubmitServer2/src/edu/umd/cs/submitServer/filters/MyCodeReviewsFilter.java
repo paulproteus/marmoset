@@ -49,6 +49,7 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
@@ -69,6 +70,7 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 		UserSession userSession = (UserSession) session
 				.getAttribute(USER_SESSION);
 		Project project = (Project) request.getAttribute(PROJECT);
+		StudentRegistration studentRegistration = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
 		Course course = (Course) request.getAttribute(COURSE);
         Submission submission = (Submission) request.getAttribute(SUBMISSION);
         boolean isInstructor = (Boolean) request.getAttribute(
@@ -124,9 +126,10 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 				CodeReviewer author = s.getAuthor();
 				if (author != null && userSession.getStudentPK() == author.getStudentPK())
 					reviewsOfMyCode.add(s);
-				else if (r.isAssignment())
-					myAssignments.add(s);
-				else
+				else if (r.isAssignment()) {
+					if (r.getCodeReviewAssignment().isVisibleToStudents()
+					    || !studentRegistration.isNormalStudent()) myAssignments.add(s);
+				} else
 					adHocReviews.add(s);
 			}
 			request.setAttribute("reviewsOfMyCode", reviewsOfMyCode);

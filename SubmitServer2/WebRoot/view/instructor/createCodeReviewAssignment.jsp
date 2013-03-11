@@ -285,63 +285,7 @@ li.deleted-rubric {
             </c:if>
         </ul>
     </fieldset>
-    <c:if test="${empty codeReviewAssignment}">
-    <fieldset id="code-for-instructional-review">
-    <h3>Submission for Prototype Instructional Review</h3>
-        <ul class="form-fields">
-            <li>
-            <c:choose>
-            <c:when test="${hasOtherStaffSubmissions}">
-            
-                <label for="exemplar-submission">Code for prototype instructional review:</label>
-                <select name="of-instructional" id="exemplar-submission-instructional">
-                    <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
-                    <c:if test="${studentRegistration.studentPK != user.studentPK || studentRegistration.pseudoStudent }">
-                    <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
-                        <c:out value="${studentRegistration.fullname}" />
-                    </option>
-                    </c:if>
-                    </c:forEach>
-                </select>
-                <p>
-                The code review will initially be created as a prototype, and you will be assigned to review the
-                 submission from the account selected above.
-                
-                </p>
-                </c:when>
-                <c:otherwise>
-                 <p>
-             
-                </p>
-                </c:otherwise>
-                </c:choose>
-            </li>
-        </ul>
-    </fieldset>
-     <fieldset id="code-for-peer-review">
-    <h3>Submission to Review</h3>
-        <ul class="form-fields">
-            <li>
-                <label for="exemplar-submission">Code for prototype peer review:</label>
-                <select name="of-peer" id="exemplar-submission-peer">
-                    <c:forEach var="studentRegistration" items="${staffStudentSubmissions}">
-                     <c:if test="${studentRegistration.studentPK != user.studentPK || !studentRegistration.pseudoStudent}">
-                   
-                    <option value="${lastSubmission[studentRegistration.studentRegistrationPK].submissionPK}">
-                        <c:out value="${studentRegistration.fullname}" />
-                    </option>
-                    </c:if>
-                    </c:forEach>
-                </select>
-                <p>
-                  The code review will initially be created as a prototype, and your pseudo-student account will be assigned to review the
-                 submission from the account selected above.
-                </p>
-            </li>
-        </ul>
-    </fieldset>
-    
-    </c:if>
+   
     <fieldset id="review-rubrics">
     <h3>Rubrics</h3>
     <div id="rubric-controls">
@@ -446,14 +390,10 @@ li.deleted-rubric {
 		case "instructionalPrototype":
 			hideItem("anonymity-info");
 			hideItem("visibility-info");
-			hideItem("code-for-peer-review");
-			showItem("code-for-instructional-review");
             break;
 		case "peerPrototype":
 			showItem("anonymity-info");
 			showItem("visibility-info");
-			showItem("code-for-peer-review");
-			hideItem("code-for-instructional-review");
             break;
 		default:
 			console.log("Unknown kind");

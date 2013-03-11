@@ -360,6 +360,10 @@
         <filter-name>CodeReviewAssignmentFilter</filter-name>
         <url-pattern>/data/instructor/PrintCodeReviewAssignmentGrades</url-pattern>
     </filter-mapping>
+        <filter-mapping>
+        <filter-name>CodeReviewAssignmentFilter</filter-name>
+        <url-pattern>/action/instructor/UnassignCodeReview</url-pattern>
+    </filter-mapping>
 	
 	<filter>
 		<filter-name>InstructorFilter</filter-name>
@@ -593,7 +597,10 @@
 		<filter-name>AllStudentsSummaryFilter</filter-name>
 		<url-pattern>/view/instructor/createCodeReviewAssignment.jsp</url-pattern>
 	</filter-mapping>
-	<filter-mapping>
+		<filter-mapping>
+		<filter-name>AllStudentsSummaryFilter</filter-name>
+		<url-pattern>/view/instructor/codeReviewAssignment.jsp</url-pattern>
+	</filter-mapping><filter-mapping>
 		<filter-name>AllStudentsSummaryFilter</filter-name>
 		<url-pattern>/view/instructor/assignCodeReviews.jsp</url-pattern>
 	</filter-mapping>
@@ -1010,6 +1017,10 @@
 		<servlet-name>CreateCodeReviewAssignment</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.CreateCodeReviewAssignment</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>AddSampleCodeReview</servlet-name>
+		<servlet-class> edu.umd.cs.submitServer.servlets.AddSampleCodeReview</servlet-class>
+	</servlet>
 
 	<servlet>
 		<servlet-name>AddSubmissionsToCodeReviewAssignment</servlet-name>
@@ -1189,6 +1200,10 @@
 		<servlet-class>edu.umd.cs.submitServer.servlets.DownloadMostRecentOnTimeAndLateSubmissions</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>ForkProject</servlet-name>
+		<servlet-class>edu.umd.cs.submitServer.servlets.ForkProject</servlet-class>
+	</servlet>
+		<servlet>
 		<servlet-name>UpdateProject</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.UpdateProject</servlet-class>
 	</servlet>
@@ -1300,6 +1315,10 @@
         <servlet-name>TestingGround</servlet-name>
         <servlet-class>edu.umd.cs.submitServer.servlets.TestingGroundServlet</servlet-class>
     </servlet>
+    	<servlet-mapping>
+        <servlet-name>TestingGround</servlet-name>
+        <url-pattern>/data/instructor/TestingGround</url-pattern>
+    </servlet-mapping>
 	<servlet>
         <servlet-name>PrintTestOutcome</servlet-name>
         <servlet-class>edu.umd.cs.submitServer.servlets.PrintTestOutcome</servlet-class>
@@ -1371,6 +1390,11 @@
 	<servlet-mapping>
 		<servlet-name>CreateCodeReviewAssignment</servlet-name>
 		<url-pattern>/action/instructor/CreateCodeReviewAssignment</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>AddSampleCodeReview</servlet-name>
+		<url-pattern>/action/instructor/AddSampleCodeReview</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AddSubmissionsToCodeReviewAssignment</servlet-name>
@@ -1516,6 +1540,10 @@
 	<servlet-mapping>
 		<servlet-name>UpdateProject</servlet-name>
 		<url-pattern>/action/instructor/UpdateProject</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ForkProject</servlet-name>
+		<url-pattern>/action/instructor/ForkProject</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>LogEclipseLaunchEvent</servlet-name>

@@ -4,7 +4,9 @@
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
 
 <c:if test="${anyCodeReviews}">
+<c:if test="${not empty title}">
 	<h2>${title}</h2>
+	</c:if>
 
 	<c:if test="${not empty reviewsOfMyCode}">
 		<h3>Reviews of my code</h3>

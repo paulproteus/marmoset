@@ -671,8 +671,10 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			stmt.setInt(2, submissionPK);
 			stmt.setInt(3, studentPK);
 			ResultSet rs = stmt.executeQuery();
-			if (rs.next())
-				return new CodeReviewer(rs, 1, conn);
+			if (rs.next()) {
+				CodeReviewer codeReviewer = new CodeReviewer(rs, 1, conn);
+				return codeReviewer;
+			}
 			return null;
 		} finally {
 			stmt.close();

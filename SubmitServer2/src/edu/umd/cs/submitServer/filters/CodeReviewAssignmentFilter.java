@@ -23,6 +23,7 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.UserSession;
@@ -46,17 +47,20 @@ public class CodeReviewAssignmentFilter extends SubmitServerFilter {
       int codeReviewAssignmentPK = codeReviewAssignment.getCodeReviewAssignmentPK();
       Collection<Submission> submissionsUnderReview = Submission
           .getSubmissionsUnderReview(codeReviewAssignmentPK, conn);
-
-      if (!submissionsUnderReview.isEmpty()) {
+      boolean hasRubrics = Rubric.countByAssignment(codeReviewAssignmentPK, conn) > 0;
+      
+      if (submissionsUnderReview.isEmpty()) {
+        request.setAttribute("hasRubrics", hasRubrics);
+        request.setAttribute("canRevertCodeReview", true);
+        request.setAttribute("overallCodeReviewStatus", CodeReviewSummary.Status.NOT_STARTED);
+        
+      } else {
         Collection<CodeReviewer> codeReviewersForAssignment = CodeReviewer.lookupByCodeReviewAssignmentPK(
             codeReviewAssignmentPK, conn);
 
         Map<Submission, CodeReviewSummary.Info> info = new HashMap<Submission, CodeReviewSummary.Info>();
-        boolean hasRubrics = false;
         for (Submission s : submissionsUnderReview) {
           CodeReviewSummary.Info thisInfo = new CodeReviewSummary.Info(conn, s, codeReviewAssignment);
-          if (!thisInfo.rubrics.isEmpty())
-            hasRubrics = true;
           info.put(s, thisInfo);
         }
         Map<CodeReviewer, CodeReviewSummary> summary = new HashMap<CodeReviewer, CodeReviewSummary>();

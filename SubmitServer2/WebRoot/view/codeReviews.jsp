@@ -29,20 +29,43 @@
 
 <!DOCTYPE HTML>
 <html>
-<ss:head title="All code reviews for ${course.courseName}" />
+
+<c:choose>
+<c:when test="${ empty project}">
+<c:set var="title">
+All code reviews for <c:out value="${course.courseName}"/>
+</c:set>
+<c:set var="fullTitle">
+All code reviews for <c:out value="${course.fullDescription}"/>
+</c:set>
+</c:when>
+<c:otherwise>
+<c:set var="title">
+All code reviews for project 
+<c:out value="${project.projectNumber}"/>
+in <c:out value="${course.courseName}"/>
+</c:set>
+<c:set var="fullTitle">
+All code reviews for project 
+<c:out value="${project.projectNumber}"/>
+in <c:out value="${course.fullDescription}"/>
+</c:set>
+</c:otherwise>
+</c:choose>
+
+<ss:head title="${title}" />
 
 <body>
 <ss:header />
 <ss:breadCrumb />
 
 <div class="sectionTitle">
-	<h1><a href="${course.url}">All code reviews for
-    <c:out value="${course.fullDescription}"/></a></h1>
+	<h1>${fullTitle}</h1>
 
 	<ss:hello/>
 </div>
 
-<ss:codeReviews title="All Code reviews"/>
+<ss:codeReviews title=""/>
 
 <ss:footer/>
 </body>

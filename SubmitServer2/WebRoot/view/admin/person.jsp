@@ -49,31 +49,39 @@
 
     <table>
         <c:forEach var="student" items="${allStudents}" varStatus="counter">
-            <tr class="r${counter.index % 2}">
-                <td class="description"><c:out value="${student.fullname}" /></td>
-                
-                <td><form method="GET" action="${editStudentUrl}">
-                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                        <button type="submit">Edit</button>
-                    </form></td>
-                <td><form method="post" action="${authenticateAsLink}">
-                        <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                        <button type="submit">Become</button>
-                    </form></td>
-                <td><c:if test="${!student.canImportCourses}">
-                        <form method="post" action="${allowCourseCreationLink}">
-                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                            <button type="submit">Allow course creation</button>
-                        </form>
-                    </c:if></td>
-                <td><c:if test="${student.canImportCourses && !student.superUser}">
-                        <form method="post" action="${makeSuperuserLink}">
-                            <input type="hidden" name="studentPK" value="${student.studentPK}" />
-                            <button type="submit">Make superuser</button>
-                        </form>
-                    </c:if></td>
-            </tr>
-        </c:forEach>
+			<tr class="r${counter.index % 2}">
+				<c:url var="viewLink" value="/view/instructor/student.jsp">
+					<c:param name="studentPK" value="${student.studentPK}" />
+				</c:url>
+
+				<td class="description"><a href="${viewLink}"><c:out
+							value="${student.fullname}" /></a></td>
+
+				<td><form method="GET" action="${editStudentUrl}">
+						<input type="hidden" name="studentPK" value="${student.studentPK}" />
+						<button type="submit">Edit</button>
+					</form></td>
+				<td><form method="post" action="${authenticateAsLink}">
+						<input type="hidden" name="studentPK" value="${student.studentPK}" />
+						<button type="submit">Become</button>
+					</form></td>
+				<td><c:if test="${!student.canImportCourses}">
+						<form method="post" action="${allowCourseCreationLink}">
+							<input type="hidden" name="studentPK"
+								value="${student.studentPK}" />
+							<button type="submit">Allow course creation</button>
+						</form>
+					</c:if></td>
+				<td><c:if
+						test="${student.canImportCourses && !student.superUser}">
+						<form method="post" action="${makeSuperuserLink}">
+							<input type="hidden" name="studentPK"
+								value="${student.studentPK}" />
+							<button type="submit">Make superuser</button>
+						</form>
+					</c:if></td>
+			</tr>
+		</c:forEach>
     </table>
 
     <ss:footer />

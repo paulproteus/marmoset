@@ -504,21 +504,22 @@ public class Student  implements Comparable<Student> {
    * @param conn the connection to the database
    * @throws SQLException
    */
-  public @CheckReturnValue Student insertOrUpdateCheckingLoginNameAndCampusUID(Connection conn)
-  throws SQLException
-  {
-    if (FAKE_NAMES)
-      throw new IllegalStateException();
-      Student existingStudent = lookupByLoginNameAndCampusUID(loginName, campusUID, conn);
+	public @CheckReturnValue
+	Student insertOrUpdateCheckingLoginNameAndCampusUID(Connection conn)
+			throws SQLException {
+		if (FAKE_NAMES)
+			throw new IllegalStateException();
+		Student existingStudent = lookupByLoginNameAndCampusUID(loginName,
+				campusUID, conn);
 
-    if (existingStudent == null) {
-      executeInsert(conn);
-      return this;
-    } else {
-      copyTo(conn, existingStudent);
-      return existingStudent;
-    }
-  }
+		if (existingStudent == null) {
+			executeInsert(conn);
+			return this;
+		} else {
+			copyTo(conn, existingStudent);
+			return existingStudent;
+		}
+	}
 
 
   public void update(Connection conn)

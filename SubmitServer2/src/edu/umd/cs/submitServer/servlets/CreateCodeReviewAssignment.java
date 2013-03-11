@@ -46,18 +46,11 @@ import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
 public class CreateCodeReviewAssignment extends SubmitServerServlet {
-    
-    private static boolean nullSafeEquals(Object x, Object y) {
-        if (x == y)
-            return true;
-        if (x == null || y == null)
-            return false;
-        return x.equals(y);
-    }
 
     private static void add(LinkedHashMap<String, Integer> map, String name,
             @CheckForNull Integer value) {
@@ -118,43 +111,10 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                 if (!kind.isPrototype())
                     throw new IllegalArgumentException(
                             "Can only create prototype code reviews");
-           
-                String of;
-                StudentRegistration reviewer;
-                
-                switch (kind) {
-                case PEER_PROTOTYPE:
-                    of = parser.getStringParameter("of-peer");
-                    
-                    reviewer = StudentAccountForInstructor
-                            .createOrFindPseudoStudentRegistration(conn,
-                                    course, instructor, user);
-                    break;
-                case INSTRUCTIONAL_PROTOTYPE:
-                    of = parser.getStringParameter("of-instructional");
-                    
-                    reviewer = instructor;
-                    break;
-                default:
-                    throw new AssertionError();
-                }
-                
-                @Submission.PK
-                int ofPK = Submission.asPK(Integer.parseInt(of));
-                Submission submission = Submission.lookupBySubmissionPK(ofPK,
-                        conn);
-                StudentRegistration author = StudentRegistration.lookupBySubmissionPK(ofPK, conn);
-                
-                
-                if (reviewer.getStudentPK() == author.getStudentPK())
-                    throw new IllegalArgumentException("Reviewer and author for prototype code review must be distinct");
-                
                 assignment = new CodeReviewAssignment(conn,
-                        project.getProjectPK(), description, deadline,
-                        canSeeOthers, anonymous, kind);
-               
-                AssignCodeReviews.reviewOneSubmission(assignment, submission,
-                        Collections.singleton(reviewer), conn);
+                    project.getProjectPK(), description, deadline,
+                    canSeeOthers, anonymous, kind);
+           
             }
             addRubrics(request, parser, assignment, conn);
 
@@ -174,6 +134,8 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     transactionSuccess, request, conn);
         }
     }
+
+
 
     public void addRubrics(HttpServletRequest request, RequestParser parser,
             CodeReviewAssignment assignment, Connection conn)
@@ -200,10 +162,10 @@ public class CreateCodeReviewAssignment extends SubmitServerServlet {
                     LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
                     String first;
                     if (defaultValue == null
-                            || nullSafeEquals(min, defaultValue)) {
+                            || Objects.nullSafeEquals(min, defaultValue)) {
                         add(map, "min", min);
                         add(map, "max", max);
-                    } else if (nullSafeEquals(max, defaultValue)) {
+                    } else if (Objects.nullSafeEquals(max, defaultValue)) {
                         add(map, "max", max);
                         add(map, "min", min);
                     } else {

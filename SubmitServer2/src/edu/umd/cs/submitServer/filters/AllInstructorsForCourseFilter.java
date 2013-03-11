@@ -39,7 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.submitServer.servlets.StudentAccountForInstructor;
 
 /**
  * @author jspacco
@@ -60,6 +62,8 @@ public class AllInstructorsForCourseFilter extends SubmitServerFilter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		Connection conn = null;
 		Course course = (Course) request.getAttribute(COURSE);
+		Student user = (Student) request.getAttribute(USER);
+    
 		String uri = request.getRequestURI();
 		if (course == null)
 		    throw new IllegalArgumentException("No course found for " + uri);
@@ -73,6 +77,9 @@ public class AllInstructorsForCourseFilter extends SubmitServerFilter {
 
 			request.setAttribute(COURSE_INSTRUCTORS, instructors);
 			request.setAttribute(COURSE_IDS, course.getCourseIDs());
+			request.setAttribute(PSEUDO_STUDENT_REGISTRATION, StudentAccountForInstructor.findPseudoStudentRegistration(conn, 
+			    course, user));
+			
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
