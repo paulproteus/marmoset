@@ -58,6 +58,8 @@ public class CourseCalendar extends SubmitServerServlet {
 		Course course = (Course) request.getAttribute(COURSE);
 		List<Project> projects = (List<Project>) request.getAttribute(PROJECT_LIST);
 
+		String fileName = course.getCourseName()  + " calendar.ics";
+		Util.setAttachmentHeaders(response, fileName);
 		ServletOutputStream sout = response.getOutputStream();
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/calendar");
@@ -71,7 +73,7 @@ public class CourseCalendar extends SubmitServerServlet {
 		writeEscaped(out,"VERSION","2.0");
 		writeEscaped(out,"PRODID","Marmoset");
     
-		writeEscaped(out,"X-WR-CALNAME",course.getCourseName());
+		writeEscaped(out,"X-WR-CALNAME;CHARSET=UTF-8",course.getCourseName());
 		for(Project p : projects) {
 
 		  if (!p.getVisibleToStudents())

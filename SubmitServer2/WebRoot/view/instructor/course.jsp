@@ -384,31 +384,37 @@ jQuery(document).ready(function ($) {
         </c:forEach>
     </table>
 
-    <h3>
-        <a id="status">Server status</a>
-    </h3>
-    <p>Server load: ${systemLoad}</p>
+<h2><a id="status">Status</a></h2>
+
+
+     <c:url var="courseCalendarLink" value="/feed/CourseCalendar">
+                            <c:param name="coursePK" value="${course.coursePK}" />
+                        </c:url>
+    <ul>
+    <li><a href="${courseCalendarLink}">Course calendar link</a> (iCalendar .ics format: 
+    subscribe in iCal, Google calendar, or Outlook)
+
+    <li>Server load: ${systemLoad}
+    
     <c:url var="createBuildserverConfig" value="/action/instructor/CreateBuildserverConfigFile">
                     <c:param name="buildserverCourse">${course.coursePK}</c:param>
                 </c:url>
     <c:url var="zippedBuildServer" value="/resources/buildserver.zip"/>
-                 
+                                  <li><a href="${createBuildserverConfig}">Generate buildserver config file to run your own
+                        buildserver</a>
+                <li><a href="${zippedBuildServer}">Zip archive of build server</a>
   <c:choose>
         <c:when test="${empty buildServers}">
-            <p>
+            <li>
                 <c:if test="${testedProjects}">
                     <b>WARNING</b>
                 </c:if>
                 There are no recent build servers for your course.
-            </p>
-            <p>
-                <a href="${createBuildserverConfig}">Generate buildserver config file to run your own buildserver</a>
-            </p>
-             <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
+           
                
         </c:when>
         <c:otherwise>
-            <p>
+            <li>
                 There are ${fn:length(buildServers)} recent build servers that can build code for your course. (<a
                     href="javascript:toggle('buildServers')">details</a>)
                 
@@ -431,19 +437,17 @@ jQuery(document).ready(function ($) {
                         </tr>
                     </c:forEach>
                 </table>
-                 <p><a href="${createBuildserverConfig}">Generate buildserver config file to run your own
-                        buildserver</a></p>
-                <p><a href="${zippedBuildServer}">Zip archive of build server</a></p>
+
                
             </div>
         </c:otherwise>
     </c:choose>
-
+    </ul>
 
     <c:if test="${instructorActionCapability}">
-        <h3>
+        <h2>
             <a id="update" >Update</a>
-        </h3>
+        </h2>
         <c:url var="updateCourseLink" value="/action/instructor/UpdateCourse" />
         <c:set var="currentURL">
             <c:out value="${course.url}" />
@@ -529,7 +533,7 @@ jQuery(document).ready(function ($) {
     <c:if test="${! empty hiddenProjects }">
 
         <h2>
-            <a id="projects">Hidden Projects</a>
+            <a id="hiddenProjects">Hidden Projects</a>
         </h2>
         <p></p>
         <table>
@@ -570,13 +574,7 @@ jQuery(document).ready(function ($) {
         </table>
     </c:if>
     
-     <h2>Feeds</h2>
-     <c:url var="courseCalendarLink" value="/feed/CourseCalendar">
-                            <c:param name="coursePK" value="${course.coursePK}" />
-                        </c:url>
-    <ul><li><a href="${courseCalendarLink}">Course calendar link</a> (iCalendar .ics format: 
-    subscribe in iCal, Google calendar, Outlook)
-    </ul>
+   
     
     <ss:footer />
 	<script type="text/javascript">
