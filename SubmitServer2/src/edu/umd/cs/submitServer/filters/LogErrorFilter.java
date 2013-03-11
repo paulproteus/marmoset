@@ -33,6 +33,8 @@ public class LogErrorFilter extends SubmitServerFilter {
 	}
 	
 	public static boolean ignore(String code, String message) {
+	    if (!code.equals("503")) 
+      return true;
 	    if (!code.equals("404")) 
 	        return false;
 	    
