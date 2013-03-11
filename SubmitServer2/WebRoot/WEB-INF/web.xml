@@ -237,10 +237,12 @@
 		<filter-name>AuthenticationFilter</filter-name>
 		<url-pattern>/action/*</url-pattern>
 	</filter-mapping>
+	<!-- 
 	<filter-mapping>
 		<filter-name>AuthenticationFilter</filter-name>
 		<url-pattern>/feed/*</url-pattern>
 	</filter-mapping>
+	 -->
 	<filter-mapping>
 		<filter-name>AuthenticationFilter</filter-name>
 		<url-pattern>/docs/instructor/*</url-pattern>
