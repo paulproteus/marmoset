@@ -20,7 +20,7 @@ public class Clover {
             xmlReporterRunReport = xmlReporter.getDeclaredMethod("runReport", String[].class);
             a = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            
         }
         available = a;
 

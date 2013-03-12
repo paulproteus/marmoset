@@ -35,7 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.net.ConnectException;
 import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -103,7 +105,14 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	@Override
 	protected void prepareToExecute() {
 		this.client = new HttpClient();
-		client.setConnectionTimeout(5000);
+		client.setConnectionTimeout(getConnectionTimeout());
+	}
+
+	/**
+	 * @return
+	 */
+	protected int getConnectionTimeout() {
+		return (int)TimeUnit.MILLISECONDS.convert(3, TimeUnit.MINUTES);
 	}
 
 	
@@ -289,6 +298,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 	protected ProjectSubmission<?> getProjectSubmission()
 			throws MissingConfigurationPropertyException, IOException {
 
+		try {
 		String url = getRequestSubmissionURL();
 		MultipartPostMethod method = new MultipartPostMethod(
 				url);		
@@ -406,6 +416,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		writeToCurrentFile(submissionPK + "\n" + testSetupPK + "\n" + kind + "\n" +  SystemInfo.getSystemLoad() + "\n" + logMsg);
 		
 		return projectSubmission;
+		} catch (ConnectException e) {
+			getLog().info("Unable to connect to " + getBuildServerConfiguration().getSubmitServerURL());
+			return null;
+		}
 	}
 
 	/**
@@ -525,6 +539,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         method.addParameter("javaVersion", System.getProperty("java.version"));
         method.addParameter("serverTimestamp",
                 Long.toString(getBuildServerConfiguration().getServerTimestamp()));
+        method.addParameter("connectionTimeout", Integer.toString(getConnectionTimeout()));
 	}
 	
 	
@@ -845,7 +860,7 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
         Logger log = buildServer.getLog();
         
         /** Redirect standard out and err to dev null, since clover
-         * writers to standard out and error */
+         * writes to standard out and error */
         
         PrintStream systemOut = System.out;
         PrintStream systemErr = System.err;

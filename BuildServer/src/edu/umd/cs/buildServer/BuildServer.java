@@ -616,6 +616,9 @@ public abstract class BuildServer implements ConfigurationKeys {
             log.error("Internal error: BuildServer got HttpException", e);
             // Assume this wasn't our fault
             return NO_WORK;
+        } catch(java.net.ConnectException e) {
+        	 	log.info("Unable to connect to submit server at " +  getBuildServerConfiguration().getSubmitServerURL());
+             return NO_WORK;
         } catch (IOException e) {
             log.error("Internal error: BuildServer got IOException", e);
             // Assume this is an internal error

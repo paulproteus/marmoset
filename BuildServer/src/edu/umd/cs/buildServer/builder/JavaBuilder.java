@@ -400,6 +400,8 @@ public class JavaBuilder extends Builder<JUnitTestProperties> implements TestPro
 		// Specify javac command line arguments.
 		ArrayList<String> args = new ArrayList<String>();
 		args.add("javac");
+		args.add("-encoding");
+		args.add("UTF-8");
 		// Specify classpath
 		args.add("-classpath");
 		args.add(cp.toString());
