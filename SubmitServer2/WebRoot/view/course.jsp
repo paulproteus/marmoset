@@ -187,8 +187,8 @@
     </table>
     
     <h2>Feeds</h2>
-     <c:url var="courseCalendarLink" value="/feed/CourseCalendar">
-                            <c:param name="coursePK" value="${course.coursePK}" />
+          <c:url var="courseCalendarLink" value="/feed/CourseCalendar">
+                            <c:param name="courseKey" value="${course.courseKey}" />
                         </c:url>
     <ul><li><a href="${courseCalendarLink}">Course calendar link</a> (iCalendar .ics format: 
     subscribe in iCal, Google calendar, Outlook)

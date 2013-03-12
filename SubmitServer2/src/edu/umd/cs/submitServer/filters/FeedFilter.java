@@ -52,8 +52,8 @@ public class FeedFilter extends SubmitServerFilter {
     HttpServletRequest request = (HttpServletRequest) req;
     HttpServletResponse response = (HttpServletResponse) resp;
     RequestParser parser = new RequestParser(request, getSubmitServerFilterLog(), strictParameterChecking());
-    Integer projectPK = parser.getIntegerParameter(PROJECT_PK, null);
-    Integer coursePK = parser.getIntegerParameter(COURSE_PK, null);
+    String courseKey = parser.getParameter(COURSE_KEY);
+    if (courseKey == null) throw new IllegalArgumentException("No course key");
 
     Project project = null;
     Course course = null;
@@ -61,19 +61,10 @@ public class FeedFilter extends SubmitServerFilter {
     Connection conn = null;
     try {
       conn = getConnection();
-      if (projectPK != null) {
-        project = Project.lookupByProjectPK(projectPK, conn);
-        if (coursePK == null)
-          coursePK = project.getCoursePK();
-        else if ( !coursePK.equals(project.getCoursePK()))
-          throw new IllegalArgumentException("Course and project PK don't match");
-        request.setAttribute(COURSE, course);
-      }
-      if (coursePK != null) {
-        course = Course.lookupByCoursePK(coursePK, conn);
-        request.setAttribute(COURSE, course);
-      }
-      List<Project> projectList = Project.lookupAllByCoursePK(coursePK, conn);
+
+      course = Course.lookupByCourseKey(courseKey, conn);
+      request.setAttribute(COURSE, course);
+      List<Project> projectList = Project.lookupAllByCoursePK(course.getCoursePK(), conn);
       Collections.reverse(projectList);
       request.setAttribute(PROJECT_LIST, projectList);
       
