@@ -187,6 +187,14 @@ public class MultipartRequest {
 		}
 		return param;
 	}
+	
+	public int getOptionalIntParameter(String name, int defaultValue) {
+	  String param = (String) parameters.get(name);
+    if (param == null || param.equals("")) {
+      return defaultValue;
+    }
+    return Integer.parseInt(param);
+	}
 
 	/**
 	 * Return the parameter's value if matched by the provided regex pattern. If

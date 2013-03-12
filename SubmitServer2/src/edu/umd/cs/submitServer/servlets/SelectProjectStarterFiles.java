@@ -60,8 +60,7 @@ public class SelectProjectStarterFiles extends SubmitServerServlet {
 			if (submission == null) {
 			    project.setArchivePK(null);
 			} else {
-			    int archivePK = submission.getArchivePK();
-			    project.setArchivePK(archivePK);
+			    project.setArchivePK(submission.getArchivePK());
 			}
 			project.update(conn);
 			Submission.clearCachedNumLinesChanged(conn, project);

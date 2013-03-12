@@ -22,9 +22,18 @@ public class EchoServlet extends HttpServlet {
             throws IOException {
         resp.setContentType("text/plain");
         resp.setCharacterEncoding("UTF-8");
-        
+        String delayString = req.getParameter("delay");
         PrintWriter out = resp.getWriter();
 
+        int delay = 60;
+        if (delayString != null)
+          delay = Integer.parseInt(delayString.trim());
+        try {
+        Thread.sleep(delay * 1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace(out);
+      }
+       
         out.println("      URI:" + req.getRequestURI());
         out.println("      URL:" + req.getRequestURL().toString());
         out.println("   scheme: " + req.getScheme());
@@ -35,6 +44,8 @@ public class EchoServlet extends HttpServlet {
         out.println("     host: " + req.getRemoteHost());
         out.println("  charset: " + req.getCharacterEncoding());
         out.println("     type: " + req.getContentType());
+        out.println("    delay: " + delay);
+        
         
         String auth = req.getAuthType();
         if (auth != null) 

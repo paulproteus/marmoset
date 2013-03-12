@@ -305,7 +305,9 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 				// Look up the testRun for the current TestOutcomeCollection
 				TestRun currentTestRun = TestRun.lookupByTestRunPK(
 						submission.getCurrentTestRunPK(), conn);
-				if (currentTestRun.getTestSetupPK() != testSetupPK) {
+				if (currentTestRun == null)
+				  getSubmitServerServletLog().warn("Unable to find test run " + submission.getCurrentTestRunPK());
+				if (currentTestRun == null || currentTestRun.getTestSetupPK() != testSetupPK) {
 					// Retest was against a different jarfile than the current
 					// one;
 					// for now just ignore this run.

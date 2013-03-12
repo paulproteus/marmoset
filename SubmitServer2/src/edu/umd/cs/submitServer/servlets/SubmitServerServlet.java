@@ -106,9 +106,9 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	/**
 	 * Generic logger object for all servlets to use.
 	 */
-	private Logger submitServerServletLog;
+	private static Logger submitServerServletLog;
 
-	protected synchronized Logger getSubmitServerServletLog() {
+	protected static synchronized Logger getSubmitServerServletLog() {
 		if (submitServerServletLog == null) {
 			submitServerServletLog = Logger
 					.getLogger(SubmitServerServlet.class);

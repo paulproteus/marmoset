@@ -58,6 +58,7 @@ import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
 import edu.umd.cs.submitServer.filters.SubmitServerFilter;
+import edu.umd.cs.submitServer.util.WaitingBuildServer;
 
 /**
  * @author jspacco
@@ -65,8 +66,7 @@ import edu.umd.cs.submitServer.filters.SubmitServerFilter;
  */
 public class RequestSubmission extends SubmitServerServlet {
 	private static final WebConfigProperties webProperties = WebConfigProperties.get();
-    private static final int LOG_REQUESTS_MORE_THAN_MS = 9000;
-
+   
     static HashSet<String> complainedAbout = new HashSet<String>();
 
     private static final int MAX_BUILD_DURATION_MINUTES = 3;
@@ -76,6 +76,10 @@ public class RequestSubmission extends SubmitServerServlet {
     enum Kind {
         UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP,
         BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST, PROJECT_RETEST;
+        
+        public boolean isBackgroundRetest() {
+          return this == BACKGROUND_RETEST || this == PROJECT_RETEST;
+        }
     }
 
     public static void timeDump(StringBuffer buf, Timestamp started, String f, Object... args) {
@@ -113,13 +117,12 @@ public class RequestSubmission extends SubmitServerServlet {
          
         Kind kind = Kind.UNKNOWN;
         Queries.RetestPriority foundPriority = null;
-        String courses = multipartRequest.getStringParameter("courses").trim();
+        String courseKey = multipartRequest.getStringParameter("courses").trim();
         String remoteHost =  SubmitServerFilter.getRemoteHost(request);
+        int connectionTimeout = multipartRequest.getOptionalIntParameter("connectionTimeout", 4000);
 
         try {
-            boolean foundNewTestSetup = false;
-            boolean foundSubmissionForBackgroundRetesting = false;
-
+            
             /**
              * We are going to use Java static locking as well as database
              * locking. If requests from two build servers come in at the same
@@ -136,12 +139,12 @@ public class RequestSubmission extends SubmitServerServlet {
             }
             try {
                 conn = getConnection();
-                 Collection<Integer> allowedCourses = getCourses(conn, courses);
+                 Collection<Integer> allowedCourses = getCourses(conn, courseKey);
                
                  if (allowedCourses.isEmpty()) {
-                     String msg = "host " + hostname + "; no courses match " + courses;
+                     String msg = "host " + hostname + "; no courses match " + courseKey;
                      getSubmitServerServletLog().warn(msg);
-                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No courses match " + courses);
+                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No courses match " + courseKey);
                      return;
                  }
 
@@ -176,23 +179,20 @@ public class RequestSubmission extends SubmitServerServlet {
                         response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, NO_SUBMISSIONS_AVAILABLE_MESSASGE);
                         return;
                     }
-                    foundSubmissionForBackgroundRetesting = true;
                 } else {
 
                     findSubmission: {
 
-                        foundNewTestSetup = Queries.lookupNewTestSetup(conn, submission, testSetup, allowedCourses,
-                                MAX_BUILD_DURATION_MINUTES);
-                        if (foundNewTestSetup && submission.getNumPendingBuildRequests() > 3) {
+                        if (Queries.lookupNewTestSetup(conn, submission, testSetup, allowedCourses,
+                                MAX_BUILD_DURATION_MINUTES)) {
+                        if (submission.getNumPendingBuildRequests() > 3) {
                             submission.setBuildStatus(Submission.BuildStatus.BROKEN);
                             submission.update(conn);
-                            foundNewTestSetup = false;
-                        }
-                        if (foundNewTestSetup)  {
+                        } else {
                             kind = Kind.NEW_TEST_SETUP;
                             break findSubmission;
                         }
-
+                        }
                         for (Queries.RetestPriority priority : Queries.RetestPriority.values()) {
 
                             timeDump(buf, now, "%s%n", priority);
@@ -230,19 +230,49 @@ public class RequestSubmission extends SubmitServerServlet {
 
                         }
 
-                        foundSubmissionForBackgroundRetesting = true;
-                        kind = Kind.BACKGROUND_RETEST;
                         // *) look for ambient background retest
                         if (isBackgroundRetestingEnabled()
-                                && Queries.lookupSubmissionForBackgroundRetest(conn, submission, testSetup, allowedCourses))
-                            break findSubmission;
-                        BuildServer.submissionRequestedNoneAvailable(conn, hostname, remoteHost, courses, now, load);
-
-                        long delay = System.currentTimeMillis() - now.getTime();
-                        if (delay > LOG_REQUESTS_MORE_THAN_MS) {
-                            String msg = "Took " + delay + "ms to find nothing :: " + buf;
-                            MonitorSlowTransactionsFilter.insertServerError(conn, request, msg, "Slow", "RequestSubmission");
+                                && Queries.lookupSubmissionForBackgroundRetest(conn, submission, testSetup, allowedCourses)) {
+                          kind = Kind.BACKGROUND_RETEST;
+                         break findSubmission;
                         }
+                        
+                        BuildServer.submissionRequestedNoneAvailable(conn, hostname, remoteHost, courseKey, now, load);
+                        int waitFor = connectionTimeout - 1000;
+                        if (waitFor > 1000)  {
+                        
+                        // OK, want to pause and wait for something to come in.
+                        lock.unlock();
+                        locked = false;
+                        releaseConnection(conn);
+                        conn = null;
+                        submission = WaitingBuildServer.waitForSubmission(allowedCourses, waitFor);
+                        if (submission != null) {
+                          locked = lock.tryLock(500, TimeUnit.MILLISECONDS);
+                          if (!locked) {
+
+                            getSubmitServerServletLog().trace(
+                                "RequestSubmission: unable to reacquire lock to verify " + submission.getSubmissionPK() + ", projectPK =  "
+                                        + submission.getProjectPK());
+                            submission = null;
+                            
+                          } else {
+                            conn = getConnection();
+                            submission = Submission.lookupBySubmissionPK(submission.getSubmissionPK(), conn);
+                            if (submission.getBuildStatus() == Submission.BuildStatus.NEW) {
+                              getSubmitServerServletLog().trace(
+                                  "RequestSubmission: used WaitingBuildServer to get submission pk = " + submission.getSubmissionPK() + ", projectPK =  "
+                                          + submission.getProjectPK());
+                              kind = Kind.BUILD_STATUS_NEW;
+                              testSetup = TestSetup.lookupCurrentTestSetupForProject(conn, submission.getProjectPK());
+                              if (testSetup != null) 
+                                break findSubmission;
+                         
+                          } 
+                        }
+                        }
+                        }
+                        
                         response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, NO_SUBMISSIONS_AVAILABLE_MESSASGE);
                         return;
 
@@ -251,14 +281,9 @@ public class RequestSubmission extends SubmitServerServlet {
                 }
 
                 timeDump(buf, now, "%s %s%n", kind, foundPriority);
-                getSubmitServerServletLog().trace(
-                        "RequestSubmission: submission pk = " + submission.getSubmissionPK() + ", projectPK =  "
+                getSubmitServerServletLog().warn(
+                        "RequestSubmission: got " + kind + " submission pk = " + submission.getSubmissionPK() + ", projectPK =  "
                                 + submission.getProjectPK());
-                long delay = System.currentTimeMillis() - now.getTime();
-                if (delay > LOG_REQUESTS_MORE_THAN_MS) {
-                    String msg = "Took " + delay + "ms to find submission " + kind + " " + foundPriority + " :: " + buf;
-                    MonitorSlowTransactionsFilter.insertServerError(conn, request, msg, "Slow", "RequestSubmission");
-                }
 
                 // at this point, either submission and testSetup are
                 // non-null or we've already sent an error
@@ -270,8 +295,8 @@ public class RequestSubmission extends SubmitServerServlet {
                 // Send submission PK in an HTTP header.
                 response.setHeader(HttpHeaders.HTTP_SUBMISSION_PK_HEADER, submission.getSubmissionPK().toString());
 
-                if (kind != null)
-                    response.setHeader(HttpHeaders.HTTP_KIND_HEADER, kind.name());
+                
+                response.setHeader(HttpHeaders.HTTP_KIND_HEADER, kind.name());
                 if (foundPriority != null)
                     response.setHeader(HttpHeaders.HTTP_PRIORITY_HEADER, foundPriority.name());
                 response.setHeader(HttpHeaders.HTTP_PREVIOUS_BUILD_STATUS_HEADER, submission.getBuildStatus().name());
@@ -287,7 +312,7 @@ public class RequestSubmission extends SubmitServerServlet {
                                     submission.getProjectPK()));
 
                 // if we found a new test setup, let the buildserver know
-                if (hasTestSetup && (foundNewTestSetup || kind == Kind.SPECIFIC_REQUEST_NEW_TESTUP)) {
+                if (hasTestSetup && (kind == Kind.NEW_TEST_SETUP || kind == Kind.SPECIFIC_REQUEST_NEW_TESTUP)) {
                     response.setHeader(HttpHeaders.HTTP_NEW_TEST_SETUP, "yes");
                     // set the status to 'pending' and set the current time for
                     // datePosted
@@ -299,24 +324,29 @@ public class RequestSubmission extends SubmitServerServlet {
                 } else
                     response.setHeader(HttpHeaders.HTTP_NEW_TEST_SETUP, "no");
 
-                if (foundSubmissionForBackgroundRetesting)
+                if (kind.isBackgroundRetest())
                     response.setHeader(HttpHeaders.HTTP_BACKGROUND_RETEST, "yes");
-                else
+                else {
                     response.setHeader(HttpHeaders.HTTP_BACKGROUND_RETEST, "no");
-
-                // If this is *NOT* a background re-test then
-                // update build_status to pending and increment number of pending build requests
-                if (!foundSubmissionForBackgroundRetesting) {
+                    // If this is *NOT* a background re-test then
+                    // update build_status to pending
+                    
                     submission.setBuildStatus(Submission.BuildStatus.PENDING);
-                   
+  
                 }
+                // in any case, increment number of pending build requests
+                if (submission.getNumPendingBuildRequests() > 0)
+                  getSubmitServerServletLog().warn("submission " + submission.getSubmissionPK()
+                      + " already has " + submission.getNumPendingBuildRequests() + " pending build requests");
+            
                 submission.incrementNumPendingBuildRequests();
                 submission.setBuildRequestTimestamp(new Timestamp(System
-                        .currentTimeMillis()));
+                    .currentTimeMillis()));
+
                submission.update(conn);
 
             } finally {
-                lock.unlock();
+                if (locked) lock.unlock();
             }
             // if communication with the buildserver fails after this
             // then we'll wait for things to time out
@@ -334,7 +364,7 @@ public class RequestSubmission extends SubmitServerServlet {
 
             OutputStream out = response.getOutputStream();
             IO.copyStream(bais, out);
-            BuildServer.submissionRequestedAndProvided(conn, hostname, remoteHost, courses, now, load, submission);
+            BuildServer.submissionRequestedAndProvided(conn, hostname, remoteHost, courseKey, now, load, submission);
         } catch (SQLException e) {
             handleSQLException(e);
             throw new ServletException(e);
@@ -342,7 +372,9 @@ public class RequestSubmission extends SubmitServerServlet {
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "request interrupted");
         } finally {
             releaseConnection(conn);
+            response.getOutputStream().close();
         }
+        getSubmitServerServletLog().info("Completed RequestSubmission");
     }
 
 

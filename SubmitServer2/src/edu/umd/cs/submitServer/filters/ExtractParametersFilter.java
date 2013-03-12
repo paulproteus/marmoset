@@ -477,7 +477,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
             codeReviewAssignment = reviewer.getCodeReviewAssignment();
         }
 
-        if (!codeReviewAssignment.isVisibleToStudents() && studentRegistration.isNormalStudent()) {
+        if (codeReviewAssignment != null && !codeReviewAssignment.isVisibleToStudents() && studentRegistration.isNormalStudent()) {
           codeReviewAssignment = null;
           if (reviewer != null && !reviewer.isAuthor())
             reviewer = null;

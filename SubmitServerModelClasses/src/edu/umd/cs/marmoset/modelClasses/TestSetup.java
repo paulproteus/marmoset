@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
+import edu.umd.cs.marmoset.modelClasses.Queries.RetestPriority;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -372,6 +373,22 @@ public class TestSetup implements Cloneable
 
             }
     
+    public static @CheckForNull TestSetup lookupCurrentTestSetupForProject(Connection conn,
+            @Project.PK int projectPK)
+            throws SQLException {
+    	
+    	   String query = " SELECT "
+                   + TestSetup.ATTRIBUTES
+                   + " FROM  test_setups"
+                   + " WHERE test_setups.jarfile_status = ? "
+                   + " AND test_setups.project_pk = ? ";
+
+                   
+    	   PreparedStatement stmt  = Queries.setStatement(conn, query, TestSetup.Status.ACTIVE.toString(), projectPK);
+           
+           return getFromPreparedStatement(stmt);
+    	   
+    }
     
     public static @CheckForNull TestSetup lookupRecentNonBrokenTestSetupForProject(Connection conn,
             @Project.PK int projectPK)

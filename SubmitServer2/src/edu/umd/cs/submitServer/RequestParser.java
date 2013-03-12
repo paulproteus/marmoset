@@ -603,15 +603,21 @@ public class RequestParser {
 	}
 	   public @Nonnull
 	    String getOptionalCheckedParameter(String name, @Nonnull String defaultValue) {
+       try {
 	       if (!hasParameter(name))
 	           return defaultValue;
 	        Pattern p = MarmosetPatterns.getPattern(name);
 	        
 	        if (p != null) {
-	            return getOptionalRegexParameter(name, p);
+	            return getRegexParameter(name, p);
 	        } else {
-	            return getOptionalScrubbedParameter(name);
+
+                return getScrubbedParameter(name);
+             
 	        }
+       } catch (InvalidRequiredParameterException e) {
+         return defaultValue;
+       }
 	    }
 
 	/**

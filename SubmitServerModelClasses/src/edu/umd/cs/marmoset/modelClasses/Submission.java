@@ -840,11 +840,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 		 setArchiveForUpload(archive);
          insert(conn);
 	}
-	/**
-	 * If a submission with
-	 * @param conn
-	 * @throws SQLException
-	 */
+
 	public void insert(Connection conn)
 	throws SQLException
 	{
@@ -2239,14 +2235,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 		return  testRunPK.equals(
 			getCurrentTestRunPK());
 	}
-	/**
-	 * @param fork
-	 * @return
-	 */
-	protected boolean isBaseline(Project fork) {
-		if (fork.getArchivePK() == null || getArchivePK() == null)
+
+	protected boolean isBaseline(Project project) {
+		Integer projectArchivePK = project.getArchivePK();
+		if (projectArchivePK == null || getArchivePK() == null)
 			return false;
-		return fork.getArchivePK().equals(getArchivePK());
+		return projectArchivePK.equals(getArchivePK());
 	}
 	public static Map<Submission,Timestamp> lookupAllActiveHelpRequests(
 	            int coursePK,

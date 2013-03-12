@@ -53,7 +53,7 @@ import edu.umd.cs.submitServer.UserSession;
  * @author jspacco
  */
 public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
-	int lowerBound = 4000;
+	int lowerBound = 7000;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -84,6 +84,8 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 			long duration = end - start;
 			if (duration > lowerBound) {
 				String url = request.getRequestURI();
+				if (url.endsWith("buildServer/RequestSubmission"))
+				  return;
 				if (request.getQueryString() != null)
 					url += "?" + request.getQueryString();
 				HttpSession session = request.getSession(false);
@@ -94,9 +96,9 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 				long size = request.getContentLength();
 				String msg;
 				if (size > 0)
-				    msg = duration + " ms, size" + size  + ":" + url;
+				    msg = "Slow: " + duration + " ms, size " + size  + ": " + url;
 				else
-				    msg = duration + " ms: " + url;
+				    msg = "Slow: " + duration + " ms: " + url;
 
 				boolean isLong = false;
 				String referer = request.getHeader("referer");
@@ -114,33 +116,32 @@ public class MonitorSlowTransactionsFilter extends SubmitServerFilter {
 					msg += " " + referer;
 				}
 
-				if (!isLong) {
-				    getSubmitServerFilterLog().info(msg);
-				    @Student.PK Integer userPK = userSession == null ? null : userSession
-		                    .getStudentPK();
-		            
-				    Course course = (Course) req.getAttribute(COURSE);
-		            Integer coursePK = null;
-		            if (course != null)
-		                coursePK = course.getCoursePK();
-		            else if (userSession != null)
-		                coursePK = userSession.getOnlyCoursePK();
-		            Student student = (Student) req.getAttribute(STUDENT);
-		            Project project = (Project) req.getAttribute(PROJECT);
-		            Submission submission = (Submission) req.getAttribute(SUBMISSION);
-	                Connection conn = null;
-	                try {
-	                    conn = getConnection();
-	                    insertServerError(conn, request, msg, userPK, coursePK, student, project, submission);
-	                } catch (SQLException e) {
-	                    getSubmitServerFilterLog().warn(e);
-                    }  finally {
-	                    releaseConnection(conn);
-	                }
-	            
-				   
+				if (isLong) 
+				  return;
+				
+				getSubmitServerFilterLog().info(msg);
+				@Student.PK Integer userPK = userSession == null ? null : userSession
+				    .getStudentPK();
 
+				Course course = (Course) req.getAttribute(COURSE);
+				Integer coursePK = null;
+				if (course != null)
+				  coursePK = course.getCoursePK();
+				else if (userSession != null)
+				  coursePK = userSession.getOnlyCoursePK();
+				Student student = (Student) req.getAttribute(STUDENT);
+				Project project = (Project) req.getAttribute(PROJECT);
+				Submission submission = (Submission) req.getAttribute(SUBMISSION);
+				Connection conn = null;
+				try {
+				  conn = getConnection();
+				  insertServerError(conn, request, msg, userPK, coursePK, student, project, submission);
+				} catch (SQLException e) {
+				  getSubmitServerFilterLog().warn(e);
+				}  finally {
+				  releaseConnection(conn);
 				}
+				
 			}
 		}
 	}
