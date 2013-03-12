@@ -32,8 +32,12 @@ $(document).ready(function() {
 			case 'NEW':
 			case 'PENDING':
 			case 'RETEST':
-				if (attempts > 0)
+				if (attempts > 10)
+					delayedUpdate(attempts-1, 5);
+				else if (attempts > 5)
 					delayedUpdate(attempts-1, 15);
+				else if (attempts > 0)
+					delayedUpdate(attempts-1, 30);
 				else
 					$("#refresh").html("(automatic refresh timed out)");
 				break;
@@ -47,7 +51,7 @@ $(document).ready(function() {
 			update(attempts, count);
 		}, 1000)
 	};
-	delayedUpdate(15, 15);
+	delayedUpdate(15, 5);
 	
 });
 </script>
