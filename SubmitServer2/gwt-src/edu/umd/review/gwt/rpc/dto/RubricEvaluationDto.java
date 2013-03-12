@@ -37,7 +37,7 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
   private @RubricEvaluation.PK int rubricEvaluationPK;
   private boolean editable = false;
   private String value;
-  private @Nonnull String explanation;
+  private @Nonnull String explanation = "";
   private @CodeReviewThread.PK int threadid;
   private int points;
   private Status status;
@@ -119,11 +119,11 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
     return value;
   }
 
-  public String getExplanation() {
+  public @Nonnull String getExplanation() {
     return explanation;
   }
 
-  public void setExplanation(String explanation) {
+  public void setExplanation(@Nonnull String explanation) {
     this.explanation = explanation;
   }
 
