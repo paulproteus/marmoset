@@ -163,6 +163,9 @@ public class Course {
 	public String getSubmitKey() {
         return submitKey;
     }
+	public String getCourseKey() {
+        return submitKey;
+    }
 
     private void setSubmitKey(String submitKey) {
         this.submitKey = submitKey;
