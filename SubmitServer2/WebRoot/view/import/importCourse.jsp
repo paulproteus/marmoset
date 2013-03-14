@@ -91,7 +91,26 @@
 					<td class="label">Semester:</td>
 					<td class="input"><c:out value="${semester}" /></td>
 				</tr>
-
+ <tr>
+            <td class="label">allows baseline/starter code download:</td>
+            <td class="input"><input name="download" type="checkbox" checked  />
+            </td>
+        </tr>
+         <tr>
+            <td class="label">allows help requests:</td>
+            <td class="input"><input name="helpRequests" type="checkbox" checked  />
+            </td>
+        </tr>
+         <tr>
+           <td class="label">Default for editing source code in browser:</td>
+            <td class="input">
+            <select name="browserEditing">
+            <option value="prohibited">Prohibited</option>
+            <option value="discouraged" selected="selected">Discouraged</option>
+            <option value="allowed">Allowed</option>
+            </select>
+            </td>
+        </tr>
 				<tr>
 					<td class="label"><a href="https://grades.cs.umd.edu">grades.cs.umd.edu</a> course(s):</td>
 					<td class="input" valign="top"><c:choose>
