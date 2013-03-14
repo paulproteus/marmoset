@@ -42,7 +42,14 @@ tr.reject {background: #f33}
 
     <div class="sectionTitle">
         <h1>
+        <c:choose>
+        <c:when test="${not empty course.url}">
             <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
+            </c:when>
+            <c:otherwise>
+            <c:out value="${course.fullDescription}"/>
+            </c:otherwise>
+            </c:choose>
             <c:choose>
             <c:when test="${instructorActionCapability}">
              (Instructor View)
@@ -512,7 +519,16 @@ jQuery(document).ready(function ($) {
         <ul>
             <li><c:url var="studentAccountForInstructorLink" value="/action/instructor/StudentAccountForInstructor" />
                 <form action="${studentAccountForInstructorLink}" method="post" name="studentAccountForInstructorForm">
-                    <input type="hidden" name="coursePK" value="${course.coursePK}" /> Create and go to pseudo-student
+                    <input type="hidden" name="coursePK" value="${course.coursePK}" />
+                    <c:choose>
+                    <c:when test="${not empty pseudoStudentRegistration}">
+                     Login as 
+                     </c:when>
+                     <c:otherwise>
+                     Create and login as
+                     </c:otherwise>
+                     </c:choose>
+                     pseudo-student
                     account for instructor
                     <c:out value="${studentRegistration.fullname}" />
                     <input type="submit" value="Go">
