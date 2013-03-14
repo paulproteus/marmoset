@@ -37,7 +37,14 @@
 
     <div class="sectionTitle">
         <h1>
-            <a href="${course.url}"><c:out value="${course.fullDescription}" /></a>
+            <c:choose>
+        <c:when test="${not empty course.url}">
+            <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
+            </c:when>
+            <c:otherwise>
+            <c:out value="${course.fullDescription}"/>
+            </c:otherwise>
+            </c:choose>
         </h1>
 
         <ss:hello />
