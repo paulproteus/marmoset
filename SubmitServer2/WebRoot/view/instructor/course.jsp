@@ -47,7 +47,7 @@ tr.reject {background: #f33}
             <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
             </c:when>
             <c:otherwise>
-            <c:out value="${course.fullDescription}"/>
+            <c:out value="${course.fullDescription}"/>:
             </c:otherwise>
             </c:choose>
             <c:choose>

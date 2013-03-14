@@ -39,7 +39,7 @@
         <h1>
             <c:choose>
         <c:when test="${not empty course.url}">
-            <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>:
+            <a href="${course.url}"><c:out value="${course.fullDescription}"/></a>
             </c:when>
             <c:otherwise>
             <c:out value="${course.fullDescription}"/>
