@@ -246,11 +246,6 @@ public class DisplaySourceCodeAsHTML {
 	}
 
 	@CheckForNull BitSet showLine;
-	public void setIsChanged(@CheckForNull BitSet isChanged, int sz) {
-		this.isChanged = isChanged;
-		this.showLine = isChanged == null ? null :  EditDistance.showLines(isChanged, sz);
-	}
-
 	/**
 	 * Set the default set of token styles.
 	 */

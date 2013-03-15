@@ -48,13 +48,15 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
+
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
+import edu.umd.cs.marmoset.utilities.EditDistance;
 import edu.umd.cs.marmoset.utilities.FileNames;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 
@@ -190,14 +192,13 @@ public class DisplaySubmissionSourceCode {
        	DisplayProperties fileProperties = new DisplayProperties();
         Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
       
-        for(DisplayProperties.Entry e : fileProperties.getEntries())
-          System.out.println(e);
+
         byte[] archive = submission.downloadArchive(conn);
         Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive, fileProperties);
 
         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
 
-        return displayArchive(text, tabWidth, codeCoverageResults, changed);
+        return displayArchive(text, tabWidth, codeCoverageResults, changed, fileProperties);
     }
 
     public static int getNumberChangedLines(Connection conn,
@@ -263,15 +264,16 @@ public class DisplaySubmissionSourceCode {
         if (baselinePK == null || baselinePK.intValue() == 0) {
         	return "[No baseline source]";
         }
-        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(project.downloadArchive(conn));
+        DisplayProperties displayProperties = new DisplayProperties();
+        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(project.downloadArchive(conn), displayProperties);
 
-        return displayArchive(text, tabWidth, null, null);
+        return displayArchive(text, tabWidth, null, null, displayProperties);
 
     }
 
 	private static String displayArchive(Map<String, List<String>> text,
 			@CheckForNull Integer tabWidth, @CheckForNull CodeCoverageResults codeCoverageResults,
-			@CheckForNull Map<String, BitSet> changed) throws UnsupportedEncodingException,
+			@CheckForNull Map<String, BitSet> changed, DisplayProperties displayProperties) throws UnsupportedEncodingException,
 			IOException {
 
 		StringWriter o = new StringWriter();
@@ -320,7 +322,7 @@ public class DisplaySubmissionSourceCode {
             List<String> txt = e.getValue();
             String description = diffDescription(changed, fileName, txt);
             
-            displaySourceCode(out, fileName, description,  fileIsChanged, txt, tabWidth, codeCoverageResults, changed == null ? null : changed.get(fileName));
+            displaySourceCode(out, fileName, description,  fileIsChanged, txt, tabWidth, codeCoverageResults, changed == null ? null : changed.get(fileName), displayProperties);
             out.printf("</div>%n");
 
         }
@@ -468,7 +470,7 @@ public class DisplaySubmissionSourceCode {
             String sourceFile, String description,
             boolean initiallyOpen,
             List<String> txt,
-            @CheckForNull Integer tabWidth, @CheckForNull CodeCoverageResults codeCoverageResults, @CheckForNull BitSet isChanged)
+            @CheckForNull Integer tabWidth, @CheckForNull CodeCoverageResults codeCoverageResults, @CheckForNull BitSet isChanged, DisplayProperties displayProperties)
             throws IOException {
 
 		String encoding = encode(sourceFile);
@@ -483,7 +485,11 @@ public class DisplaySubmissionSourceCode {
         if (tabWidth != null && tabWidth > 0)
             src2html.setTabWidth(tabWidth);
 
-        src2html.setIsChanged(isChanged, txt.size());
+        src2html.isChanged = isChanged;
+        if (isChanged == null || displayProperties.isComplete(sourceFile))
+          src2html.showLine = null;
+        else
+          src2html.showLine = EditDistance.showLines(isChanged, txt.size(), displayProperties.getContext(sourceFile));
         out.printf("<h4><a id=\"%s\" href=\"javascript:sourceToggle('%s')\">%s</a> %s</h4>%n", "__" + encoding, encoding, sourceFile, description);
 
         out.printf("  <div id=\"%s\" class=\"sourceCode\" style=\"display:%s\">%n", encoding, initiallyOpen ? "block" : "none");
