@@ -54,6 +54,7 @@ import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestProperties;
+import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.FileNames;
 import edu.umd.cs.marmoset.utilities.TextUtilities;
 
@@ -186,10 +187,15 @@ public class DisplaySubmissionSourceCode {
             @CheckForNull Integer tabWidth, @CheckForNull  CodeCoverageResults codeCoverageResults) throws IOException,
             SQLException {
 
+       	DisplayProperties fileProperties = new DisplayProperties();
+        Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
+      
+        for(DisplayProperties.Entry e : fileProperties.getEntries())
+          System.out.println(e);
         byte[] archive = submission.downloadArchive(conn);
-        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive);
+        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive, fileProperties);
 
-        Map<String, BitSet> changed = project.computeDiff(conn, submission, text, null);
+        Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
 
         return displayArchive(text, tabWidth, codeCoverageResults, changed);
     }
@@ -201,10 +207,13 @@ public class DisplaySubmissionSourceCode {
         int numChangedLines = submission.getNumChangedLines();
         if (numChangedLines >= 0)
             return numChangedLines;
+        DisplayProperties fileProperties = new DisplayProperties();
+        Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
+      
     	 byte[] archive = submission.downloadArchive(conn);
-         Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive);
+         Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive, fileProperties);
 
-         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, null);
+         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
          int count = 0;
          for(Map.Entry<String, List<String>> e : text.entrySet()) {
         	 	BitSet b = changed.get(e.getKey());

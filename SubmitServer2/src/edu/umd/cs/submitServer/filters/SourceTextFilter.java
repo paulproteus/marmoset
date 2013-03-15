@@ -86,7 +86,6 @@ public class SourceTextFilter extends SubmitServerFilter {
 			request.setAttribute("sourceContents", sourceContents);
 			if (sourceContents != null) {
 			  request.setAttribute("sourceFiles", sourceContents.keySet());
-			  request.setAttribute("sourceProperties", fileProperties.getProperties());
 			}
 			
 		} catch (SQLException e) {

@@ -656,10 +656,6 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
     }
 
 	public Map<String,List<String>>
-    getText(Connection conn) throws SQLException, IOException {
-     return getText(conn, null);
-}
-	public Map<String,List<String>>
 		getText(Connection conn, @CheckForNull DisplayProperties fileProperties) throws SQLException, IOException {
 		  byte[] archive = downloadArchive(conn);
 		  return TextUtilities.scanTextFilesInZip(archive, fileProperties);

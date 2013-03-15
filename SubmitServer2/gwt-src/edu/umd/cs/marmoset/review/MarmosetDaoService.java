@@ -133,7 +133,7 @@ public class MarmosetDaoService implements ReviewDao {
       Map<String, List<String>> baselineText = project.getBaselineText(conn, fileProperties);
     
       text = submission.getText(conn, fileProperties);
-      Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baselineText);
+      Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baselineText, fileProperties);
       for (Map.Entry<String, List<String>> e : text.entrySet()) {
         String path = e.getKey();
         List<String> contents = e.getValue();

@@ -601,24 +601,23 @@ public class RequestParser {
 			return getOptionalScrubbedParameter(name);
 		}
 	}
-	   public @Nonnull
-	    String getOptionalCheckedParameter(String name, @Nonnull String defaultValue) {
-       try {
-	       if (!hasParameter(name))
-	           return defaultValue;
-	        Pattern p = MarmosetPatterns.getPattern(name);
-	        
-	        if (p != null) {
-	            return getRegexParameter(name, p);
-	        } else {
 
-                return getScrubbedParameter(name);
-             
-	        }
-       } catch (InvalidRequiredParameterException e) {
-         return defaultValue;
-       }
-	    }
+  public @Nonnull
+  String getOptionalCheckedParameter(String name, @Nonnull String defaultValue) {
+    try {
+      if (!hasParameter(name))
+        return defaultValue;
+      Pattern p = MarmosetPatterns.getPattern(name);
+
+      if (p != null) {
+        return getRegexParameter(name, p);
+      } else {
+        return getScrubbedParameter(name);
+      }
+    } catch (InvalidRequiredParameterException e) {
+      return defaultValue;
+    }
+  }
 
 	/**
 	 * Returns the parameter bound to key as an Integer. Returns null if no such
