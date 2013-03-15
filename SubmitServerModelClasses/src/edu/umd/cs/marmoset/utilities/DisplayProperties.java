@@ -31,6 +31,10 @@ public class DisplayProperties {
 		public boolean isLast() {
 			return s.contains("last");
 		}
+		
+		public boolean isComplete() {
+			return s.contains("complete");
+		}
 
 		public boolean isHidden() {
 			return s.contains("hidden");
@@ -103,6 +107,7 @@ public class DisplayProperties {
 			return false;
 		}
 
+		@Override
 		public String toString() {
 			if (name != null)
 				return String.format("%12s %2d %s", name, rank, properties);
@@ -114,6 +119,9 @@ public class DisplayProperties {
 	}
 
 	int nextRank = 0;
+	
+	int context = 0;
+	boolean complete = true;
 
 	final static int UNRANKED = 100000;
 
@@ -128,6 +136,30 @@ public class DisplayProperties {
 
 	final Map<String, Entry> matched = new HashMap<String, Entry>();
 
+	public void initialize(List<String> contents) {
+		for (String s : contents) {
+			if (s.startsWith("#"))
+				continue;
+			s = s.trim();
+			String[] parts = s.split("[ ]*[=\t][ ]*");
+			if (parts.length == 0)
+				continue;
+			if (parts.length == 2) {
+				if (parts[0].equals("$context")) {
+					try {
+						context = Integer.parseInt(parts[1]);
+					} catch (RuntimeException e) {
+						
+					}
+				} else  
+					put(parts[0], parts[1]);
+			} else if (parts.length == 1) {
+				if (parts[0].equals("$complete"))
+					complete = true;
+				else put(parts[0],null);
+			}
+		}
+	}
 	public Entry getEntry(String filename) {
 		Entry e = matched.get(filename);
 		if (e != null)
@@ -141,6 +173,14 @@ public class DisplayProperties {
 		return entries;
 	}
 
+	public int getContext(String filename) {
+		return context;
+	}
+	public boolean isComplete(String filename) {
+		if (complete) return true;
+		Entry e = getEntry(filename);
+		return e.properties.isComplete();
+	}
 	public Entry getEntry0(String filename) {
 		for (Entry e : entries)
 			if (e.matches(filename))

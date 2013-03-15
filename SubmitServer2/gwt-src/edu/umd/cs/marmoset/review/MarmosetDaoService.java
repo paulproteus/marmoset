@@ -148,9 +148,14 @@ public class MarmosetDaoService implements ReviewDao {
               && !path.endsWith("StudentTests.java"))
             continue;
           modifiedLines = bitsSet(modifiedLinesBits, contents);
-          BitSet showBits = EditDistance.showLines(modifiedLinesBits, contents.size());
-          showBits.or(getLinesWithThreads(path, contents.size()));
-          linesToShow = bitsSet(showBits, contents);
+          if (!fileProperties.isComplete(path)) {
+            int context = fileProperties.getContext(path);
+            
+            BitSet showBits = EditDistance.showLines(modifiedLinesBits, contents.size(), context);
+            showBits.or(getLinesWithThreads(path, contents.size()));
+            linesToShow = bitsSet(showBits, contents);
+          } else 
+            linesToShow = bitsSet(null, contents);
         }
         FileDto file = new FileDto(0, path, contents);
         file.setModifiedLines(modifiedLines);
