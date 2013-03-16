@@ -120,8 +120,8 @@ public class DisplayProperties {
 
 	int nextRank = 0;
 	
-	int context = 0;
-	boolean complete = true;
+	int context = 5;
+	boolean complete = false;
 
 	final static int UNRANKED = 100000;
 
