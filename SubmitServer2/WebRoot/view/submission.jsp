@@ -29,8 +29,10 @@
 
 <!DOCTYPE HTML>
 <html>
-<ss:head
-	title="Submission ${submission.submissionNumber} for project ${project.projectNumber}" />
+<c:set var="title">
+<c:out value="Submission ${submission.submissionNumber} for project ${project.projectNumber}"/>
+</c:set>
+<ss:head title="${title}" />
 <body>
 	<ss:header />
 	<ss:breadCrumb />
