@@ -203,18 +203,7 @@ public class TextUtilities {
 		}
 		zIn.close();
 		if (submitDisplay != null) {
-			for (String s : submitDisplay) {
-				if (s.startsWith("#"))
-					continue;
-				String[] parts = s.split("[ ]*=[ ]*|\t");
-				if (parts.length == 0)
-					continue;
-				if (parts.length == 2)
-					displayProperties.put(parts[0], parts[1]);
-				else
-					displayProperties.put(parts[0]);
-
-			}
+			displayProperties.initialize(submitDisplay);
 		}
 		return displayProperties.build(result);
 	}

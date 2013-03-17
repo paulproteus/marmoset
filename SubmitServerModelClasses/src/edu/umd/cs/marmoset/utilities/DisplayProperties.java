@@ -200,11 +200,11 @@ public class DisplayProperties {
 		return entries.isEmpty();
 	}
 
-	public void put(String filename) {
+	private void put(String filename) {
 		put(filename, null);
 	}
 
-	public void put(String filename, @CheckForNull String properties) {
+	private void put(String filename, @CheckForNull String properties) {
 		Entry e = new Entry(filename, nextRank++,
 				FileProperties.build(properties));
 		if (e.isPattern())
