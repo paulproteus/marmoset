@@ -1642,10 +1642,7 @@
         <servlet-name>CreateDotSubmitUserFile</servlet-name>
         <url-pattern>/data/GetDotSubmitUserFile</url-pattern>
     </servlet-mapping>
-	   <servlet-mapping>
-        <servlet-name>CreateDotSubmitFile</servlet-name>
-        <url-pattern>/data/instructor/CreateDotSubmitFile</url-pattern>
-    </servlet-mapping>
+
 	
 	<servlet-mapping>
 		<servlet-name>ExportProject</servlet-name>
