@@ -1115,7 +1115,7 @@ public class Project implements Serializable, Cloneable {
     public  @Nonnull Map<String, BitSet> computeDiff(Connection conn,
     		Submission submission, 
     		Map<String, List<String>> current,
-    		@CheckForNull Map<String, List<String>> baselineText)
+    		@CheckForNull Map<String, List<String>> baselineText, DisplayProperties fileProperties)
 			throws IOException, SQLException {
 		Map<String, BitSet> changed =  new HashMap<String,BitSet>();
         int baselinePK = 0;
@@ -1134,7 +1134,7 @@ public class Project implements Serializable, Cloneable {
 	        
 	    if (baselinePK != 0 && baselinePK != submission.getArchivePK()) {
 	        if (baselineText == null)
-	            baselineText = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn));
+	            baselineText = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
 	        for(Entry<String, List<String>> e : current.entrySet()) {
 	            String file = e.getKey();
 	            if (!baselineText.containsKey(file))

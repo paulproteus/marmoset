@@ -29,8 +29,14 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+  <c:set var="title">
+<c:out value="Submission ${submission.submissionNumber} for project ${project.projectNumber}"/>
+<c:if test="${instructorCapability == 'true'}">
+by <c:out value="${student.fullname}"/>
+</c:if>
+</c:set>
    <ss:headContent title="${title}"/>
-   <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+   <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'/>
    ${ss:displayAllSourceFilesHead()}
   </head>
 
@@ -45,6 +51,7 @@
 	</c:otherwise>
 	</c:choose>
 
+<h1>${title}</h1>
 
 	<c:if test="${instructorCapability == 'true'}">
 		<ss:studentPicture/>

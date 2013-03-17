@@ -187,9 +187,6 @@ public class EditDistance<T> {
     return result;
   }
 
-  static final int LENGTH_TO_ELIDE = 10;
-  static final int CONTEXT = 3;
-
   /** Given a BitSet of changed lines, which ones should be shown?
    * All changed lines will be shown. Long stretches of unchanged lines will be elided.
    *
@@ -198,6 +195,12 @@ public class EditDistance<T> {
    * @return
    */
   public static BitSet showLines(BitSet changed, int sz) {
+	  return showLines(changed, sz, 20, 8);
+  }
+  public static BitSet showLines(BitSet changed, int sz, int context) {
+	  return showLines(changed, sz, context * 3, context);
+  }
+  public static BitSet showLines(BitSet changed, int sz, int lengthToElide, int context) {
     if (changed == null) {
       BitSet shown = new BitSet();
       for (int i = 0; i < sz; i++) {
@@ -213,14 +216,14 @@ public class EditDistance<T> {
       return changed;
     }
     while (true) {
-      if (nextTrue - lastTrue > LENGTH_TO_ELIDE) {
+      if (nextTrue - lastTrue > lengthToElide) {
         if (lastTrue >= 0) {
           // Show at most CONTEXT lines after the last modified line.
-          results.set(lastTrue + 1, Math.min(lastTrue + CONTEXT, nextTrue - 1) + 1);
+          results.set(lastTrue + 1, Math.min(lastTrue + context, nextTrue - 1) + 1);
         }
         if (nextTrue < sz) {
           // Show at most CONTEXT lines before the next modified line.
-          results.set(Math.max(lastTrue + 1, nextTrue - CONTEXT), nextTrue);
+          results.set(Math.max(lastTrue + 1, nextTrue - context), nextTrue);
         }
       } else if (lastTrue + 1 <= nextTrue - 1) {
         results.set(lastTrue + 1, nextTrue);
