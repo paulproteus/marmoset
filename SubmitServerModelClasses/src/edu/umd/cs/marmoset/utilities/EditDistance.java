@@ -195,7 +195,7 @@ public class EditDistance<T> {
    * @return
    */
   public static BitSet showLines(BitSet changed, int sz) {
-	  return showLines(changed, sz, 20, 8);
+	  return showLines(changed, sz, 10, 3);
   }
   public static BitSet showLines(BitSet changed, int sz, int context) {
 	  return showLines(changed, sz, context * 3, context);
