@@ -37,13 +37,11 @@ public class CodeReviewFilter extends SubmitServerFilter {
         Student user = (Student) request.getAttribute(USER);
         Submission submission = (Submission) request.getAttribute(SUBMISSION);
         CodeReviewAssignment codeReviewAssignment = (CodeReviewAssignment) request.getAttribute(CODE_REVIEW_ASSIGNMENT);
-        StudentRegistration commenter = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
         Connection conn = null;
         try {
 
             conn = getConnection();
-            if (commenter == null) 
-              commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
+            StudentRegistration commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
                 course.getCoursePK(), conn);
             if (reviewer == null) {
               if (submission == null) 
