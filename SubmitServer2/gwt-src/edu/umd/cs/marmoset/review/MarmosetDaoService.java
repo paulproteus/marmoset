@@ -121,7 +121,8 @@ public class MarmosetDaoService implements ReviewDao {
       
       CodeReviewSummary summary = getSummary();
       this.project = summary.getProject();
-      this.requestReviewOnPublish = summary.isNeedsPublishToRequestHelp();
+      this.requestReviewOnPublish = summary.getCourse().isAllowsHelpRequests()
+           && summary.isNeedsPublishToRequestHelp();
       
       this.codeAuthor = summary.getAuthor();
 
