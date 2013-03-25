@@ -100,7 +100,6 @@ public class DownloadSubmission extends SubmitServerServlet {
 				filename = project.getProjectNumber() + ".zip";
 
 			Util.setAttachmentHeaders(response, filename);
-			;
 
 			OutputStream out = response.getOutputStream();
 			IO.copyStream(bais, out);

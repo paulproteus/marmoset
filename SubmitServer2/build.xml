@@ -100,6 +100,24 @@
     </javac>
   </target>
 
+  <target name="errorprone" depends="init, modelClasses,libs,cpwebxml">
+    <javac
+      encoding="utf-8"
+      includes="**/*.java"
+      destdir="${bin}"
+      deprecation="no"
+      debug="on"
+      source="1.6"
+      target="1.6"
+      includeantruntime="false"
+	compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"
+      >
+            <src path="${src}" />
+            <src path="gwt-src" />
+      <classpath refid="base.classpath" />
+    </javac>
+  </target>
+
   <!-- compile rule: Compile the servlets -->
   <target name="compile" depends="init, modelClasses,libs,cpwebxml">
     <javac

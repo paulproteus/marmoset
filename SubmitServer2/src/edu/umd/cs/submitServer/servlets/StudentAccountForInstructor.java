@@ -67,7 +67,6 @@ public class StudentAccountForInstructor extends SubmitServerServlet {
         createOrFindPseudoStudentRegistrationFromPseudoStudent(conn, course, instructor, student2);
         redirectUrl = request.getContextPath() + "/view/course.jsp?coursePK=" + course.getCoursePK();
       }
-      ;
 
       HttpSession session = request.getSession(false);
 

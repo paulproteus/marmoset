@@ -112,7 +112,7 @@ public class StudentForUpload {
 			throw new IllegalStateException("lastname CANNOT be empty!");
 		// remove leading/trailing whitespace
 		firstname = tokens[1].replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-		;
+		
 		if (firstname.equals(""))
 			throw new IllegalStateException("firstname CANNOT be empty!");
 
