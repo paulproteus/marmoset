@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -17,7 +16,7 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
-import java.util.EnumSet;
+import java.util.EnumMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
@@ -70,7 +69,7 @@ public class TextDiff extends StringsWriter {
                 System.setIn(input);
                 System.setOut(oStream);
                 return null;
-            };
+            }
         });
     }
 
@@ -78,36 +77,39 @@ public class TextDiff extends StringsWriter {
         return new Builder();
     }
 
-    public static Builder withOptions(EnumSet<Option> options) {
+    public static Builder withOptions(EnumMap<Option, String> options) {
         return new Builder(options);
     }
 
     public enum Option {
-        TRIM, IGNORES_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES;
+        TRIM, IGNORE_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES, WAIT_FOR;
         public static Option valueOfAnyCase(String name) {
             name = name.toUpperCase();
-            if (name.equals("IGNORESCASE") || name.equals("IGNORECASE") 
-                    || name.equals("IGNORE_CASE") )
-                return IGNORES_CASE;
+            if (name.startsWith("IGNORES"))
+                name = "IGNORE" + name.substring(6);
+            if (name.equals("WAITFOR") )
+                return WAIT_FOR;
+            if (name.equals("IGNORECASE") )
+                return IGNORE_CASE;
             if (name.equals("IGNOREWHITESPACECHANGE"))
                 return IGNORE_WHITESPACE_CHANGE;
             if (name.equals("IGNOREBLANKLINES"))
                 return IGNORE_BLANK_LINES;
             return valueOf(name);
         }
-    };
+    }
 
     public static class Builder implements Cloneable {
-        final EnumSet<Option> options;
+        final EnumMap<Option,String> options;
 
         final ArrayDeque<Object> expect = new ArrayDeque<Object>();
 
         Builder() {
-            options = EnumSet.noneOf(Option.class);
+            options = new EnumMap<Option, String>(Option.class);
         }
 
-        Builder(EnumSet<Option> options) {
-            this.options = EnumSet.copyOf(options);
+        Builder(EnumMap<Option, String>options) {
+            this.options = new EnumMap<Option,String>(options);
         }
 
         @Override
@@ -126,9 +128,15 @@ public class TextDiff extends StringsWriter {
         public Builder set(Option... options) {
 
             for (Option o : options) {
-                this.options.add(o);
+                this.options.put(o, null);
 
             }
+            return this;
+        }
+        public Builder set(Option option, String value) {
+
+            this.options.put(option, value);
+
             return this;
         }
 
@@ -138,7 +146,7 @@ public class TextDiff extends StringsWriter {
         }
 
         public Builder ignoreCase() {
-            set(Option.IGNORES_CASE);
+            set(Option.IGNORE_CASE);
             return this;
         }
 
@@ -180,7 +188,7 @@ public class TextDiff extends StringsWriter {
         }
 
         public TextDiff build() {
-            return new TextDiff(new ArrayDeque<Object>(expect),  EnumSet.copyOf(options));
+            return new TextDiff(new ArrayDeque<Object>(expect),  new EnumMap<Option,String>(options));
         }
 
         /**
@@ -248,26 +256,46 @@ public class TextDiff extends StringsWriter {
         }
     }
 
-    final EnumSet<Option> options;
+    final EnumMap<Option, String> options;
     final ArrayDeque<Object> expect;
+    boolean gotExpectedWaitFor;
+    boolean gotActualWaitFor;
 
-    TextDiff(ArrayDeque<Object> expect, EnumSet<Option> options) {
+    TextDiff(ArrayDeque<Object> expect, EnumMap<Option, String> options) {
         this.expect = expect;
-        this.options = EnumSet.copyOf(options);
-
+        this.options = new EnumMap<Option, String>(options);
+        this.gotExpectedWaitFor = this.gotActualWaitFor
+                = !options.containsKey(Option.WAIT_FOR);
+        
     }
+    
+    
 
+    
     private String normalize(String s) {
-        if (options.contains(Option.TRIM))
+        if (options.containsKey(Option.TRIM))
             s = s.trim();
-        if (options.contains(Option.IGNORES_CASE))
+        if (options.containsKey(Option.IGNORE_CASE))
             s = s.toLowerCase();
-        if (options.contains(Option.IGNORE_WHITESPACE_CHANGE))
+        if (options.containsKey(Option.IGNORE_WHITESPACE_CHANGE))
             s = s.replaceAll("\\s+", " ");
         return s;
     }
 
     private Object getNextExpected() {
+        while (true) {
+            Object o = getNextExpected0();
+            if (o == null) return null;
+            if (!gotExpectedWaitFor) {
+                if (!normalize((String)o).equals(options.get(Option.WAIT_FOR)))
+                    continue;
+                gotExpectedWaitFor = true;
+            }
+            return o;
+        }
+    }
+    
+    private Object getNextExpected0() {
         try {
             while (true) {
                 Object o = expect.pollFirst();
@@ -312,10 +340,17 @@ public class TextDiff extends StringsWriter {
 
     @Override
     protected void got(String txt) {
+        if (txt == null)
+            throw new NullPointerException();
         actual = txt;
 
         int line = getLine();
-        boolean ignoreBlankLines = options.contains(Option.IGNORE_BLANK_LINES);
+        if (!gotActualWaitFor) {
+            if (!normalize(txt).equals(options.get(Option.WAIT_FOR))) 
+                return;
+            gotActualWaitFor = true;
+        }
+        boolean ignoreBlankLines = options.containsKey(Option.IGNORE_BLANK_LINES);
         if (ignoreBlankLines && txt.trim().isEmpty())
             return;
         Object o;
@@ -345,6 +380,10 @@ public class TextDiff extends StringsWriter {
     @Override
     public void close() {
         super.close();
+        if (!gotActualWaitFor) {
+            fail(String.format("output ended at line %d but didn't see signal %s for start of expected output", getLine(), options.get(Option.WAIT_FOR)));
+            
+        }
         Object o = getNextExpected();
         if (o == null)
             return;
