@@ -287,7 +287,7 @@ public class TextDiff extends StringsWriter {
             Object o = getNextExpected0();
             if (o == null) return null;
             if (!gotExpectedWaitFor) {
-                if (!normalize((String)o).equals(options.get(Option.WAIT_FOR)))
+                if (! isWhatWeAreWaitingFor((String) o))
                     continue;
                 gotExpectedWaitFor = true;
             }
@@ -346,7 +346,7 @@ public class TextDiff extends StringsWriter {
 
         int line = getLine();
         if (!gotActualWaitFor) {
-            if (!normalize(txt).equals(options.get(Option.WAIT_FOR))) 
+            if (! isWhatWeAreWaitingFor(txt) ) 
                 return;
             gotActualWaitFor = true;
         }
@@ -375,6 +375,14 @@ public class TextDiff extends StringsWriter {
             fail("Got " + o.getClass());
         }
 
+    }
+
+    /**
+     * @param txt
+     * @return
+     */
+    public boolean isWhatWeAreWaitingFor(String txt) {
+        return normalize(txt).contains(options.get(Option.WAIT_FOR));
     }
 
     @Override
