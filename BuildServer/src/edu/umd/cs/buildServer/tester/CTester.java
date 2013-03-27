@@ -152,12 +152,15 @@ public class CTester extends Tester<ScriptTestProperties> {
             EnumMap<Option,String> optionsForDiffing = new EnumMap<Option, String>(Option.class);
             if (options != null) {
                 for (String oName : options.split("[\\s,]+")) {
-                    String parts[] = oName.split("=");
-                    Option o = Option.valueOfAnyCase(parts[0]);
-                    if (parts.length == 1)
-                        optionsForDiffing.put(o, null);
-                    else
-                        optionsForDiffing.put(o, parts[1]);
+                    int colon = oName.indexOf(':');
+                    String value = null;
+                    if (colon != -1) {
+                        value = oName.substring(colon+1);
+                        oName = oName.substring(0, colon);
+                    }
+                        
+                    Option o = Option.valueOfAnyCase(oName);
+                    optionsForDiffing.put(o, value);
                 }
 
             }
