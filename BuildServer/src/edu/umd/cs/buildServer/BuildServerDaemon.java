@@ -883,6 +883,10 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
             e.printStackTrace(systemErr);
             System.exit(1);
         }
+        if (buildServer.isQuiet()) {
+            System.setOut(systemOut);
+            System.setErr(systemErr);
+        }
     }
 
 	public static void timedSystemExit0() {

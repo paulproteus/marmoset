@@ -37,7 +37,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.EnumSet;
+import java.util.EnumMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,7 +59,7 @@ import edu.umd.cs.diffText.StringListWriter;
 import edu.umd.cs.diffText.TextDiff;
 import edu.umd.cs.diffText.TextDiff.Option;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase;
-import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.OutputKind;
+import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.ExpectedKind;
 import edu.umd.cs.marmoset.modelClasses.ScriptTestProperties;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 
@@ -149,11 +149,15 @@ public class CTester extends Tester<ScriptTestProperties> {
             File buildDirectory = getDirectoryFinder().getBuildDirectory();
             String options = testCase
                     .getProperty(ExecutableTestCase.Property.OPTIONS);
-            EnumSet<Option> optionsForDiffing = EnumSet.noneOf(Option.class);
+            EnumMap<Option,String> optionsForDiffing = new EnumMap<Option, String>(Option.class);
             if (options != null) {
                 for (String oName : options.split("[\\s,]+")) {
-                    Option o = Option.valueOfAnyCase(oName);
-                    optionsForDiffing.add(o);
+                    String parts[] = oName.split("=");
+                    Option o = Option.valueOfAnyCase(parts[0]);
+                    if (parts.length == 1)
+                        optionsForDiffing.put(o, null);
+                    else
+                        optionsForDiffing.put(o, parts[1]);
                 }
 
             }
@@ -191,16 +195,17 @@ public class CTester extends Tester<ScriptTestProperties> {
                 throw new AssertionError();
             }
 
-            ExecutableTestCase.OutputKind outputKind = testCase.getOutputKind();
+            ExecutableTestCase.ExpectedKind outputKind = testCase.getOutputKind();
             TextDiff output = null;
             long startTime = System.currentTimeMillis();
-            if (outputKind == OutputKind.NONE) {
+            if (outputKind == ExpectedKind.NONE) {
                 output = null;
             } else {
                 TextDiff.Builder builder = TextDiff
                         .withOptions(optionsForDiffing);
                 switch (outputKind) {
                 case STRING:
+                    builder.expect(optionsForDiffing.get(Option.WAIT_FOR));
                     builder.expect(testCase
                             .getProperty(ExecutableTestCase.Property.EXPECTED));
                     break;

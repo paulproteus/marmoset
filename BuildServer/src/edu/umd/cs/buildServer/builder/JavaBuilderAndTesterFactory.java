@@ -56,7 +56,7 @@ public class JavaBuilderAndTesterFactory extends BuilderAndTesterFactory<JUnitTe
 	public JavaBuilder createBuilder()
 			throws MissingConfigurationPropertyException, BuilderException,
 			ZipExtractorException {
-		JavaSubmissionExtractor submissionExtractor = new JavaSubmissionExtractor(
+        JavaSubmissionExtractor submissionExtractor = new JavaSubmissionExtractor(
 				projectSubmission.getZipFile(),
 				directoryFinder.getBuildDirectory(), projectSubmission.getLog());
 		// If the buildserver configuration specifies source files to exclude,

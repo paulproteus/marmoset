@@ -342,7 +342,7 @@ public class TestRunner extends BaseTestRunner {
 	                System.setOut(oStream);
 	                System.setErr(err);
 	                return null;
-	            };
+	            }
 	        });
 	    }
 	/**
