@@ -58,6 +58,14 @@
 		<pathelement location="lib/modelClasses.jar"/>
 	</path>
 
+	<target name="diffOutputStream" depends="init">
+		<ant
+			antfile="${diffOutputStream}/build.xml"
+			inheritall="false"
+			>
+		</ant>
+		<copy todir="lib" file="${diffOutputStream}/diffOutputStream.jar"/>
+	</target>
 	<target name="modelClasses" depends="init">
 		<!--
 		Effectively builds the modelClasses jarfile in the lib directory for this project.
@@ -79,7 +87,7 @@
     <ant antfile="build.xml" dir="${findbugs.dir}" inheritAll="false"/>
   </target>
 	
-	<target name="classes" depends="modelClasses">
+	<target name="classes" depends="diffOutputStream,modelClasses">
 		<javac
 			srcdir="src"
 			destdir="build/classes"
