@@ -1293,6 +1293,12 @@
 		<servlet-name>RegisterOneStudent</servlet-name>
 		<servlet-class>edu.umd.cs.submitServer.servlets.RegisterOneStudent</servlet-class>
 	</servlet>
+	<servlet>
+        <servlet-name>TurnStudentIntoTA</servlet-name>
+        <servlet-class>edu.umd.cs.submitServer.servlets.TurnStudentIntoTA</servlet-class>
+    </servlet>
+  
+        
 	<!--  
 	<servlet>
 		<servlet-name>RegisterOneTeam</servlet-name>
@@ -1624,6 +1630,11 @@
 		<servlet-name>RegisterOneStudent</servlet-name>
 		<url-pattern>/action/instructor/RegisterOneStudent</url-pattern>
 	</servlet-mapping>
+	   <servlet-mapping>
+        <servlet-name>TurnStudentIntoTA</servlet-name>
+        <url-pattern>/action/instructor/TurnStudentIntoTA</url-pattern>
+    </servlet-mapping>
+	
 	<!-- 
 	<servlet-mapping>
 		<servlet-name>RegisterOneTeam</servlet-name>

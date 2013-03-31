@@ -122,6 +122,48 @@
     </form>
 
 </div>
+<div>
+    <form id="promoteStudentToTA"
+        action='<c:url value="/action/instructor/TurnStudentIntoTA"/>'
+        method="post">
+        <input type="hidden" name="coursePK" value="${course.coursePK}" />
+        <table class="form">
+             <tfoot>
+            <tr class="submit">
+                <td class="submit" colspan="2"><input type="submit"
+                    value="Turn student into TA" />
+                </td>
+            </tr>
+            </tfoot>
+        <tbody>
+            <tr>
+                <td class="label">Student</td>
+                
+                <td class="input"><select name="studentRegistrationPK">
+                    <c:forEach var="studentRegistration" items="${justStudentRegistrationSet}">
+                    <option value="${studentRegistration.studentRegistrationPK}">
+                    <c:out value="${studentRegistration.fullname}"/>
+                    </option>
+                    </c:forEach>
+                    </select>
+
+
+             <tr>
+                <td class="label">Capability</td>
+                <td class="input">
+                    <select name="capability">
+                                 <option value="modify">Instructor/TA</option>
+                                 <option value="read-only">Grader</option>
+                            </select>
+                            
+                </td>
+            </tr>
+            </tbody>
+       
+        </table>
+    </form>
+
+</div>
 </c:if>
             
 <c:if test="${gradesServer}">
