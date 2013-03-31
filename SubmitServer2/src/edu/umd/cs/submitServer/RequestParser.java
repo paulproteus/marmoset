@@ -314,7 +314,10 @@ public class RequestParser {
 		project.setProjectNumber(getCheckedParameter("projectNumber"));
 		Timestamp ontime = getTimestampParameter("ontime");
 		project.setOntime(ontime);
-		project.setLate(getOptionalTimestampParameter("late", ontime));
+		Timestamp late = getOptionalTimestampParameter("late", ontime);
+		if (ontime.compareTo(late) > 0)
+		  throw new IllegalArgumentException("late deadline is before ontime deadline");
+    project.setLate(late);
 		String title = getCheckedParameter("title");
     project.setTitle(title);
 	    project.setUrl(getOptionalCheckedParameter("url"));
