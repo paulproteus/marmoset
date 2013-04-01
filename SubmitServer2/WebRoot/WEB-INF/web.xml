@@ -1038,11 +1038,17 @@
 		<servlet-name>AddSampleCodeReview</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.AddSampleCodeReview</servlet-class>
 	</servlet>
+    <servlet>
+        <servlet-name>ChangeCodeReviewAssignmentVisibility</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.ChangeCodeReviewAssignmentVisibility</servlet-class>
+    </servlet>
+
 
 	<servlet>
 		<servlet-name>AddSubmissionsToCodeReviewAssignment</servlet-name>
 		<servlet-class> edu.umd.cs.submitServer.servlets.AddSubmissionsToCodeReviewAssignment</servlet-class>
 	</servlet>
+
 
 
 <servlet>
@@ -1423,6 +1429,15 @@
 		<servlet-name>AddSubmissionsToCodeReviewAssignment</servlet-name>
 		<url-pattern>/action/instructor/AddSubmissionsToCodeReviewAssignment</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>ChangeCodeReviewAssignmentVisibility</servlet-name>
+        <url-pattern>/action/instructor/ChangeCodeReviewAssignmentVisibility</url-pattern>
+    </servlet-mapping>
+    
+	
+	
+	
+	
 	<servlet-mapping>
 		<servlet-name>AssignCodeReviews</servlet-name>
 		<url-pattern>/action/instructor/AssignCodeReviews</url-pattern>
