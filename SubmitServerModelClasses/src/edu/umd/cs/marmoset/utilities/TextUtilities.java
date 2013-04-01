@@ -154,8 +154,6 @@ public class TextUtilities {
 				if (z.isDirectory())
 					continue;
 				if (z.getSize() > 100000) {
-					System.out.println("Discarding " + z.getName() + ", size "
-							+ z.getSize());
 					continue;
 				}
 				String name = z.getName();
@@ -173,6 +171,8 @@ public class TextUtilities {
 					continue;
 				if (name.charAt(0) == '.' || name.contains("/."))
 					continue;
+				if (name.equals("META-INF/MANIFEST.MF"))
+				    continue;
 
 				@CheckForNull
 				String mimeType = mimeMap.getContentTypeFor(name);
