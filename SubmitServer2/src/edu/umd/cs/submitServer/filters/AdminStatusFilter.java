@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.BuildServer;
+import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
@@ -93,6 +94,12 @@ public class AdminStatusFilter extends SubmitServerFilter {
 
             List<Project> projectList = Project.lookupAllUpcoming(now, conn);
             request.setAttribute(UPCOMING_PROJECTS, projectList);
+            
+            List<CodeReviewAssignment> reviewAssignments = CodeReviewAssignment.lookupAllUpcoming(now, conn);
+            request.setAttribute(UPCOMING_CODE_REVIEW_ASSIGNMENTS, reviewAssignments);
+
+            
+            
 			Set<Course> coursesThatNeedTesting = new HashSet<Course>();
 			for(Project p : projectList) {
 				buildStatusCount.put(p, p.getBuildStatusCount(conn));
