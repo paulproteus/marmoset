@@ -169,7 +169,7 @@
                     <td class="description"><c:out value="${project.fullTitle}" /></td>
                     <td><fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" /></td>
                     <td><c:out value="${codeReviewAssignment.kind}" /></td>
-                    <td><c:if test="${not empty codeReviewAssignment.visibleToStudents}">
+                    <td><c:if test="${codeReviewAssignment.visibleToStudents}">
                             <input type="checkbox" checked="checked" onclicked="return false;" />
                         </c:if></td>
                     <td class="description"><a href="${reviewLink}"> <c:out value="${codeReviewAssignment.description}" />
