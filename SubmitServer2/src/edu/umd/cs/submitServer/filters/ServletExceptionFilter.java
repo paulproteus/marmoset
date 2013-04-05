@@ -44,8 +44,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
+import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.UserSession;
 
 /**
@@ -75,12 +79,6 @@ public class ServletExceptionFilter extends SubmitServerFilter {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-	 * javax.servlet.ServletResponse, javax.servlet.FilterChain)
-	 */
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -174,10 +172,31 @@ public class ServletExceptionFilter extends SubmitServerFilter {
             e = new RuntimeException("No exception provided");
         String requestURI = request.getRequestURI();
         String userAgent = request.getHeader("User-Agent");
-        Integer userPK = userSession != null ? userSession.getStudentPK() : null;
+        @Student.PK Integer userPK = userSession != null ? userSession.getStudentPK() : null;
+        Student student = (Student) request.getAttribute(STUDENT);
+        StudentRegistration studentRegistration = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
+        @Student.PK Integer studentPK = userPK;
+        if (studentPK == null) {
+          if (student != null)
+            studentPK = student.getStudentPK();
+          else if (studentRegistration != null)
+            studentPK = studentRegistration.getStudentPK();
+        }
         
-        ServerError.insert(conn,kind, userPK, null,  null, /* project */ null, 
-                /* submission */ null, /* code */ null, message, type, ServletExceptionFilter.class.getName(), requestURI,
+        Project project = (Project) request.getAttribute(PROJECT);
+        
+        @Project.PK Integer projectPK = null;
+        if (project != null)
+          projectPK = project.getProjectPK();
+          
+        Submission submission = (Submission) request.getAttribute(SUBMISSION);
+        
+        @Submission.PK Integer submissionPK = null;
+        if (submission != null)
+          submissionPK = submission.getSubmissionPK();
+        
+        ServerError.insert(conn,kind, userPK, studentPK,  /* course */ null, projectPK, 
+                submissionPK, /* code */ null, message, type, ServletExceptionFilter.class.getName(), requestURI,
                 request.getQueryString(), remoteHost, referer, userAgent, e);
 
         if (response != null) {
