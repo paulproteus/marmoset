@@ -71,6 +71,7 @@ public interface SubmitServerConstants {
 	public static final String TEST_PROPERTIES = "testProperties";
 	public static final String PROJECT = "project";
 	public static final String PROJECT_LIST = "projectList";
+	 public static final String UPCOMING_CODE_REVIEW_ASSIGNMENTS = "upcomingCodeReviewAssignments";
 	public static final String COURSE = "course";
 	public static final String REVIEWER = "reviewer";
 	public static final String COURSE_INSTRUCTORS = "courseInstructors";

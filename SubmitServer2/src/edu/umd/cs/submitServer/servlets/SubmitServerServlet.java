@@ -234,8 +234,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
             boolean transactionSuccess, HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
         try {
-            if (!transactionSuccess && conn != null) {
-                // TODO Log a stack trace as well!
+            if (!transactionSuccess && conn != null && conn.getAutoCommit()) {
                 String reqStr = req.getRequestURI();
                 if (req.getQueryString() != null) {
                     reqStr += "?" + req.getQueryString();

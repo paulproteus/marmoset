@@ -9,18 +9,15 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import javax.annotation.Nonnull;
 
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.submitServer.servlets.SubmitServerServlet;
 
 public class WaitingBuildServer {
   private static ConcurrentLinkedQueue<WaitingBuildServer> waiting = new ConcurrentLinkedQueue<WaitingBuildServer>();
   
-  public static boolean offerSubmission(Project project, Submission submission) {
+  public static boolean offerSubmission(@Nonnull Project project, @Nonnull Submission submission) {
      if (submission.getBuildStatus() != Submission.BuildStatus.NEW)
       return false;
      for(Iterator<WaitingBuildServer> i = waiting.iterator(); i.hasNext(); ) {

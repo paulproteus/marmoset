@@ -37,12 +37,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.common.base.Strings;
+
+import edu.umd.cs.marmoset.modelClasses.BrowserEditing;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.UserSession;
 import edu.umd.cs.submitServer.WebConfigProperties;
 
@@ -52,21 +56,6 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 	Pattern courseNamePattern = Pattern.compile("[\\w-]+");
 	Pattern termPattern = Pattern.compile("\\d{6}");
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 *
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 *
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -104,6 +93,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 		String courseDescription = request.getParameter("description");
 		String courseURL = request.getParameter("url");
 
+
 		Connection gradesConn = null;
 		Connection conn = null;
 		boolean transactionSuccess = false;
@@ -115,10 +105,12 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			if (course != null)
 				throw new ServletException("Already imported as "
 						+ course.getCourseName());
-			course = new Course();
-			course.setCourseName(courseName);
-			course.setUrl(courseURL);
-			course.setDescription(courseDescription);
+			
+			 RequestParser parser = new RequestParser(request,
+	          getSubmitServerServletLog(), strictParameterChecking());
+	      course = parser.getCourse();
+
+	      
 			course.setSemester(term);
 			course.setSection(section);
 			course.setCourseIDs(combinedCourseIds);

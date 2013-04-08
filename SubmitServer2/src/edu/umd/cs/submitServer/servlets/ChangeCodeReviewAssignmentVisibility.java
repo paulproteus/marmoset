@@ -54,7 +54,7 @@ public class ChangeCodeReviewAssignmentVisibility extends SubmitServerServlet {
     CodeReviewAssignment assignment = (CodeReviewAssignment) request.getAttribute(CODE_REVIEW_ASSIGNMENT);
     
     if (!instructor.isInstructorModifiy()) throw new IllegalArgumentException();
-    boolean visibleToStudents = parser.getBooleanParameter("visible-to-students");
+    boolean visibleToStudents = parser.getBooleanParameter("visibleToStudents");
     Connection conn = null;
     try {
       conn = getConnection();

@@ -48,33 +48,28 @@ import edu.umd.cs.marmoset.modelClasses.Project;
  */
 public class AllProjectsFilter extends SubmitServerFilter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-	 * javax.servlet.ServletResponse, javax.servlet.FilterChain)
-	 */
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) resp;
-		Connection conn = null;
-		try {
-			conn = getConnection();
+  @Override
+  public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
+      ServletException {
+    HttpServletRequest request = (HttpServletRequest) req;
+    HttpServletResponse response = (HttpServletResponse) resp;
+    Connection conn = null;
+    try {
+      conn = getConnection();
 
-				List<Project> projectList = Project.lookupAll(conn);
-			request.setAttribute(PROJECT_LIST, projectList);
-			Map<Integer, Project> projectMap = new HashMap<Integer, Project>();
-			for (Project p : projectList)
-				projectMap.put(p.getProjectPK(), p);
-			request.setAttribute(PROJECT_MAP, projectMap);
-		} catch (SQLException e) {
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
-		chain.doFilter(request, response);
-	}
+      List<Project> projectList = Project.lookupAll(conn);
+      request.setAttribute(PROJECT_LIST, projectList);
+
+      Map<Integer, Project> projectMap = new HashMap<Integer, Project>();
+      for (Project p : projectList)
+        projectMap.put(p.getProjectPK(), p);
+      request.setAttribute(PROJECT_MAP, projectMap);
+    } catch (SQLException e) {
+      throw new ServletException(e);
+    } finally {
+      releaseConnection(conn);
+    }
+    chain.doFilter(request, response);
+  }
 
 }

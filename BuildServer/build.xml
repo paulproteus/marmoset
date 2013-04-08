@@ -58,6 +58,14 @@
 		<pathelement location="lib/modelClasses.jar"/>
 	</path>
 
+	<target name="diffOutputStream" depends="init">
+		<ant
+			antfile="${diffOutputStream}/build.xml"
+			inheritall="false"
+			>
+		</ant>
+		<copy todir="lib" file="${diffOutputStream}/diffOutputStream.jar"/>
+	</target>
 	<target name="modelClasses" depends="init">
 		<!--
 		Effectively builds the modelClasses jarfile in the lib directory for this project.
@@ -72,14 +80,11 @@
 		</ant>
 	</target>
 
-
-
-
   <target name="findbugs" depends="init">
     <ant antfile="build.xml" dir="${findbugs.dir}" inheritAll="false"/>
   </target>
 	
-	<target name="classes" depends="modelClasses">
+	<target name="classes" depends="diffOutputStream,modelClasses">
 		<javac
 			srcdir="src"
 			destdir="build/classes"
@@ -96,7 +101,19 @@
 		</copy>
 	</target>
 	
-	<target name="dist" depends="clean,jar">
+	<target name="jar" depends="classes" description="create buildserver.jar">
+		<jar destfile="buildserver.jar"
+  			manifest="etc/MANIFEST.MF">
+			<fileset dir="build/classes">
+				<include name="**/*.class"/>
+				<include name="**/*.policy"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="clean,jar" description="Create buildserver.zip in ../SubmitServer2/WebRoot/resources/">
 	<mkdir dir="build/BuildServer"/>
 	<mkdir dir="build/BuildServer/lib"/>
 	<copy file="buildserver.jar" todir="build/BuildServer"/> 
@@ -111,18 +128,6 @@
 	<zip destfile="../SubmitServer2/WebRoot/resources/buildserver.zip" basedir="build" includes="BuildServer/**" />
 	</target>
 
-	<target name="jar" depends="classes">
-		<jar destfile="buildserver.jar"
-  			manifest="etc/MANIFEST.MF">
-			<fileset dir="build/classes">
-				<include name="**/*.class"/>
-				<include name="**/*.policy"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.xml"/>
-			</fileset>
-		</jar>
-	</target>
-	
 	<target name="doc">
 		<exec executable="xsltproc" os="${os}">
 			<arg line="-o doc/ doc/manual.xsl doc/manual.xml"/>
@@ -145,91 +150,5 @@
 		<mkdir dir="build/classes"/>
 	</target>
 	
-	<target name="test">
-		<echo message="javahome: ${java.home}"/>
-		<echoproperties/>
-	</target>
 
-	<property name="run.dir" value="run"/>
-	<property name="scripts.dir" value="scripts"/>
-	<property name="runBuildServer" value="runBuildServer"/>
-	<property name="findbugs.version" value="findbugs-0.8.6-dev"/>
-  <property name="build.server.home" value="${user.dir}"/>
-
-  <!--
-  A "full install" also calls the jar task.
-  -->
-  <target name="full.install" depends="jar, install"/>
-
-  <!-- 
-  run.dir should incorporate not only the name of the run directory
-  but also the hostname.  This is not well documented.
-  -->
-  <target name="install">
-    <property name="path.to.run" value="${build.server.home}/${run.dir}"/>
-    <mkdir dir="${path.to.run}"/>
-    <copy tofile="${path.to.run}/config.properties"
-      file="${scripts.dir}/cluster.template"
-      overwrite="yes">
-      <filterset>
-	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
-	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
-	<filter token="BUILD_SERVER_HOME" value="${path.to.run}"/>
-	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
-	<filter token="SERVER_HOST" value="${server.host}"/>
-	<filter token="PMD_HOME" value="${pmd.dir}"/>
-	<filter token="HOSTNAME" value="${run.dir}"/>
-	<filter token="COURSES" value="${courses}"/>
-	<filter token="SEMESTER" value="${semester}"/>
-	<filter token="PORT" value="${port}"/>
-	<filter token="PASSWORD" value="${password}"/>
-	<filter token="UNPRIVILEGED_ACCOUNT" value="${unprivileged.account}"/>
-      </filterset>
-    </copy>
-    <copy todir="${path.to.run}" file="${scripts.dir}/${runBuildServer}"/>
-    <copy todir="${path.to.run}" file="${scripts.dir}/checkDaemon.sh"/>
-  </target>
-  
-  <target name="parameters.print">
-    <echo message="java.home: ${java.home}"/>
-    <echo message="JAVA_HOME: ${env.JAVA_HOME}"/>
-    <echo message="run.dir: ${run.dir}"/>
-    <echo message="semester = ${semester}"/>
-    <echo message="courses = ${courses}"/>
-  </target>
-	
-  <target name="cluster.install" depends="jar">
-    <mkdir dir="${hostname}"/>
-    <copy tofile="${hostname}/config.properties"
-      file="${scripts.dir}/cluster.template">
-      <filterset>
-	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
-	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
-	<filter token="BUILD_SERVER_HOME" value="${user.dir}/${hostname}"/>
-	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
-	<filter token="HOSTNAME" value="${hostname}"/>
-      </filterset>
-    </copy>
-    <copy todir="${hostname}" file="${scripts.dir}/${runBuildServer}" />
-  </target>
-
-  <target name="normal.install" depends="jar">
-    <!--
-    <property name="run.hostname"
-    value="run.${hostname}"/>
-    -->
-    <mkdir dir="${run.dir}"/>
-    <copy tofile="${run.dir}/config.properties"
-      file="${scripts.dir}/cluster.template">
-      <filterset>
-	<filter token="JAVA_HOME" value="${env.JAVA_HOME}"/>
-	<filter token="BUILD_SERVER_ROOT" value="${user.dir}"/>
-	<filter token="BUILD_SERVER_HOME" value="${user.dir}/${run.dir}"/>
-	<filter token="FIND_BUGS_HOME" value="${findbugs.dir}"/>
-	<filter token="HOSTNAME" value="${run.dir}.${hostname}"/>
-      </filterset>
-    </copy>
-    <copy todir="${run.dir}" file="${scripts.dir}/${runBuildServer}" />
-  </target>
-  
 </project>

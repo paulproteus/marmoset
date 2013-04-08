@@ -85,8 +85,7 @@ import edu.umd.cs.submitServer.WebConfigProperties;
  * studentSubmitStatus and submissionList attributes in the request.
  */
 public class ExtractParametersFilter extends SubmitServerFilter {
-  private static final WebConfigProperties webProperties = WebConfigProperties.get();
-
+ 
   public boolean checkCourse(Collection<Course> courses, int coursePK) {
     for (Course c : courses)
       if (c.getCoursePK() == coursePK)

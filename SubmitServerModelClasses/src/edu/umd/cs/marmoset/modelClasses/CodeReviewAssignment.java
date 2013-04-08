@@ -35,6 +35,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
@@ -288,7 +289,43 @@ public class CodeReviewAssignment {
             Queries.closeStatement(stmt);
         }
     }
+    
+    public static List<CodeReviewAssignment> lookupAllUpcoming(Timestamp time,
+            Connection conn) throws SQLException
+    {
+        String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME +
+        " WHERE deadline > ? "+
+        " ORDER BY deadline ASC ";
 
+
+        return getFromPreparedStatement( Queries.setStatement(conn, query, time));
+       
+    }
+    
+
+    public static List<CodeReviewAssignment> lookupAll(Connection conn)
+            throws SQLException {
+        String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME;
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        return getFromPreparedStatement(stmt);
+
+    }
+
+    private static List<CodeReviewAssignment> getFromPreparedStatement(
+            PreparedStatement stmt) throws SQLException {
+        try {
+            List<CodeReviewAssignment> assignments = new LinkedList<CodeReviewAssignment>();
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                assignments.add(new CodeReviewAssignment(rs, 1));
+            }
+            return assignments;
+        } finally {
+            stmt.close();
+        }
+    }
+    
 	public static @CheckForNull CodeReviewAssignment lookupByPK(
 			@CodeReviewAssignment.PK int codeReviewAssignmentPK,
 			Connection conn) throws SQLException {

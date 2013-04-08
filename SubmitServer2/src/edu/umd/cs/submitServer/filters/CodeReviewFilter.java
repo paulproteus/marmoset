@@ -37,15 +37,15 @@ public class CodeReviewFilter extends SubmitServerFilter {
         Student user = (Student) request.getAttribute(USER);
         Submission submission = (Submission) request.getAttribute(SUBMISSION);
         CodeReviewAssignment codeReviewAssignment = (CodeReviewAssignment) request.getAttribute(CODE_REVIEW_ASSIGNMENT);
-        StudentRegistration commenter = (StudentRegistration) request.getAttribute(STUDENT_REGISTRATION);
         Connection conn = null;
         try {
 
             conn = getConnection();
-            if (commenter == null) 
-              commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
+            StudentRegistration commenter = StudentRegistration.lookupByStudentPKAndCoursePK(user.getStudentPK(),
                 course.getCoursePK(), conn);
             if (reviewer == null) {
+              if (submission == null) 
+                throw new IllegalArgumentException("Have neither reviewer nor submission");
                 if (commenter == null) {
                     if (!userSession.isSuperUser()) {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
@@ -79,6 +79,8 @@ public class CodeReviewFilter extends SubmitServerFilter {
                 && !reviewer.isAuthor())
               throw new IllegalArgumentException("Code review assignment not visible");
             
+            if (user.getStudentPK() != reviewer.getStudentPK())
+              throw new IllegalArgumentException("User and reviewer studentPK don't match");
             reviewer.markAsViewed(conn);
             MarmosetDaoService dao = new MarmosetDaoService(submitServerDatabaseProperties, reviewer);
             ReviewerDto reviewerDto = dao.getReviewer();

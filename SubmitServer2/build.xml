@@ -91,12 +91,30 @@
       includes="**/*.java"
       destdir="${bin}"
       deprecation="yes"
-      source="1.6"
-      target="1.6"
+      source="1.7"
+      target="1.7"
       debug="on"
       includeantruntime="false"
       >
       <classpath refid="junit.classpath" />
+    </javac>
+  </target>
+
+  <target name="errorprone" depends="init, modelClasses,libs,cpwebxml">
+    <javac
+      encoding="utf-8"
+      includes="**/*.java"
+      destdir="${bin}"
+      deprecation="no"
+      debug="on"
+      source="1.7"
+      target="1.7"
+      includeantruntime="false"
+	compiler="com.google.errorprone.ErrorProneAntCompilerAdapter"
+      >
+            <src path="${src}" />
+            <src path="gwt-src" />
+      <classpath refid="base.classpath" />
     </javac>
   </target>
 
@@ -108,8 +126,8 @@
       destdir="${bin}"
       deprecation="no"
       debug="on"
-      source="1.6"
-      target="1.6"
+      source="1.7"
+      target="1.7"
       includeantruntime="false"
       >
             <src path="${src}" />

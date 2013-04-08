@@ -60,7 +60,7 @@ import edu.umd.cs.submitServer.policy.ChosenSubmissionPolicy;
  * 
  */
 public abstract class SubmitServerFilter implements Filter, SubmitServerConstants {
-	private static final WebConfigProperties webProperties = WebConfigProperties.get();
+	protected static final WebConfigProperties webProperties = WebConfigProperties.get();
     private Logger authenticationLog;
 
     

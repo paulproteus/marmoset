@@ -36,6 +36,9 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 		public final Submission submission;
 		@Nonnull
 		public final Project project;
+		
+		@Nonnull 
+		public final Course course;
 		@CheckForNull
 		public final CodeReviewer author;
 		@CheckForNull
@@ -58,6 +61,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				throw new IllegalArgumentException();
 			this.submission = submission;
 			this.project = Project.getByProjectPK(submission.getProjectPK(), conn);
+			this.course = Course.getByCoursePK(project.getCoursePK(), conn);
 			this.author = CodeReviewer.lookupAuthorBySubmission(
 					submission.getSubmissionPK(), conn);
 
@@ -314,6 +318,10 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 	
 	public Project getProject() {
 		return info.project;
+	}
+	
+	public Course getCourse() {
+	    return info.course;
 	}
 
 	public Student getViewer() {

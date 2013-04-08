@@ -1231,19 +1231,20 @@ public class Project implements Serializable, Cloneable {
         }
     }
 
-    private static List<Project> getProjectsFromPreparedStatement(PreparedStatement stmt)
-    throws SQLException
-    {
+    private static List<Project> getProjectsFromPreparedStatement(
+            PreparedStatement stmt) throws SQLException {
         List<Project> projects = new LinkedList<Project>();
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next())
-        {
-            Project project = new Project();
-            project.fetchValues(rs, 1);
-            projects.add(project);
+        try {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Project project = new Project();
+                project.fetchValues(rs, 1);
+                projects.add(project);
+            }
+            return projects;
+        } finally {
+            stmt.close();
         }
-        stmt.close();
-        return projects;
     }
 
     public static Project importProject(InputStream in,

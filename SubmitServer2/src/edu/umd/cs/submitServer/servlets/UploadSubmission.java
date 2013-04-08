@@ -93,9 +93,6 @@ public class UploadSubmission extends SubmitServerServlet {
         String cvsTimestamp = multipartRequest.getOptionalCheckedParameter("cvstagTimestamp");
 
       
-        boolean codemirror = clientTool.equals("codemirror");
-
-        Connection conn = null;
         Collection<FileItem> files = multipartRequest.getFileItems();
         Kind kind;
 

@@ -78,21 +78,21 @@ public class ExecutableTestCase {
                 return REFERENCE_EXEC;
             return valueOf(name);
         }
-    };
+    }
 
     public enum InputKind {
         NONE, STRING, FILE;
         public boolean hasValue() {
             return this == STRING || this == FILE;
         }
-    };
+    }
 
-    public enum OutputKind {
+    public enum ExpectedKind {
         NONE, STRING, FILE, REFERENCE_IMPL;
         public boolean hasValue() {
             return this == STRING || this == FILE;
         }
-    };
+    }
 
     final @CheckForNull
     ExecutableTestCase defaults; // null only for defaults
@@ -100,11 +100,16 @@ public class ExecutableTestCase {
     final String name;
     final int number;
 
+    public String toString() {
+        if  (testType != null)
+            return testType.toString() + ":" + name;
+        return name;
+    }
     private EnumMap<Property, String> properties = new EnumMap<Property, String>(
             Property.class);
 
     private  InputKind inputKind;
-    private  OutputKind outputKind;
+    private  ExpectedKind expectedKind;
 
     private ExecutableTestCase(ExecutableTestCase defaults, TestType testType,
             String name, int number) {
@@ -141,15 +146,15 @@ public class ExecutableTestCase {
         return null;
     }
 
-    public OutputKind getOutputKind() {
-        OutputKind result = outputKind;
+    public ExpectedKind getOutputKind() {
+        ExpectedKind result = expectedKind;
         if (result != null)
             return result;
         if (defaults != null)
             result = defaults.getOutputKind();
         if (result != null) return result;
         if (isLeafTestCase())
-            return OutputKind.NONE;
+            return ExpectedKind.NONE;
         return null;
     }
 
@@ -205,21 +210,21 @@ public class ExecutableTestCase {
             }
             break;
         case EXPECTED:
-            if (outputKind != null)
+            if (expectedKind != null)
                 throw new IllegalArgumentException("Can't set both output of  "
                         + value + " and a reference exec");
             if (isQuotedString(value)) {
                 value = stripQuotes(value);
-                outputKind = OutputKind.STRING;
+                expectedKind = ExpectedKind.STRING;
             } else {
-                outputKind = OutputKind.FILE;
+                expectedKind = ExpectedKind.FILE;
             }
             break;
         case REFERENCE_EXEC:
-            if (outputKind != null)
+            if (expectedKind != null)
                 throw new IllegalArgumentException("Can't set both output of  "
-                        + outputKind + " and a reference exec");
-            outputKind = OutputKind.REFERENCE_IMPL;
+                        + expectedKind + " and a reference exec");
+            expectedKind = ExpectedKind.REFERENCE_IMPL;
             break;
         default:
             assert true;

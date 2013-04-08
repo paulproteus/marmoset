@@ -161,7 +161,7 @@
 		<c:when test="${canRevertCodeReview}">
 		<c:choose>
 		<c:when test="${!codeReviewAssignment.visibleToStudents}">
-		<h2>Code review assigned but not visible to students</h2>
+		<h2>Code review created but not visible to students</h2>
 		</c:when>
 		<c:otherwise>
 		<h2>Code review assigned and visible, but not started</h2>
@@ -184,9 +184,9 @@
 								action="${changeCodeReviewAssignmentVisibilityLink}">
 								<input type="hidden" name="codeReviewAssignmentPK"
 									value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-								Currently invisible to students. <input type="hidden"
-									name="visibleToStudents" value="true" /> <input type="submit"
-									value="Make Visible" style="color: #003399" />
+								Currently visible to students. <input type="hidden"
+									name="visibleToStudents" value="false" /> <input type="submit"
+									value="Make Invisible" style="color: #003399" />
 							</form>
 					</c:when>
 					<c:otherwise>
@@ -194,8 +194,8 @@
 								action="${changeCodeReviewAssignmentVisibilityLink}">
 								<input type="hidden" name="codeReviewAssignmentPK"
 									value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-								Currently visible to students. <input type="hidden"
-									name="visibleToStudents" value="false" /> <input type="submit"
+								Currently invisible to students. <input type="hidden"
+									name="visibleToStudents" value="true" /> <input type="submit"
 									value="Make Visible" style="color: #003399" />
 							</form>
 					</c:otherwise>

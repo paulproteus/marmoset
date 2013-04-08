@@ -144,6 +144,40 @@
     </table>
 
 
+  <h2><a href="javascript:toggle('upcomindCodeReviews')">Upcoming code review assignments</a></h2>
+    <div id="upcomindCodeReviews" style="display: none">
+    <table>
+        <tr>
+            <th >Course</th>
+            <th >Project</th>
+            <th >Deadline</th>
+             <th >Kind</th>
+               <th >Visible</th>
+            <th >Description</th>
+        </tr>
+       
+
+        <c:forEach var="codeReviewAssignment" items="${upcomingCodeReviewAssignments}" varStatus="counter">
+            <c:set var="project" value="${projectMap[codeReviewAssignment.projectPK]}"/>
+            <c:set var="course" value="${courseMap[project.coursePK]}"/>
+            <c:url var="reviewLink" value="/view/instructor/codeReviewAssignment.jsp">
+                        <c:param name="codeReviewAssignmentPK" value="${codeReviewAssignment.codeReviewAssignmentPK}" />
+                    </c:url>
+                <tr class="r${counter.index % 2}">
+
+                    <td class="description"><c:out value="${course.courseName}" /></td>
+                    <td class="description"><c:out value="${project.fullTitle}" /></td>
+                    <td><fmt:formatDate value="${codeReviewAssignment.deadline}" pattern="dd MMM, hh:mm a" /></td>
+                    <td><c:out value="${codeReviewAssignment.kind}" /></td>
+                    <td><c:if test="${codeReviewAssignment.visibleToStudents}">
+                            <input type="checkbox" checked="checked" onclicked="return false;" />
+                        </c:if></td>
+                    <td class="description"><a href="${reviewLink}"> <c:out value="${codeReviewAssignment.description}" />
+                    </a></td>
+                </tr>
+            </c:forEach>
+    </table>
+    </div>
 
     <h2><a href="javascript:toggle('upcomingProjects')">Upcoming project deadlines</a></h2>
     <div id="upcomingProjects" style="display: none">
