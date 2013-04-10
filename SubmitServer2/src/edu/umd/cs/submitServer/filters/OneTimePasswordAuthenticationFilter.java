@@ -123,7 +123,7 @@ public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
 				if (studentRegistration != null)
 					throw new BadPasswordException(
 							HttpServletResponse.SC_UNAUTHORIZED,
-							"The one-time password stored in .submitUser is incorrect");
+							"The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
 				else
 					throw new CanNotFindDirectoryIDException(
 							HttpServletResponse.SC_UNAUTHORIZED, classAccount
