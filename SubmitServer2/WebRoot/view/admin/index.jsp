@@ -330,6 +330,11 @@
 
 
     <h1>Administrative actions</h1>
+    <c:set var="mailToURL">
+    mailto:
+    <c:out value="${allInstructorEmails}"/>
+    </c:set>
+    <p><a href="${mailToURL}">Email all instructors</a></p>
     <c:if test="${gradesServer}">
         <h2>
             Synchronize with <a href="http://grades.cs.umd.edu">grades.cs.umd.edu</a>

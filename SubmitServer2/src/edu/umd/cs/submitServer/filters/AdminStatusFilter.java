@@ -52,6 +52,7 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
+import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.submitServer.WebConfigProperties;
@@ -129,6 +130,18 @@ public class AdminStatusFilter extends SubmitServerFilter {
 			request.setAttribute("coursesThatNeedBuildServers", coursesThatNeedBuildServers);
 			request.setAttribute("buildServers", buildServers);
 			request.setAttribute("systemLoad", SystemInfo.getSystemLoad());
+			Collection<Student> allInstructors = Student.lookupAllInstructors(conn).values();
+      request.setAttribute("allInstructors", allInstructors);
+      StringBuilder b = new StringBuilder();
+      for(Student s : allInstructors) {
+        if (b.length() > 0)
+          b.append(",");
+        if (s.getEmail() != null && s.getEmail().length() > 0)
+          b.append(s.getEmail());
+      }
+      request.setAttribute("allInstructorEmails", b.toString());
+      
+        
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		} finally {
