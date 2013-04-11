@@ -183,6 +183,9 @@ public class ServletExceptionFilter extends SubmitServerFilter {
             studentPK = studentRegistration.getStudentPK();
         }
         
+        if (userPK == null)
+          userPK = studentPK;
+        
         Project project = (Project) request.getAttribute(PROJECT);
         
         @Project.PK Integer projectPK = null;
