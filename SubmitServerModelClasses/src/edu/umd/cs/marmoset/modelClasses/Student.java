@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckReturnValue;
@@ -853,6 +854,23 @@ public class Student  implements Comparable<Student> {
         PreparedStatement stmt= conn.prepareStatement(query);
         stmt.setString(1, emailAddress);
         return getFromPreparedStatement(stmt);
+    }
+    
+    public static Map<Integer, Student> lookupAllInstructors(Connection conn)  throws SQLException {
+    	String query =
+                " SELECT DISTINCT " +ATTRIBUTES+
+                " FROM " +TABLE_NAME+ "," + StudentRegistration.TABLE_NAME +
+                 " WHERE students.student_pk = student_registration.student_pk " +
+                 " AND student_registration.instructor_capability =  'modify'";
+    	
+    	PreparedStatement stmt = null;
+        try {
+          stmt = conn.prepareStatement(query);
+          return getAllFromPreparedStatement(stmt);
+        } finally {
+          Queries.closeStatement(stmt);
+        }
+        
     }
 
 }
