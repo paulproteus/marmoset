@@ -136,7 +136,7 @@ public class AdminStatusFilter extends SubmitServerFilter {
       for(Student s : allInstructors) {
         if (b.length() > 0)
           b.append(",");
-        if (s.getEmail().length() > 0)
+        if (s.getEmail() != null && s.getEmail().length() > 0)
           b.append(s.getEmail());
       }
       request.setAttribute("allInstructorEmails", b.toString());

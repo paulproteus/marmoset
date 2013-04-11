@@ -334,7 +334,7 @@
     mailto:
     <c:out value="${allInstructorEmails}"/>
     </c:set>
-    <p><a href="$mailToURL">Email all instructors</a></p>
+    <p><a href="${mailToURL}">Email all instructors</a></p>
     <c:if test="${gradesServer}">
         <h2>
             Synchronize with <a href="http://grades.cs.umd.edu">grades.cs.umd.edu</a>
