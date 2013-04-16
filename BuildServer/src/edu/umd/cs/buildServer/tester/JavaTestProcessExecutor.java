@@ -197,7 +197,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		        : getTrustedCodeBaseFinder().getCollection()) {
 			javaArgs.add("-D" + trustedCodeBase.getProperty() + "="
 					+ trustedCodeBase.getValue());
-			getLog().debug("adding trusted codebase " + trustedCodeBase);
+//			getLog().debug("adding trusted codebase " + trustedCodeBase);
 		}
 		// Let the test classes know where test files are.
 		// Append a separator to the end, because this makes it
