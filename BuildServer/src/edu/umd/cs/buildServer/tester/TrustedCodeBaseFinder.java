@@ -53,10 +53,10 @@ final class TrustedCodeBaseFinder {
 	 */
 	public void execute() {
 	    File junit = JavaBuilder.getCodeBase(TestCase.class);
-	    tester.getLog().debug("junit at: " + junit);
+//	    tester.getLog().debug("junit at: " + junit);
 	    addTrustedCodeBase("buildserver.junit.jar.file", junit.getAbsolutePath());
 	    File buildserverRoot =tester.getDirectoryFinder().getBuildServerRoot();
-        tester.getLog().debug("buildserver at: " + buildserverRoot);
+//        tester.getLog().debug("buildserver at: " + buildserverRoot);
         addTrustedCodeBase("buildserver.tester.codebase", buildserverRoot.getAbsolutePath());
     	}
 
@@ -72,8 +72,8 @@ final class TrustedCodeBaseFinder {
 	private void addTrustedCodeBase(String property, String value) {
 	    if (defined.contains(property))
 	        throw new IllegalArgumentException("already defined " + property);
-		this.tester.getLog().debug(
-				"Trusted code base: " + property + "=" + value);
+//		this.tester.getLog().debug(
+//				"Trusted code base: " + property + "=" + value);
 		trustedCodeBaseList.add(new TrustedCodeBase(property, value));
 	}
 }
