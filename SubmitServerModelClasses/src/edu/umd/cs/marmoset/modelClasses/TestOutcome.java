@@ -531,6 +531,9 @@ public class TestOutcome implements Serializable {
 	public void setCodeCoveralXMLResults(File file)
 	throws IOException
 	{
+	    if (!file.exists() || !file.canRead())  {
+	        return;
+	    }
 	    ByteArrayOutputStream actualData = new ByteArrayOutputStream();
 	    ZipOutputStream zipOut = new ZipOutputStream(actualData);
 
