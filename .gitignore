@@ -31,6 +31,7 @@ SubmitServer2/WebRoot/WEB-INF/deploy
 SubmitServer2/WebRoot/codereview
 BuildServer/bin/
 BuildServer/build/
+BuildServer/lib/clover.license
 BuildServer/lib/clover.jar
 BuildServer/run
 BuildServer/buildserver.jar

@@ -461,6 +461,13 @@ public class JavaTester extends Tester<JUnitTestProperties> {
 			cloverDBPath = getProjectSubmission().getConfig().getConfig()
 					.getRequiredProperty(CLOVER_DB);
 
+			File cloverDBFile = new File(cloverDBPath);
+			if (!cloverDBFile.exists() || !cloverDBFile.canRead()) {
+			    getLog().error(
+	                    "Clover db file doesn't exist at " + cloverDBPath);
+			    return;
+	        
+			}
 			// the name of xml file where we'll put the results
 			String xmlOutputFile = getDirectoryFinder().getBuildDirectory()
 					.getAbsolutePath()

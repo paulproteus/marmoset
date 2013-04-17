@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5deb1
+-- version 3.3.9.2
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 29, 2012 at 10:56 AM
--- Server version: 5.1.58
--- PHP Version: 5.3.6-13ubuntu3.3
+-- Generation Time: Apr 11, 2013 at 05:05 PM
+-- Server version: 5.5.9
+-- PHP Version: 5.3.6
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -30,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `buildservers` (
   `buildserver_pk` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `remote_host` text COLLATE utf8_bin NOT NULL,
-  `courses` text  COLLATE utf8_bin NOT NULL,
+  `courses` text COLLATE utf8_bin NOT NULL,
   `last_request` datetime NOT NULL,
   `last_request_submission_pk` int(11) NOT NULL DEFAULT '0',
   `last_job` datetime DEFAULT NULL,
@@ -70,9 +69,12 @@ CREATE TABLE IF NOT EXISTS `code_reviewer` (
   `is_author` tinyint(1) NOT NULL,
   `is_instructor` tinyint(1) NOT NULL DEFAULT '0',
   `last_update` datetime DEFAULT NULL,
+  `last_seen` datetime DEFAULT NULL COMMENT 'last time this reviewer examined the code review',
   `num_comments` int(11) NOT NULL DEFAULT '0',
   `known_as` varchar(100) NOT NULL,
   `is_automated` tinyint(1) NOT NULL DEFAULT '0',
+  `rating` int(11) NOT NULL DEFAULT '0' COMMENT 'Rating of reviewer by author (1-5)',
+  `rating_comment` text COMMENT 'Comments from author explaining the rating they gave a reviewer',
   PRIMARY KEY (`code_reviewer_pk`),
   KEY `code_review_pk` (`student_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`),
@@ -93,9 +95,10 @@ CREATE TABLE IF NOT EXISTS `code_review_assignment` (
   `other_reviews_visible` tinyint(1) NOT NULL,
   `anonymous` tinyint(1) NOT NULL DEFAULT '0',
   `kind` varchar(30) NOT NULL DEFAULT 'INSTRUCTIONAL',
+  `visible_to_students` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`code_review_assignment_pk`),
   KEY `project_pk` (`project_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -124,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `code_review_comment` (
 
 CREATE TABLE IF NOT EXISTS `code_review_thread` (
   `code_review_thread_pk` int(11) NOT NULL AUTO_INCREMENT,
-  `file` varchar(120) NULL,
+  `file` varchar(120) DEFAULT NULL,
   `line` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
   `created_by` int(11) NOT NULL,
@@ -154,7 +157,7 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `buildserver_key` varchar(40) NOT NULL,
   `browser_editing` varchar(20) NOT NULL DEFAULT 'prohibited',
   `sections` text,
-  `help_requests_allowed` TINYINT( 1 ) NOT NULL DEFAULT  '0',
+  `help_requests_allowed` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`course_pk`),
   UNIQUE KEY `submit_key` (`submit_key`),
   UNIQUE KEY `buildserver_key` (`buildserver_key`)
@@ -186,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
 -- Table structure for table `errors`
 --
 
-CREATE TABLE `errors` (
+CREATE TABLE IF NOT EXISTS `errors` (
   `error_pk` int(11) NOT NULL AUTO_INCREMENT,
   `when` datetime NOT NULL,
   `user_pk` int(11) DEFAULT NULL,
@@ -195,7 +198,7 @@ CREATE TABLE `errors` (
   `project_pk` int(11) DEFAULT NULL,
   `submission_pk` int(11) DEFAULT NULL,
   `code` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  `message` text COLLATE utf8_bin DEFAULT NULL,
+  `message` text COLLATE utf8_bin,
   `type` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `servlet` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `uri` text COLLATE utf8_bin,
@@ -214,6 +217,23 @@ CREATE TABLE `errors` (
   KEY `project_pk` (`project_pk`),
   KEY `submission_pk` (`submission_pk`),
   KEY `kind` (`kind`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `help_requests`
+--
+
+CREATE TABLE IF NOT EXISTS `help_requests` (
+  `review_request_pk` int(11) NOT NULL AUTO_INCREMENT,
+  `submission_pk` int(11) NOT NULL,
+  `course_pk` int(11) NOT NULL,
+  `when` datetime NOT NULL DEFAULT '2012-02-01 00:00:00',
+  `accepted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`review_request_pk`),
+  UNIQUE KEY `submission_pk` (`submission_pk`),
+  KEY `course_pk` (`course_pk`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -286,9 +306,9 @@ CREATE TABLE IF NOT EXISTS `registration_requests` (
   `timestamp` bigint(20) NOT NULL,
   `status` enum('PENDING','APPROVED','DENIED') COLLATE utf8_bin NOT NULL,
   `section` text COLLATE utf8_bin,
+  UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`),
   KEY `student_pk` (`student_pk`),
-  KEY `course_pk` (`course_pk`),
-  UNIQUE KEY `student_pk_2` (`student_pk`,`course_pk`)
+  KEY `course_pk` (`course_pk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -306,7 +326,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `data` varchar(120) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`rubric_pk`),
   KEY `code_review_assignment_pk` (`code_review_assignment_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -327,7 +347,7 @@ CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
   PRIMARY KEY (`rubric_evaluation_pk`),
   KEY `rubric_pk` (`rubric_pk`,`code_reviewer_pk`,`code_review_thread_pk`),
   KEY `status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -553,19 +573,5 @@ CREATE TABLE IF NOT EXISTS `test_setup_archives` (
   UNIQUE KEY `checksum` (`checksum`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
 
-CREATE TABLE `help_requests` (
-  `review_request_pk` int(11) NOT NULL AUTO_INCREMENT,
-  `submission_pk` int(11) NOT NULL,
-  `course_pk` int(11) NOT NULL,
-  `when` datetime NOT NULL,
-  `accepted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`review_request_pk`),
-  UNIQUE KEY `submission_pk` (`submission_pk`),
-  KEY `course_pk` (`course_pk`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
-
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
