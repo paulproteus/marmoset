@@ -857,7 +857,7 @@ public class Project implements Serializable, Cloneable {
 				Project project = new Project();
 				project.fetchValues(rs, 1);
 				if (rs.next())
-				    throw new SQLException("project not uniquely identified");
+				    throw new SQLException("project not uniquely identified by " + stmt);
 				return project;
 			}
 			return null;
