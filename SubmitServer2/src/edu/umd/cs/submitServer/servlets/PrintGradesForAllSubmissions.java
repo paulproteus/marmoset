@@ -54,7 +54,9 @@ public class PrintGradesForAllSubmissions extends SubmitServerServlet {
 
 			Project project = (Project) request.getAttribute("project");
 			Map<Integer, StudentRegistration> registrationMap = (Map<Integer, StudentRegistration>) request
-					.getAttribute("studentRegistrationMap");
+          .getAttribute("studentRegistrationMap");
+			if (registrationMap == null)
+			  throw new NullPointerException("no studentRegistrationMap");
 			Timestamp ontime = project.getOntime();
 			Map<Integer, StudentSubmitStatus> submitStatusMap 
       = (Map<Integer, StudentSubmitStatus>) request.getAttribute("submitStatusMap");
@@ -96,8 +98,16 @@ public class PrintGradesForAllSubmissions extends SubmitServerServlet {
 				if (registration != null
 						&& registration.getInstructorLevel() == StudentRegistration.STUDENT_CAPABILITY_LEVEL) {
 				  
+				  if (registration == null)
+				    throw new NullPointerException("registration is null");
+				  
+				  
 				  StudentSubmitStatus status = submitStatusMap.get(registration.getStudentRegistrationPK());
 
+				  if (status == null)
+            throw new NullPointerException("status is null");
+         
+				  
 					// Now find the test outcome collection
 					TestOutcomeCollection testOutcomeCollection = TestOutcomeCollection
 							.lookupByTestRunPK(
