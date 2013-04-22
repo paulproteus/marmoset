@@ -59,8 +59,10 @@ public class PrintGradesForAllSubmissions extends SubmitServerServlet {
 			  throw new NullPointerException("no studentRegistrationMap");
 			Timestamp ontime = project.getOntime();
 			Map<Integer, StudentSubmitStatus> submitStatusMap 
-      = (Map<Integer, StudentSubmitStatus>) request.getAttribute("submitStatusMap");
-     
+      = (Map<Integer, StudentSubmitStatus>) request.getAttribute("studentSubmitStatusMap");
+			 if (submitStatusMap == null)
+	        throw new NullPointerException("no submitStatusMap");
+	    
 			response.setContentType("text/plain");
 	    response.setCharacterEncoding("UTF-8");
 			String filename = "project-" + project.getProjectNumber()
