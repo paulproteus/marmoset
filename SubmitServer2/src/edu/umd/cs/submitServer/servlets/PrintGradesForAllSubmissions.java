@@ -91,11 +91,13 @@ public class PrintGradesForAllSubmissions extends SubmitServerServlet {
 				// Get the studentRegistration associated with this submission
 				StudentRegistration registration = registrationMap
 						.get(submission.getStudentRegistrationPK());
-				StudentSubmitStatus status = submitStatusMap.get(registration.getStudentRegistrationPK());
-        
+			        
 				// Only interested in student submissions
 				if (registration != null
 						&& registration.getInstructorLevel() == StudentRegistration.STUDENT_CAPABILITY_LEVEL) {
+				  
+				  StudentSubmitStatus status = submitStatusMap.get(registration.getStudentRegistrationPK());
+
 					// Now find the test outcome collection
 					TestOutcomeCollection testOutcomeCollection = TestOutcomeCollection
 							.lookupByTestRunPK(
