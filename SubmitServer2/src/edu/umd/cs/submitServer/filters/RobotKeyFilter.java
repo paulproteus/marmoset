@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
+import edu.umd.cs.submitServer.SubmitServerConstants;
 
 /**
  * @author jspacco
@@ -77,7 +78,12 @@ public class RobotKeyFilter extends SubmitServerFilter {
 		}
 
 		String robotKey = getRobotKey(course, project, status);
+		String robotKeyParameter = request.getParameter("key");
+		if (robotKeyParameter != null && robotKeyParameter.equals(robotKey))
+		  request.setAttribute(SubmitServerConstants.INSTRUCTOR_CAPABILITY, true);
+    
 		request.setAttribute("robotKey", robotKey);
+
 		chain.doFilter(req, resp);
 	}
 
