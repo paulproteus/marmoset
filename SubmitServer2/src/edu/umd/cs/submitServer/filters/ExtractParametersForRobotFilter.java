@@ -83,6 +83,7 @@ public class ExtractParametersForRobotFilter extends SubmitServerFilter {
 
 			request.setAttribute(STUDENT_REGISTRATION_SET,
 					studentRegistrationSet);
+      request.setAttribute("allStudents", studentRegistrationSet);
 
 		} catch (SQLException e) {
 			throw new ServletException(e);

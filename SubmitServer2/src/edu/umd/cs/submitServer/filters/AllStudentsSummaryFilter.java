@@ -212,23 +212,25 @@ public class AllStudentsSummaryFilter extends SubmitServerFilter {
 				TreeSet<StudentRegistration>  studentsWithoutSubmissions =
 				(TreeSet<StudentRegistration>) request.getAttribute("studentsWithoutSubmissions");
 
-				for(StudentSubmitStatus status : submitStatusMap.values()) {
-					Integer partnerPK = status.getPartnerPK();
-					if (partnerPK != null && partnerPK > 0) {
-						StudentRegistration from = studentRegistrationMap.get(status.getStudentRegistrationPK());
-						StudentRegistration to = studentRegistrationMap.get(partnerPK);
-						if (from == null || to == null)
-							continue;
-						partner.put(from, to);
-						request.setAttribute("partnerMap", partner);
-						if (!studentsWithoutSubmissions.contains(from))
-							studentsWithoutSubmissions.remove(to);
+				if (studentsWithoutSubmissions != null && submitStatusMap != null) {
+				  for(StudentSubmitStatus status : submitStatusMap.values()) {
+				    Integer partnerPK = status.getPartnerPK();
+				    if (partnerPK != null && partnerPK > 0) {
+				      StudentRegistration from = studentRegistrationMap.get(status.getStudentRegistrationPK());
+				      StudentRegistration to = studentRegistrationMap.get(partnerPK);
+				      if (from == null || to == null)
+				        continue;
+				      partner.put(from, to);
+				      request.setAttribute("partnerMap", partner);
+				      if (!studentsWithoutSubmissions.contains(from))
+				        studentsWithoutSubmissions.remove(to);
 
-					}
+				    }
 
+				  }
+				  request.setAttribute("partnerMap", partner);
+				  request.setAttribute("studentsWithoutSubmissions", studentsWithoutSubmissions);
 				}
-				request.setAttribute("partnerMap", partner);
-				request.setAttribute("studentsWithoutSubmissions", studentsWithoutSubmissions);
 
 			}
 		} catch (SQLException e) {
