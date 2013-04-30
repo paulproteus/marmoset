@@ -36,3 +36,8 @@ ALTER TABLE  `code_reviewer` ADD  `rating_comment` TEXT CHARACTER SET utf8 COLLA
 
 ALTER TABLE  `code_review_assignment` ADD  `visible_to_students` TINYINT( 1 ) NOT NULL DEFAULT  '1'
 
+# change 4/30/2013
+
+ALTER TABLE  `courses` CHANGE  `url`  `url` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE  `projects` CHANGE  `URL`  `URL` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE  `projects` CHANGE  `title`  `title` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
