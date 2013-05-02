@@ -140,6 +140,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 				codeMetrics.setCodeSegmentSize(multipartRequest
 						.getIntParameter("codeSegmentSize"));
 			}
+			int testDurationsMillis = multipartRequest.getIntegerParameter("testDurationsMillis", 0);
 
 			// Get the fileItem
 			fileItem = multipartRequest.getFileItem();
@@ -387,6 +388,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 				testRun.setMd5sumClassfiles(codeMetrics.getMd5sumClassfiles());
 				testRun.setMd5sumSourcefiles(codeMetrics.getMd5sumSourcefiles());
 			}
+			testRun.setTestDurationMillis(testDurationsMillis);
 
 			// perform insert
 			testRun.insert(conn);

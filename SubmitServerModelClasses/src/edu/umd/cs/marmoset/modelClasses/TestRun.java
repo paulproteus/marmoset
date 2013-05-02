@@ -57,6 +57,7 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
     private int numFindBugsWarnings;
     private String md5sumClassfiles;
     private String md5sumSourcefiles;
+    private int testDurationMillis;
 
      static final String[] ATTRIBUTE_NAME_LIST = {
             "test_run_pk", "test_setup_pk",
@@ -69,7 +70,8 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
             "num_secret_tests_passed",
             "num_findbugs_warnings",
             "checksum_classfiles",
-            "checksum_sourcefiles"
+            "checksum_sourcefiles",
+            "test_duration_millis",
     };
 
     public static final String ATTRIBUTES = Queries.getAttributeList("test_runs", ATTRIBUTE_NAME_LIST);
@@ -98,6 +100,7 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
         setNumFindBugsWarnings(rs.getInt(startingFrom++));
         setMd5sumClassfiles(rs.getString(startingFrom++));
         setMd5sumSourcefiles(rs.getString(startingFrom++));
+        setTestDurationMillis(rs.getInt(startingFrom++));
         return startingFrom;
     }
 
@@ -289,6 +292,14 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
     {
         this.md5sumSourcefiles = md5sumSourcefiles;
     }
+    public int getTestDurationMillis() {
+        return testDurationMillis;
+    }
+
+    public void setTestDurationMillis(int testDurationMillis) {
+        this.testDurationMillis = testDurationMillis;
+    }
+
     /**
      * Gets a testRun with the given testRunPK
      * @param testRunPK the PK
@@ -345,6 +356,7 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
         stmt.setInt(index++, getNumFindBugsWarnings());
         stmt.setString(index++, getMd5sumClassfiles());
         stmt.setString(index++, getMd5sumSourcefiles());
+        stmt.setInt(index++, getTestDurationMillis());
         return index;
     }
 

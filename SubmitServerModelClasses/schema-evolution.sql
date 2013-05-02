@@ -41,3 +41,7 @@ ALTER TABLE  `code_review_assignment` ADD  `visible_to_students` TINYINT( 1 ) NO
 ALTER TABLE  `courses` CHANGE  `url`  `url` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ALTER TABLE  `projects` CHANGE  `URL`  `URL` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ALTER TABLE  `projects` CHANGE  `title`  `title` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+# change 5/1/2013
+
+ALTER TABLE  `test_runs` ADD  `test_duration_millis` INT NOT NULL DEFAULT  '0' COMMENT  'Build and test time, in ms'
