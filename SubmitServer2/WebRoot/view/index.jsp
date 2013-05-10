@@ -194,8 +194,10 @@ label.error {
                 <c:url var="createCourseLink" value="/view/instructor/createCourse.jsp" />
                 <li><a href="${createCourseLink}">Create course via web form</a></li>
 
-                <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
-                <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>
+                <c:if test="${empty courseList}">
+                    <c:url var="buildServerConfigLink" value="/view/instructor/createBuildserverConfig.jsp" />
+                    <li><a href="${buildServerConfigLink}">Generate buildserver config file</a></li>
+                </c:if>
                 <c:if test="${not empty userSession.superuserPK}">
                     <c:url var="authenticateAsLink" value="/action/AuthenticateAs" />
                     <li><form method="POST" action="${authenticateAsLink}">
@@ -203,11 +205,13 @@ label.error {
                                 type="submit" value="Become superuser" />
                         </form></li>
 
-                 <li><c:url var="studentAccountForInstructorLink" value="/action/instructor/StudentAccountForInstructor" />
-                <form action="${studentAccountForInstructorLink}" method="post" name="studentAccountForInstructorForm">
-                    <input type="submit" value="Become pseudo-student">
-                </form></li>
-                                </c:if>
+                    <li><c:url var="studentAccountForInstructorLink"
+                            value="/action/instructor/StudentAccountForInstructor" />
+                        <form action="${studentAccountForInstructorLink}" method="post"
+                            name="studentAccountForInstructorForm">
+                            <input type="submit" value="Become pseudo-student">
+                        </form></li>
+                </c:if>
             </ul>
         </div>
     </c:if>
