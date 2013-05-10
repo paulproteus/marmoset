@@ -169,6 +169,11 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       Project project = Project.getByProjectPK(submission.getProjectPK(), conn);
 
       TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK, conn);
+      Integer canonicalTestRunPK = testSetup.getTestRunPK();
+      if (newTestSetup && (canonicalTestRunPK != null || testSetup.getStatus() == TestSetup.Status.TESTED 
+          || testSetup.getStatus() == TestSetup.Status.ACTIVE)) {
+        newTestSetup = false;
+      }
       BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost, now, load, submission);
 
       Collection<Integer> allowedCourses = RequestSubmission.getCourses(conn, courses);
@@ -201,6 +206,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       conn.setAutoCommit(false);
       conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
+    
       //
       // * Create new TestRun row
       // * increment numTestOutcomes in submissions table
@@ -211,7 +217,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       // TODO Handle partial credit for grades here?
       if (!newTestSetup) {
         // Set point totals
-        TestRun canonicalTestRun = TestRun.lookupByTestRunPK(testSetup.getTestRunPK(), conn);
+        TestRun canonicalTestRun = TestRun.lookupByTestRunPK(canonicalTestRunPK, conn);
         TestOutcomeCollection canonicalTestOutcomeCollection = TestOutcomeCollection.lookupByTestRunPK(
             canonicalTestRun.getTestRunPK(), conn);
         Map<String, TestOutcome> canonicalTestOutcomeMap = new HashMap<String, TestOutcome>();
