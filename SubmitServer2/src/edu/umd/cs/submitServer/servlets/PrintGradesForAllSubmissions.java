@@ -123,7 +123,6 @@ public class PrintGradesForAllSubmissions extends SubmitServerServlet {
 					String result = registration.getClassAccount() + ","
 							+ submission.getSubmissionTimestamp() + ","
 							+ submission.getSubmissionTimestamp().getTime()
-							+ "," 
 							+ "," + lateInHours +","+ submission.getValuePassedOverall();
 					for (TestOutcome outcome : testOutcomeCollection) {
 						// Skip anything that is not a cardinal test type
