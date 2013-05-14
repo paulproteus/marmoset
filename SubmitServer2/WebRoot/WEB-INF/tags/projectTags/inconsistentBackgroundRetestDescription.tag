@@ -1,6 +1,6 @@
 
                 <p>
-      <a href="javascript:toggle2('inconsistentResults')" title="Click to toggle display of explanation">
+      <a href="javascript:toggle('inconsistentResults')" title="Click to toggle display of explanation">
             Explanation of inconsistent test results (toggle) </a>
             </p>
   
