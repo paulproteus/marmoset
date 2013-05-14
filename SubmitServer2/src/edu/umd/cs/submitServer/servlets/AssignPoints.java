@@ -77,7 +77,7 @@ public class AssignPoints extends SubmitServerServlet {
 		// Create a map of testNames to corresponding testOutcomes
 		Map<String, TestOutcome> testOutcomes = new HashMap<String, TestOutcome>();
 		for (TestOutcome testOutcome : testOutcomeCollection
-				.getAllTestOutcomes()) {
+				.getAllScoredOutcomes()) {
 			testOutcomes.put(testOutcome.getTestName(), testOutcome);
 		}
 

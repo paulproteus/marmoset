@@ -143,7 +143,18 @@ public class TestOutcome implements Serializable {
             } catch (Exception e) {
                 return null;
             }
-            
+        }
+        
+        /** Does this test have a standard score defined by the current test setup */
+        public boolean isScored() {
+            switch (this) {
+            case PUBLIC:
+            case RELEASE:
+            case SECRET:
+                return true;
+            default:
+                return false;
+            }
         }
         public static TestOutcome.TestType[] DYNAMIC_TEST_TYPES = { PUBLIC, RELEASE, SECRET, STUDENT };
         @Override
@@ -1367,9 +1378,7 @@ public class TestOutcome implements Serializable {
 	 * or a student-written test).
 	 */
 	public boolean isCardinalTestType() {
-	    return (testType.equals(PUBLIC) ||
-	            testType.equals(RELEASE) ||
-	            testType.equals(SECRET));
+	    return testType.isScored();
 	}
 
 	/**

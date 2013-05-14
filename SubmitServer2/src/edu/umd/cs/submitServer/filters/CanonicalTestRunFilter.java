@@ -75,7 +75,7 @@ public class CanonicalTestRunFilter extends SubmitServerFilter {
 								conn);
 				Map<String, TestOutcome> canonicalTestOutcomeMap = new HashMap<String, TestOutcome>();
 				for (TestOutcome testOutcome : canonicalTestOutcomeCollection
-						.getAllTestOutcomes()) {
+						.getAllScoredOutcomes()) {
 					canonicalTestOutcomeMap.put(testOutcome.getTestName(),
 							testOutcome);
 				}
