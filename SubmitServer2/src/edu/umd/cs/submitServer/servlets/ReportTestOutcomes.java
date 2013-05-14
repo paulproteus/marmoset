@@ -50,6 +50,8 @@ import edu.umd.cs.marmoset.modelClasses.BuildServer;
 import edu.umd.cs.marmoset.modelClasses.CodeMetrics;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.ServerError;
+import edu.umd.cs.marmoset.modelClasses.Student;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
@@ -97,7 +99,6 @@ public class ReportTestOutcomes extends SubmitServerServlet {
     // create new TestRun
     // and update submission as having been tested.
     Connection conn = null;
-    FileItem fileItem = null;
     boolean transactionSuccess = false;
     try {
       // Get submission pk and the submission
@@ -121,40 +122,12 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       if (testMachine == null)
         testMachine = "unknown";
 
-      // Get md5sum of classfiles (if specified)
-      CodeMetrics codeMetrics = new CodeMetrics();
-      codeMetrics.setMd5sumSourcefiles(multipartRequest.getOptionalStringParameter("md5sumClassfiles"));
-      codeMetrics.setMd5sumClassfiles(multipartRequest.getOptionalStringParameter("md5sumSourcefiles"));
-      if (multipartRequest.hasKey("codeSegmentSize")) {
-        codeMetrics.setCodeSegmentSize(multipartRequest.getIntParameter("codeSegmentSize"));
-      }
+      CodeMetrics codeMetrics = getCodeMetrics(multipartRequest);
       int testDurationsMillis = multipartRequest.getIntegerParameter("testDurationsMillis", 0);
 
-      // Get the fileItem
-      fileItem = multipartRequest.getFileItem();
-
       // Read into TestOutcomeCollection in memory
-      TestOutcomeCollection testOutcomeCollection = new TestOutcomeCollection();
-
-      ObjectInputStream in = null;
-      try {
-        byte[] data = fileItem.get();
-        in = new ObjectInputStream(new ByteArrayInputStream(data));
-        testOutcomeCollection.read(in);
-      } catch (IOException e) {
-        getSubmitServerServletLog().error("Could not read test outcomes from build server");
-        throw new ServletException(e);
-      } finally {
-        if (in != null)
-          in.close();
-      }
-
-      // Make sure test outcome collection is not empty
-      if (testOutcomeCollection.isEmpty()) {
-        String msg = "No test outcomes received; ";
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
-        return;
-      }
+      TestOutcomeCollection testOutcomeCollection = TestOutcomeCollection.deserialize(
+          getfileItemDataAndDelete(multipartRequest));
 
       logHotspotErrors(submissionPK, testSetupPK, testMachine, testOutcomeCollection);
 
@@ -166,20 +139,25 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         throw new ServletException("submissionPK " + submissionPK + " does not refer to a submission in the database");
       }
 
+      StudentRegistration studentRegistration = StudentRegistration.lookupByStudentRegistrationPK(
+          submission.getStudentRegistrationPK(), conn);
+      @Student.PK
+      Integer studentPK = studentRegistration.getStudentPK();
       Project project = Project.getByProjectPK(submission.getProjectPK(), conn);
 
       TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK, conn);
       Integer canonicalTestRunPK = testSetup.getTestRunPK();
-      if (newTestSetup && (canonicalTestRunPK != null || testSetup.getStatus() == TestSetup.Status.TESTED 
-          || testSetup.getStatus() == TestSetup.Status.ACTIVE)) {
+      if (newTestSetup
+          && (canonicalTestRunPK != null || testSetup.getStatus() == TestSetup.Status.TESTED || testSetup.getStatus() == TestSetup.Status.ACTIVE)) {
         newTestSetup = false;
       }
       BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost, now, load, submission);
 
+      // Validate buildserver
       Collection<Integer> allowedCourses = RequestSubmission.getCourses(conn, courses);
 
       if (allowedCourses.isEmpty()) {
-        ServerError.insert(conn, ServerError.Kind.BAD_AUTHENTICATION, null, null, project.getCoursePK(),
+        ServerError.insert(conn, ServerError.Kind.BAD_AUTHENTICATION, studentPK, studentPK, project.getCoursePK(),
             project.getProjectPK(), submission.getSubmissionPK(), "", "Build server " + testMachine
                 + " reporting outcome but does not provide any valid credentials", "", this.getClass().getSimpleName(),
             "", "", remoteHost, "", "", null);
@@ -188,52 +166,53 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       }
 
       if (!allowedCourses.contains(project.getCoursePK())) {
-        ServerError.insert(conn, ServerError.Kind.BAD_AUTHENTICATION, null, null, project.getCoursePK(),
+        ServerError.insert(conn, ServerError.Kind.BAD_AUTHENTICATION, studentPK, studentPK, project.getCoursePK(),
             project.getProjectPK(), submission.getSubmissionPK(), "", "Build server " + testMachine
                 + " reporting outcome for course it is not authorized to do so", "", this.getClass().getSimpleName(),
             "", "", remoteHost, "", "", null);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Not authorized");
         return;
       }
-
-      conn.close();
-      // Begin a transaction.
-      // We can set this to a low isolation level because
-      // - We don't read anything
-      // - The inserts/updates we perform should not affect
-      // rows visible to any other transaction
-      conn = getConnection();
-      conn.setAutoCommit(false);
-      conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-
-    
-      //
-      // * Create new TestRun row
-      // * increment numTestOutcomes in submissions table
-      // * set currentTestRunPK in submissions table
-      // * set testRunPK in all the testOutcomes
-      // * write the testoutcomes to the disk
-
-      // TODO Handle partial credit for grades here?
+      
+      
+      
+      TestRun canonicalTestRun = TestRun.lookupByTestRunPK(canonicalTestRunPK, conn);
       if (!newTestSetup) {
+        if (canonicalTestRun == null || canonicalTestRun.getTestSetupPK() != testSetupPK) {
+          ServerError.insert(conn, ServerError.Kind.UNKNOWN, studentPK, studentPK, project.getCoursePK(),
+              project.getProjectPK(), submission.getSubmissionPK(), "", "Discarding stale build server result", "",
+              this.getClass().getSimpleName(), "", "", remoteHost, "", "", null);
+          response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "not current test setup");
+          return;
+        }
+
         // Set point totals
-        TestRun canonicalTestRun = TestRun.lookupByTestRunPK(canonicalTestRunPK, conn);
+
         TestOutcomeCollection canonicalTestOutcomeCollection = TestOutcomeCollection.lookupByTestRunPK(
             canonicalTestRun.getTestRunPK(), conn);
         Map<String, TestOutcome> canonicalTestOutcomeMap = new HashMap<String, TestOutcome>();
         for (TestOutcome testOutcome : canonicalTestOutcomeCollection.getAllOutcomes()) {
           canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
         }
-        for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes()) {
-          // TODO should this check isTestType()???
-          if (!testOutcome.getTestType().equals(TestOutcome.TestType.FINDBUGS)
-              && !testOutcome.getTestType().equals(TestOutcome.TestType.UNCOVERED_METHOD)
-              && canonicalTestOutcomeMap.containsKey(testOutcome.getTestName())) {
+        for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
+          if (testOutcome.isCardinalTestType()) {
             TestOutcome canonicalTestOutcome = canonicalTestOutcomeMap.get(testOutcome.getTestName());
+            if (canonicalTestOutcome == null || !canonicalTestOutcome.getTestType().equals(testOutcome.getTestType())) {
+              String message = "Did not find matching canonical test outcome for " + testOutcome.getTestName();
+              ServerError.insert(conn, ServerError.Kind.UNKNOWN, studentPK, studentPK, project.getCoursePK(), project
+                  .getProjectPK(), submission.getSubmissionPK(), "", message, "", this.getClass().getSimpleName(), "",
+                  "", remoteHost, "", "", null);
+              response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, message);
+              return;
+            }
+
             testOutcome.setPointValue(canonicalTestOutcome.getPointValue());
+
           }
-        }
       } else {
+        
+        // new test setup
+        
         // set all point values to 1
         for (TestOutcome testOutcome : testOutcomeCollection) {
           testOutcome.setPointValue(1);
@@ -261,8 +240,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
           // Retest was against a different jarfile than the current
           // one;
           // for now just ignore this run.
-          transactionSuccess = true;
-          conn.commit();
+
           return;
         }
 
@@ -282,8 +260,6 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         } else if (differences.equals("skip")) {
           // There may have been differences but we don't care
           // We don't re-test "could_not_run" results
-          conn.commit();
-          transactionSuccess = true;
           return;
         } else {
           // If the results differ, log which test cases were
@@ -301,33 +277,21 @@ public class ReportTestOutcomes extends SubmitServerServlet {
 
         // If there were no differences, commit what we've done and
         // exit.
-        if (differences == null) {
-          conn.commit();
-          transactionSuccess = true;
+        if (differences == null)
           return;
-        }
-      }
+      } // isBackgroundRetest
+
+      conn = switchToTransaction(conn);
+
+      // * Create new TestRun row
+      // * increment numTestOutcomes in submissions table
+      // * set currentTestRunPK in submissions table
+      // * set testRunPK in all the testOutcomes
+      // * write the testoutcomes to the disk
 
       // Create new TestRun row.
-      TestRun testRun = new TestRun();
-      testRun.setSubmissionPK(submissionPK);
-      testRun.setTestSetupPK(testSetupPK);
-      testRun.setTestMachine(testMachine);
-      testRun.setTestTimestamp(now);
-      testRun.setValuePassedOverall(testOutcomeCollection.getValuePassedOverall());
-      testRun.setCompileSuccessful(testOutcomeCollection.isCompileSuccessful());
-      testRun.setValuePublicTestsPassed(testOutcomeCollection.getValuePublicTestsPassed());
-      testRun.setValueReleaseTestsPassed(testOutcomeCollection.getValueReleaseTestsPassed());
-      testRun.setValueSecretTestsPassed(testOutcomeCollection.getValueSecretTestsPassed());
-      testRun.setNumFindBugsWarnings(testOutcomeCollection.getNumFindBugsWarnings());
-      // set the md5sum for this testRun
-      // XXX currently the md5sums are stored in both testRuns and
-      // codeMetrics tables
-      if (codeMetrics.getMd5sumClassfiles() != null && codeMetrics.getMd5sumSourcefiles() != null) {
-        testRun.setMd5sumClassfiles(codeMetrics.getMd5sumClassfiles());
-        testRun.setMd5sumSourcefiles(codeMetrics.getMd5sumSourcefiles());
-      }
-      testRun.setTestDurationMillis(testDurationsMillis);
+      TestRun testRun = createTestRun(submissionPK, testSetupPK, testMachine, testOutcomeCollection, codeMetrics, now,
+          testDurationsMillis);
 
       // perform insert
       testRun.insert(conn);
@@ -369,24 +333,19 @@ public class ReportTestOutcomes extends SubmitServerServlet {
           // If any tests have failed, then set status to failed
           testSetup.setStatus(TestSetup.Status.FAILED);
         } else {
-          // TODO count num tests passed and set build/public/release
-          // stats
-          // set status to OK for this jarfile
           testSetup.setStatus(TestSetup.Status.TESTED);
-
         }
-        // update pending project_jarfile to reflect the changes just
+        // update pending testSetup to reflect the changes just
         // made
         testSetup.update(conn);
       }
 
       // Only change information about the current test_run if this
       // run used the most recent testSetup
-      if (!isBackgroundRetest && (!submission.isComplete() || testRun.getTestSetupPK() == project.getTestSetupPK())) {
+      if (!isBackgroundRetest && (newTestSetup || testRun.getTestSetupPK() == project.getTestSetupPK())) {
         // update the pass/fail/warning stats
         submission.setCurrentTestRunPK(testRun.getTestRunPK());
 
-        // [NAT]
         // Ensure that submission is not release eligible if the
         // student_submit_status.can_release_test is false
         StudentSubmitStatus submitStatus = StudentSubmitStatus.lookupByStudentRegistrationPKAndProjectPK(
@@ -406,16 +365,15 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         submission.setValueSecretTestsPassed(testOutcomeCollection.getValueSecretTestsPassed());
         submission.setNumFindBugsWarnings(testOutcomeCollection.getNumFindBugsWarnings());
 
-        if (!isBackgroundRetest) {
-          // If we're re-setting the currentTestRunPK, then find any
-          // existing
-          // backgroundRetests and clear them. Background re-tests are
-          // always compared
-          // to the current set of testOutcomes.
-          submission.setNumFailedBackgroundRetests(0);
-          submission.setNumSuccessfulBackgroundRetests(0);
-          submission.setNumPendingBuildRequests(0);
-        }
+        // If we're re-setting the currentTestRunPK, then find any
+        // existing
+        // backgroundRetests and clear them. Background re-tests are
+        // always compared
+        // to the current set of testOutcomes.
+        submission.setNumFailedBackgroundRetests(0);
+        submission.setNumSuccessfulBackgroundRetests(0);
+        submission.setNumPendingBuildRequests(0);
+
       }
       // perform update
       // Update the status of the submission
@@ -432,9 +390,86 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       throw new ServletException(e);
     } finally {
       rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);
-      if (fileItem != null)
-        fileItem.delete();
     }
+  }
+
+  /**
+   * @param multipartRequest
+   * @return
+   */
+  private byte[] getfileItemDataAndDelete(MultipartRequest multipartRequest) {
+    // Get the fileItem
+    FileItem fileItem = multipartRequest.getFileItem();
+    byte[] data = fileItem.get();
+    fileItem.delete();
+    return data;
+  }
+
+  /**
+   * @param multipartRequest
+   * @return
+   * @throws InvalidRequiredParameterException
+   */
+  private CodeMetrics getCodeMetrics(MultipartRequest multipartRequest) throws InvalidRequiredParameterException {
+    CodeMetrics codeMetrics = new CodeMetrics();
+    codeMetrics.setMd5sumSourcefiles(multipartRequest.getOptionalStringParameter("md5sumClassfiles"));
+    codeMetrics.setMd5sumClassfiles(multipartRequest.getOptionalStringParameter("md5sumSourcefiles"));
+    if (multipartRequest.hasKey("codeSegmentSize")) {
+      codeMetrics.setCodeSegmentSize(multipartRequest.getIntParameter("codeSegmentSize"));
+    }
+    return codeMetrics;
+  }
+
+  /**
+   * @param submissionPK
+   * @param testSetupPK
+   * @param testMachine
+   * @param testOutcomeCollection
+   * @param codeMetrics
+   * @param now
+   * @param testDurationsMillis
+   * @return
+   */
+  private TestRun createTestRun(@Submission.PK int submissionPK, int testSetupPK, String testMachine,
+      TestOutcomeCollection testOutcomeCollection, CodeMetrics codeMetrics, Timestamp now, int testDurationsMillis) {
+    TestRun testRun = new TestRun();
+    testRun.setSubmissionPK(submissionPK);
+    testRun.setTestSetupPK(testSetupPK);
+    testRun.setTestMachine(testMachine);
+    testRun.setTestTimestamp(now);
+    testRun.setValuePassedOverall(testOutcomeCollection.getValuePassedOverall());
+    testRun.setCompileSuccessful(testOutcomeCollection.isCompileSuccessful());
+    testRun.setValuePublicTestsPassed(testOutcomeCollection.getValuePublicTestsPassed());
+    testRun.setValueReleaseTestsPassed(testOutcomeCollection.getValueReleaseTestsPassed());
+    testRun.setValueSecretTestsPassed(testOutcomeCollection.getValueSecretTestsPassed());
+    testRun.setNumFindBugsWarnings(testOutcomeCollection.getNumFindBugsWarnings());
+    // set the md5sum for this testRun
+    // XXX currently the md5sums are stored in both testRuns and
+    // codeMetrics tables
+    if (codeMetrics.getMd5sumClassfiles() != null && codeMetrics.getMd5sumSourcefiles() != null) {
+      testRun.setMd5sumClassfiles(codeMetrics.getMd5sumClassfiles());
+      testRun.setMd5sumSourcefiles(codeMetrics.getMd5sumSourcefiles());
+    }
+    testRun.setTestDurationMillis(testDurationsMillis);
+    return testRun;
+  }
+
+  /**
+   * @param conn
+   * @return
+   * @throws SQLException
+   */
+  private Connection switchToTransaction(Connection conn) throws SQLException {
+    conn.close();
+    // Begin a transaction.
+    // We can set this to a low isolation level because
+    // - We don't read anything
+    // - The inserts/updates we perform should not affect
+    // rows visible to any other transaction
+    conn = getConnection();
+    conn.setAutoCommit(false);
+    conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+    return conn;
   }
 
   /**
