@@ -231,25 +231,34 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 			boolean transactionSuccess, HttpServletRequest req, Connection conn) {
 	    rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, req, conn, submitServerDatabaseProperties, getSubmitServerServletLog());
 	}
-	protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
-            boolean transactionSuccess, HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
-        try {
-            if (!transactionSuccess && conn != null && conn.getAutoCommit()) {
-                String reqStr = req.getRequestURI();
-                if (req.getQueryString() != null) {
-                    reqStr += "?" + req.getQueryString();
-                }
-                log.warn(
-                        "Unable to rollback connection: " + reqStr);
-                conn.rollback();
-            }
-        } catch (SQLException ignore) {
-           log.warn("Unable to rollback connection",
-                    ignore);
-            // ignore
+
+	
+	protected static boolean isOpen(Connection conn) {
+	  try {
+	    return conn != null && !conn.isClosed();
+	  } catch(SQLException e) {
+	    return  false;
+	  }
+	}
+  protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(boolean transactionSuccess,
+      HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
+    if (!transactionSuccess && isOpen(conn) )
+      try {
+        if (conn.getAutoCommit()) {
+          String reqStr = req.getRequestURI();
+          if (req.getQueryString() != null) {
+            reqStr += "?" + req.getQueryString();
+          }
+          log.warn("Unable to rollback, already autocommitted: " + reqStr);
         }
-        releaseConnection(conn, db, log);
-    }
+        else 
+          conn.rollback();
+      } catch (SQLException ignore) {
+        log.warn("Unable to rollback connection", ignore);
+        // ignore
+      }
+    releaseConnection(conn, db, log);
+  }
 
 	private ILDAPAuthenticationService authenticationService;
 
