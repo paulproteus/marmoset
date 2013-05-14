@@ -131,7 +131,7 @@ public class TestResultHistory extends SubmitServerServlet {
 								submission.getCurrentTestRunPK(), conn);
 						testRuns.put(submission.getCurrentTestRunPK(), outcome);
 					}
-					for (TestOutcome test : outcome.getAllTestOutcomes()) {
+					for (TestOutcome test : outcome.getAllScoredOutcomes()) {
 						if (test.getOutcome().equals(TestOutcome.PASSED)) {
 							MutableInt count = histogram
 									.get(test.getTestName());
@@ -149,7 +149,7 @@ public class TestResultHistory extends SubmitServerServlet {
 			out.println("</tr>");
 			int count = 0;
 			for (TestOutcome outcome : canonicalTestOutcomeCollection
-					.getAllTestOutcomes()) {
+					.getAllScoredOutcomes()) {
 				String testName = outcome.getTestName();
 				out.println("<tr class=\"r" + count % 2
 						+ "\"><td class=\"description\">"
