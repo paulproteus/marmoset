@@ -531,6 +531,7 @@ CREATE TABLE IF NOT EXISTS `test_runs` (
   `num_findbugs_warnings` smallint(3) NOT NULL DEFAULT '0',
   `checksum_classfiles` varchar(32) DEFAULT NULL,
   `checksum_sourcefiles` varchar(32) DEFAULT NULL,
+  `test_duration_millis` INT NOT NULL DEFAULT  '0' COMMENT  'Build and test time, in ms',
   PRIMARY KEY (`test_run_pk`),
   KEY `test_runs_ibfk_1` (`submission_pk`),
   KEY `checksum_classfiles` (`checksum_classfiles`(4))
