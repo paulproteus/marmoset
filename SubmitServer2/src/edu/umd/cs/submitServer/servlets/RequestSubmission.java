@@ -56,7 +56,6 @@ import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
-import edu.umd.cs.submitServer.filters.MonitorSlowTransactionsFilter;
 import edu.umd.cs.submitServer.filters.SubmitServerFilter;
 import edu.umd.cs.submitServer.util.WaitingBuildServer;
 
@@ -141,7 +140,13 @@ public class RequestSubmission extends SubmitServerServlet {
                 conn = getConnection();
                  Collection<Integer> allowedCourses = getCourses(conn, courseKey);
                
-                 if (allowedCourses.isEmpty()) {
+                 if (allowedCourses.isEmpty() ) {
+                    if (isUniversalBuildServer(courseKey)) {
+                     BuildServer.submissionRequestedNoneAvailable(conn, hostname, remoteHost, courseKey, now, load);
+                     response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, NO_SUBMISSIONS_AVAILABLE_MESSASGE);
+                     return;
+                    }
+                   
                      String msg = "host " + hostname + "; no courses match " + courseKey;
                      getSubmitServerServletLog().warn(msg);
                      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No courses match " + courseKey);
@@ -377,15 +382,27 @@ public class RequestSubmission extends SubmitServerServlet {
         getSubmitServerServletLog().info("Completed RequestSubmission");
     }
 
+    public static boolean isUniversalBuildServer(String courses) {
+      @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
+      
+      return universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-");
+    }
+    
+    public static String courseKeysExcludedFromUniversal(String courseKey) {
+      String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
+      
+      if (universalBuilderserver == null)
+        throw new NullPointerException();
+      
+      return courseKey.substring(universalBuilderserver.length()+1);
+    }
 
     public static Collection<Integer> getCourses(Connection conn, String courses)
             throws SQLException {
         Collection<Integer> allowedCourses;
-         @CheckForNull String universalBuilderserver = webProperties.getProperty("buildserver.password.universal");
          
-         if (universalBuilderserver != null && courses.startsWith(universalBuilderserver+"-"))
-             allowedCourses = Course.lookupAllPKButByBuildserverKey(conn, courses.substring(universalBuilderserver.length()+1));
-         
+         if (isUniversalBuildServer(courses))
+             allowedCourses = Course.lookupAllPKButByBuildserverKey(conn, courseKeysExcludedFromUniversal(courses));
          else 
              allowedCourses = Course.lookupAllPKByBuildserverKey(conn, courses);
         return allowedCourses;
