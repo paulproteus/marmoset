@@ -74,7 +74,7 @@ public class UploadSubmission extends SubmitServerServlet {
 
   
   private static final  Logger LOGGER = Logger
-      .getLogger(UploadSubmission.class);
+      .getLogger(SUBMISSION_LOG);
 
   
     enum Kind {
@@ -236,12 +236,7 @@ public class UploadSubmission extends SubmitServerServlet {
             submission = uploadSubmission(project, studentRegistration, zipOutput, request, submissionTimestamp, clientTool,
                     clientVersion, cvsTimestamp, getDatabaseProps(), getSubmitServerServletLog());
        
-        LOGGER.log(Level.INFO, "Uploaded submission " + submission.getSubmissionPK() 
-            + " of " + zipOutput.length + " bytes " 
-            + " from student PK " + studentRegistration.getStudentPK()
-            + " for project PK " + submission.getProjectPK());
-            
-        request.setAttribute("submission", submission);
+       request.setAttribute("submission", submission);
 
        
 
@@ -276,6 +271,20 @@ public class UploadSubmission extends SubmitServerServlet {
 
         response.sendRedirect(redirectUrl);
 
+    }
+
+    /**
+     * @param studentRegistration
+     * @param zipOutput
+     * @param submission
+     */
+    public static void logSubmission(StudentRegistration studentRegistration, byte[] zipOutput, Submission submission) {
+      String msg = "Uploaded submission " + submission.getSubmissionPK() 
+          + " of " + zipOutput.length + " bytes " 
+          + " with archive PK " + submission.getArchivePK()
+          + " from student PK " + studentRegistration.getStudentPK()
+          + " for project PK " + submission.getProjectPK();
+      LOGGER.log(Level.INFO, msg);
     }
 
     public static Submission uploadSubmission(Project project, StudentRegistration studentRegistration, byte[] zipOutput,
@@ -336,6 +345,8 @@ public class UploadSubmission extends SubmitServerServlet {
             rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, 
                     request, conn, db, log);
         }
+        logSubmission(studentRegistration, zipOutput, submission);
+        
         WaitingBuildServer.offerSubmission(project, submission);
         return submission;
     }
