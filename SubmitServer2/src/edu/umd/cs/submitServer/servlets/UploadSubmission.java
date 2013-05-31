@@ -52,6 +52,7 @@ import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.ice.tar.TarEntry;
@@ -71,6 +72,11 @@ import edu.umd.cs.submitServer.util.WaitingBuildServer;
  */
 public class UploadSubmission extends SubmitServerServlet {
 
+  
+  private static final  Logger LOGGER = Logger
+      .getLogger(UploadSubmission.class);
+
+  
     enum Kind {
         UNKNOWN, SINGLE_FILE, MULTIFILE_UPLOAD, ZIP_UPLOAD, TAR_UPLOAD, ZIP_UPLOAD2, FIXED_ZIP_UPLOAD, CODEMIRROR
     }
@@ -230,6 +236,11 @@ public class UploadSubmission extends SubmitServerServlet {
             submission = uploadSubmission(project, studentRegistration, zipOutput, request, submissionTimestamp, clientTool,
                     clientVersion, cvsTimestamp, getDatabaseProps(), getSubmitServerServletLog());
        
+        LOGGER.log(Level.INFO, "Uploaded submission " + submission.getSubmissionPK() 
+            + " of " + zipOutput.length + " bytes " 
+            + " from student PK " + studentRegistration.getStudentPK()
+            + " for project PK " + submission.getProjectPK());
+            
         request.setAttribute("submission", submission);
 
        
