@@ -195,10 +195,11 @@ public class ReportTestOutcomes extends SubmitServerServlet {
           canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
         }
         for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
-          if (testOutcome.isCardinalTestType() && testOutcome.getOutcome() != TestOutcome.COULD_NOT_RUN) {
+          if (testOutcome.isCardinalTestType() && !testOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN)) {
             TestOutcome canonicalTestOutcome = canonicalTestOutcomeMap.get(testOutcome.getTestName());
             if (canonicalTestOutcome == null || !canonicalTestOutcome.getTestType().equals(testOutcome.getTestType())) {
-              String message = "Did not find matching canonical test outcome for " + testOutcome.getTestName();
+              String message = "Did not find matching canonical test outcome for " + testOutcome.getTestName()
+                  + " with outcome " + testOutcome.getOutcome();
               ServerError.insert(conn, ServerError.Kind.UNKNOWN, studentPK, studentPK, project.getCoursePK(), project
                   .getProjectPK(), submission.getSubmissionPK(), "", message, "", this.getClass().getSimpleName(), "",
                   "", remoteHost, "", "", null);
