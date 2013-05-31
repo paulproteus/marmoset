@@ -195,7 +195,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
           canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
         }
         for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
-          if (testOutcome.isCardinalTestType()) {
+          if (testOutcome.isCardinalTestType() && testOutcome.getOutcome() != TestOutcome.COULD_NOT_RUN) {
             TestOutcome canonicalTestOutcome = canonicalTestOutcomeMap.get(testOutcome.getTestName());
             if (canonicalTestOutcome == null || !canonicalTestOutcome.getTestType().equals(testOutcome.getTestType())) {
               String message = "Did not find matching canonical test outcome for " + testOutcome.getTestName();
