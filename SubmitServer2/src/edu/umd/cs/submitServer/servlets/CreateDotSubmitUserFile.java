@@ -53,7 +53,7 @@ public class CreateDotSubmitUserFile extends SubmitServerServlet {
             conn.setAutoCommit(false);
             conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-            StudentSubmitStatus submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
+            StudentSubmitStatus submitStatus = StudentSubmitStatus.findOrCreate(project.getProjectPK(),
                     studentRegistration.getStudentRegistrationPK(), conn);
             transactionSuccess = true;
             NegotiateOneTimePassword.generateSubmitUser(response, student,

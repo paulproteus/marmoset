@@ -280,7 +280,7 @@ public class UploadSubmission extends SubmitServerServlet {
      */
     public static void logSubmission(StudentRegistration studentRegistration, byte[] zipOutput, Submission submission) {
       String msg = "Uploaded submission " + submission.getSubmissionPK() 
-          + " of " + zipOutput.length + " bytes " 
+          + " of " + zipOutput.length + " bytes" 
           + " with archive PK " + submission.getArchivePK()
           + " from student PK " + studentRegistration.getStudentPK()
           + " for project PK " + submission.getProjectPK();

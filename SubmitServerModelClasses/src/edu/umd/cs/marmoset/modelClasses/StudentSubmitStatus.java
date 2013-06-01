@@ -119,6 +119,10 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		this.oneTimePassword = oneTimePassword;
 	}
 
+	@Deprecated
+	public void setOneTimePasswordHack(String oneTimePassword) {
+        this.oneTimePassword = oneTimePassword;
+    }
 	/**
 	 * @return Returns the projectPK.
 	 */
@@ -222,7 +226,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	 * @return the StudentSubmitStatus to use
 	 * @throws SQLException
 	 */
-	private @CheckReturnValue StudentSubmitStatus insert(Connection conn)
+	private @CheckReturnValue StudentSubmitStatus findOrInsert(Connection conn)
 		throws SQLException
 	{
 		StudentSubmitStatus studentSubmitStatus = StudentSubmitStatus.lookupByStudentRegistrationPKAndProjectPK(
@@ -291,8 +295,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 	public StudentSubmitStatus() {}
 
-	public static StudentSubmitStatus createOrInsert(
-	        int projectPK,
+	public static StudentSubmitStatus findOrCreate(
+	        @Project.PK int projectPK,
 	        @StudentRegistration.PK int studentRegistrationPK,
 	        @Nonnull Connection conn)
 	throws SQLException
@@ -301,7 +305,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	    studentSubmitStatus.projectPK = projectPK;
 	    studentSubmitStatus.studentRegistrationPK = studentRegistrationPK;
 	    studentSubmitStatus.oneTimePassword = MarmosetUtilities.nextRandomPassword(); // [NAT P002]
-	    return studentSubmitStatus.insert(conn);
+	    return studentSubmitStatus.findOrInsert(conn);
 	}
 
 	private int executeUpdate(PreparedStatement stmt) throws SQLException {
@@ -451,7 +455,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  			// insert student_submit_status entry if it does not exist
  			if (studentSubmitStatus == null) {
 
- 	            studentSubmitStatus = StudentSubmitStatus.createOrInsert(
+ 	            studentSubmitStatus = StudentSubmitStatus.findOrCreate(
  	            		projectPK, studentRegistrationPK, conn);
  			}
 

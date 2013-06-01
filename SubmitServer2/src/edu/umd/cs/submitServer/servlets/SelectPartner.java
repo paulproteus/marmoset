@@ -86,7 +86,7 @@ public class SelectPartner extends SubmitServerServlet {
 			conn = getConnection();
 
 			StudentSubmitStatus status
-			= StudentSubmitStatus.createOrInsert(project.getProjectPK(),
+			= StudentSubmitStatus.findOrCreate(project.getProjectPK(),
 					studentRegistration.getStudentRegistrationPK(),
 					conn);
 			status.setPartnerPK(partnerPK);

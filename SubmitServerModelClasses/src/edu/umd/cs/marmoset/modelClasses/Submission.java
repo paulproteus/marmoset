@@ -1784,7 +1784,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 //          find StudentSubmitStatus record
             StudentSubmitStatus studentSubmitStatus
-            = StudentSubmitStatus.createOrInsert(
+            = StudentSubmitStatus.findOrCreate(
                         project.getProjectPK(),
                         studentRegistration.getStudentRegistrationPK(),
                         conn);
@@ -1943,7 +1943,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 			Connection conn) throws SQLException {
 		// find StudentSubmitStatus record
         StudentSubmitStatus studentSubmitStatus
-        = StudentSubmitStatus.createOrInsert(
+        = StudentSubmitStatus.findOrCreate(
                     project.getProjectPK(),
                     studentRegistration.getStudentRegistrationPK(),
                     conn);

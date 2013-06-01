@@ -34,10 +34,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Level;
+
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
+import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
 import edu.umd.cs.submitServer.BadPasswordException;
 import edu.umd.cs.submitServer.CanNotFindDirectoryIDException;
 import edu.umd.cs.submitServer.ClientRequestException;
@@ -120,11 +125,27 @@ public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
 				studentRegistration = StudentRegistration
 						.lookupByCvsAccountAndCoursePK(classAccount,
 								course.getCoursePK(), conn);
-				if (studentRegistration != null)
+				if (studentRegistration != null) {
+				  if (false)
 					throw new BadPasswordException(
 							HttpServletResponse.SC_UNAUTHORIZED,
 							"The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
-				else
+				  StudentSubmitStatus status = StudentSubmitStatus.findOrCreate( project.getProjectPK(),
+				      studentRegistration.getStudentRegistrationPK(), conn);
+				  String msg = "Changing one-time password for " + classAccount + " for project " + project.getProjectNumber();
+				  String remoteHost = SubmitServerFilter.getRemoteHost(request);
+			    ServerError.insert(conn, Kind.BAD_AUTHENTICATION, studentRegistration.getStudentPK(), studentRegistration.getStudentPK(),
+				      project.getCoursePK(), project.getProjectPK(),
+				        /* submissionPK */ null,  /* code */ "", msg , 
+				         /* type */ "", OneTimePasswordAuthenticationFilter.class.getName(), request.getRequestURI(),
+                request.getQueryString(), remoteHost,  /* refered */ null,  /* userAgent */ "", /* exception */ null);
+			    
+				  getSubmitServerFilterLog().log(Level.WARN, msg);
+				  status.setOneTimePasswordHack(oneTimePassword);
+				  status.update(conn);
+				  
+			        
+				} else
 					throw new CanNotFindDirectoryIDException(
 							HttpServletResponse.SC_UNAUTHORIZED, classAccount
 									+ " is not registered for "

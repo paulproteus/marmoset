@@ -71,7 +71,7 @@ public class GrantExtension extends SubmitServerServlet {
 			conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
 			StudentSubmitStatus studentSubmitStatus
-				= StudentSubmitStatus.createOrInsert(
+				= StudentSubmitStatus.findOrCreate(
 						projectPK, studentRegistrationPK, conn);
 
 			studentSubmitStatus.setExtension(extension);
