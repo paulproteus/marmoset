@@ -28,9 +28,7 @@
  */
 package edu.umd.cs.submitServer.servlets;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -63,6 +61,7 @@ import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.SubmitServerFilter;
+import edu.umd.cs.submitServer.servlets.RequestSubmission.Kind;
 
 /**
  * @author jspacco Called (usually by the Build Server) to report the outcomes
@@ -112,8 +111,20 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       boolean newTestSetup = multipartRequest.getBooleanParameter("newTestSetup");
       boolean isBackgroundRetest = multipartRequest.getBooleanParameter("isBackgroundRetest");
       String load = multipartRequest.getOptionalStringParameter("load");
+      
       if (load == null)
         load = "unknown";
+      String kindString = multipartRequest.getOptionalStringParameter("kind");
+      Kind kind = Kind.UNKNOWN;
+      if (kindString != null) {
+        try {
+        kind = Kind.valueOf(kindString);
+        } catch (RuntimeException e) {
+          // ignore
+        }
+        
+      }
+      
       String remoteHost = SubmitServerFilter.getRemoteHost(request);
       // Get test machine (if specified)
       String testMachine = multipartRequest.getOptionalStringParameter("hostname");
@@ -220,6 +231,10 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         }
       }
 
+      getSubmitServerServletLog().info(
+          "Reporting test outcome for submissionPK = " + submissionPK + ", testSetupPK = " + testSetupPK
+              + " performed by " + testMachine + ", kind = " + kind);
+
       // Background Retests:
       // If this was a background re-test, then we need to take special
       // steps.
@@ -320,6 +335,10 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       // if this was a new project jarfile being tested against the
       // canonical account
       if (newTestSetup) {
+        getSubmitServerServletLog().info(
+            "Ran new test setup, submissionPK = " + submissionPK + ", testSetupPK = " + testSetupPK
+                + " performed by " + testMachine + ", kind = " + kind);
+        
         // lookup the pending project
 
         testSetup.setValueTotalTests(testOutcomeCollection.getValuePassedOverall());
@@ -336,6 +355,10 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         } else {
           testSetup.setStatus(TestSetup.Status.TESTED);
         }
+        getSubmitServerServletLog().info(
+            "Ran new test setup, submissionPK = " + submissionPK + ", testSetupPK = " + testSetupPK
+                + " performed by " + testMachine + ", kind = " + kind + ", status = " + testSetup.getStatus());
+      
         // update pending testSetup to reflect the changes just
         // made
         testSetup.update(conn);
@@ -376,11 +399,14 @@ public class ReportTestOutcomes extends SubmitServerServlet {
         submission.setNumPendingBuildRequests(0);
 
       }
-      // perform update
+       // perform update
       // Update the status of the submission
       submission.setBuildStatus(Submission.BuildStatus.COMPLETE);
       submission.update(conn);
-
+      getSubmitServerServletLog().info(
+          "Completed testing submissionPK = " + submissionPK + ", testSetupPK = " + testSetupPK
+              + " performed by " + testMachine + ", kind = " + kind + ", status = " + testSetup.getStatus());
+    
       conn.commit();
       transactionSuccess = true;
     } catch (InvalidRequiredParameterException e) {
