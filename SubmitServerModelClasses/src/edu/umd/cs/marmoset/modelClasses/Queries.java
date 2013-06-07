@@ -454,7 +454,7 @@ public final class Queries {
 
 		String courseRestrictions = makeCourseRestrictionsWhereClause(allowedCourses);
 
-		String query = " SELECT "
+	    String query = " SELECT "
 				+ Submission.ATTRIBUTES
 				+ ", "
 				+ TestSetup.ATTRIBUTES
@@ -467,9 +467,9 @@ public final class Queries {
 				+ courseRestrictions
 				+ " AND test_setups.project_pk = projects.project_pk "
 				+ " AND submissions.project_pk = projects.project_pk "
+			    + " AND submissions.most_recent = 1 "
 				+ " AND submissions.student_registration_pk = projects.canonical_student_registration_pk "
-				+ " ORDER BY submissions.submission_number DESC " + " LIMIT 1 "
-				+ " LOCK IN SHARE MODE ";
+				+ " ORDER BY submissions.submission_number DESC " + " LIMIT 1 ";
 
 		PreparedStatement stmt = conn.prepareStatement(query);
 		stmt.setString(1, TestSetup.Status.NEW.toString());
@@ -719,7 +719,7 @@ public final class Queries {
 	 * @param allowedCourses
 	 * @return
 	 */
-    private static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
+    public static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
         if (allowedCourses.isEmpty())
             throw new IllegalArgumentException("no courses");
         String whereClause = null;
