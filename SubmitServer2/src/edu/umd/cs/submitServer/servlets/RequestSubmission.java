@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -78,6 +80,10 @@ public class RequestSubmission extends SubmitServerServlet {
         
         public boolean isBackgroundRetest() {
           return this == BACKGROUND_RETEST || this == PROJECT_RETEST;
+        }
+        
+        public boolean isSpecificRequest() {
+          return this == SPECIFIC_REQUEST_NO_TESTSETUP || this == SPECIFIC_REQUEST_NEW_TESTUP || this == SPECIFIC_REQUEST;
         }
     }
 
@@ -158,6 +164,7 @@ public class RequestSubmission extends SubmitServerServlet {
                     submission = Submission.lookupBySubmissionPK(Submission.asPK(subPK), conn);
                     Project project = Project.lookupByProjectPK(submission.getProjectPK(), conn);
                     if (testSetupPK != null) {
+                        // test setup specified by buildserver
                         testSetup = TestSetup.lookupByTestSetupPK(Integer.valueOf(testSetupPK), conn);
                         if (testSetup !=null && testSetup.getProjectPK() != submission.getProjectPK())
                             throw new ServletException("Submission " + submissionPK + " and test setup " + testSetupPK 
@@ -187,8 +194,9 @@ public class RequestSubmission extends SubmitServerServlet {
                 } else {
 
                     findSubmission: {
-
-                        if (Queries.lookupNewTestSetup(conn, submission, testSetup, allowedCourses,
+                        
+                        if (logNewTestSetups(conn, submission, testSetup, allowedCourses,
+                            MAX_BUILD_DURATION_MINUTES) && Queries.lookupNewTestSetup(conn, submission, testSetup, allowedCourses,
                                 MAX_BUILD_DURATION_MINUTES)) {
                         if (submission.getNumPendingBuildRequests() > 3) {
                             submission.setBuildStatus(Submission.BuildStatus.BROKEN);
@@ -441,5 +449,55 @@ public class RequestSubmission extends SubmitServerServlet {
 
     private boolean isBackgroundRetestingEnabled() {
         return performBackgroundRetesting;
+    }
+    
+    public static boolean logNewTestSetups(Connection conn,
+        Submission submission, TestSetup testSetup,
+        Collection<Integer> allowedCourses, int maxBuildDurationInMinutes)
+        throws SQLException {
+        if (allowedCourses.isEmpty())
+            throw new IllegalArgumentException();
+      // SQL timestamp of build requests that have,
+      // as of this moment, taken too long.
+      Timestamp buildTimeout = new Timestamp(System.currentTimeMillis()
+          - (maxBuildDurationInMinutes * 60L * 1000L));
+
+      String courseRestrictions = Queries.makeCourseRestrictionsWhereClause(allowedCourses);
+
+          String query = " SELECT "
+                    + "submissions.submission_pk, test_setups.test_setup_pk, projects.project_pk, projects.course_pk"
+                    + " FROM submissions, test_setups, projects "
+                    + " WHERE ("
+                    + "      (test_setups.jarfile_status = ?) "
+                    + "      OR (test_setups.jarfile_status = ? AND test_setups.date_posted < ?)"
+                    + "       ) "
+                    + courseRestrictions
+                    + " AND test_setups.project_pk = projects.project_pk "
+                    + " AND submissions.project_pk = projects.project_pk "
+                    + " AND submissions.most_recent = 1 "
+                    + " AND submissions.student_registration_pk = projects.canonical_student_registration_pk "
+                    + " ORDER BY submissions.submission_number DESC " ;
+          PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, TestSetup.Status.NEW.toString());
+            stmt.setString(2, TestSetup.Status.PENDING.toString());
+            stmt.setTimestamp(3, buildTimeout);
+
+            ResultSet rs = stmt.executeQuery();
+
+            int count = 0;
+            while (rs.next()) {
+              int submissionPK = rs.getInt(1);
+              int testSetupPK = rs.getInt(2);
+              int projectPK = rs.getInt(3);
+              int coursePK = rs.getInt(4);
+              getSubmitServerServletLog().warn(String.format("new test setup available: course %d, project %d, test setup %d, submission %d", 
+                  coursePK, projectPK, testSetupPK, submissionPK));
+              count++;
+        
+                
+            }
+            getSubmitServerServletLog().warn(String.format("Total of %d new test setups available", count));
+            return count > 0;
+            
     }
 }
