@@ -159,7 +159,7 @@ public class ReportTestOutcomes extends SubmitServerServlet {
       TestSetup testSetup = TestSetup.lookupByTestSetupPK(testSetupPK, conn);
       Integer canonicalTestRunPK = testSetup.getTestRunPK();
       if (newTestSetup
-          && (canonicalTestRunPK != null || testSetup.getStatus() == TestSetup.Status.TESTED || testSetup.getStatus() == TestSetup.Status.ACTIVE)) {
+          && (testSetup.getStatus() == TestSetup.Status.TESTED || testSetup.getStatus() == TestSetup.Status.ACTIVE)) {
         newTestSetup = false;
       }
       BuildServer.insertOrUpdateSuccess(conn, testMachine, remoteHost, now, load, submission);
