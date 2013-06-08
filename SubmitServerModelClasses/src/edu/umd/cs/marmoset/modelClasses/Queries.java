@@ -468,6 +468,7 @@ public final class Queries {
 				+ " AND test_setups.project_pk = projects.project_pk "
 				+ " AND submissions.project_pk = projects.project_pk "
 			    + " AND submissions.most_recent = 1 "
+			    + " AND submissions.build_status != ? "
 				+ " AND submissions.student_registration_pk = projects.canonical_student_registration_pk "
 				+ " ORDER BY submissions.submission_number DESC " + " LIMIT 1 ";
 
@@ -475,6 +476,8 @@ public final class Queries {
 		stmt.setString(1, TestSetup.Status.NEW.toString());
 		stmt.setString(2, TestSetup.Status.PENDING.toString());
 		stmt.setTimestamp(3, buildTimeout);
+		stmt.setString(4,  Submission.BuildStatus.BROKEN.toString());
+
 
 		return getFromPreparedStatement(stmt, submission, testSetup);
 	}
