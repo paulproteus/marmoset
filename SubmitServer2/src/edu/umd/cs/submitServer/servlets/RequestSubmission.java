@@ -272,6 +272,15 @@ public class RequestSubmission extends SubmitServerServlet {
                           } else {
                             conn = getConnection();
                             submission = Submission.lookupBySubmissionPK(submission.getSubmissionPK(), conn);
+                            Project project = Project.lookupByProjectPK(submission.getProjectPK(), conn);
+                            boolean canonicalSubmission = submission.getStudentRegistrationPK() == project.getCanonicalStudentRegistrationPK();
+                            if (submission.getBuildStatus() != Submission.BuildStatus.BROKEN && canonicalSubmission) {
+                              testSetup = TestSetup.lookupRecentNonBrokenTestSetupForProject(conn, project.getProjectPK());
+                              if (testSetup != null && (testSetup.getStatus() == TestSetup.Status.NEW || testSetup.getStatus() == TestSetup.Status.FAILED)) {
+                                kind = Kind.NEW_TEST_SETUP;
+                                break findSubmission;
+                              }
+                            }
                             if (submission.getBuildStatus() == Submission.BuildStatus.NEW) {
                               getSubmitServerServletLog().trace(
                                   "RequestSubmission: used WaitingBuildServer to get submission pk = " + submission.getSubmissionPK() + ", projectPK =  "

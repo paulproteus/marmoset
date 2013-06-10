@@ -415,7 +415,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  	 * @throws SQLException
  	 */
  	public static void banExistingTeamsFromProject(Connection conn,
- 			Integer coursePK, Integer projectPK)
+ 			Integer coursePK, @Project.PK Integer projectPK)
 	throws SQLException
 	{
  		// get teams in course corresponding to project
@@ -441,7 +441,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  	 * @throws SQLException
  	 */
  	public static void banStudentsFromProject(Connection conn,
- 			Integer projectPK, List<Integer> studentRegistrationPKs)
+ 			@Project.PK Integer projectPK, List<Integer> studentRegistrationPKs)
 	throws SQLException
 	{
  		// for each student,

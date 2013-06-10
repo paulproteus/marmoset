@@ -43,6 +43,7 @@ import com.google.common.base.Strings;
 import edu.umd.cs.marmoset.modelClasses.BrowserEditing;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.utilities.LenientDateParser;
 import edu.umd.cs.marmoset.utilities.MarmosetPatterns;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
@@ -358,7 +359,7 @@ public class RequestParser {
             project.setLateConstant(lateConstant);
 
 		}
-		project.setCanonicalStudentRegistrationPK(getIntParameter("canonicalStudentRegistrationPK"));
+		project.setCanonicalStudentRegistrationPK(StudentRegistration.asPK(getIntParameter("canonicalStudentRegistrationPK")));
 		// these could be null
 		project.setArchivePK(getIntegerParameter("archivePK", null));
 		project.setUrl(getOptionalCheckedParameter("url"));

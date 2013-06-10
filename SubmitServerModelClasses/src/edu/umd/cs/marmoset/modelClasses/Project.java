@@ -106,7 +106,7 @@ public class Project implements Serializable, Cloneable {
 	private String kindOfLatePenalty;
 	private double lateMultiplier;
 	private int lateConstant;
-	private int canonicalStudentRegistrationPK;
+	private @StudentRegistration.PK int canonicalStudentRegistrationPK;
     private String bestSubmissionPolicy;
     private String releasePolicy;
     private String stackTracePolicy;
@@ -470,7 +470,7 @@ public class Project implements Serializable, Cloneable {
     /**
      * @return Returns the canonicalStudentRegistrationPK.
      */
-    public int getCanonicalStudentRegistrationPK()
+    public @StudentRegistration.PK int getCanonicalStudentRegistrationPK()
     {
         return canonicalStudentRegistrationPK;
     }
@@ -478,7 +478,7 @@ public class Project implements Serializable, Cloneable {
      * @param canonicalStudentRegistrationPK The canonicalStudentRegistrationPK to set.
      */
     public void setCanonicalStudentRegistrationPK(
-            int canonicalStudentRegistrationPK)
+            @StudentRegistration.PK int canonicalStudentRegistrationPK)
     {
         this.canonicalStudentRegistrationPK = canonicalStudentRegistrationPK;
     }
@@ -588,7 +588,7 @@ public class Project implements Serializable, Cloneable {
 		setKindOfLatePenalty(resultSet.getString(startingFrom++));
 		setLateMultiplier(resultSet.getDouble(startingFrom++));
 		setLateConstant(resultSet.getInt(startingFrom++));
-		setCanonicalStudentRegistrationPK(resultSet.getInt(startingFrom++));
+		setCanonicalStudentRegistrationPK(StudentRegistration.asPK(resultSet.getInt(startingFrom++)));
         setBestSubmissionPolicy(resultSet.getString(startingFrom++));
         setReleasePolicy(resultSet.getString(startingFrom++));
         setStackTracePolicy(resultSet.getString(startingFrom++));

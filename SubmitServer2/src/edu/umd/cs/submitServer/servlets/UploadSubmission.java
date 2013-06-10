@@ -347,7 +347,8 @@ public class UploadSubmission extends SubmitServerServlet {
         }
         logSubmission(studentRegistration, zipOutput, submission);
         
-        WaitingBuildServer.offerSubmission(project, submission);
+        if (submission.getBuildStatus() == Submission.BuildStatus.NEW)
+          WaitingBuildServer.offerSubmission(project, submission);
         return submission;
     }
 

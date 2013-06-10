@@ -1284,6 +1284,37 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         }
     }
     
+    public static Submission lookupMostRecent(
+            @StudentRegistration.PK int studentRegistrationPK,
+            @Project.PK int projectPK,
+            Connection conn)
+    throws SQLException
+    {
+        String query = "SELECT " +ATTRIBUTES+ " "+
+        " FROM " +
+        " submissions " +
+        " WHERE submission_timestamp IS NOT NULL " +
+        " AND student_registration_pk = ?" +
+        " AND project_pk = ?" +
+        " AND most_recent = ? " ;
+
+        PreparedStatement stmt = Queries.setStatement(conn, query, studentRegistrationPK, projectPK, true);
+
+        try {
+            ResultSet rs = stmt.executeQuery();
+        
+            Map<Integer, Submission> submissions = new HashMap<Integer,Submission>();
+        
+            if (rs.next())
+            {
+                return new Submission(rs, 1);
+            }
+            return null;
+        } finally {
+            Queries.closeStatement(stmt);
+        }
+    }
+    
     public static List<Submission> lookupAllReleaseTestedStudentSubmissionsByProjectPK(
         Integer projectPK,
         Connection conn)
@@ -2003,13 +2034,11 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	/** Returns the set of submission_pk's that have published reviews */
     public static Set<Integer> lookupSubmissionsWithReviews(Project project, Connection conn) throws SQLException {
         HashSet<Integer> result = new HashSet<Integer>();
-        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, code_review_comment "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
-                + " AND EXISTS (SELECT * FROM code_review_comment " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = code_review_comment.code_review_thread_pk " 
-                + "   and code_review_comment.draft = 0)";
+                + " AND code_review_thread.code_review_thread_pk = code_review_comment.code_review_thread_pk " 
+                + " AND code_review_comment.draft = 0";
         PreparedStatement stmt = Queries.setStatement(conn, query, project.getProjectPK());
         try {
             ResultSet rs = stmt.executeQuery();
@@ -2019,13 +2048,11 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         } finally {
             stmt.close();
         }
-        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, rubric_evaluations "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
-                + " AND EXISTS (SELECT * FROM rubric_evaluations " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = rubric_evaluations.code_review_thread_pk " 
-                + "   AND rubric_evaluations.status = 'LIVE')";
+                + " AND code_review_thread.code_review_thread_pk  = rubric_evaluations.code_review_thread_pk " 
+                + " AND rubric_evaluations.status = 'LIVE'";
         stmt = Queries.setStatement(conn, query, project.getProjectPK());
         try {
             ResultSet rs = stmt.executeQuery();
@@ -2046,14 +2073,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         if (studentRegistration == null)
             throw new NullPointerException("no studentRegistration");
         HashSet<Integer> result = new HashSet<Integer>();
-        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, code_review_comment "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
                 + " AND submissions.student_registration_pk  = ? "
-                + " AND EXISTS (SELECT * FROM code_review_comment " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = code_review_comment.code_review_thread_pk " 
-                + "   AND code_review_comment.draft = 0)";
+                + " AND code_review_thread.code_review_thread_pk  = code_review_comment.code_review_thread_pk " 
+                + " AND code_review_comment.draft = 0";
         PreparedStatement stmt = Queries.setStatement(conn, query, project.getProjectPK(), 
                     studentRegistration.getStudentRegistrationPK());
         try {
@@ -2063,14 +2088,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         } finally {
             stmt.close();
         }
-        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, rubric_evaluations "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
                 + " AND submissions.student_registration_pk  = ? "
-                + " AND EXISTS (SELECT * FROM rubric_evaluations " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = rubric_evaluations.code_review_thread_pk " 
-                + "   AND rubric_evaluations.status = 'LIVE')";
+                + " AND code_review_thread.code_review_thread_pk = rubric_evaluations.code_review_thread_pk " 
+                + " AND rubric_evaluations.status = 'LIVE'";
         stmt = Queries.setStatement(conn, query, project.getProjectPK(), 
                 studentRegistration.getStudentRegistrationPK());
         try {

@@ -18,8 +18,6 @@ public class WaitingBuildServer {
   private static ConcurrentLinkedQueue<WaitingBuildServer> waiting = new ConcurrentLinkedQueue<WaitingBuildServer>();
   
   public static boolean offerSubmission(@Nonnull Project project, @Nonnull Submission submission) {
-     if (submission.getBuildStatus() != Submission.BuildStatus.NEW)
-      return false;
      for(Iterator<WaitingBuildServer> i = waiting.iterator(); i.hasNext(); ) {
       WaitingBuildServer bs = i.next();
       if (bs.offer(project, submission)) {
