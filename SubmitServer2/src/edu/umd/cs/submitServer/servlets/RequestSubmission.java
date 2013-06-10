@@ -501,12 +501,13 @@ public class RequestSubmission extends SubmitServerServlet {
               int testSetupPK = rs.getInt(2);
               int projectPK = rs.getInt(3);
               int coursePK = rs.getInt(4);
-              getSubmitServerServletLog().warn(String.format("new test setup available: course %d, project %d, test setup %d, submission %d", 
+              getSubmitServerServletLog().info(String.format("new test setup available: course %d, project %d, test setup %d, submission %d", 
                   coursePK, projectPK, testSetupPK, submissionPK));
               count++;
         
                 
             }
+            if (count > 1)
             getSubmitServerServletLog().warn(String.format("Total of %d new test setups available", count));
             return count > 0;
             
