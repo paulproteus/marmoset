@@ -358,7 +358,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
                                                 </c:url>
                                                 <p>
                                                 <h3>
-                                                    <a href="${releaseRequestLink}" class="confirm" title="Performing a release test uses up a release token. You should do all you reasonably can to ensure the correctness of your code before performing a release test."> Release test this
+                                                    <a href="${releaseRequestLink}" class="confirm" title="Performing a release test uses up a release token (you have ${releaseInformation.tokensRemaining} remaining). You should do all you reasonably can to ensure the correctness of your code before performing a release test."> Release test this
                                                         submission </a>
                                                 </h3>
                                             </c:when>
