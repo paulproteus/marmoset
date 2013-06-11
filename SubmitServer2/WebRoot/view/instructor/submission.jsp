@@ -134,7 +134,7 @@
 						value="Broken submissions are not tested unless you specifically mark them for retest." />
 					<c:param name="buildStatus" value="broken" />
 				</c:url>
-				<a href="${markBrokenLink}"  class="confirm" title="Are you sure you want to mark this submission as broken?">>mark broken</a>
+				<a href="${markBrokenLink}"  class="confirm" title="Are you sure you want to mark this submission as broken?">mark broken</a>
 			</c:when>
 			<c:otherwise>
 				<p>

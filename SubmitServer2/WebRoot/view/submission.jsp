@@ -70,6 +70,7 @@
 				pattern="E',' dd MMM 'at' hh:mm a" />
 		</h2>
 
+    
 		<c:if test="${submission.currentTestRunPK != testRun.testRunPK}">
 			<p>Results from previous testing against version
 				${testSetup.version} of the test setup
@@ -349,6 +350,7 @@ not empty testOutcomeCollection.releaseOutcomes}">
 								<c:when test="${submission.releaseEligible}">
 									<p>
 										This submission is eligible for release testing.
+                                        ${project.testSetupPK} ${testRun.testSetupPK}
 										<c:choose>
                                             <c:when test="${releaseInformation.releaseRequestOK && project.testSetupPK != testRun.testSetupPK}">
                                                 <c:url var="releaseRequestLink"
