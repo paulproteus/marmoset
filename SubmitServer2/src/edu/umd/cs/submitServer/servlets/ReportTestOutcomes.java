@@ -34,7 +34,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -203,8 +206,22 @@ public class ReportTestOutcomes extends SubmitServerServlet {
             canonicalTestRun.getTestRunPK(), conn);
         Map<String, TestOutcome> canonicalTestOutcomeMap = new HashMap<String, TestOutcome>();
         for (TestOutcome testOutcome : canonicalTestOutcomeCollection.getAllOutcomes()) {
-          canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
+          if (testOutcome.isCardinalTestType())
+            canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
         }
+//        Set<String> theseNames = new HashSet<String>();
+//        for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
+//          if (testOutcome.isCardinalTestType() && !testOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN))
+//            theseNames.add(testOutcome.getTestName());
+//        Set<String> extraNames = new TreeSet<String>(theseNames);
+//        extraNames.removeAll(canonicalTestOutcomeMap.keySet());
+//        Set<String> missingNames = new TreeSet<String>(canonicalTestOutcomeMap.keySet());
+//        missingNames.removeAll(theseNames);
+//        if (!missingNames.isEmpty())
+//          System.out.println("Missing cardinal results for " + missingNames);
+//        if (!extraNames.isEmpty())
+//          System.out.println("Extra cardinal results results for " + extraNames);
+        
         for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
           if (testOutcome.isCardinalTestType() && !testOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN)) {
             TestOutcome canonicalTestOutcome = canonicalTestOutcomeMap.get(testOutcome.getTestName());
