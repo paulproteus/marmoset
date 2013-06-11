@@ -350,9 +350,9 @@ not empty testOutcomeCollection.releaseOutcomes}">
 								<c:when test="${submission.releaseEligible}">
 									<p>
 										This submission is eligible for release testing.
-                                        ${project.testSetupPK} ${testRun.testSetupPK}
-										<c:choose>
-                                            <c:when test="${releaseInformation.releaseRequestOK && project.testSetupPK != testRun.testSetupPK}">
+                                       
+                                       <c:choose>
+                                            <c:when test="${releaseInformation.releaseRequestOK && project.testSetupPK == testRun.testSetupPK}">
                                                 <c:url var="releaseRequestLink"
                                                     value="/action/RequestReleaseTest">
                                                     <c:param name="submissionPK"
