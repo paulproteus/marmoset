@@ -453,7 +453,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 
 			TestOutcome outcome = new TestOutcome();
 			outcome.setTestType(testType);
-			outcome.setTestName(testMethod);
+			outcome.setTestName(testMethod + "(" + testClass + ")");    
 			outcome.setOutcome(TestOutcome.FAILED);
 			outcome.setShortTestResult("Unable to read test results for "
 					+ testMethod);
