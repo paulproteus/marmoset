@@ -26,13 +26,24 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
-
+<c:url var="jsBase" value="/js" />
 <!DOCTYPE HTML>
 <html>
 <c:set var="title">
 <c:out value="Submission ${submission.submissionNumber} for project ${project.projectNumber}"/>
 </c:set>
-<ss:head title="${title}" />
+<head>
+<ss:headContent title="${title}" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/blitzer/jquery-ui.css"
+    type="text/css" />
+<script src="${jsBase}/jquery.easy-confirm-dialog.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".confirm").easyconfirm();
+  });
+    </script>
+</head>
 <body>
 	<ss:header />
 	<ss:breadCrumb />
@@ -339,6 +350,18 @@ not empty testOutcomeCollection.releaseOutcomes}">
 									<p>
 										This submission is eligible for release testing.
 										<c:choose>
+                                            <c:when test="${releaseInformation.releaseRequestOK && project.testSetupPK != testRun.testSetupPK}">
+                                                <c:url var="releaseRequestLink"
+                                                    value="/action/RequestReleaseTest">
+                                                    <c:param name="submissionPK"
+                                                        value="${submission.submissionPK}" />
+                                                </c:url>
+                                                <p>
+                                                <h3>
+                                                    <a href="${releaseRequestLink}" class="confirm" title="Performing a release test uses up a release token. You should do all you reasonably can to ensure the correctness of your code before performing a release test."> Release test this
+                                                        submission </a>
+                                                </h3>
+                                            </c:when>
 											<c:when test="${releaseInformation.releaseRequestOK}">
 												<c:url var="releaseRequestLink"
 													value="/view/confirmReleaseRequest.jsp">
