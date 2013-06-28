@@ -77,7 +77,7 @@ an extension on project
 
 <h2>Submissions</h2>
 <table>
-	${ss:formattedColumnHeaders(7+testCols, canonicalTestOutcomeCollection)}
+	${ss:formattedColumnHeaders(5+testCols, canonicalTestOutcomeCollection)}
 
 	<tr>
 			<th rowspan="2">#</th>
