@@ -104,6 +104,23 @@ public class TextDiffTest {
         out.println("c");
         out.close();
     }
+    
+    @Test(expected= AssertionFailedError.class)
+    public void testDiagnoseIncorrectCase() {
+        try {
+        TextDiff t = new TextDiff.Builder().expect("a", "b").build();
+        
+        PrintWriter out = new PrintWriter(t);
+        
+        out.println("A");
+        out.println("C");
+        out.close();
+        } catch (AssertionFailedError e) {
+            if (!e.getMessage().contains("incorrect case"))
+                throw new RuntimeException("Incorrect diagnose", e);
+            throw e;
+        }
+    }
     @Test(expected= AssertionFailedError.class)
     public void testFailTooMuchOutput() {
         TextDiff t = new TextDiff.Builder().expect("a", "b").build();
@@ -115,6 +132,7 @@ public class TextDiffTest {
         out.println("c");
         out.close();
     }
+    
     @Test(expected= AssertionFailedError.class)
     public void testFailTooLittleOutput() {
         TextDiff t = new TextDiff.Builder().expect("a", "b").build();
