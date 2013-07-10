@@ -1,6 +1,7 @@
 package edu.umd.cs.diffText;
 
 import java.io.PrintWriter;
+import java.util.EnumSet;
 
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -32,6 +33,22 @@ public class TextDiffTest {
         out.println("b  \t");
         out.close();
     }
+    
+    @Test 
+    public void testNormalizeIgnoreWhitespaceChange() {
+       Assert.assertEquals("a b c", 
+               TextDiff.normalize(EnumSet.of(Option.IGNORE_WHITESPACE_CHANGE), "a  b\tc "));
+    }
+    @Test
+    public void testTrailingWhitespace() {
+        TextDiff t = new TextDiff.Builder().expect("a", "b").set(Option.IGNORE_WHITESPACE_CHANGE).build();
+        
+        PrintWriter out = new PrintWriter(t);
+        
+        out.println("a ");
+        out.println("b  \t");
+        out.close();
+    }
     @Test
     public void testIgnoreCase() {
         TextDiff t = new TextDiff.Builder().expect("a", "b").set(Option.IGNORE_CASE).build();
@@ -40,6 +57,16 @@ public class TextDiffTest {
         
         out.println("A");
         out.println("B");
+        out.close();
+    }
+    @Test
+    public void testIgnoreWhitespace() {
+        TextDiff t = new TextDiff.Builder().expect("a,b,c", "x, y, z").set(Option.IGNORE_WHITESPACE).build();
+        
+        PrintWriter out = new PrintWriter(t);
+        
+        out.println(" a, b, c ");
+        out.println("x,y,z");
         out.close();
     }
     @Test
