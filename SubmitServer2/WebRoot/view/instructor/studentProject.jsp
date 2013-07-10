@@ -46,8 +46,18 @@
 <p><ss:studentEmail/>
 
 <c:set var="testCols" value="2" />
+
+<c:if test="${project.tested}">
+	<c:if test="${inconsistentResults > 0}">
+		<c:set var="testCols" value="${1+testCols}" />
+	</c:if>
+	<c:if test="${testProperties.language=='java'}">
+		<c:set var="testCols" value="${2+testCols}" />
+	</c:if>
+</c:if>
+
 <c:set var="inconsistentResults"
-        value="${fn:length(failedBackgroundRetestSubmissionList)}" />
+      value="${fn:length(failedBackgroundRetestSubmissionList)}" />
 
 
 <p>
@@ -67,49 +77,42 @@ an extension on project
 
 <h2>Submissions</h2>
 <table>
-	<c:choose>
-	<c:when test="${testProperties.language=='java' or testProperties.language=='Java'}">
-	${ss:formattedColumnHeaders(10, canonicalTestOutcomeCollection)}
-	</c:when>
-	<c:otherwise>
-	${ss:formattedColumnHeaders(8, canonicalTestOutcomeCollection)}
-	</c:otherwise>
-	</c:choose>
+	${ss:formattedColumnHeaders(5+testCols, canonicalTestOutcomeCollection)}
 
 	<tr>
-		<th rowspan="2">#</th>
-		<th rowspan="2">date submitted</th>
-		<th rowspan="2"># changed <br/>lines</th>
+			<th rowspan="2">#</th>
+			<th rowspan="2">date submitted</th>
+			<th rowspan="2"># changed <br />lines
+			</th>
 
-		<c:if test="${project.tested }">
-		<th rowspan="2">Results<br><abbr title="Public Tests">P</abbr>
-					 | <abbr title="Release Tests">R</abbr>
-					 | <abbr title="Secret Tests">S</abbr>
-					 <c:if test="${testProperties.language=='java'}">
+			<c:if test="${project.tested }">
+				<th rowspan="2">Results<br>
+				<abbr title="Public Tests">P</abbr> | <abbr title="Release Tests">R</abbr>
+					| <abbr title="Secret Tests">S</abbr> <c:if
+						test="${testProperties.language=='java'}">
 					 | <abbr title="Findbugs Warnings">F</abbr>
-					 </c:if>
-					 </th>
-		<th rowspan="2">release tested</th>
-        <c:if test="${inconsistentResults > 0}">
-		<th rowspan="2"># inconsistent<br>background<br>retests</th>
-        <c:set var="testCols" value="${1+testCols}" />
-        
-        </c:if>
-		<c:if test="${testProperties.language=='java'}">
-		<c:set var="testCols" value="${2+testCols}" />
-		<th rowspan="2"># FindBugs<br>warnings</th>
-		<th rowspan="2"># Student<br>written<br>tests</th>
-		</c:if>
-		</c:if>
-		<th rowspan="2">view source</th>
-		<th rowspan="2">Download</th>
+					</c:if>
+				</th>
+				<th rowspan="2">release tested</th>
+				<c:if test="${inconsistentResults > 0}">
+					<th rowspan="2"># inconsistent<br>background<br>retests
+					</th>
+				</c:if>
+				<c:if test="${testProperties.language=='java'}">
+					<th rowspan="2"># FindBugs<br>warnings
+					</th>
+					<th rowspan="2"># Student<br>written<br>tests
+					</th>
+				</c:if>
+			</c:if>
+			<th rowspan="2">view source</th>
+			<th rowspan="2">Download</th>
 
-		${ss:formattedTestHeaderTop(canonicalTestOutcomeCollection, true)}
+			${ss:formattedTestHeaderTop(canonicalTestOutcomeCollection, true)}
 
 		</tr>
 	<tr>
 		${ss:formattedTestHeader(canonicalTestOutcomeCollection, true)}
-
 		</tr>
 
 
