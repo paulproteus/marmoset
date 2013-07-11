@@ -362,7 +362,7 @@ jQuery(document).ready(function ($) {
 
     <c:if test="${not empty inactiveStudentRegistrationSet }">
         <h3>
-            <a href="javascript:toggle('inactiveStudentRegistrationSet')" title="Click to toggle display of inactive students">
+            <a href="javascript:toggle('inactiveStudentList')" title="Click to toggle display of inactive students">
                 <c:out value="${fn:length(inactiveStudentRegistrationSet)}" /> Inactive Students
             </a>
         </h3>
@@ -390,7 +390,7 @@ jQuery(document).ready(function ($) {
                         <td title="registration status is controlled through grades.cs.umd.edu"><input
                             name="dropped" type="checkbox" ${ss:isChecked(studentRegistration.dropped)} disabled /></td>
                         <td title="registration status is controlled through grades.cs.umd.edu"><input
-                            name="inactive" type="checkbox" ${ss:isChecked(!studentRegistration.active)} disabled /></td>
+                            name="inactive" type="checkbox" ${ss:isChecked(studentRegistration.inactive)} disabled /></td>
 
                         <td class="description"><a href="${studentLink}"> <c:out
                                     value="${studentRegistration.fullname}" /></a></td>
