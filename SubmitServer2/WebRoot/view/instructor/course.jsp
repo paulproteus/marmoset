@@ -362,12 +362,12 @@ jQuery(document).ready(function ($) {
 
     <c:if test="${not empty inactiveStudentRegistrationSet }">
         <h3>
-            <a href="javascript:toggle('inactiveStudentList')" title="Click to toggle display of inactive students">
+            <a href="javascript:toggle('inactiveStudentRegistrationSet')" title="Click to toggle display of inactive students">
                 <c:out value="${fn:length(inactiveStudentRegistrationSet)}" /> Inactive Students
             </a>
         </h3>
 
-        <div id="studentList" style="display: none">
+        <div id="inactiveStudentList" style="display: none">
 
             <table>
                 <tr>
@@ -381,7 +381,7 @@ jQuery(document).ready(function ($) {
 
                 </tr>
 
-                <c:forEach var="studentRegistration" items="${inactiveStudentList}" varStatus="counter">
+                <c:forEach var="studentRegistration" items="${inactiveStudentRegistrationSet}" varStatus="counter">
                     <tr class="r${counter.index % 2}">
                         <c:url var="studentLink" value="/view/instructor/student.jsp">
                             <c:param name="studentPK" value="${studentRegistration.studentPK}" />
