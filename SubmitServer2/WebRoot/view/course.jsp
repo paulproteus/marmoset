@@ -68,15 +68,6 @@
        
       </p></c:if>
 
-      
-      
-            <c:if test="${!studentRegistration.inactive}">
-      <p>The last time the course was synchronized with grades.cs.umd.edu,
-      it reported that you are listed as inactive.
-      </p></c:if>
-  
-    </c:if>
-
     <ss:codeReviews title="Pending Code reviews" />
 
     <h2>Projects</h2>
