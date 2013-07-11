@@ -313,24 +313,21 @@ jQuery(document).ready(function ($) {
 
         <table>
             <tr>
-                <th>Active</th>
-                <th>Name</th>
+                 <th>Name</th>
                 <th>class account</th>
             </tr>
             <c:choose>
             <c:when test="${not empty sections}">
              <c:forEach var="section" items="${sections}" >
              <c:set var="inSection" value="${sectionMap[section]}"/>
-           <tr><td colspan="3">${fn:length(inSection)} Students in Section <c:out value="${section}"/></td></tr>
+           <tr><td colspan="2">${fn:length(inSection)} Students in Section <c:out value="${section}"/></td></tr>
             <c:forEach var="studentRegistration" items="${inSection}" varStatus="counter">
                 <tr class="r${counter.index % 2}">
                     <c:url var="studentLink" value="/view/instructor/student.jsp">
                         <c:param name="studentPK" value="${studentRegistration.studentPK}" />
                         <c:param name="coursePK" value="${course.coursePK}" />
                     </c:url>
-                    <td title="registration status is controlled through grades.cs.umd.edu"><input name="active"
-                        type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled /></td>
-                    <td class="description"><a href="${studentLink}">
+                     <td class="description"><a href="${studentLink}">
                     <c:out value="${studentRegistration.fullname}"/></a></td>
                     <td><a href="${studentLink}">
                     <c:out value="${studentRegistration.classAccount}"/></a></td>
@@ -345,8 +342,6 @@ jQuery(document).ready(function ($) {
                         <c:param name="studentPK" value="${studentRegistration.studentPK}" />
                         <c:param name="coursePK" value="${course.coursePK}" />
                     </c:url>
-                    <td title="registration status is controlled through grades.cs.umd.edu"><input name="active"
-                        type="checkbox" ${ss:isChecked(studentRegistration.active)}  disabled /></td>
                     <td class="description"><a href="${studentLink}">
                     <c:out value="${studentRegistration.fullname}"/></a></td>
                     <td><a href="${studentLink}">
@@ -369,6 +364,7 @@ jQuery(document).ready(function ($) {
 
         <div id="inactiveStudentList" style="display: none">
 
+            <p>Registration status is controlled through grades.cs.umd.edu; dropped students will be deleted if they have no submissions or code reviews
             <table>
                 <tr>
                     <th>Dropped</th>
@@ -396,9 +392,7 @@ jQuery(document).ready(function ($) {
                                     value="${studentRegistration.fullname}" /></a></td>
                         <td><a href="${studentLink}"> <c:out value="${studentRegistration.classAccount}" /></a></td>
                         <c:if test="${not empty sections}">
-                            <c:out value="${studentRegistration.section}" />
-                            </a>
-                            </td>
+                            <td><c:out value="${studentRegistration.section}" /></td>
                         </c:if>
                     </tr>
                 </c:forEach>
