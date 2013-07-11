@@ -378,6 +378,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
             StudentRegistration.getComparator(sortKey));
         TreeSet<StudentRegistration> justStudentRegistrationSet = new TreeSet<StudentRegistration>(
             StudentRegistration.getComparator(sortKey));
+        TreeSet<StudentRegistration> inactiveStudentRegistrationSet = new TreeSet<StudentRegistration>(
+            StudentRegistration.getComparator(sortKey));
         studentRegistrationSet.addAll(studentRegistrationCollection);
 
         Map<Integer, StudentRegistration> studentRegistrationMap = new HashMap<Integer, StudentRegistration>();
@@ -387,6 +389,8 @@ public class ExtractParametersFilter extends SubmitServerFilter {
             staffStudentRegistrationSet.add(registration);
           else if (registration.isNormalStudent())
             justStudentRegistrationSet.add(registration);
+          else if (registration.isInactiveStudent())
+            inactiveStudentRegistrationSet.add(registration);
         }
 
         request.setAttribute("studentRegistrationMap", studentRegistrationMap);
@@ -394,6 +398,7 @@ public class ExtractParametersFilter extends SubmitServerFilter {
         request.setAttribute("studentRegistrationCollection", studentRegistrationCollection);
         request.setAttribute(STUDENT_REGISTRATION_SET, studentRegistrationSet);
         request.setAttribute(JUST_STUDENT_REGISTRATION_SET, justStudentRegistrationSet);
+        request.setAttribute(INACTIVE_STUDENT_REGISTRATION_SET, inactiveStudentRegistrationSet);
         request.setAttribute(STAFF_STUDENT_REGISTRATION_SET, staffStudentRegistrationSet);
         TreeMap<String, SortedSet<StudentRegistration>> sectionMap = new TreeMap<String, SortedSet<StudentRegistration>>();
 

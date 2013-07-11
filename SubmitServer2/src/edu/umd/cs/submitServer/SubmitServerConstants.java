@@ -65,6 +65,8 @@ public interface SubmitServerConstants {
 	public static final String STUDENT_REGISTRATION_SET = "studentRegistrationSet";
 	public static final String STAFF_STUDENT_REGISTRATION_SET = "staffStudentRegistrationSet";
 	public static final String JUST_STUDENT_REGISTRATION_SET = "justStudentRegistrationSet";
+	public static final String INACTIVE_STUDENT_REGISTRATION_SET = "inactiveStudentRegistrationSet";
+  
 	public static final String SECTION_MAP = "sectionMap";
 	public static final String SECTIONS = "sections";
 	public static final String SECTION = "section";

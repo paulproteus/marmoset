@@ -360,8 +360,57 @@ jQuery(document).ready(function ($) {
     </div>
 
 
+    <c:if test="${not empty inactiveStudentRegistrationSet }">
+        <h3>
+            <a href="javascript:toggle('inactiveStudentList')" title="Click to toggle display of inactive students">
+                <c:out value="${fn:length(inactiveStudentRegistrationSet)}" /> Inactive Students
+            </a>
+        </h3>
 
-	<h2>
+        <div id="studentList" style="display: none">
+
+            <table>
+                <tr>
+                    <th>Dropped</th>
+                    <th>Inactive</th>
+                    <th>Name</th>
+                    <th>class account</th>
+                    <c:if test="${not empty sections}">
+                        <th>Section</th>
+                    </c:if>
+
+                </tr>
+
+                <c:forEach var="studentRegistration" items="${inactiveStudentList}" varStatus="counter">
+                    <tr class="r${counter.index % 2}">
+                        <c:url var="studentLink" value="/view/instructor/student.jsp">
+                            <c:param name="studentPK" value="${studentRegistration.studentPK}" />
+                            <c:param name="coursePK" value="${course.coursePK}" />
+                        </c:url>
+                        <td title="registration status is controlled through grades.cs.umd.edu"><input
+                            name="dropped" type="checkbox" ${ss:isChecked(studentRegistration.dropped)} disabled /></td>
+                        <td title="registration status is controlled through grades.cs.umd.edu"><input
+                            name="inactive" type="checkbox" ${ss:isChecked(!studentRegistration.active)} disabled /></td>
+
+                        <td class="description"><a href="${studentLink}"> <c:out
+                                    value="${studentRegistration.fullname}" /></a></td>
+                        <td><a href="${studentLink}"> <c:out value="${studentRegistration.classAccount}" /></a></td>
+                        <c:if test="${not empty sections}">
+                            <c:out value="${studentRegistration.section}" />
+                            </a>
+                            </td>
+                        </c:if>
+                    </tr>
+                </c:forEach>
+
+
+            </table>
+        </div>
+    </c:if>
+
+
+
+    <h2>
         <a id="staff">Staff</a>
     </h2>
     <table>

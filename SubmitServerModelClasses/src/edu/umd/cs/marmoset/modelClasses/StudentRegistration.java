@@ -358,6 +358,10 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
     		return instructorCapability == null && isActive();
     }
     
+    public boolean isInactiveStudent() {
+        return instructorCapability == null && !isActive();
+}
+    
     /** Has either modify or read_only instructor capability */
     public boolean isInstructorModifiy() {
     		return getInstructorLevel() >= MODIFY_CAPABILITY_LEVEL;
