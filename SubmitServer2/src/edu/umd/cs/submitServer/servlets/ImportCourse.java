@@ -183,7 +183,6 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			boolean dropped = rs.getBoolean(col++);
 			boolean inactive = rs.getBoolean(col++);
 
-
 			boolean active = !dropped && !inactive;
 			if (active)
 				activeCount++;
@@ -202,7 +201,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			else if (s == null) {
 				try {
 				s = Student.insertOrUpdateByUID(campusUID, firstname, lastname,
-						loginName, null, conn);
+						loginName, email, conn);
 				} catch (SQLException e) {
 					String msg = "Error trying to insert/update " + campusUID
 						+ " " + loginName + ":" + e.getMessage();
@@ -260,6 +259,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			
 			registration.setDropped(dropped);
 			registration.setInactive(inactive);
+
 
 			registration.setCoursePK(course.getCoursePK());
 			registration.setClassAccount(classAccount);
