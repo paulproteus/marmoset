@@ -49,6 +49,33 @@
 
         <ss:hello />
     </div>
+    
+    <c:if test="${studentRegistration.dropped}">
+    <h2>You are listed as dropped in the course</h2>
+
+      <p>The last time the submit server was synchronized with grades.cs.umd.edu,
+      it reported that you have dropped the course. The grades server gets this information from UMEG. 
+      If you do not have any submissions or code reviews, your registration on the submit server will be deleted.
+      Please contact the instructor ASAP if you have not dropped the course.
+      </p></c:if>
+      
+       <c:if test="${studentRegistration.inactive}">
+    <h2>You are listed as inactive in the course</h2>
+
+      <p>The last time the submit server was synchronized with grades.cs.umd.edu,
+      it reported that are inactive in this course. The instructional staff marks you as inactive on grades.cs.umd.edu if they believe you have stopped participating in the course, so that they 
+      know not to bug you about missing assignments. If you still believe yourself to be active, please contact the instructor ASAP.
+       
+      </p></c:if>
+
+      
+      
+            <c:if test="${!studentRegistration.inactive}">
+      <p>The last time the course was synchronized with grades.cs.umd.edu,
+      it reported that you are listed as inactive.
+      </p></c:if>
+  
+    </c:if>
 
     <ss:codeReviews title="Pending Code reviews" />
 
