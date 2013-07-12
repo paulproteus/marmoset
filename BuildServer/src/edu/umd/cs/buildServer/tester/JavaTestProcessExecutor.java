@@ -174,7 +174,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			}
 		}
 		if (!memorySet)
-		    javaArgs.add("-Xmx256m");
+		    javaArgs.add("-Xmx456m");
         javaArgs.add("-Dcom.sun.management.jmxremote");
         
 		javaArgs.add("-classpath");
