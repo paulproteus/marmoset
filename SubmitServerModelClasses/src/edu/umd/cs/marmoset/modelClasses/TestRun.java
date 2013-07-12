@@ -296,6 +296,9 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
         return testDurationMillis;
     }
 
+    public int getTestDurationMinutes() {
+        return testDurationMillis / 1000 / 60;
+    }
     public void setTestDurationMillis(int testDurationMillis) {
         this.testDurationMillis = testDurationMillis;
     }
