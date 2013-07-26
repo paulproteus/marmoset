@@ -126,11 +126,7 @@ public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
 						.lookupByCvsAccountAndCoursePK(classAccount,
 								course.getCoursePK(), conn);
 				if (studentRegistration != null) {
-				  if (false)
-					throw new BadPasswordException(
-							HttpServletResponse.SC_UNAUTHORIZED,
-							"The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
-				  StudentSubmitStatus status = StudentSubmitStatus.findOrCreate( project.getProjectPK(),
+				   StudentSubmitStatus status = StudentSubmitStatus.findOrCreate( project.getProjectPK(),
 				      studentRegistration.getStudentRegistrationPK(), conn);
 				  String msg = "Changing one-time password for " + classAccount + " for project " + project.getProjectNumber();
 				  String remoteHost = SubmitServerFilter.getRemoteHost(request);
@@ -141,6 +137,11 @@ public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
                 request.getQueryString(), remoteHost,  /* refered */ null,  /* userAgent */ "", /* exception */ null);
 			    
 				  getSubmitServerFilterLog().log(Level.WARN, msg);
+				  if (false)
+	          throw new BadPasswordException(
+	              HttpServletResponse.SC_UNAUTHORIZED,
+	              "The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
+	         
 				  status.setOneTimePasswordHack(oneTimePassword);
 				  status.update(conn);
 				  
