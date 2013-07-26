@@ -1784,6 +1784,16 @@
 
 
     <servlet>
+      <servlet-name>SystemInfo</servlet-name>
+      <servlet-class>edu.umd.cs.submitServer.servlets.SystemInfoServlet</servlet-class> 
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>SystemInfo</servlet-name>
+      <url-pattern>/info/system</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>StudentAccountForInstructor</servlet-name>
         <servlet-class>edu.umd.cs.submitServer.servlets.StudentAccountForInstructor</servlet-class>
     </servlet>
