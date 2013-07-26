@@ -15,7 +15,9 @@ import com.sun.management.UnixOperatingSystemMXBean;
 
 public class SystemInfo {
 
-	static final int MEGABYTE = 1024 * 1024;
+	private static final String GOOD = " good ";
+
+    static final int MEGABYTE = 1024 * 1024;
 
 	static OperatingSystemMXBean osBean = ManagementFactory
 			.getOperatingSystemMXBean();
@@ -99,8 +101,12 @@ public class SystemInfo {
         out.close();
         String s =  w.toString();
         if (s.isEmpty())
-            return " good ";
+            return GOOD;
         return s.substring(0, s.length() -2);
+	}
+	
+	public static boolean isGood(String load) {
+	    return load.equals(GOOD);
 	}
 	
 	public static void main(String args[]) {

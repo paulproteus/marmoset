@@ -34,6 +34,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -45,9 +49,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVWriter;
-
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
@@ -138,6 +142,24 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		return submitServerDatabaseProperties;
 	}
 
+	static ScheduledExecutorService periodicExecution = null;
+  static ScheduledFuture<?> taskFuture = null;
+	private static synchronized void initializeTimer() {
+	  if (periodicExecution != null)
+	    return;
+	  periodicExecution =   Executors.newScheduledThreadPool(1);
+	  Runnable task = new Runnable() {
+
+      @Override
+      public void run() {
+        String load = SystemInfo.getSystemLoad();
+        if (SystemInfo.isGood(load))
+          return;
+        Logger log = getSubmitServerServletLog();
+        log.warn(load);
+      }};
+	  taskFuture = periodicExecution.scheduleAtFixedRate(task, 5, 10, TimeUnit.MINUTES);
+	}
 	/*
 	 * (non-Javadoc)
 	 *
@@ -147,6 +169,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	public void init() throws ServletException {
 		super.init();
 
+		initializeTimer();
 		ServletContext servletContext = getServletContext();
 
 			submitServerDatabaseProperties = new SubmitServerDatabaseProperties(
