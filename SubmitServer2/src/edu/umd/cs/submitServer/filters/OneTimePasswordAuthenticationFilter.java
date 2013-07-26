@@ -137,7 +137,7 @@ public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
                 request.getQueryString(), remoteHost,  /* refered */ null,  /* userAgent */ "", /* exception */ null);
 			    
 				  getSubmitServerFilterLog().log(Level.WARN, msg);
-				  if (false)
+				  if (true)
 	          throw new BadPasswordException(
 	              HttpServletResponse.SC_UNAUTHORIZED,
 	              "The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
