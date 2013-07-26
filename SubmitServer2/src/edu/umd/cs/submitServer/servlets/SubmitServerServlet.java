@@ -142,24 +142,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		return submitServerDatabaseProperties;
 	}
 
-	static ScheduledExecutorService periodicExecution = null;
-  static ScheduledFuture<?> taskFuture = null;
-	private static synchronized void initializeTimer() {
-	  if (periodicExecution != null)
-	    return;
-	  periodicExecution =   Executors.newScheduledThreadPool(1);
-	  Runnable task = new Runnable() {
-
-      @Override
-      public void run() {
-        String load = SystemInfo.getSystemLoad();
-        if (SystemInfo.isGood(load))
-          return;
-        Logger log = getSubmitServerServletLog();
-        log.warn(load);
-      }};
-	  taskFuture = periodicExecution.scheduleAtFixedRate(task, 5, 10, TimeUnit.MINUTES);
-	}
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -169,7 +152,6 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 	public void init() throws ServletException {
 		super.init();
 
-		initializeTimer();
 		ServletContext servletContext = getServletContext();
 
 			submitServerDatabaseProperties = new SubmitServerDatabaseProperties(

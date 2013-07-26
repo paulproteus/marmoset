@@ -27,7 +27,7 @@ public class ServerError {
 	public enum Kind {
 	    SLOW(600), PAGE_NOT_FOUND(500), BAD_AUTHENTICATION(500), NOT_REGISTERED(500),
 	    BAD_PARAMETERS(500),SUBMIT(500),
-	    EXCEPTION(900), UNKNOWN(600), BUILD_SERVER(900);
+	    EXCEPTION(900), UNKNOWN(600), OVERLOADED(600), BUILD_SERVER(900);
 	    Kind(int level) {
 	        this.level = level;
 	    }
@@ -158,6 +158,13 @@ public class ServerError {
                 + " ORDER BY  `errors`.`when` DESC "
                 + " LIMIT ?", maxAge, kind, limit);
     }
+
+    public static int insert(Connection conn, Kind kind, 
+            String message, String servlet, String uri, 
+            Throwable t)
+            {
+            return  insert(conn,kind,null,null,null,null,null,"",message,"", servlet,uri,"","","","",t);
+            }
 
 	public static int insert(Connection conn, Kind kind, 
 			@Student.PK Integer userPK,  @Student.PK Integer studentPK,
