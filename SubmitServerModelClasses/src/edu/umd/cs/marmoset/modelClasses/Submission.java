@@ -1009,6 +1009,36 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 		return getFromPreparedStatement(stmt);
 	}
+	   public static List<Integer> getAllArchivesForProject(
+	            @Project.PK Integer projectPK,
+	            Connection conn)
+	        throws SQLException
+	    {
+	        String query = " SELECT archive_pk "+
+	        " FROM "+
+	        " submissions " +
+	        " WHERE submissions.project_pk= ? ";
+	        
+
+	        PreparedStatement stmt = null;
+
+	        stmt = conn.prepareStatement(query);
+	        SqlUtilities.setInteger(stmt, 1, projectPK);
+	        List<Integer> result = new ArrayList<Integer>();
+	           
+	        try {
+	            ResultSet rs = stmt.executeQuery();
+
+	            while (rs.next())
+	            {
+	                result.add(rs.getInt(1));
+	            }
+	            return result;
+	        }
+	        finally {
+	            Queries.closeStatement(stmt);
+	        }
+	    }
 
 	/**
 	 * Retrieves a submission from a database by its submissionPK.

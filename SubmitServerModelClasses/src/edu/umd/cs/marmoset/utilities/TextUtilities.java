@@ -138,6 +138,7 @@ public class TextUtilities {
 		return scanTextFilesInZip(in, null);
 	}
 
+	
 	public static Map<String, List<String>> scanTextFilesInZip(InputStream in,
 			@CheckForNull DisplayProperties displayProperties)
 			throws IOException {

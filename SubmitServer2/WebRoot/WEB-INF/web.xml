@@ -956,6 +956,15 @@
       <url-pattern>/view/submitStatus.jsp</url-pattern>
     </filter-mapping>
     
+        <servlet>
+        <servlet-name>AnalyzeArchives</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.AnalyzeArchives </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnalyzeArchives</servlet-name>
+        <url-pattern>/view/instructor/AnalyzeArchives</url-pattern>
+    </servlet-mapping>
+    
     <servlet>
         <servlet-name>CreateBuildserverConfigFile</servlet-name>
         <servlet-class> edu.umd.cs.submitServer.servlets.CreateBuildserverConfigFile </servlet-class>

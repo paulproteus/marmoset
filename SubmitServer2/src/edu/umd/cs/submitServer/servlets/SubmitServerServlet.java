@@ -30,6 +30,8 @@ package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -362,7 +364,15 @@ public abstract class SubmitServerServlet extends HttpServlet implements
     return writer;
   }
 	
-	 protected static  void write(CSVWriter writer, Object... values) {
+	 public MessageDigest getSHA1() {
+    try {
+      return MessageDigest.getInstance("SHA-1");
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected static  void write(CSVWriter writer, Object... values) {
      String [] s = new String[values.length];
      for(int i = 0; i < values.length; i++) {
        if (values[i] == null)

@@ -83,7 +83,7 @@ public class SystemInfo {
         if (unixBean != null) {
             long openFD = unixBean.getOpenFileDescriptorCount();
             long maxFD = unixBean.getMaxFileDescriptorCount() ;
-            if (verbose || openFD > maxFD/2 || openFD > 300)
+            if (verbose || openFD > maxFD/2 || openFD > 450)
                 out.printf("fd %d/%d, ", openFD, maxFD);
         }
         
