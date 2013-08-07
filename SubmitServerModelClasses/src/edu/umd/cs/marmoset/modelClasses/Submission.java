@@ -655,10 +655,15 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	    return Archive.downloadBytesFromArchive(SUBMISSION_ARCHIVES, getArchivePK(), conn);
     }
 
+	   public Map<String, byte[]> getContents(Connection conn)
+	           throws IOException, SQLException
+	           {
+	               return Archive.getContents(SUBMISSION_ARCHIVES, getArchivePK(), conn);
+	           }
+	   
 	public Map<String,List<String>>
 		getText(Connection conn, @CheckForNull DisplayProperties fileProperties) throws SQLException, IOException {
-		  byte[] archive = downloadArchive(conn);
-		  return TextUtilities.scanTextFilesInZip(archive, fileProperties);
+		  return TextUtilities.scanTextFiles(getContents(conn), fileProperties);
 	}
 
     /**
@@ -1326,14 +1331,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         " WHERE submission_timestamp IS NOT NULL " +
         " AND student_registration_pk = ?" +
         " AND project_pk = ?" +
-        " AND most_recent = ? " ;
+        " AND most_recent = ?  LIMIT 1" ;
 
         PreparedStatement stmt = Queries.setStatement(conn, query, studentRegistrationPK, projectPK, true);
 
         try {
             ResultSet rs = stmt.executeQuery();
-        
-            Map<Integer, Submission> submissions = new HashMap<Integer,Submission>();
         
             if (rs.next())
             {

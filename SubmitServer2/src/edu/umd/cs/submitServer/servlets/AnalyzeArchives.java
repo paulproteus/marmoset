@@ -25,19 +25,17 @@ package edu.umd.cs.submitServer.servlets;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,13 +46,12 @@ import com.google.common.collect.Multiset;
 
 import edu.umd.cs.marmoset.modelClasses.Archive;
 import edu.umd.cs.marmoset.modelClasses.Course;
-import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 
 public class AnalyzeArchives extends SubmitServerServlet {
 
-  static class Info implements Comparable<Info>{
+  static class Info implements Comparable<Info> {
     final String name;
     final int size;
     final BigInteger hash;
@@ -73,15 +70,15 @@ public class AnalyzeArchives extends SubmitServerServlet {
     @Override
     public int compareTo(Info that) {
       int result = this.name.compareTo(that.name);
-      if (result != 0) 
+      if (result != 0)
         return result;
       result = this.size - that.size;
       if (result != 0)
         return result;
       result = this.hash.compareTo(that.hash);
-      
+
       return result;
-      
+
     }
 
   }
@@ -92,29 +89,35 @@ public class AnalyzeArchives extends SubmitServerServlet {
     Connection conn = null;
     response.setContentType("text/plain");
     PrintWriter writer = response.getWriter();
-    
+
     Project project = (Project) request.getAttribute("project");
     Course course = (Course) request.getAttribute("course");
-    
+
     long totalArchiveSpace = 0;
+    long totalDistinctArchiveSpace = 0;
+    HashSet<Integer> seen = new HashSet<Integer>();
+    
     MessageDigest digest = getSHA1();
     HashMap<BigInteger, Info> archiveContents = new HashMap<BigInteger, Info>();
-    Multiset<String> files =  HashMultiset.create();
+    Multiset<String> files = HashMultiset.create();
     try {
       conn = getConnection();
       List<Integer> archives = Submission.getAllArchivesForProject(project.getProjectPK(), conn);
-      writer.printf("Analyzing %d submissions for %s project %s%n",
-          archives.size(), course.getCourseName(), project.getProjectNumber());
-          for (Integer archivePK : archives) {
-        byte[] archive = Archive.downloadBytesFromArchive(Submission.SUBMISSION_ARCHIVES, archivePK, conn);
-        TreeMap<String, byte[]> contents = unzip(new ByteArrayInputStream(archive));
+      writer.printf("Analyzing %d submissions for %s project %s%n", archives.size(), course.getCourseName(),
+          project.getProjectNumber());
+      for (Integer archivePK : archives) {
+        byte[] bytes = Archive.downloadBytesFromArchive((String) Submission.SUBMISSION_ARCHIVES, (Integer) archivePK, (Connection) conn);
+        totalArchiveSpace += bytes.length;
+        if (!seen.add(archivePK)) 
+          continue;
+        totalDistinctArchiveSpace += bytes.length;
+        TreeMap<String, byte[]> contents = Archive.unzip(new ByteArrayInputStream(bytes));
 
         for (Map.Entry<String, byte[]> e : contents.entrySet()) {
           digest.reset();
           byte[] archiveBytes = e.getValue();
           String name = e.getKey();
           files.add(name);
-          totalArchiveSpace += archiveBytes.length;
           byte[] hash = digest.digest(archiveBytes);
           BigInteger biHash = new BigInteger(hash);
           Info info = archiveContents.get(biHash);
@@ -136,75 +139,27 @@ public class AnalyzeArchives extends SubmitServerServlet {
     }
     long totalSize = 0;
     TreeSet<Info> ordered = new TreeSet<Info>(archiveContents.values());
-    writer.printf("%5s %9s %s%n", "#", "size",  "name");
-    
+    writer.printf("%5s %9s %s%n", "#", "size", "name");
+
     String prevName = null;
-    for(Info info : ordered) {
-      if (prevName == null || !prevName.equals(info.name)){
+    for (Info info : ordered) {
+      if (prevName == null || !prevName.equals(info.name)) {
         if (prevName != null)
           writer.println();
-        writer.printf("%5d %9s %s%n",
-            files.count(info.name), " ",
-            info.name);
+        writer.printf("%5d %9s %s%n", files.count(info.name), " ", info.name);
         prevName = info.name;
       }
-      writer.printf("%5d %9d %s%n",
-          info.count, info.size, 
-          info.name);
+      writer.printf("%5d %9d %s%n", info.count, info.size, info.name);
       totalSize += info.size;
     }
     writer.printf("%n");
-    writer.printf("%d distinct files%n", files.elementSet().size()
-        );
-    writer.printf("%d total files%n", files.size()
-        );
- 
-    writer.printf("%d bytes as archives%n", totalArchiveSpace);
+    writer.printf("%d distinct archives%n", seen.size());
+    writer.printf("%d distinct files%n", files.elementSet().size());
+    writer.printf("%d total files%n", files.size());
+
+    writer.printf("%d bytes in distinct archives%n", totalDistinctArchiveSpace);
+    writer.printf("%d bytes in repeated archives%n", totalArchiveSpace);
     writer.printf("%d bytes as files%n", totalSize);
-  }
-
-  public static TreeMap<String, byte[]> unzip(InputStream in) throws IOException {
-    TreeMap<String, byte[]> result = new TreeMap<String, byte[]>();
-    ZipInputStream zIn = new ZipInputStream(in);
-
-    while (true) {
-      try {
-        ZipEntry z = zIn.getNextEntry();
-        if (z == null)
-          break;
-        if (z.isDirectory())
-          continue;
-        if (z.getSize() > 100000) {
-          continue;
-        }
-        String name = z.getName();
-        int lastSlash = name.lastIndexOf('/');
-        String simpleName = name.substring(lastSlash + 1);
-
-        if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
-          continue;
-        if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
-          continue;
-        if (simpleName.endsWith("~"))
-          continue;
-        if (name.charAt(0) == '.' || name.contains("/."))
-          continue;
-        if (name.equals("META-INF/MANIFEST.MF"))
-          continue;
-
-       
-        byte[] bytes = IO.getBytes(zIn);
-        zIn.closeEntry();
-        result.put(name, bytes);
-
-      } catch (Exception e) {
-
-        break;
-
-      }
-    }
-    zIn.close();
-    return result;
   }
 
 }

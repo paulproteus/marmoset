@@ -116,7 +116,8 @@ public class Project implements Serializable, Cloneable {
     
 
     private transient byte[] cachedArchive;
-
+    private transient Map<String, byte[]>  cachedContents;
+    
     private static final long serialVersionUID = 1;
     private static final int serialMinorVersion = 1;
 
@@ -982,7 +983,7 @@ public class Project implements Serializable, Cloneable {
      * @return an array of bytes of the cached archive
      * @throws SQLException
      */
-    public byte[] downloadArchive(Connection conn)
+    public byte[] getBaselineZip(Connection conn)
     throws SQLException
     {
     		if (cachedArchive == null)
@@ -990,13 +991,28 @@ public class Project implements Serializable, Cloneable {
     		return cachedArchive;
     }
 
-    public byte[] downloadArchive(int archivePK, Connection conn) throws SQLException {
+    public byte[] getBaselineZip(int archivePK, Connection conn) throws SQLException {
         Integer projectArchivePK = getArchivePK();
         if (projectArchivePK != null && archivePK == projectArchivePK)
-            return downloadArchive(conn);
+            return getBaselineZip(conn);
         return Archive.downloadBytesFromArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK, conn);
     }
 
+    public Map<String, byte[]> getBaselineContents(Connection conn)
+    throws SQLException, IOException
+    {
+            if (cachedContents == null)
+                cachedContents = Archive.getContents(PROJECT_STARTER_FILE_ARCHIVES, getArchivePK(), conn);
+            return cachedContents;
+    }
+
+    public Map<String, byte[]> getBaselineContents(int archivePK, Connection conn) throws SQLException, IOException {
+        Integer projectArchivePK = getArchivePK();
+        if (projectArchivePK != null && archivePK == projectArchivePK)
+            return getBaselineContents(conn);
+        return Archive.getContents(PROJECT_STARTER_FILE_ARCHIVES, archivePK, conn);
+    }
+    
 	@Override
 	protected Project clone() {
 		Project result;
@@ -1075,7 +1091,7 @@ public class Project implements Serializable, Cloneable {
         // project starter files, if any
         if (getArchivePK() != null) {
             zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() +"-project-starter-files.zip"));
-            zipOutputStream.write(downloadArchive(conn));
+            zipOutputStream.write(getBaselineZip(conn));
         }
 
         zipOutputStream.close();
@@ -1107,7 +1123,7 @@ public class Project implements Serializable, Cloneable {
         if (baselinePK == null)
             return null;
         Map<String, List<String>> baselineText
-        = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
+        = TextUtilities.scanTextFiles(this.getBaselineContents(baselinePK, conn), fileProperties);
         return baselineText;
 
        
@@ -1134,7 +1150,7 @@ public class Project implements Serializable, Cloneable {
 	        
 	    if (baselinePK != 0 && baselinePK != submission.getArchivePK()) {
 	        if (baselineText == null)
-	            baselineText = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
+	            baselineText = TextUtilities.scanTextFiles(this.getBaselineContents(baselinePK, conn), fileProperties);
 	        for(Entry<String, List<String>> e : current.entrySet()) {
 	            String file = e.getKey();
 	            if (!baselineText.containsKey(file))
@@ -1374,4 +1390,16 @@ public class Project implements Serializable, Cloneable {
 		return result;
 
 	}
+    /**
+     * @param project
+     * @param displayProperties
+     * @param conn
+     * @return
+     * @throws IOException
+     * @throws SQLException
+     */
+    public  Map<String, List<String>> getBaselineText(DisplayProperties displayProperties,
+        Connection conn) throws IOException, SQLException {
+      return TextUtilities.scanTextFiles(this.getBaselineContents(conn), displayProperties);
+    }
 }

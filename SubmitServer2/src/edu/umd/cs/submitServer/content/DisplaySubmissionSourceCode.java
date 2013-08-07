@@ -193,8 +193,7 @@ public class DisplaySubmissionSourceCode {
         Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
       
 
-        byte[] archive = submission.downloadArchive(conn);
-        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive, fileProperties);
+        Map<String, List<String>> text = submission.getText(conn, fileProperties);
 
         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
 
@@ -211,8 +210,7 @@ public class DisplaySubmissionSourceCode {
         DisplayProperties fileProperties = new DisplayProperties();
         Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
       
-    	 byte[] archive = submission.downloadArchive(conn);
-         Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(archive, fileProperties);
+    	  Map<String, List<String>> text = submission.getText(conn, fileProperties);
 
          Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
          int count = 0;
@@ -265,13 +263,13 @@ public class DisplaySubmissionSourceCode {
         	return "[No baseline source]";
         }
         DisplayProperties displayProperties = new DisplayProperties();
-        Map<String, List<String>> text = TextUtilities.scanTextFilesInZip(project.downloadArchive(conn), displayProperties);
+        Map<String, List<String>> text = project.getBaselineText(displayProperties, conn);
 
         return displayArchive(text, tabWidth, null, null, displayProperties);
 
     }
 
-	private static String displayArchive(Map<String, List<String>> text,
+  private static String displayArchive(Map<String, List<String>> text,
 			@CheckForNull Integer tabWidth, @CheckForNull CodeCoverageResults codeCoverageResults,
 			@CheckForNull Map<String, BitSet> changed, DisplayProperties displayProperties) throws UnsupportedEncodingException,
 			IOException {

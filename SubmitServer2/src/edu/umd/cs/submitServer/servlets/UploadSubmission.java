@@ -305,7 +305,7 @@ public class UploadSubmission extends SubmitServerServlet {
             int testSetupPK = project.getTestSetupPK();
             byte baseLineSubmission[] = null;
             if (baselinePK != null && baselinePK.intValue() != 0) {
-                 baseLineSubmission = project.downloadArchive(conn); 
+                 baseLineSubmission = project.getBaselineZip(conn); 
             } else if (testSetupPK != 0){
                 baseLineSubmission = Submission.lookupCanonicalSubmissionArchive(project.getProjectPK(), conn);
             }

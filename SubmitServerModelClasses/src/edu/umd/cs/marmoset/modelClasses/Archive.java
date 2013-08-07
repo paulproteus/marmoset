@@ -27,6 +27,9 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +37,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.annotation.Nonnull;
 
@@ -77,7 +83,55 @@ public class Archive {
 		return archivePK;
 	}
 
-	public static Archive getArchive(String tableName, int archivePK,
+	public static TreeMap<String, byte[]> getContents(String tableName, Integer archivePK, Connection conn) throws IOException, SQLException {
+      return unzip(new ByteArrayInputStream(downloadBytesFromArchive(tableName, archivePK, conn)));
+    }
+
+    public static TreeMap<String, byte[]> unzip(InputStream in) throws IOException {
+      TreeMap<String, byte[]> result = new TreeMap<String, byte[]>();
+      ZipInputStream zIn = new ZipInputStream(in);
+    
+      while (true) {
+        try {
+          ZipEntry z = zIn.getNextEntry();
+          if (z == null)
+            break;
+          if (z.isDirectory())
+            continue;
+          if (z.getSize() > 100000) {
+            continue;
+          }
+          String name = z.getName();
+          int lastSlash = name.lastIndexOf('/');
+          String simpleName = name.substring(lastSlash + 1);
+    
+          if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
+            continue;
+          if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
+            continue;
+          if (simpleName.endsWith("~"))
+            continue;
+          if (name.charAt(0) == '.' || name.contains("/."))
+            continue;
+          if (name.equals("META-INF/MANIFEST.MF"))
+            continue;
+    
+         
+          byte[] bytes = IO.getBytes(zIn);
+          zIn.closeEntry();
+          result.put(name, bytes);
+    
+        } catch (Exception e) {
+    
+          break;
+    
+        }
+      }
+      zIn.close();
+      return result;
+    }
+
+    public static Archive getArchive(String tableName, int archivePK,
 			Connection conn) throws SQLException {
 		if (!MarmosetPatterns.isTableName(tableName)) {
 			throw new IllegalArgumentException("tableName is malformed");

@@ -188,14 +188,11 @@ public class VerifyOpenId extends SubmitServerServlet {
 	 * identifier.
 	 */
 	private String hashOpenId(String identifier) throws ServletException {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA-1");
+			MessageDigest digest = getSHA1();
 			digest.update(identifier.getBytes());
 			String hashed = String.format("%040x", new BigInteger(1, digest.digest()));
 			getSubmitServerServletLog().info("Hashed openid " + identifier + " to " + hashed);
 			return hashed;
-		} catch (NoSuchAlgorithmException e) {
-			throw new ServletException("Couldn't hash OpenID identifier");
-		}
+		
 	}
 }
