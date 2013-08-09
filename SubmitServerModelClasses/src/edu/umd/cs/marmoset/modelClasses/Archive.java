@@ -105,13 +105,11 @@ public class Archive {
           int lastSlash = name.lastIndexOf('/');
           String simpleName = name.substring(lastSlash + 1);
     
-          if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
-            continue;
-          if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
+          if (name.startsWith("CVS/") || name.contains("/CVS/"))
             continue;
           if (simpleName.endsWith("~"))
             continue;
-          if (name.charAt(0) == '.' || name.contains("/."))
+          if (name.startsWith("../") || name.contains("/.."))
             continue;
           if (name.equals("META-INF/MANIFEST.MF"))
             continue;
@@ -261,6 +259,14 @@ public class Archive {
 		}
 	}
 
+	public static class UploadResult {
+	    public UploadResult(int archive_pk, boolean isNew) {
+            this.archive_pk = archive_pk;
+            this.isNew = isNew;
+        }
+        public final int archive_pk;
+	    public final boolean isNew;
+	}
 	/**
 	 * Upload an archive to the database, returning the primary key for the
 	 * created entry. If a matching archive already exists, return the primary
@@ -272,7 +278,7 @@ public class Archive {
 	 * @return
 	 * @throws SQLException
 	 */
-	static int uploadBytesToArchive(String tableName, byte[] bytes,
+	static UploadResult uploadBytesToArchive(String tableName, byte[] bytes,
 			Connection conn) throws SQLException {
 		if (!MarmosetPatterns.isTableName(tableName)) {
 			throw new IllegalArgumentException("tableName is malformed");
@@ -290,7 +296,7 @@ public class Archive {
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				return rs.getInt(1);
+				return new UploadResult(rs.getInt(1), false);
 			}
 		} finally {
 			Queries.closeStatement(stmt);
@@ -308,7 +314,7 @@ public class Archive {
 
 			stmt.executeUpdate();
 
-			return Queries.getGeneratedPrimaryKey(stmt);
+			return new UploadResult(Queries.getGeneratedPrimaryKey(stmt), true);
 		} finally {
 			Queries.closeStatement(stmt);
 		}

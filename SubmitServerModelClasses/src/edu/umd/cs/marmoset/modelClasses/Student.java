@@ -450,7 +450,7 @@ public class Student  implements Comparable<Student> {
   {
     if (FAKE_NAMES)
       throw new IllegalStateException();
-      String query = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
+    String query = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
 
     PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 

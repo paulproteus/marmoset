@@ -74,6 +74,45 @@ public class TextUtilities {
 		return scanTextFileNamesInZip(new ByteArrayInputStream(bytes));
 	}
 
+    public static boolean isText(String simpleName) {
+        @CheckForNull
+        String mimeType = mimeMap.getContentTypeFor(simpleName);
+
+        if ("application/octet-stream".equals(mimeType))
+            return false;
+
+        if ("text/plain".equals(mimeType))
+            return true;
+
+        int lastDot = simpleName.lastIndexOf('.');
+        if (lastDot > 0) {
+            String extension = simpleName.substring(lastDot + 1);
+            if (binaryFileExtensions.contains(extension))
+                return false;
+        }
+        return true;
+    }
+    
+    public static String simpleName(String path) {
+
+        int lastSlash = path.lastIndexOf('/');
+        String simpleName = path.substring(lastSlash + 1);
+        return simpleName;
+    
+    }
+    
+    public static boolean shouldDisplay(String name, String simpleName) {
+        if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
+            return false;
+        if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
+            return false;
+        if (simpleName.endsWith("~"))
+            return false;
+        if (name.charAt(0) == '.' || name.contains("/."))
+            return false;
+        return isText(simpleName);
+    }
+    
 	public static SortedSet<String> scanTextFileNamesInZip(InputStream in)
 			throws IOException {
 		SortedSet<String> result = new TreeSet<String>();
@@ -90,31 +129,10 @@ public class TextUtilities {
 				}
 				String name = z.getName();
 
-				int lastSlash = name.lastIndexOf('/');
-				String simpleName = name.substring(lastSlash + 1);
-				if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
-					continue;
-				if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
-					continue;
-				if (simpleName.endsWith("~"))
-					continue;
-				if (name.charAt(0) == '.' || name.contains("/."))
-					continue;
-
-				@CheckForNull
-				String mimeType = mimeMap.getContentTypeFor(name);
-
-				if ("application/octet-stream".equals(mimeType))
-					continue;
-
-				if (!"text/plain".equals(mimeType)) {
-					int lastDot = name.lastIndexOf('.');
-					if (lastDot > 0) {
-						String extension = name.substring(lastDot + 1);
-						if (binaryFileExtensions.contains(extension))
-							continue;
-					}
-				}
+				String simpleName =  simpleName(name);
+				if (!shouldDisplay(name, simpleName))
+				    continue;
+				
 				result.add(name);
 			} catch (Exception e) {
 				String err = dumpException(e);
@@ -150,34 +168,9 @@ public class TextUtilities {
                 if (name.equals(".submitDisplay")) {
                     submitDisplay = getText(bytes);
                 }
-                int lastSlash = name.lastIndexOf('/');
-                String simpleName = name.substring(lastSlash + 1);
-
-                if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
+                String simpleName =  simpleName(name);
+                if (!shouldDisplay(name, simpleName))
                     continue;
-                if (simpleName.charAt(0) == '.' || name.contains("CVS/"))
-                    continue;
-                if (simpleName.endsWith("~"))
-                    continue;
-                if (name.charAt(0) == '.' || name.contains("/."))
-                    continue;
-                if (name.equals("META-INF/MANIFEST.MF"))
-                    continue;
-
-                @CheckForNull
-                String mimeType = mimeMap.getContentTypeFor(name);
-
-                if ("application/octet-stream".equals(mimeType))
-                    continue;
-
-                if (!"text/plain".equals(mimeType)) {
-                    int lastDot = name.lastIndexOf('.');
-                    if (lastDot > 0) {
-                        String extension = name.substring(lastDot + 1);
-                        if (binaryFileExtensions.contains(extension))
-                            continue;
-                    }
-                }
 
                 List<String> textContents = getText(bytes);
                 if (contents != null) {
@@ -214,8 +207,7 @@ public class TextUtilities {
 				if (name.equals(".submitDisplay")) {
 					submitDisplay = getText(zIn);
 				}
-				int lastSlash = name.lastIndexOf('/');
-				String simpleName = name.substring(lastSlash + 1);
+				String simpleName = simpleName(name);
 
 				if (simpleName.isEmpty() || simpleName.charAt(0) == '.')
 					continue;

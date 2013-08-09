@@ -80,6 +80,8 @@ public class DisplayProperties {
 			this.properties = properties;
 
 		}
+		
+
 
 		public boolean isPattern() {
 			return regex != null || endsWith != null;
@@ -114,7 +116,7 @@ public class DisplayProperties {
 			if (endsWith != null)
 				return String.format("%12s %2d %s", "*" + endsWith, rank,
 						properties);
-			return String.format("%12s %2d %s", regex, rank, properties);
+			return String.format("%12s %2d %s", regex.pattern(), rank, properties);
 		}
 	}
 
@@ -214,7 +216,7 @@ public class DisplayProperties {
 
 	public Map<String, List<String>> build(
 			Map<String, List<String>> sourceContents) {
-		if (isEmpty())
+		if (sourceContents.isEmpty())
 			return sourceContents;
 		TreeMap<String, List<String>> sorted = new TreeMap<String, List<String>>(
 				fileComparator());

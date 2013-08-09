@@ -161,12 +161,12 @@ public class CodeMetrics {
 
 	public void setMd5sumClassfiles(Collection<File> fileList)
 			throws NoSuchAlgorithmException, IOException {
-		setMd5sumClassfiles(Checksums.md5sumAsHexString(fileList));
+		setMd5sumClassfiles(Checksums.checksumAsHexString(fileList));
 	}
 
 	public void setMd5sumSourcefiles(Collection<File> fileList)
 			throws NoSuchAlgorithmException, IOException {
-		setMd5sumSourcefiles(Checksums.md5sumAsHexString(fileList));
+		setMd5sumSourcefiles(Checksums.checksumAsHexString(fileList));
 	}
 
 	@Override

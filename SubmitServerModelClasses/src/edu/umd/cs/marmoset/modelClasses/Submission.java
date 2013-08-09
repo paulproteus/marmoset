@@ -23,6 +23,7 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 import edu.umd.cs.marmoset.utilities.Multiset;
@@ -604,13 +606,26 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	 * @return the archivePK of the newly uploaded archive
 	 * @throws SQLException
 	 */
-	public int uploadCachedArchive(Connection conn) throws SQLException {
+	public int uploadCachedArchive(Connection conn) throws SQLException, IOException {
 		return uploadSubmissionArchive(cachedArchive, conn);
 	}
 
 	public static int uploadSubmissionArchive(byte[] bytes, Connection conn)
-			throws SQLException {
-		return Archive.uploadBytesToArchive(SUBMISSION_ARCHIVES, bytes, conn);
+			throws SQLException, IOException {
+		UploadResult uploadResult = Archive.uploadBytesToArchive(SUBMISSION_ARCHIVES, bytes, conn);
+        int archive_pk  = uploadResult.archive_pk;
+        if (uploadResult.isNew){ 
+		TreeMap<String, byte[]> contents = Archive.unzip(new ByteArrayInputStream(bytes));
+		for(Map.Entry<String, byte[]> e : contents.entrySet()) {
+		    String path = e.getKey();
+		    String simpleName = TextUtilities.simpleName(path);
+		    boolean isText = TextUtilities.isText(simpleName);
+		    FileContents fc = FileContents.lookupOrInsert(conn, path, isText, e.getValue());
+		    ArchiveContents.add(archive_pk, fc.getFilePk(), conn);
+		}
+        }
+
+		return archive_pk;
 	}
 	public static void deleteAbortedSubmissionArchive(int pk, Connection conn)
 	throws SQLException {
@@ -619,7 +634,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 	@Deprecated
     public void updateCachedArchive(Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
 		if (archivePK != null && archivePK.intValue() != 0)
           Archive.updateBytesInArchive(SUBMISSION_ARCHIVES, archivePK, cachedArchive, conn);
@@ -837,13 +852,13 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	}
 
 	
-	public void insert(Connection conn, byte [] archive) throws SQLException {
+	public void insert(Connection conn, byte [] archive) throws SQLException, IOException {
 		 setArchiveForUpload(archive);
          insert(conn);
 	}
 
 	public void insert(Connection conn)
-	throws SQLException
+	throws SQLException, IOException
 	{
 	    String insert = Queries.makeInsertStatement(ATTRIBUTE_NAME_LIST.length, ATTRIBUTES, TABLE_NAME);
         if (!hasArchive() && !hasCachedArchive())
@@ -1807,7 +1822,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String courseName,
         String semester,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         boolean transactionSuccess=false;
         try {
@@ -1931,6 +1946,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
      * @param conn Connection to the database.
      * @return The submission object that's been uploaded into the database.
      * @throws SQLException If something goes wrong communicating with the database.
+     * @throws IOException 
      */
     public static Submission submit(
         byte[] bytesForUpload,
@@ -1941,7 +1957,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String submitClientVersion,
         Timestamp submissionTimestamp,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         Submission submission = prepareSubmission(studentRegistration, project,
 				cvstagTimestamp, submitClientTool, submitClientVersion,
@@ -1967,6 +1983,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
      * @param conn Connection to the database.
      * @return The submission object that's been uploaded into the database.
      * @throws SQLException If something goes wrong communicating with the database.
+     * @throws IOException 
      */
     public static Submission submit(
         int archivePK,
@@ -1977,7 +1994,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String submitClientVersion,
         Timestamp submissionTimestamp,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         Submission submission = prepareSubmission(studentRegistration, project,
 				cvstagTimestamp, submitClientTool, submitClientVersion,

@@ -26,7 +26,6 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.zip.Checksum;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,42 +46,13 @@ import com.google.common.collect.Multiset;
 
 import edu.umd.cs.marmoset.modelClasses.Archive;
 import edu.umd.cs.marmoset.modelClasses.Course;
+import edu.umd.cs.marmoset.modelClasses.FileContents;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Submission;
+import edu.umd.cs.marmoset.utilities.Checksums;
+import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 public class AnalyzeArchives extends SubmitServerServlet {
-
-  static class Info implements Comparable<Info> {
-    final String name;
-    final int size;
-    final BigInteger hash;
-    int count = 0;
-
-    public Info(String name, int size, BigInteger hash) {
-      this.name = name;
-      this.size = size;
-      this.hash = hash;
-    }
-
-    public void saw() {
-      count++;
-    }
-
-    @Override
-    public int compareTo(Info that) {
-      int result = this.name.compareTo(that.name);
-      if (result != 0)
-        return result;
-      result = this.size - that.size;
-      if (result != 0)
-        return result;
-      result = this.hash.compareTo(that.hash);
-
-      return result;
-
-    }
-
-  }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -97,9 +68,9 @@ public class AnalyzeArchives extends SubmitServerServlet {
     long totalDistinctArchiveSpace = 0;
     HashSet<Integer> seen = new HashSet<Integer>();
     
-    MessageDigest digest = getSHA1();
-    HashMap<BigInteger, Info> archiveContents = new HashMap<BigInteger, Info>();
+    HashMap<String, FileContents> archiveContents = new HashMap<String, FileContents>();
     Multiset<String> files = HashMultiset.create();
+    Multiset<String> checksums = HashMultiset.create();
     try {
       conn = getConnection();
       List<Integer> archives = Submission.getAllArchivesForProject(project.getProjectPK(), conn);
@@ -114,19 +85,18 @@ public class AnalyzeArchives extends SubmitServerServlet {
         TreeMap<String, byte[]> contents = Archive.unzip(new ByteArrayInputStream(bytes));
 
         for (Map.Entry<String, byte[]> e : contents.entrySet()) {
-          digest.reset();
           byte[] archiveBytes = e.getValue();
+          String checksum = Checksums.getChecksum(archiveBytes);
           String name = e.getKey();
           files.add(name);
-          byte[] hash = digest.digest(archiveBytes);
-          BigInteger biHash = new BigInteger(hash);
-          Info info = archiveContents.get(biHash);
+          checksums.add(checksum);
+          FileContents info = archiveContents.get(checksum);
           if (info == null) {
 
-            info = new Info(name, archiveBytes.length, biHash);
-            archiveContents.put(biHash, info);
+            info = new FileContents(name, TextUtilities.isText(TextUtilities.simpleName(name)),
+                archiveBytes.length, checksum, null);
+            archiveContents.put(checksum, info);
           }
-          info.saw();
 
         }
 
@@ -138,18 +108,19 @@ public class AnalyzeArchives extends SubmitServerServlet {
       releaseConnection(conn);
     }
     long totalSize = 0;
-    TreeSet<Info> ordered = new TreeSet<Info>(archiveContents.values());
+    TreeSet<FileContents> ordered = new TreeSet<FileContents>(archiveContents.values());
     writer.printf("%5s %9s %s%n", "#", "size", "name");
 
     String prevName = null;
-    for (Info info : ordered) {
+    for (FileContents info : ordered) {
       if (prevName == null || !prevName.equals(info.name)) {
         if (prevName != null)
           writer.println();
         writer.printf("%5d %9s %s%n", files.count(info.name), " ", info.name);
         prevName = info.name;
       }
-      writer.printf("%5d %9d %s%n", info.count, info.size, info.name);
+      int count = checksums.count(info.checksum);
+      writer.printf("%5d %9d %s%n", count, info.size, info.name);
       totalSize += info.size;
     }
     writer.printf("%n");

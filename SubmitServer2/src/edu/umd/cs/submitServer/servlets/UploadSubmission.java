@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -58,6 +59,7 @@ import org.apache.log4j.Logger;
 import com.ice.tar.TarEntry;
 import com.ice.tar.TarInputStream;
 
+import edu.umd.cs.marmoset.modelClasses.Archive;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
@@ -289,7 +291,7 @@ public class UploadSubmission extends SubmitServerServlet {
 
     public static Submission uploadSubmission(Project project, StudentRegistration studentRegistration, byte[] zipOutput,
             HttpServletRequest request, Timestamp submissionTimestamp, String clientTool, String clientVersion, String cvsTimestamp,
-            SubmitServerDatabaseProperties db,Logger log) throws ServletException {
+            SubmitServerDatabaseProperties db,Logger log) throws ServletException, IOException {
        
         Connection conn;
         try {
@@ -312,6 +314,7 @@ public class UploadSubmission extends SubmitServerServlet {
             zipOutput = FixZip.adjustZipNames(baseLineSubmission, zipOutput);
             
             int archivePK = Submission.uploadSubmissionArchive(zipOutput, conn);
+            
             
             synchronized (UPLOAD_LOCK) {
                 final int NUMBER_OF_ATTEMPTS = 2;

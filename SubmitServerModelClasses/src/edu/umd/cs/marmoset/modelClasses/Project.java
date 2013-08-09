@@ -59,6 +59,7 @@ import javax.annotation.meta.TypeQualifier;
 import org.apache.commons.io.CopyUtils;
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
@@ -948,7 +949,8 @@ public class Project implements Serializable, Cloneable {
     public Integer uploadCachedArchive(Connection conn)
     throws SQLException
     {
-        setArchivePK(Archive.uploadBytesToArchive(PROJECT_STARTER_FILE_ARCHIVES, cachedArchive, conn));
+        UploadResult uploadBytesToArchive = Archive.uploadBytesToArchive(PROJECT_STARTER_FILE_ARCHIVES, cachedArchive, conn);
+        setArchivePK(uploadBytesToArchive.archive_pk);
         return getArchivePK();
     }
 
@@ -1025,7 +1027,7 @@ public class Project implements Serializable, Cloneable {
 		return result;
 	}
 
-	public Project fork(Connection conn) throws SQLException {
+	public Project fork(Connection conn) throws SQLException, IOException {
 		Project fork = this.clone();
 		fork.setVisibleToStudents(false);
 		fork.setTitle("Fork of " + this.getTitle());

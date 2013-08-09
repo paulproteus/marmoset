@@ -567,19 +567,19 @@ public final class Queries {
 		result.append(" ? ) \n");
 		return result.toString();
 	}
-
+	
 	public static String makeInsertStatementUsingSetSyntax(String[] attributes,
-			String tableName, boolean skipFirstAttribute) {
-		StringBuffer buf = new StringBuffer();
-		buf.append(" INSERT INTO " + tableName + " \n");
-		buf.append(" SET \n");
-		// Skip primary key
-		for (int ii = skipFirstAttribute ? 1 : 0; ii < attributes.length - 1; ii++) {
-			buf.append(" " + attributes[ii] + " = ?, \n");
-		}
-		buf.append(" " + attributes[attributes.length - 1] + " = ? \n");
-		return buf.toString();
-	}
+            String tableName, boolean skipFirstAttribute) {
+        StringBuffer buf = new StringBuffer();
+        buf.append(" INSERT INTO " + tableName + " \n");
+        buf.append(" SET \n");
+        // Skip primary key
+        for (int ii = skipFirstAttribute ? 1 : 0; ii < attributes.length - 1; ii++) {
+            buf.append(" " + attributes[ii] + " = ?, \n");
+        }
+        buf.append(" " + attributes[attributes.length - 1] + " = ? \n");
+        return buf.toString();
+    }
 
 	public static String makeInsertOrUpdateStatement(String[] insert, String[] update,
 			String tableName) {
