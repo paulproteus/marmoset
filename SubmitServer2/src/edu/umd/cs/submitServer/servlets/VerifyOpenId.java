@@ -3,7 +3,6 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -16,7 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.openid4java.association.AssociationException;
+import org.openid4java.association.AssociationSessionType;
 import org.openid4java.consumer.ConsumerManager;
+import org.openid4java.consumer.InMemoryConsumerAssociationStore;
+import org.openid4java.consumer.InMemoryNonceVerifier;
 import org.openid4java.consumer.VerificationResult;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
@@ -52,6 +54,14 @@ public class VerifyOpenId extends SubmitServerServlet {
 	}
 
 	private final transient ConsumerManager consumerManager = new ConsumerManager();
+	
+	{
+	  // magic from http://stackoverflow.com/questions/7645226/verification-failure-while-using-openid4java-for-login-with-google
+	  consumerManager.setAssociations(new InMemoryConsumerAssociationStore()); 
+	  consumerManager.setNonceVerifier(new InMemoryNonceVerifier(5000)); 
+	  consumerManager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
+
+	}
 
 	@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
