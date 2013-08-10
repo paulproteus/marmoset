@@ -44,7 +44,7 @@ public class InitiateOpenId extends SubmitServerServlet {
   
   private String getOpenidRealm(HttpServletRequest req) {
     
-    UrlBuilder builder = new UrlBuilder(req);
+    UrlBuilder builder = new UrlBuilder(req.getScheme(), req.getServerName(), req.getServerPort(), "/");
     String result =   builder.toString();
     return result;
   
