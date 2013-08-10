@@ -133,7 +133,7 @@ public class VerifyOpenId extends SubmitServerServlet {
 
 			Identifier verified = verification.getVerifiedId();
 			if (verified == null)
-			    throw new ServletException("OpenID authentication declined or failed: " + verification.getStatusMsg() + "; " + verification);
+			    throw new ServletException("OpenID authentication declined or failed: " + verification.getStatusMsg() + "; " + verification.getAuthResponse());
 			
 			getSubmitServerServletLog().info("Verified OpenID " + verified.getIdentifier());
 			AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
