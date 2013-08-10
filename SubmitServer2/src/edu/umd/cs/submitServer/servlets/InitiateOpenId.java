@@ -32,7 +32,7 @@ import edu.umd.cs.submitServer.UrlBuilder;
  * @see VerifyOpenId
  */
 public class InitiateOpenId extends SubmitServerServlet {
-  private final transient ConsumerManager consumerManager = new ConsumerManager();
+  private static final transient ConsumerManager consumerManager = new ConsumerManager();
   
   {
     // magic from http://stackoverflow.com/questions/7645226/verification-failure-while-using-openid4java-for-login-with-google
@@ -40,6 +40,10 @@ public class InitiateOpenId extends SubmitServerServlet {
     consumerManager.setNonceVerifier(new InMemoryNonceVerifier(5000)); 
     consumerManager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
 
+  }
+  
+  public static ConsumerManager getConsumerManager() {
+    return consumerManager;
   }
   
   private String getOpenidRealm(HttpServletRequest req) {
