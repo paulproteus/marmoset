@@ -54,8 +54,8 @@ ALTER TABLE  `test_setup_archives` CHANGE  `checksum`  `checksum` VARCHAR( 40 ) 
 ALTER TABLE  `eclipse_launch_events` CHANGE  `checksum`  `checksum` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
 ALTER TABLE  `code_metrics` CHANGE  `checksum_sourcefiles`  `checksum_sourcefiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
 ALTER TABLE  `code_metrics` CHANGE  `checksum_classfiles`  `checksum_classfiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
-ALTER TABLE  `test_runs` CHANGE  `checksum_sourcefiles`  `checksum_sourcefiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
-ALTER TABLE  `test_runs` CHANGE  `checksum_classfiles`  `checksum_classfiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE  `test_runs` CHANGE  `checksum_sourcefiles`  `checksum_sourcefiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
+ALTER TABLE  `test_runs` CHANGE  `checksum_classfiles`  `checksum_classfiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
 
 # change 8/9/2013 - add tables for file contents
 
