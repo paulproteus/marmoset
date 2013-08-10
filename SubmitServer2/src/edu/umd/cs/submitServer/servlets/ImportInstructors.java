@@ -54,9 +54,14 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
     try {
       gradesConn = getGradesConnection();
       conn = getConnection();
+      HashSet<String> allUIDs = new HashSet<String>();
+      for (Student instructor : Student.lookupAllInstructors(conn).values()) {
+        allUIDs.add(instructor.getCampusUID());
+      }
+
       {
         String query = "SELECT DISTINCT lastName, firstName, nickname, uid, directoryID" + " FROM submitexportstaff "
-            + " WHERE term = ?" + " AND role = ? ";
+            + " WHERE term = ? AND role = ? ";
         PreparedStatement stmt = gradesConn.prepareStatement(query);
         stmt.setString(1, term);
         stmt.setString(2, "Instructor");
@@ -70,7 +75,9 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
           String nickname = rs.getString(col++);
           firstname = ImportCourse.getEffectiveFirstname(firstname, nickname);
           s.setFirstname(firstname);
-          s.setCampusUID(rs.getString(col++));
+          String uid = rs.getString(col++);
+          allUIDs.add(uid);
+          s.setCampusUID(uid);
           s.setLoginName(rs.getString(col++));
           s.setCanImportCourses(true);
           boolean added = s == s.insertOrUpdate(conn);
@@ -84,12 +91,6 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
       }
 
       {
-
-        HashSet<String> allUIDs = new HashSet<String>();
-        for (Student instructor : Student.lookupAllInstructors(conn).values()) {
-          allUIDs.add(instructor.getCampusUID());
-        }
-
         String query = "SELECT DISTINCT uid, lastName, firstName, nickname, directoryID" + " FROM submitexportcourses "
             + " WHERE term = ?";
         PreparedStatement stmt = gradesConn.prepareStatement(query);
