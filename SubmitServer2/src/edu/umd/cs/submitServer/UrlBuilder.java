@@ -62,9 +62,9 @@ public class UrlBuilder {
     StringBuilder builder = new StringBuilder();
     String path = Joiner.on("/").join(pathElements);
     if (scheme.equals("http") && port == 80 || scheme.equals("https") && port == 443) {
-      builder.append(String.format("%s://%s/%s", scheme, host, path));
+      builder.append(String.format("%s://%s%s", scheme, host, path));
     } else
-      builder.append(String.format("%s://%s:%d/%s", scheme, host, port, path));
+      builder.append(String.format("%s://%s:%d%s", scheme, host, port, path));
     if (!parameters.isEmpty()) {
       StringBuilder paramString = new StringBuilder("?");
       Iterator<Entry<String, String>> iter = parameters.entrySet().iterator();
