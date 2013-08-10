@@ -52,12 +52,13 @@ public class UrlBuilder {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		String path = Joiner.on("/").join(pathElements);
-		if (scheme.equals("http") && port == 80 || scheme.equals("https") && port == 443 )
+		if (scheme.equals("http") && port == 80 || scheme.equals("https") && port == 443 ) {
 	    builder.append(String.format("%s://%s%s",
           scheme,
           host,
           path));
-		else
+	    System.out.printf("URLBuilder: %s %d%n", scheme, port);
+		} else
 		builder.append(String.format("%s://%s:%d%s",
 		                             scheme,
 		                             host,
