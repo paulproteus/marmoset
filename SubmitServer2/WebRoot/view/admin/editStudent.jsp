@@ -60,6 +60,12 @@ form li.required label {font-weight: bold;}
 				<label for="login-input">Username:</label>
 				<input type="text" name="login" id="login-input" placeholder="username" class="required" required="required" value="${ss:escapeHtml(student.loginName)}" />
 			</li>
+            <li class="required">
+                <label for="login-input">Campus UID:</label>
+                <input type="text" name="login" id="login-input" placeholder="uid" class="required" required="required" readonly value="${ss:escapeHtml(student.campusUID)}" />
+            </li>
+          
+            
 		</ul>
 		<button name="action" value="UPDATE" type="submit">Update</button>
 		<!-- <button name="action" value="DELETE" type="submit">Delete Student</button> -->
