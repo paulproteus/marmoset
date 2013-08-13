@@ -64,7 +64,6 @@ public class SubmitStatusFilter extends SubmitServerFilter {
                 submitStatus = StudentSubmitStatus.findOrCreate(project.getProjectPK(),
                         studentRegistration.getStudentRegistrationPK(), conn);
                 conn.commit();
-                System.out.println("success");
                 transactionSuccess = true;
             } catch (SQLException e) {
                 throw new ServletException(e);

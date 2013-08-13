@@ -90,10 +90,6 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 		if (!courseNamePattern.matcher(courseName).matches())
 			throw new ServletException("Invalid course name");
 
-		String courseDescription = request.getParameter("description");
-		String courseURL = request.getParameter("url");
-
-
 		Connection gradesConn = null;
 		Connection conn = null;
 		boolean transactionSuccess = false;
@@ -228,7 +224,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				out.printf("Registering %s %s%n", firstname, lastname);
 				registration = new StudentRegistration();
 				registration.setStudentPK(s.getStudentPK());
-				isNew = true;
+			  isNew = true;
 			} else if (dropped) {
 				if (registration.isDropped()) {
 					if (registration.delete(conn)) {
@@ -271,8 +267,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				registration
 						.setInstructorCapability(StudentRegistration.READ_ONLY_CAPABILITY);
 			else {
-				registration.setInstructorCapability(null);
-				if (active)
+				if (active && registration.getInstructorLevel() == StudentRegistration.STUDENT_CAPABILITY_LEVEL)
 					activeStudentCount++;
 			}
 			registration.setFirstname(s.getFirstname());

@@ -59,9 +59,7 @@ public class UpdateProject extends SubmitServerServlet {
 			parser.updateProject(project);
 			project.update(conn);
 			Project project2 = Project.lookupByProjectPK(project.getProjectPK(), conn);
-			if (!project.getTitle().equals(project2.getTitle()))
-			  System.out.println(project2.getTitle());
-     if (project.isTested() != wasTested)
+			if (project.isTested() != wasTested)
 				Submission.setBuildStatusForAllSubmissions(conn, project);
 
 			String redirectUrl = request.getContextPath()

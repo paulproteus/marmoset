@@ -92,10 +92,4 @@ public class UrlBuilder {
     }
   }
   
-  public static void main(String args[]) {
-    ArrayList<String> foo = new ArrayList<String>();
-    foo.add("a");
-    foo.add("b");
-    System.out.println(Joiner.on("/").join(foo));
-  }
 }

@@ -209,18 +209,6 @@ public class ReportTestOutcomes extends SubmitServerServlet {
           if (testOutcome.isCardinalTestType())
             canonicalTestOutcomeMap.put(testOutcome.getTestName(), testOutcome);
         }
-//        Set<String> theseNames = new HashSet<String>();
-//        for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
-//          if (testOutcome.isCardinalTestType() && !testOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN))
-//            theseNames.add(testOutcome.getTestName());
-//        Set<String> extraNames = new TreeSet<String>(theseNames);
-//        extraNames.removeAll(canonicalTestOutcomeMap.keySet());
-//        Set<String> missingNames = new TreeSet<String>(canonicalTestOutcomeMap.keySet());
-//        missingNames.removeAll(theseNames);
-//        if (!missingNames.isEmpty())
-//          System.out.println("Missing cardinal results for " + missingNames);
-//        if (!extraNames.isEmpty())
-//          System.out.println("Extra cardinal results results for " + extraNames);
         
         for (TestOutcome testOutcome : testOutcomeCollection.getAllOutcomes())
           if (testOutcome.isCardinalTestType() && !testOutcome.getOutcome().equals(TestOutcome.COULD_NOT_RUN)) {
@@ -429,8 +417,6 @@ public class ReportTestOutcomes extends SubmitServerServlet {
     } catch (InvalidRequiredParameterException e) {
       throw new ServletException(e);
     } catch (SQLException e) {
-      System.out.println(e);
-      e.printStackTrace();
       throw new ServletException(e);
     } finally {
       rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, request, conn);

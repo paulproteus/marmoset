@@ -77,7 +77,6 @@ public class CourseRSS extends SubmitServerServlet {
 					request.getContextPath());
 			LogEntry.write(System.out, logEntries,  course.getCourseName(), link, "Student RSS feed for " + course.getCourseName(),
 					request.getContextPath());
-			System.out.println("Done");
 
 		} catch (SQLException e) {
 			throw new ServletException(e);
