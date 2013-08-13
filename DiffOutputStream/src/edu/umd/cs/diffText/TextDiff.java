@@ -433,7 +433,8 @@ public class TextDiff extends StringsWriter {
      * @return
      */
     public boolean isWhatWeAreWaitingFor(String txt) {
-        return normalize(txt).contains(options.get(Option.WAIT_FOR));
+        String waitWeAreWaitingFor = options.get(Option.WAIT_FOR);
+        return waitWeAreWaitingFor != null && normalize(txt).contains(waitWeAreWaitingFor);
     }
 
     @Override

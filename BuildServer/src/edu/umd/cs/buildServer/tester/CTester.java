@@ -208,7 +208,9 @@ public class CTester extends Tester<ScriptTestProperties> {
                         .withOptions(optionsForDiffing);
                 switch (outputKind) {
                 case STRING:
-                    builder.expect(optionsForDiffing.get(Option.WAIT_FOR));
+                    String waitFor = optionsForDiffing.get(Option.WAIT_FOR);
+                    if (waitFor != null)
+                        builder.expect(waitFor);
                     builder.expect(testCase
                             .getProperty(ExecutableTestCase.Property.EXPECTED));
                     break;
