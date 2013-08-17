@@ -57,8 +57,11 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
       HashSet<String> allUIDs = new HashSet<String>();
       for (Student instructor : Student.lookupAllInstructors(conn).values()) {
         allUIDs.add(instructor.getCampusUID());
+        response.getWriter().printf("Already have %s %s%n", instructor.getFirstname(), instructor.getLastname());
       }
 
+      response.getWriter().printf("Already have %d instructors%n", allUIDs.size());
+      
       {
         String query = "SELECT DISTINCT lastName, firstName, nickname, uid, directoryID" + " FROM submitexportstaff "
             + " WHERE term = ? AND role = ? ";
@@ -89,7 +92,8 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
         rs.close();
         stmt.close();
       }
-
+      response.getWriter().printf("Now have %d instructors%n", allUIDs.size());
+      
       {
         String query = "SELECT DISTINCT uid, lastName, firstName, nickname, directoryID" + " FROM submitexportcourses "
             + " WHERE term = ?";
@@ -123,7 +127,8 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
             response.getWriter().printf("Added %s %s (not in grades server)%n", s.getFirstname(), s.getLastname());
           else
             response.getWriter()
-                .printf("Updated %s %s (should not have happened)%n", s.getFirstname(), s.getLastname());
+                .printf("Updated %s %s (should not have happened - %d instructors)%n", s.getFirstname(), s.getLastname(),
+                    allUIDs.size());
         }
         transactionSuccess = true;
         rs.close();
