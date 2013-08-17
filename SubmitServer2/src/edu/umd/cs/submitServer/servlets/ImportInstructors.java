@@ -55,9 +55,9 @@ public class ImportInstructors extends GradeServerInterfaceServlet {
       gradesConn = getGradesConnection();
       conn = getConnection();
       HashSet<String> allUIDs = new HashSet<String>();
-      for (Student instructor : Student.lookupAllInstructors(conn).values()) {
+      for (Student instructor : Student.lookupAllCanImportCourses(conn).values()) {
         allUIDs.add(instructor.getCampusUID());
-        response.getWriter().printf("Already have %s %s%n", instructor.getFirstname(), instructor.getLastname());
+//        response.getWriter().printf("Already have %s %s%n", instructor.getFirstname(), instructor.getLastname());
       }
 
       response.getWriter().printf("Already have %d instructors%n", allUIDs.size());
