@@ -366,19 +366,25 @@ public class DisplaySubmissionSourceCode {
   
 	private static String diffDescription(Map<String, BitSet> changed,
 			String sourceFile, List<String> contents) {
+	  
 		if (isUnchanged(sourceFile, changed))
 		   return null; // String.format("%d lines, unchanged", contents.size());
-		else if  (changed != null) {
+		if (contents == null) {
+      System.out.println("No contents for " + sourceFile);
+    }
+		  
+		if  (changed != null) useChanged: {
 		    BitSet bitSet = changed.get(sourceFile);
 		    if (bitSet == null)
-		    	   return String.format("%d lines", contents.size());
+		    	   break useChanged;
 		    assert bitSet.cardinality() > 0;
 		    if (bitSet.cardinality() == contents.size())
 		        return String.format("%d lines, all new", contents.size());
 		    else
 		        return String.format("%d/%d lines changed", bitSet.cardinality(), contents.size());
-
-		} else if (contents != null) {
+		}
+		
+		if (contents != null) {
 		    return String.format("%d lines", contents.size());
 		} else
 		  return String.format("huh (%s)", sourceFile);
