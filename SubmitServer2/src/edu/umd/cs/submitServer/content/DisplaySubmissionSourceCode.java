@@ -197,6 +197,10 @@ public class DisplaySubmissionSourceCode {
 
         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
 
+        if (baseline != null)  System.out.println("Baseline files: " + baseline.keySet());
+        System.out.println("Text files: " + text.keySet());
+        System.out.println("diff files: " + changed.keySet());
+    
         return displayArchive(text, tabWidth, codeCoverageResults, changed, fileProperties);
     }
 
@@ -223,7 +227,8 @@ public class DisplaySubmissionSourceCode {
               if (value == null) {
                 if (!logged) {
                   logged = true;
-                  System.out.println("Baseline files: " + baseline.keySet());
+                  if (baseline != null)
+                    System.out.println("Baseline files: " + baseline.keySet());
                   System.out.println("Text files: " + text.keySet());
                   System.out.println("diff files: " + changed.keySet());
                 }
