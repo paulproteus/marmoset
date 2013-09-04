@@ -218,8 +218,13 @@ public class DisplaySubmissionSourceCode {
         	 	BitSet b = changed.get(e.getKey());
         	 	if (b != null)
         	 		count += b.cardinality();
-        	 	else
-        	 		count += e.getValue().size();
+            else {
+              List<String> value = e.getValue();
+              if (value == null) 
+                System.out.println("No value for " + e.getKey());
+              else
+                count += value.size();
+            }
          }
 
          submission.setNumChangedLines(count);
