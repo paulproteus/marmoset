@@ -211,7 +211,7 @@ public class DisplaySubmissionSourceCode {
         Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
       
     	  Map<String, List<String>> text = submission.getText(conn, fileProperties);
-
+    	  boolean logged = false;
          Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
          int count = 0;
          for(Map.Entry<String, List<String>> e : text.entrySet()) {
@@ -220,8 +220,15 @@ public class DisplaySubmissionSourceCode {
         	 		count += b.cardinality();
             else {
               List<String> value = e.getValue();
-              if (value == null) 
-                System.out.println("No value for " + e.getKey());
+              if (value == null) {
+                if (!logged) {
+                  logged = true;
+                  System.out.println("Baseline files: " + baseline.keySet());
+                  System.out.println("Text files: " + text.keySet());
+                  System.out.println("diff files: " + changed.keySet());
+                }
+              }
+               
               else
                 count += value.size();
             }
@@ -371,9 +378,10 @@ public class DisplaySubmissionSourceCode {
 		    else
 		        return String.format("%d/%d lines changed", bitSet.cardinality(), contents.size());
 
-		} else {
+		} else if (contents != null) {
 		    return String.format("%d lines", contents.size());
-		}
+		} else
+		  return String.format("huh (%s)", sourceFile);
 
 	}
 
