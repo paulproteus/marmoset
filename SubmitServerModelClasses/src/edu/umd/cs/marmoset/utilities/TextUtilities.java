@@ -173,7 +173,7 @@ public class TextUtilities {
                     continue;
 
                 List<String> textContents = getText(bytes);
-                if (contents != null) {
+                if (textContents != null) {
                     result.put(name, textContents);
                 }
            
