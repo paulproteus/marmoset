@@ -69,7 +69,6 @@ public class AdminFilter extends SubmitServerFilter {
 					"You need admin privileges to view " + scrubbedURI);
 			return;
 		}
-		// System.out.println("superuser OK according to adminfilter");
 		chain.doFilter(req, resp);
 	}
 }
