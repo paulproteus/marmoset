@@ -49,6 +49,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import edu.umd.cs.marmoset.codeCoverage.CodeCoverageResults;
 import edu.umd.cs.marmoset.codeCoverage.FileWithCoverage;
@@ -58,7 +59,6 @@ import edu.umd.cs.marmoset.modelClasses.TestProperties;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
 import edu.umd.cs.marmoset.utilities.FileNames;
-import edu.umd.cs.marmoset.utilities.TextUtilities;
 
 /**
  * Render a sourcefile from a Submission as HTML.
@@ -197,10 +197,6 @@ public class DisplaySubmissionSourceCode {
 
         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
 
-        if (baseline != null)  System.out.println("Baseline files: " + baseline.keySet());
-        System.out.println("Text files: " + text.keySet());
-        System.out.println("diff files: " + changed.keySet());
-    
         return displayArchive(text, tabWidth, codeCoverageResults, changed, fileProperties);
     }
 
@@ -215,8 +211,7 @@ public class DisplaySubmissionSourceCode {
         Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
       
     	  Map<String, List<String>> text = submission.getText(conn, fileProperties);
-    	  boolean logged = false;
-         Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
+    	  Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
          int count = 0;
          for(Map.Entry<String, List<String>> e : text.entrySet()) {
         	 	BitSet b = changed.get(e.getKey());
@@ -224,17 +219,7 @@ public class DisplaySubmissionSourceCode {
         	 		count += b.cardinality();
             else {
               List<String> value = e.getValue();
-              if (value == null) {
-                if (!logged) {
-                  logged = true;
-                  if (baseline != null)
-                    System.out.println("Baseline files: " + baseline.keySet());
-                  System.out.println("Text files: " + text.keySet());
-                  System.out.println("diff files: " + changed.keySet());
-                }
-              }
-               
-              else
+              
                 count += value.size();
             }
          }
@@ -370,14 +355,11 @@ public class DisplaySubmissionSourceCode {
 
   
 	private static String diffDescription(Map<String, BitSet> changed,
-			String sourceFile, List<String> contents) {
+			String sourceFile, @Nonnull List<String> contents) {
 	  
 		if (isUnchanged(sourceFile, changed))
 		   return null; // String.format("%d lines, unchanged", contents.size());
-		if (contents == null) {
-      System.out.println("No contents for " + sourceFile);
-    }
-		  
+	
 		if  (changed != null) useChanged: {
 		    BitSet bitSet = changed.get(sourceFile);
 		    if (bitSet == null)
@@ -389,10 +371,8 @@ public class DisplaySubmissionSourceCode {
 		        return String.format("%d/%d lines changed", bitSet.cardinality(), contents.size());
 		}
 		
-		if (contents != null) {
 		    return String.format("%d lines", contents.size());
-		} else
-		  return String.format("huh (%s)", sourceFile);
+	
 
 	}
 
