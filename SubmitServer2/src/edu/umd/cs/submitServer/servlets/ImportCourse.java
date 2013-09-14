@@ -185,19 +185,23 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 
 			Student s = Student.lookupByLoginNameAndCampusUID(loginName, campusUID,
 					conn);
+			boolean loginNameChanged = false;
 			if (s == null) {
 				s = Student.lookupByCampusUID(campusUID, conn);
-				if (s != null)
-					out.printf("Changed login name from %s to %s%n", loginName, s.getLoginName());
+				if (s != null) {
+					out.printf("Changing login name from %s to %s%n", s.getLoginName(), loginName);
+					loginNameChanged = true;
+				}
 			}
-
 
 			if (dropped && s == null)
 					continue;
-			else if (s == null) {
-				try {
+			
+		  try {
 				s = Student.insertOrUpdateByUID(campusUID, firstname, lastname,
 						loginName, email, conn);
+				if (loginNameChanged)
+				  out.printf("Updated record for %s: %s%n", s.getCampusUID(), s);
 				} catch (SQLException e) {
 					String msg = "Error trying to insert/update " + campusUID
 						+ " " + loginName + ":" + e.getMessage();
@@ -208,7 +212,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 					e.printStackTrace(out);
 					continue studentLoop;
 				}
-			}
+
 
 			if ((updatePictures || ! s.getHasPicture()) &&  active && SyncStudents.loadStudentPicture(s, gradesConn, conn))
 				s.update(conn);
