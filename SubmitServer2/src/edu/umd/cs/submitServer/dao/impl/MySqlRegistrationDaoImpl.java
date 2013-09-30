@@ -143,7 +143,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  	ResultSet rs = stmt.executeQuery();
 	  	List<Course> courses = Lists.newArrayList();
 	  	while (rs.next()) {
-	  		int coursePK = rs.getInt("course_pk");
+	  		int coursePK = Course.asPK(rs.getInt("course_pk"));
 	  		courses.add(Course.getByCoursePK(coursePK, conn));
 	  	}
 	  	return courses;
@@ -166,7 +166,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
 	  	ResultSet rs = stmt.executeQuery();
 	  	List<Course> courses = Lists.newArrayList();
 	  	while (rs.next()) {
-	  		Course course = Course.getByCoursePK(rs.getInt("course_pk"), conn);
+	  		Course course = Course.getByCoursePK(Course.asPK(rs.getInt("course_pk")), conn);
 	  		course.setSection(rs.getString("section"));
 			courses.add(course);
 	  	}
@@ -180,12 +180,12 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 
 	@Override
-	  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK) {
+	  public boolean acceptRegistration(@Course.PK int coursePK, @Student.PK int studentPK) {
 		return acceptRegistration(coursePK, studentPK, null);
 	}
 
 	@Override
-  public boolean acceptRegistration(int coursePK, @Student.PK int studentPK, String section) {
+  public boolean acceptRegistration(@Course.PK int coursePK, @Student.PK int studentPK, String section) {
 	  Connection conn = null;
 	  PreparedStatement stmt = null;
 	  try {
@@ -220,7 +220,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 
 	@Override
-  public boolean denyRegistration(int coursePK, int studentPK) {
+  public boolean denyRegistration(@Course.PK int coursePK, @Student.PK int studentPK) {
 	  Connection conn = null;
 	  PreparedStatement stmt = null;
 	  try {
@@ -239,7 +239,7 @@ public class MySqlRegistrationDaoImpl implements RegistrationDao {
   }
 	
 	@Override
-	public Map<Integer, String> getRequestSection(int coursePK) {
+	public Map<Integer, String> getRequestSection(@Course.PK int coursePK) {
 		  Connection conn = null;
 		  PreparedStatement stmt = null;
 		  try {

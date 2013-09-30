@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import com.google.common.base.Strings;
 
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
@@ -44,7 +45,7 @@ public class RequestRegistration extends SubmitServerServlet {
 				if (!matcher.matches()) {
 					continue;
 				}
-				int coursePK = Integer.parseInt(matcher.group(1));
+				int coursePK = Course.asPK(Integer.parseInt(matcher.group(1)));
 				RegistrationDao dao = normalDao;
 				String autoRegistrationCoursePK =  WebConfigProperties.get().getProperty("registration.autoCoursePKs");
 				if (autoRegistrationCoursePK != null && 

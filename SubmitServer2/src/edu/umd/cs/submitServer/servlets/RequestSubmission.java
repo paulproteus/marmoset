@@ -172,7 +172,7 @@ public class RequestSubmission extends SubmitServerServlet {
                 } else if (projectNumber != null) {
                     if (allowedCourses.size() != 1)   
                         throw new ServletException("Can only specify a single course when specifying a project number"); 
-                   Integer coursePK = allowedCourses.iterator().next();
+                   Integer coursePK = Course.asPK(allowedCourses.iterator().next());
                     Project project = Project.lookupByCourseAndProjectNumber(coursePK, projectNumber, conn);
                     kind = Kind.PROJECT_RETEST;
                     if (!Queries.lookupOldestSubmissionForProject(conn, submission, testSetup, project)) {

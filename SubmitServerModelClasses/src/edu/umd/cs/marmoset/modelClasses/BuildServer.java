@@ -25,6 +25,8 @@ public class BuildServer implements Comparable<BuildServer> {
 	@CheckForNull
 	Timestamp lastJob;
 	String load;
+	@Project.PK int lastRequestProjectPK;
+	@Course.PK int lastRequestCoursePK;
 	public static final String TABLE_NAME = "buildservers";
 
 	static final String[] ATTRIBUTE_NAME_LIST = { "buildserver_pk", "name",
@@ -43,6 +45,8 @@ public class BuildServer implements Comparable<BuildServer> {
 		lastJob = rs.getTimestamp(startingFrom++);
 		lastSuccess = rs.getTimestamp(startingFrom++);
 		load = rs.getString(startingFrom++);
+		lastRequestProjectPK = Project.asPK(rs.getInt(startingFrom++));
+		lastRequestCoursePK = Course.asPK(rs.getInt(startingFrom++));
 	}
 
 	public boolean canBuild(Course course, @CheckForNull String universalBuilderserverKey) {
@@ -149,9 +153,10 @@ public class BuildServer implements Comparable<BuildServer> {
 
 	public static Collection<BuildServer> getAll(Connection conn)
 			throws SQLException {
-		String query = " SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME;
-
-		PreparedStatement stmt = conn.prepareStatement(query);
+		String query = " SELECT " + ATTRIBUTES + ", submissions.project_pk, projects.project_pk FROM " + TABLE_NAME +"," + Submission.TABLE_NAME +"," + Project.TABLE_NAME
+				+ " WHERE buildservers.last_request_submission_pk = submissions.submission_pk " 
+				+ " AND submissions.project_pk = projects.project_pk ";
+	    PreparedStatement stmt = conn.prepareStatement(query);
 		Collection<BuildServer> collection = new TreeSet<BuildServer>();
 		ResultSet rs = stmt.executeQuery();
 		long recent = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(40, TimeUnit.MINUTES);

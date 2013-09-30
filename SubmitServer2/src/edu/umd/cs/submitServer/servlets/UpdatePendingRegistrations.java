@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.dao.RegistrationDao;
@@ -32,7 +33,7 @@ public class UpdatePendingRegistrations extends SubmitServerServlet {
 		Student user = (Student) req.getAttribute(SubmitServerConstants.USER);
 		RegistrationDao dao = new MySqlRegistrationDaoImpl(user, getDatabaseProps());
 		
-		int coursePK = Integer.parseInt(Preconditions.checkNotNull(req.getParameter("course")));
+		int coursePK = Course.asPK(Integer.parseInt(Preconditions.checkNotNull(req.getParameter("course"))));
 		for (Entry<String, String[]> entry : (Set<Entry<String, String[]>>) req.getParameterMap().entrySet()) {
 			Matcher matcher = requestParam.matcher(entry.getKey());
 			if (!matcher.matches()) {

@@ -21,7 +21,7 @@ public interface RegistrationDao {
 	 * false.
 	 * 
 	 */
-	public boolean requestRegistration(int coursePK, String section);
+	public boolean requestRegistration(@Course.PK int coursePK, String section);
 	
 	/**
 	 * Request that the dao's Student be registered for a course with a
@@ -30,19 +30,19 @@ public interface RegistrationDao {
 	 * or accepted, returns false.
 	 * 
 	 */
-	public boolean requestRegistration(int coursePK);
+	public boolean requestRegistration(@Course.PK int coursePK);
 	
 	
 	/**
 	 * Return a list of Students waiting for registration in the given course. The dao's user must
 	 * be an instructor for the course.
 	 */
-	public List<Student> getPendingRegistrations(int coursePK); 
+	public List<Student> getPendingRegistrations(@Course.PK int coursePK); 
 	
 	/**
 	 * Return a mapping from student PK to the section the student is requesting. The dao's user must be an instructor for the course.
 	 */
-	public Map<Integer, String> getRequestSection(int coursePK);
+	public Map<Integer, String> getRequestSection(@Course.PK int coursePK);
 	
 
 	/** Returns a list of all courses a student may register for. */
@@ -57,7 +57,7 @@ public interface RegistrationDao {
 	 * 
 	 * @return false if the request was not pending, or if there was no such request. true otherwise.
 	 */
-	public boolean acceptRegistration(int coursePK, @Student.PK int studentPK);
+	public boolean acceptRegistration(@Course.PK int coursePK, @Student.PK int studentPK);
 
 	/**
 	 * Accept a registration request, optionally changing the section. The dao's Student must be an instructor for the course, and the
@@ -66,7 +66,7 @@ public interface RegistrationDao {
 	 * 
 	 * @return false if the request was not pending, or if there was no such request. true otherwise.
 	 */
-	public boolean acceptRegistration(int coursePK, @Student.PK int studentPK, String section);
+	public boolean acceptRegistration(@Course.PK int coursePK, @Student.PK int studentPK, String section);
 
 	/**
 	 * Accept a registration request. The dao's Student must be an instructor for the course, and the
@@ -74,5 +74,5 @@ public interface RegistrationDao {
 	 * 
 	 * @return false if the request was not pending, or if there was no such request. true otherwise.
 	 */
-	public boolean denyRegistration(int coursePK, @Student.PK int studentPK);
+	public boolean denyRegistration(@Course.PK int coursePK, @Student.PK int studentPK);
 }

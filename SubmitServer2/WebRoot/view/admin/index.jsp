@@ -117,24 +117,38 @@
     <h2>BuildServers</h2>
     <table>
         <tr>
-            <th>Host</th>
-            <th>Last request</th>
+            <th rowspan="2">Host</th>
+            <th rowspan="2">Last request</th>
             <th>now building</th>
-            <th>Last job</th>
-            <th>Last success</th>
-            <th>Load</th>
+            <th rowspan="2">Last job</th>
+            <th rowspan="2">Last success</th>
+            <th rowspan="2">Load</th>
         </tr>
-
+		<tr><td>submission<td>project<td>course
         <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
             <tr class="r${counter.index % 2}">
                 <td><c:out value="${buildServer.name}" /></td>
                 <td><fmt:formatDate value="${buildServer.lastRequest}" pattern="dd MMM, hh:mm a" /></td>
-                <td><c:if test="${buildServer.lastRequestSubmissionPK > 0}">
+                <c:choose><c:when test="${buildServer.lastRequestSubmissionPK > 0}">
+                <td>
                 <c:url var="s" value="/view/instructor/submission.jsp">
                 <c:param name="submissionPK" value="${buildServer.lastRequestSubmissionPK}" />
                 </c:url>
                 <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
-                </c:if>
+                <td>
+                <c:url var="s" value="/view/instructor/project.jsp">
+                <c:param name="submissionPK" value="${buildServer.lastRequesProjectPK}" />
+                </c:url>
+                <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                <td>
+                <c:url var="s" value="/view/instructor/course.jsp">
+                <c:param name="submissionPK" value="${buildServer.lastRequestCoursePK}" />
+                </c:url>
+                <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                </c:when>
+                <c:otherwise>
+                </c:otherwise>
+                </c:choose>
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
 
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>

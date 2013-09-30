@@ -211,7 +211,7 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
     }
 	public static final String TABLE_NAME = "student_registration";
     private @StudentRegistration.PK int studentRegistrationPK; // autoincrement
-	private int coursePK; 
+	private @Course.PK int coursePK; 
 	private @Student.PK int studentPK; 
 	private @Nonnull String classAccount;
 	private @CheckForNull @Capability String instructorCapability;
@@ -279,13 +279,13 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 	/**
 	 * @return Returns the coursePK.
 	 */
-	public int getCoursePK() {
+	public @Course.PK int getCoursePK() {
 		return coursePK;
 	}
 	/**
 	 * @param coursePK The coursePK to set.
 	 */
-	public void setCoursePK(int coursePK) {
+	public void setCoursePK(@Course.PK int coursePK) {
 		this.coursePK = coursePK;
 	}
 	/**
@@ -477,7 +477,7 @@ public class StudentRegistration implements Comparable<StudentRegistration> {
 
 	public int fetchValues(ResultSet resultSet, int startingFrom) throws SQLException {
 		setStudentRegistrationPK(asPK(resultSet.getInt(startingFrom++)));
-		setCoursePK(resultSet.getInt(startingFrom++));
+		setCoursePK(Course.asPK(resultSet.getInt(startingFrom++)));
 		setStudentPK(Student.asPK(resultSet.getInt(startingFrom++)));
 		setClassAccount(resultSet.getString(startingFrom++));
 		setInstructorCapability(asCapability(resultSet.getString(startingFrom++)));

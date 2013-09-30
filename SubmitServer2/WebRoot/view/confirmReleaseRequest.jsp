@@ -48,7 +48,7 @@
 <p>Submitted at <fmt:formatDate
     value="${submission.submissionTimestamp}"
     pattern="E',' dd MMM 'at' hh:mm a" />
-    </h2>
+
 <c:if
     test="${submission.currentTestRunPK != testRun.testRunPK}">
     <p>Warning: we don't have results from the current version of the test setup.

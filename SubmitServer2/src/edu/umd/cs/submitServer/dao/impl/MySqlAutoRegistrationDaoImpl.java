@@ -38,7 +38,7 @@ public class MySqlAutoRegistrationDaoImpl implements RegistrationDao {
     }
 
     @Override
-    public boolean requestRegistration(int coursePK, @Nullable String section) {
+    public boolean requestRegistration(@Course.PK int coursePK, @Nullable String section) {
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
@@ -69,12 +69,12 @@ public class MySqlAutoRegistrationDaoImpl implements RegistrationDao {
     }
 
     @Override
-    public boolean requestRegistration(int coursePK) {
+    public boolean requestRegistration(@Course.PK int coursePK) {
         return requestRegistration(coursePK, null);
     }
 
     @Override
-    public List<Student> getPendingRegistrations(int coursePK) {
+    public List<Student> getPendingRegistrations(@Course.PK int coursePK) {
         throw new UnsupportedOperationException();
     }
 

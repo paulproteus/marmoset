@@ -310,7 +310,7 @@ public class RequestParser {
 			throw new IllegalArgumentException("Can't change projectPK");
 
 		project.setTestSetupPK(getIntParameter("testSetupPK", 0));
-		project.setCoursePK(getIntParameter("coursePK", 0));
+		project.setCoursePK(Course.asPK(getIntParameter("coursePK", 0)));
 		project.setProjectNumber(getCheckedParameter("projectNumber"));
 		Timestamp ontime = getTimestampParameter("ontime");
 		project.setOntime(ontime);

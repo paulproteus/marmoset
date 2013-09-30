@@ -147,13 +147,13 @@
 					<td class="label">Anonymous</td>
 					<td class="input"><input type="checkbox" name="anonymous"
 						value="true"
-						"${ss:isChecked(codeReviewAssignment.anonymous)} 
+						${ss:isChecked(codeReviewAssignment.anonymous)} 
 						 /></td>
 				</tr>
 				<tr>
 					<td class="label">Can see comments from other reviewers</td>
 					<td class="input"><input type="checkbox" name="canSeeOthers"
-					"${ss:isChecked(codeReviewAssignment.otherReviewsVisible)} 
+					${ss:isChecked(codeReviewAssignment.otherReviewsVisible)} 
 						value="true" /></td>
 				</tr>
 

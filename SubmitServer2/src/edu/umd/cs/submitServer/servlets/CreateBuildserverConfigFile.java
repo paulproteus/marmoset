@@ -68,7 +68,7 @@ public class CreateBuildserverConfigFile extends SubmitServerServlet {
             conn = getConnection();
 
             for (String coursePK : coursePKs) {
-                int pk = Integer.parseInt(coursePK);
+                int pk = Course.asPK(Integer.parseInt(coursePK));
                 if (!userSession.hasInstructorActionCapability(pk)) {
                     response.setStatus(403);
                     return;

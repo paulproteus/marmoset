@@ -88,7 +88,7 @@ public class Project implements Serializable, Cloneable {
     public static final String TABLE_NAME = "projects";
 	private static final String PROJECT_STARTER_FILE_ARCHIVES = "submission_archives";
     private @Project.PK int projectPK; //  autoincrement
-	private int coursePK;
+	private @Course.PK int coursePK;
 	private int testSetupPK = 0; 
 	private @Project.PK int diffAgainst; // 0 to diff against canonical submission (if any), otherwise project to diff against
 	private String projectNumber;
@@ -264,13 +264,13 @@ public class Project implements Serializable, Cloneable {
 	/**
 	 * @return Returns the coursePK.
 	 */
-	public int getCoursePK() {
+	public @Course.PK int getCoursePK() {
 		return coursePK;
 	}
 	/**
 	 * @param coursePK The coursePK to set.
 	 */
-	public void setCoursePK(int coursePK) {
+	public void setCoursePK(@Course.PK int coursePK) {
 		this.coursePK = coursePK;
 	}
 	/**
@@ -570,7 +570,7 @@ public class Project implements Serializable, Cloneable {
 	 */
 	public void fetchValues(ResultSet resultSet, int startingFrom) throws SQLException {
 		setProjectPK(Project.asPK(SqlUtilities.getInteger(resultSet, startingFrom++)));
-		setCoursePK(resultSet.getInt(startingFrom++));
+		setCoursePK(Course.asPK(resultSet.getInt(startingFrom++)));
 		setTestSetupPK(resultSet.getInt(startingFrom++));
 		setDiffAgainst(Project.asPK(resultSet.getInt(startingFrom++)));
 		setProjectNumber(resultSet.getString(startingFrom++));
@@ -632,7 +632,7 @@ public class Project implements Serializable, Cloneable {
 	private int putValues(PreparedStatement stmt, int index)
 	throws SQLException
 	{
-	    stmt.setInt(index++, getCoursePK());
+	    stmt.setInt(index++, Course.asPK(getCoursePK()));
 		stmt.setInt(index++, getTestSetupPK());
 		stmt.setInt(index++, getDiffAgainst());
 		stmt.setString(index++, getProjectNumber());
@@ -796,7 +796,7 @@ public class Project implements Serializable, Cloneable {
         }
         return result;
     }
-    public static Project lookupByCourseAndProjectNumber(int coursePK, String projectNumber,
+    public static Project lookupByCourseAndProjectNumber(@Course.PK int coursePK, String projectNumber,
             Connection conn) throws SQLException {
         String query = "SELECT " + ATTRIBUTES + " FROM " + " projects " 
                + " WHERE course_pk = ? "
@@ -1147,14 +1147,14 @@ public class Project implements Serializable, Cloneable {
 		return changed;
 	}
     
-    public static List<Project> lookupAllByCoursePK(int coursePK,
+    public static List<Project> lookupAllByCoursePK(@Course.PK int coursePK,
     		Connection conn) throws SQLException
     		{
     		return lookupAllByCoursePK(coursePK, false, conn);
     		}
     		
 
-	public static List<Project> lookupAllByCoursePK(int coursePK, boolean hidden, 
+	public static List<Project> lookupAllByCoursePK(@Course.PK int coursePK, boolean hidden, 
     		Connection conn) throws SQLException
     {
     	String query = "SELECT " +ATTRIBUTES+
@@ -1210,7 +1210,7 @@ public class Project implements Serializable, Cloneable {
 
     public static List<Project> lookupAllByStudentPKAndCoursePK(
     		@Student.PK Integer studentPK,
-            Integer coursePK, Connection conn)
+    		@Course.PK  Integer coursePK, Connection conn)
     throws SQLException
     {
     	String query = " SELECT " +ATTRIBUTES+

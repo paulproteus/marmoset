@@ -86,7 +86,7 @@ import edu.umd.cs.submitServer.WebConfigProperties;
  */
 public class ExtractParametersFilter extends SubmitServerFilter {
  
-  public boolean checkCourse(Collection<Course> courses, int coursePK) {
+  public boolean checkCourse(Collection<Course> courses, @Course.PK int coursePK) {
     for (Course c : courses)
       if (c.getCoursePK() == coursePK)
         return true;

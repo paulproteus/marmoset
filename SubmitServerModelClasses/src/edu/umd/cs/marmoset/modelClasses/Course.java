@@ -23,6 +23,9 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,9 +40,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.meta.TypeQualifier;
 
 import com.google.common.base.Joiner;
 
+import edu.umd.cs.marmoset.modelClasses.Project.PK;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
@@ -47,6 +52,19 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  *
  */
 public class Course {
+
+	@Documented
+	@TypeQualifier(applicableTo = Integer.class)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface PK {}
+
+	public static @PK int asPK( int pk) {
+		return pk;
+	}
+	public static @PK Integer asPK( Integer pk) {
+		return pk;
+	}
+
     public static final String TABLE_NAME = "courses";
 
 	public static String defaultSemester;
@@ -96,7 +114,7 @@ public class Course {
 	 public static final String ATTRIBUTES = Queries.getAttributeList(TABLE_NAME,
 			ATTRIBUTE_NAME_LIST);
 
-	private Integer coursePK; // non-NULL, autoincrement
+	private @PK Integer coursePK; // non-NULL, autoincrement
 	private String semester;
 	private String courseName;
 	private String section;
@@ -180,13 +198,13 @@ public class Course {
 	/**
 	 * @return Returns the coursePK.
 	 */
-	public Integer getCoursePK() {
+	public @PK Integer getCoursePK() {
 		return coursePK;
 	}
 	/**
 	 * @param coursePK The coursePK to set.
 	 */
-	public void setCoursePK(Integer coursePK) {
+	public void setCoursePK(@PK Integer coursePK) {
 		this.coursePK = coursePK;
 	}
 	/**
@@ -295,7 +313,7 @@ public class Course {
 	        stmt = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
 	        putValues(stmt,1);
 	        stmt.executeUpdate();
-	        setCoursePK(Queries.getGeneratedPrimaryKey(stmt));
+	        setCoursePK(asPK(Queries.getGeneratedPrimaryKey(stmt)));
 	    } finally {
 	        Queries.closeStatement(stmt);
 	    }
@@ -345,7 +363,7 @@ public class Course {
 
 	public int fetchValues(ResultSet resultSet, int startingFrom) throws SQLException
 	{
-		setCoursePK(resultSet.getInt(startingFrom++));
+		setCoursePK(asPK(resultSet.getInt(startingFrom++)));
 		setSemester(resultSet.getString(startingFrom++));
 		setCourseName(resultSet.getString(startingFrom++));
 		setSection(resultSet.getString(startingFrom++));
@@ -387,7 +405,7 @@ public class Course {
 	}
 
 	/**
-	 * Finds a cousre in the database based in the name of the course.
+	 * Finds a course in the database based in the name of the course.
 	 * @param courseName
 	 * @param conn
 	 * @return the Course object representing the row found in the DB; null if it can't be found
@@ -441,7 +459,7 @@ public class Course {
 	 * thrown.  This method never returns null.
 	 * @throws SQLException if an error occurrs or the course is not found
 	 */
-	public static Course getByCoursePK(Integer coursePK, Connection conn)
+	public static Course getByCoursePK(@PK Integer coursePK, Connection conn)
 	throws SQLException
 	{
 	    Course course = lookupByCoursePK(coursePK, conn);
@@ -459,7 +477,7 @@ public class Course {
 	 * return null.
 	 * @throws SQLException
 	 */
-	public static Course getByProjectPK(Integer projectPK, Connection conn)
+	public static Course getByProjectPK(@Project.PK Integer projectPK, Connection conn)
 	throws SQLException
 	{
 	    String query = " SELECT " +ATTRIBUTES+ " " +
@@ -484,7 +502,7 @@ public class Course {
 	 * @return the Course if the coursePK is found; null otherwise
 	 * @throws SQLException
 	 */
-	public static Course lookupByCoursePK(Integer coursePK, Connection conn)
+	public static Course lookupByCoursePK(@PK Integer coursePK, Connection conn)
 	throws SQLException
 	{
 		String query = "SELECT " +ATTRIBUTES+ " " +
