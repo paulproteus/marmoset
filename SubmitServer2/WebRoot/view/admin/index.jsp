@@ -124,7 +124,7 @@
             <th rowspan="2">Last success</th>
             <th rowspan="2">Load</th>
         </tr>
-		<tr><td>submission<td>project<td>course
+		<tr><th>submission<th>project<th>course
         <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
             <tr class="r${counter.index % 2}">
                 <td><c:out value="${buildServer.name}" /></td>
