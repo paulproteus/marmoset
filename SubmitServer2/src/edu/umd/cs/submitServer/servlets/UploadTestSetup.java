@@ -45,8 +45,10 @@ import org.apache.commons.fileupload.FileItem;
 
 import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
+import edu.umd.cs.submitServer.util.WaitingBuildServer;
 
 /**
  * @author jspacco
@@ -54,21 +56,7 @@ import edu.umd.cs.submitServer.MultipartRequest;
  */
 public class UploadTestSetup extends SubmitServerServlet {
 
-	/**
-	 * The doPost method of the servlet. <br>
-	 * 
-	 * This method is called when a form has its tag value method equals to
-	 * post.
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
+
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -110,12 +98,16 @@ public class UploadTestSetup extends SubmitServerServlet {
 						"You MUST submit test-setups that are either zipped or jarred");
 				return;
 			}
+			Submission canonicalSubmission = Submission.lookupMostRecent(project.getCanonicalStudentRegistrationPK(), project.getProjectPK(), conn);
 			// start transaction here
 			conn.setAutoCommit(false);
 			conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 			TestSetup.submit(byteArray, project, comment, conn);
 			conn.commit();
 			transactionSuccess = true;
+			if (canonicalSubmission != null && canonicalSubmission.getBuildStatus() != Submission.BuildStatus.BROKEN) {
+			  WaitingBuildServer.offerSubmission(project, canonicalSubmission);
+			}
 
 			String redirectUrl = request.getContextPath()
 					+ "/view/instructor/projectUtilities.jsp?projectPK="

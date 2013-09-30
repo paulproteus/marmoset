@@ -140,8 +140,12 @@ public class BuildServerConfiguration implements BuildServerConfigurationMBean {
 	    InetAddress localHost;
         try {
             localHost = InetAddress.getLocalHost();
-            return localHost.getHostName() +"/" 
-                    + getBuildServerWorkingDir().getCanonicalFile().getName();
+            String username = System.getProperty("user.name");
+            if (username == null)
+                username = "";
+            else username = "/" + username;
+            return localHost.getHostName()
+                    + username;
         } catch (Exception e) {
             return "unknown";
         }

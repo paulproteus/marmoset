@@ -23,6 +23,7 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -350,7 +351,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
      */
     public int getNumPassedOverall() {
         int numPassed=0;
-        for (TestOutcome outcome : getAllTestOutcomes()) {
+        for (TestOutcome outcome : getAllScoredOutcomes()) {
             if (outcome.isPassed())
                 numPassed++;
         }
@@ -449,7 +450,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
 
     public int countCardinalOutcomes(@OutcomeType String outcome) {
         int count = 0;
-        for (TestOutcome testOutcome : getAllTestOutcomes()) {
+        for (TestOutcome testOutcome : getAllScoredOutcomes()) {
             if (testOutcome.getOutcome().equals(outcome))
                 ++count;
         }
@@ -476,7 +477,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     private int countNonPassedOutcomes()
     {
         int nonPassed=0;
-        for (TestOutcome outcome : getAllTestOutcomes()) {
+        for (TestOutcome outcome : getAllScoredOutcomes()) {
             if (outcome.isFailed())
                 nonPassed++;
         }
@@ -518,18 +519,25 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
         }
         return count;
     }
-    /**
-     * Get a list of the PUBLIC, RELEASE and SECRET tests.
-     * Does <b>not</b> return FindBugs warnings.
-     *
-     * @return a List of the build and quick outcomes.
-     */
+
+    @Deprecated
     public List<TestOutcome> getAllTestOutcomes() {
-        List<TestOutcome> outcomes = getOutcomesForTestType(TestOutcome.TestType.PUBLIC);
-        outcomes.addAll(getOutcomesForTestType(TestOutcome.TestType.RELEASE));
-        outcomes.addAll(getOutcomesForTestType(TestOutcome.TestType.SECRET));
-        return outcomes;
+    	return getAllScoredOutcomes();
     }
+
+    /**
+     * Get a list of the scored test results
+     *
+     */
+	public List<TestOutcome> getAllScoredOutcomes() {
+
+		ArrayList<TestOutcome> outcomes = new ArrayList<TestOutcome>();
+		for (TestOutcome outcome : getAllOutcomes())
+			if (outcome.getTestType().isScored())
+				outcomes.add(outcome);
+
+		return outcomes;
+	}
 
     /**
      * Gets only the build and quick outcomes
@@ -641,6 +649,25 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     public TestOutcomeCollection() {
     }
 
+	public static TestOutcomeCollection deserialize(byte[] data) throws IOException {
+		TestOutcomeCollection testOutcomeCollection = new TestOutcomeCollection();
+		ObjectInputStream in = null;
+		try {
+			in = new ObjectInputStream(new ByteArrayInputStream(data));
+			testOutcomeCollection.read(in);
+		} finally {
+			if (in != null)
+				in.close();
+		}
+
+		// Make sure test outcome collection is not empty
+		if (testOutcomeCollection.isEmpty()) {
+			throw new IllegalArgumentException("Empty test outcome collection");
+		}
+		return testOutcomeCollection;
+	}
+    
+    	 
     /**
      * Add a TestOutcome.
      *
@@ -1263,7 +1290,7 @@ public class TestOutcomeCollection implements ITestSummary<TestOutcomeCollection
     public List<TestOutcome> getFailingCardinalOutcomesDueToException(@Nonnull String exceptionClassName)
     {
         List<TestOutcome> list=new LinkedList<TestOutcome>();
-        for (TestOutcome outcome : getAllTestOutcomes()) {
+        for (TestOutcome outcome : getAllScoredOutcomes()) {
             if (outcome.isError() && exceptionClassName.equals(outcome.getExceptionClassName())) {
                 list.add(outcome);
             }

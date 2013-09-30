@@ -61,10 +61,9 @@ public class SubmitStatusFilter extends SubmitServerFilter {
                 conn.setAutoCommit(false);
                 conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-                submitStatus = StudentSubmitStatus.createOrInsert(project.getProjectPK(),
+                submitStatus = StudentSubmitStatus.findOrCreate(project.getProjectPK(),
                         studentRegistration.getStudentRegistrationPK(), conn);
                 conn.commit();
-                System.out.println("success");
                 transactionSuccess = true;
             } catch (SQLException e) {
                 throw new ServletException(e);

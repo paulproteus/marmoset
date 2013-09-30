@@ -450,7 +450,7 @@ public class Student  implements Comparable<Student> {
   {
     if (FAKE_NAMES)
       throw new IllegalStateException();
-      String query = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
+    String query = Queries.makeInsertStatementUsingSetSyntax(ATTRIBUTE_NAME_LIST, TABLE_NAME, true);
 
     PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
@@ -866,6 +866,24 @@ public class Student  implements Comparable<Student> {
     	PreparedStatement stmt = null;
         try {
           stmt = conn.prepareStatement(query);
+          return getAllFromPreparedStatement(stmt);
+        } finally {
+          Queries.closeStatement(stmt);
+        }
+        
+    }
+    
+    public static Map<Integer, Student> lookupAllCanImportCourses(Connection conn)  throws SQLException {
+        String query =
+                " SELECT DISTINCT " +ATTRIBUTES+
+                " FROM " +TABLE_NAME+ 
+                 " WHERE can_import_courses = ? " ;
+                
+        
+        PreparedStatement stmt = null;
+        try {
+          stmt = conn.prepareStatement(query);
+          stmt.setBoolean(1, true);
           return getAllFromPreparedStatement(stmt);
         } finally {
           Queries.closeStatement(stmt);

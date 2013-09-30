@@ -73,6 +73,8 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 
 	private File zipFile;
 	private File testSetup;
+	
+	private int testDurationMillis;
 
 	private final TestOutcomeCollection testOutcomeCollection;
 
@@ -143,7 +145,15 @@ public class ProjectSubmission<T extends TestProperties> implements Configuratio
 	public String getKind() {
 	    return kind;
 	}
-	/**
+	public int getTestDurationMillis() {
+        return testDurationMillis;
+    }
+
+    public void setTestDurationMillis(int testDurationMillis) {
+        this.testDurationMillis = testDurationMillis;
+    }
+
+    /**
 	 * @return Returns the isNewTestSetup value.
 	 */
 	public String getIsNewTestSetup() {

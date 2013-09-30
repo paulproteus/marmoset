@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
+import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
 import edu.umd.cs.marmoset.modelClasses.Queries.RetestPriority;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
@@ -389,6 +390,7 @@ public class TestSetup implements Cloneable
            return getFromPreparedStatement(stmt);
     	   
     }
+
     
     public static @CheckForNull TestSetup lookupRecentNonBrokenTestSetupForProject(Connection conn,
             @Project.PK int projectPK)
@@ -445,8 +447,9 @@ public class TestSetup implements Cloneable
 				if (cachedArchive == null)
 					throw new IllegalStateException(
 							"there is no archive for upload, you should call setArchiveForUpload first");
-				setArchivePK(Archive.uploadBytesToArchive(
-						"test_setup_archives", cachedArchive, conn));
+				UploadResult uploadResult = Archive.uploadBytesToArchive(
+						"test_setup_archives", cachedArchive, conn);
+                setArchivePK(uploadResult.archive_pk);
 			}
             int index=1;
             putValues(stmt, index);

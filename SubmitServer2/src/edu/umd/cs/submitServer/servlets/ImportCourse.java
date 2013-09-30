@@ -90,10 +90,6 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 		if (!courseNamePattern.matcher(courseName).matches())
 			throw new ServletException("Invalid course name");
 
-		String courseDescription = request.getParameter("description");
-		String courseURL = request.getParameter("url");
-
-
 		Connection gradesConn = null;
 		Connection conn = null;
 		boolean transactionSuccess = false;
@@ -183,26 +179,29 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			boolean dropped = rs.getBoolean(col++);
 			boolean inactive = rs.getBoolean(col++);
 
-
 			boolean active = !dropped && !inactive;
 			if (active)
 				activeCount++;
 
 			Student s = Student.lookupByLoginNameAndCampusUID(loginName, campusUID,
 					conn);
+			boolean loginNameChanged = false;
 			if (s == null) {
 				s = Student.lookupByCampusUID(campusUID, conn);
-				if (s != null)
-					out.printf("Changed login name from %s to %s%n", loginName, s.getLoginName());
+				if (s != null) {
+					out.printf("Changing login name from %s to %s%n", s.getLoginName(), loginName);
+					loginNameChanged = true;
+				}
 			}
-
 
 			if (dropped && s == null)
 					continue;
-			else if (s == null) {
-				try {
+			
+		  try {
 				s = Student.insertOrUpdateByUID(campusUID, firstname, lastname,
-						loginName, null, conn);
+						loginName, email, conn);
+				if (loginNameChanged)
+				  out.printf("Updated record for %s: %s%n", s.getCampusUID(), s);
 				} catch (SQLException e) {
 					String msg = "Error trying to insert/update " + campusUID
 						+ " " + loginName + ":" + e.getMessage();
@@ -213,7 +212,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 					e.printStackTrace(out);
 					continue studentLoop;
 				}
-			}
+
 
 			if ((updatePictures || ! s.getHasPicture()) &&  active && SyncStudents.loadStudentPicture(s, gradesConn, conn))
 				s.update(conn);
@@ -229,7 +228,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				out.printf("Registering %s %s%n", firstname, lastname);
 				registration = new StudentRegistration();
 				registration.setStudentPK(s.getStudentPK());
-				isNew = true;
+			  isNew = true;
 			} else if (dropped) {
 				if (registration.isDropped()) {
 					if (registration.delete(conn)) {
@@ -261,6 +260,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 			registration.setDropped(dropped);
 			registration.setInactive(inactive);
 
+
 			registration.setCoursePK(course.getCoursePK());
 			registration.setClassAccount(classAccount);
 			
@@ -271,8 +271,7 @@ public class ImportCourse extends GradeServerInterfaceServlet {
 				registration
 						.setInstructorCapability(StudentRegistration.READ_ONLY_CAPABILITY);
 			else {
-				registration.setInstructorCapability(null);
-				if (active)
+				if (active && registration.getInstructorLevel() == StudentRegistration.STUDENT_CAPABILITY_LEVEL)
 					activeStudentCount++;
 			}
 			registration.setFirstname(s.getFirstname());

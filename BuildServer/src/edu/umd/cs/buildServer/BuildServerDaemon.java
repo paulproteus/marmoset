@@ -656,7 +656,8 @@ public class BuildServerDaemon extends BuildServer implements ConfigurationKeys 
 		method.addParameter("isBackgroundRetest",
 				projectSubmission.getIsBackgroundRetest());
 		method.addParameter("testMachine", hostname);
-		
+		method.addParameter("testDurationsMillis", Long.toString(projectSubmission.getTestDurationMillis()));
+        
 		addCommonParameters(method);
 		    
         method.addParameter("kind", projectSubmission.getKind());

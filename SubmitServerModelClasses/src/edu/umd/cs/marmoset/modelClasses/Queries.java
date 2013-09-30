@@ -454,7 +454,7 @@ public final class Queries {
 
 		String courseRestrictions = makeCourseRestrictionsWhereClause(allowedCourses);
 
-		String query = " SELECT "
+	    String query = " SELECT "
 				+ Submission.ATTRIBUTES
 				+ ", "
 				+ TestSetup.ATTRIBUTES
@@ -467,14 +467,17 @@ public final class Queries {
 				+ courseRestrictions
 				+ " AND test_setups.project_pk = projects.project_pk "
 				+ " AND submissions.project_pk = projects.project_pk "
+			    + " AND submissions.most_recent = 1 "
+			    + " AND submissions.build_status != ? "
 				+ " AND submissions.student_registration_pk = projects.canonical_student_registration_pk "
-				+ " ORDER BY submissions.submission_number DESC " + " LIMIT 1 "
-				+ " LOCK IN SHARE MODE ";
+				+ " ORDER BY submissions.submission_number DESC " + " LIMIT 1 ";
 
 		PreparedStatement stmt = conn.prepareStatement(query);
 		stmt.setString(1, TestSetup.Status.NEW.toString());
 		stmt.setString(2, TestSetup.Status.PENDING.toString());
 		stmt.setTimestamp(3, buildTimeout);
+		stmt.setString(4,  Submission.BuildStatus.BROKEN.toString());
+
 
 		return getFromPreparedStatement(stmt, submission, testSetup);
 	}
@@ -564,19 +567,19 @@ public final class Queries {
 		result.append(" ? ) \n");
 		return result.toString();
 	}
-
+	
 	public static String makeInsertStatementUsingSetSyntax(String[] attributes,
-			String tableName, boolean skipFirstAttribute) {
-		StringBuffer buf = new StringBuffer();
-		buf.append(" INSERT INTO " + tableName + " \n");
-		buf.append(" SET \n");
-		// Skip primary key
-		for (int ii = skipFirstAttribute ? 1 : 0; ii < attributes.length - 1; ii++) {
-			buf.append(" " + attributes[ii] + " = ?, \n");
-		}
-		buf.append(" " + attributes[attributes.length - 1] + " = ? \n");
-		return buf.toString();
-	}
+            String tableName, boolean skipFirstAttribute) {
+        StringBuffer buf = new StringBuffer();
+        buf.append(" INSERT INTO " + tableName + " \n");
+        buf.append(" SET \n");
+        // Skip primary key
+        for (int ii = skipFirstAttribute ? 1 : 0; ii < attributes.length - 1; ii++) {
+            buf.append(" " + attributes[ii] + " = ?, \n");
+        }
+        buf.append(" " + attributes[attributes.length - 1] + " = ? \n");
+        return buf.toString();
+    }
 
 	public static String makeInsertOrUpdateStatement(String[] insert, String[] update,
 			String tableName) {
@@ -719,7 +722,7 @@ public final class Queries {
 	 * @param allowedCourses
 	 * @return
 	 */
-    private static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
+    public static String makeCourseRestrictionsWhereClause(Collection<Integer> allowedCourses) {
         if (allowedCourses.isEmpty())
             throw new IllegalArgumentException("no courses");
         String whereClause = null;

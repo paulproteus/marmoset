@@ -174,7 +174,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 			}
 		}
 		if (!memorySet)
-		    javaArgs.add("-Xmx256m");
+		    javaArgs.add("-Xmx456m");
         javaArgs.add("-Dcom.sun.management.jmxremote");
         
 		javaArgs.add("-classpath");
@@ -197,7 +197,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 		        : getTrustedCodeBaseFinder().getCollection()) {
 			javaArgs.add("-D" + trustedCodeBase.getProperty() + "="
 					+ trustedCodeBase.getValue());
-			getLog().debug("adding trusted codebase " + trustedCodeBase);
+//			getLog().debug("adding trusted codebase " + trustedCodeBase);
 		}
 		// Let the test classes know where test files are.
 		// Append a separator to the end, because this makes it
@@ -453,7 +453,7 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 
 			TestOutcome outcome = new TestOutcome();
 			outcome.setTestType(testType);
-			outcome.setTestName(testMethod);
+			outcome.setTestName(testMethod + "(" + testClass + ")");    
 			outcome.setOutcome(TestOutcome.FAILED);
 			outcome.setShortTestResult("Unable to read test results for "
 					+ testMethod);

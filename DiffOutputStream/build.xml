@@ -2,16 +2,19 @@
 
 	<property name="jar.name" value="diffOutputStream.jar" />
 
-	<target name="jarFile">
-		<delete file="${jar.name}" />
-		<delete file="bin" />
-		<mkdir dir="bin" />
+	<target name="jarFile" depends="clean">
 		<javac destdir="bin" srcdir="src" includeantruntime="true"
 			deprecation="off" debug="on" />
 
 		<jar destfile="${jar.name}">
 			<fileset dir="bin" />
 		</jar>
+	</target>
+
+	<target name="clean">
+		<delete file="${jar.name}" />
+		<delete dir="bin" />
+		<mkdir dir="bin" />
 	</target>
 
 

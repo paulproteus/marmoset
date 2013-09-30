@@ -7,8 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openid4java.association.AssociationSessionType;
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
+import org.openid4java.consumer.InMemoryConsumerAssociationStore;
+import org.openid4java.consumer.InMemoryNonceVerifier;
 import org.openid4java.discovery.DiscoveryException;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
@@ -29,13 +32,26 @@ import edu.umd.cs.submitServer.UrlBuilder;
  * @see VerifyOpenId
  */
 public class InitiateOpenId extends SubmitServerServlet {
-  private final transient ConsumerManager consumerManager = new ConsumerManager();
+  private static final transient ConsumerManager consumerManager = new ConsumerManager();
+  
+  {
+    // magic from http://stackoverflow.com/questions/7645226/verification-failure-while-using-openid4java-for-login-with-google
+    consumerManager.setAssociations(new InMemoryConsumerAssociationStore()); 
+    consumerManager.setNonceVerifier(new InMemoryNonceVerifier(5000)); 
+    consumerManager.setMinAssocSessEnc(AssociationSessionType.DH_SHA256);
+
+  }
+  
+  public static ConsumerManager getConsumerManager() {
+    return consumerManager;
+  }
   
   private String getOpenidRealm(HttpServletRequest req) {
-  	return String.format("%s://%s:%d/",
-  	                     req.getScheme(),
-  	                     req.getServerName(),
-  	                     req.getServerPort());
+    
+    UrlBuilder builder = new UrlBuilder(req.getScheme(), req.getServerName(), req.getServerPort(), "/");
+    String result =   builder.toString();
+    return result;
+  
   }
 
   @Override
@@ -63,6 +79,7 @@ public class InitiateOpenId extends SubmitServerServlet {
     	if (!Strings.isNullOrEmpty(targetPath)) {
     		returnUrl.setParameter("marmoset.target", targetPath);
     	}
+
       getSubmitServerServletLog().info("Using returnURL  " + returnUrl);
          
       AuthRequest authReq = consumerManager.authenticate(discovered, returnUrl.toString());

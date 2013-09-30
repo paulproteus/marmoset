@@ -6,8 +6,9 @@
  <c:url var="css" value="/styles.css"/>
  <link rel="stylesheet" type="text/css" href="${css}">
  <script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
 	type="text/javascript"></script>
+	
     <script type="text/javascript">
  function toggle(item) {
      $(document.getElementById(item)).slideToggle("slow");

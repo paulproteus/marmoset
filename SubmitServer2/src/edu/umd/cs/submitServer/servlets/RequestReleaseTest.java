@@ -45,6 +45,7 @@ import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.ReleaseInformation;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.UserSession;
+import edu.umd.cs.submitServer.filters.AuthenticationFilter;
 
 /**
  * @author jspacco
@@ -52,6 +53,14 @@ import edu.umd.cs.submitServer.UserSession;
  */
 public class RequestReleaseTest extends SubmitServerServlet {
 
+  
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    AuthenticationFilter.checkReferer(request);
+    doPost(request, response);
+  }
+  
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

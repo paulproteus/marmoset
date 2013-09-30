@@ -413,6 +413,18 @@
 		<filter-name>ExtractParametersForRobotFilter</filter-name>
 		<url-pattern>/robot/*</url-pattern>
 	</filter-mapping>
+    <filter>
+        <filter-name>RobotKeyFilter</filter-name>
+        <filter-class> edu.umd.cs.submitServer.filters.RobotKeyFilter </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RobotKeyFilter</filter-name>
+        <url-pattern>/robot/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>RobotKeyFilter</filter-name>
+        <url-pattern>/view/instructor/projectUtilities.jsp</url-pattern>
+    </filter-mapping>
 
 	<filter>
 		<filter-name>EclipseLaunchEventsFilter</filter-name>
@@ -707,18 +719,6 @@
 		<url-pattern>/view/project.jsp</url-pattern>
 	</filter-mapping>
 
-	<filter>
-		<filter-name>RobotKeyFilter</filter-name>
-		<filter-class> edu.umd.cs.submitServer.filters.RobotKeyFilter </filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>RobotKeyFilter</filter-name>
-		<url-pattern>/robot/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>RobotKeyFilter</filter-name>
-		<url-pattern>/view/instructor/projectUtilities.jsp</url-pattern>
-	</filter-mapping>
 
 	<filter>
 		<filter-name>NoCacheFilter</filter-name>
@@ -955,6 +955,15 @@
       <filter-name>SubmitStatusFilter</filter-name>
       <url-pattern>/view/submitStatus.jsp</url-pattern>
     </filter-mapping>
+    
+        <servlet>
+        <servlet-name>AnalyzeArchives</servlet-name>
+        <servlet-class> edu.umd.cs.submitServer.servlets.AnalyzeArchives </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnalyzeArchives</servlet-name>
+        <url-pattern>/view/instructor/AnalyzeArchives</url-pattern>
+    </servlet-mapping>
     
     <servlet>
         <servlet-name>CreateBuildserverConfigFile</servlet-name>
@@ -1780,6 +1789,16 @@
     <servlet-mapping>
       <servlet-name>BecomePersona</servlet-name>
       <url-pattern>/action/become</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+      <servlet-name>SystemInfo</servlet-name>
+      <servlet-class>edu.umd.cs.submitServer.servlets.SystemInfoServlet</servlet-class> 
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>SystemInfo</servlet-name>
+      <url-pattern>/info/system</url-pattern>
     </servlet-mapping>
 
 

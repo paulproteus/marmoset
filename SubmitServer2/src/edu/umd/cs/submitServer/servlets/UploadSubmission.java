@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -52,11 +53,13 @@ import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.ice.tar.TarEntry;
 import com.ice.tar.TarInputStream;
 
+import edu.umd.cs.marmoset.modelClasses.Archive;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
@@ -71,6 +74,11 @@ import edu.umd.cs.submitServer.util.WaitingBuildServer;
  */
 public class UploadSubmission extends SubmitServerServlet {
 
+  
+  private static final  Logger LOGGER = Logger
+      .getLogger(SUBMISSION_LOG);
+
+  
     enum Kind {
         UNKNOWN, SINGLE_FILE, MULTIFILE_UPLOAD, ZIP_UPLOAD, TAR_UPLOAD, ZIP_UPLOAD2, FIXED_ZIP_UPLOAD, CODEMIRROR
     }
@@ -230,7 +238,7 @@ public class UploadSubmission extends SubmitServerServlet {
             submission = uploadSubmission(project, studentRegistration, zipOutput, request, submissionTimestamp, clientTool,
                     clientVersion, cvsTimestamp, getDatabaseProps(), getSubmitServerServletLog());
        
-        request.setAttribute("submission", submission);
+       request.setAttribute("submission", submission);
 
        
 
@@ -267,9 +275,23 @@ public class UploadSubmission extends SubmitServerServlet {
 
     }
 
+    /**
+     * @param studentRegistration
+     * @param zipOutput
+     * @param submission
+     */
+    public static void logSubmission(StudentRegistration studentRegistration, byte[] zipOutput, Submission submission) {
+      String msg = "Uploaded submission " + submission.getSubmissionPK() 
+          + " of " + zipOutput.length + " bytes" 
+          + " with archive PK " + submission.getArchivePK()
+          + " from student PK " + studentRegistration.getStudentPK()
+          + " for project PK " + submission.getProjectPK();
+      LOGGER.log(Level.INFO, msg);
+    }
+
     public static Submission uploadSubmission(Project project, StudentRegistration studentRegistration, byte[] zipOutput,
             HttpServletRequest request, Timestamp submissionTimestamp, String clientTool, String clientVersion, String cvsTimestamp,
-            SubmitServerDatabaseProperties db,Logger log) throws ServletException {
+            SubmitServerDatabaseProperties db,Logger log) throws ServletException, IOException {
        
         Connection conn;
         try {
@@ -285,13 +307,14 @@ public class UploadSubmission extends SubmitServerServlet {
             int testSetupPK = project.getTestSetupPK();
             byte baseLineSubmission[] = null;
             if (baselinePK != null && baselinePK.intValue() != 0) {
-                 baseLineSubmission = project.downloadArchive(conn); 
+                 baseLineSubmission = project.getBaselineZip(conn); 
             } else if (testSetupPK != 0){
                 baseLineSubmission = Submission.lookupCanonicalSubmissionArchive(project.getProjectPK(), conn);
             }
             zipOutput = FixZip.adjustZipNames(baseLineSubmission, zipOutput);
             
             int archivePK = Submission.uploadSubmissionArchive(zipOutput, conn);
+            
             
             synchronized (UPLOAD_LOCK) {
                 final int NUMBER_OF_ATTEMPTS = 2;
@@ -325,7 +348,10 @@ public class UploadSubmission extends SubmitServerServlet {
             rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, 
                     request, conn, db, log);
         }
-        WaitingBuildServer.offerSubmission(project, submission);
+        logSubmission(studentRegistration, zipOutput, submission);
+        
+        if (submission.getBuildStatus() == Submission.BuildStatus.NEW)
+          WaitingBuildServer.offerSubmission(project, submission);
         return submission;
     }
 

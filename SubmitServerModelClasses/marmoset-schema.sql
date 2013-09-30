@@ -21,11 +21,22 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 -- --------------------------------------------------------
 
+-- Table structure for table `archive_contents`
+--
+
+CREATE TABLE `archive_contents` (
+  `archive_pk` int(11) NOT NULL,
+  `file_pk` int(11) NOT NULL,
+  KEY `submission_pk` (`archive_pk`,`file_pk`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `buildservers`
 --
 
-CREATE TABLE IF NOT EXISTS `buildservers` (
+CREATE TABLE `buildservers` (
   `buildserver_pk` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8_bin NOT NULL,
   `remote_host` text COLLATE utf8_bin NOT NULL,
@@ -47,10 +58,10 @@ CREATE TABLE IF NOT EXISTS `buildservers` (
 -- Table structure for table `code_metrics`
 --
 
-CREATE TABLE IF NOT EXISTS `code_metrics` (
+CREATE TABLE `code_metrics` (
   `test_run_pk` mediumint(6) unsigned NOT NULL DEFAULT '0',
-  `checksum_sourcefiles` varchar(32) NOT NULL DEFAULT '',
-  `checksum_classfiles` varchar(32) NOT NULL DEFAULT '',
+  `checksum_sourcefiles` varchar(40) NOT NULL DEFAULT '',
+  `checksum_classfiles` varchar(40) NOT NULL DEFAULT '',
   `code_segment_size` mediumint(8) NOT NULL DEFAULT '0',
   PRIMARY KEY (`test_run_pk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -61,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `code_metrics` (
 -- Table structure for table `code_reviewer`
 --
 
-CREATE TABLE IF NOT EXISTS `code_reviewer` (
+CREATE TABLE `code_reviewer` (
   `code_reviewer_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_review_assignment_pk` int(11) NOT NULL,
   `submission_pk` int(11) NOT NULL,
@@ -87,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `code_reviewer` (
 -- Table structure for table `code_review_assignment`
 --
 
-CREATE TABLE IF NOT EXISTS `code_review_assignment` (
+CREATE TABLE `code_review_assignment` (
   `code_review_assignment_pk` int(11) NOT NULL AUTO_INCREMENT,
   `description` text NOT NULL,
   `project_pk` int(11) NOT NULL,
@@ -106,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `code_review_assignment` (
 -- Table structure for table `code_review_comment`
 --
 
-CREATE TABLE IF NOT EXISTS `code_review_comment` (
+CREATE TABLE `code_review_comment` (
   `code_review_comment_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_reviewer_pk` int(11) NOT NULL,
   `comment` mediumtext NOT NULL,
@@ -125,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `code_review_comment` (
 -- Table structure for table `code_review_thread`
 --
 
-CREATE TABLE IF NOT EXISTS `code_review_thread` (
+CREATE TABLE `code_review_thread` (
   `code_review_thread_pk` int(11) NOT NULL AUTO_INCREMENT,
   `file` varchar(120) DEFAULT NULL,
   `line` int(11) NOT NULL DEFAULT '0',
@@ -144,13 +155,13 @@ CREATE TABLE IF NOT EXISTS `code_review_thread` (
 -- Table structure for table `courses`
 --
 
-CREATE TABLE IF NOT EXISTS `courses` (
+CREATE TABLE `courses` (
   `course_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `semester` varchar(15) NOT NULL DEFAULT '',
   `coursename` varchar(20) DEFAULT NULL,
   `section` varchar(2) DEFAULT NULL,
   `description` text,
-  `url` varchar(100) DEFAULT NULL,
+  `url` text DEFAULT NULL,
   `course_ids` varchar(50) DEFAULT NULL,
   `allows_baseline_download` tinyint(1) NOT NULL DEFAULT '1',
   `submit_key` varchar(40) NOT NULL,
@@ -169,12 +180,12 @@ CREATE TABLE IF NOT EXISTS `courses` (
 -- Table structure for table `eclipse_launch_events`
 --
 
-CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
+CREATE TABLE `eclipse_launch_events` (
   `eclipse_launch_event_pk` mediumint(10) unsigned NOT NULL AUTO_INCREMENT,
   `student_registration_pk` mediumint(10) unsigned NOT NULL DEFAULT '0',
   `project_number` varchar(20) NOT NULL DEFAULT '',
   `project_pk` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `checksum` varchar(32) NOT NULL DEFAULT '',
+  `checksum` varchar(40) NOT NULL DEFAULT '',
   `event` varchar(20) NOT NULL DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `skew` mediumint(9) NOT NULL DEFAULT '0',
@@ -189,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `eclipse_launch_events` (
 -- Table structure for table `errors`
 --
 
-CREATE TABLE IF NOT EXISTS `errors` (
+CREATE TABLE `errors` (
   `error_pk` int(11) NOT NULL AUTO_INCREMENT,
   `when` datetime NOT NULL,
   `user_pk` int(11) DEFAULT NULL,
@@ -222,10 +233,28 @@ CREATE TABLE IF NOT EXISTS `errors` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `file_contents`
+--
+
+CREATE TABLE `file_contents` (
+  `file_pk` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text CHARACTER SET utf8 NOT NULL,
+  `text` tinyint(1) NOT NULL,
+  `size` int(11) NOT NULL,
+  `checksum` varchar(40) CHARACTER SET utf8 NOT NULL,
+  `contents` mediumblob NOT NULL,
+  PRIMARY KEY (`file_pk`),
+  UNIQUE KEY `checksum` (`checksum`),
+  KEY `text` (`text`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `help_requests`
 --
 
-CREATE TABLE IF NOT EXISTS `help_requests` (
+CREATE TABLE `help_requests` (
   `review_request_pk` int(11) NOT NULL AUTO_INCREMENT,
   `submission_pk` int(11) NOT NULL,
   `course_pk` int(11) NOT NULL,
@@ -242,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `help_requests` (
 -- Table structure for table `log_entries`
 --
 
-CREATE TABLE IF NOT EXISTS `log_entries` (
+CREATE TABLE `log_entries` (
   `log_pk` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `course_pk` int(10) unsigned NOT NULL,
   `student_pk` int(10) unsigned DEFAULT NULL,
@@ -262,7 +291,7 @@ CREATE TABLE IF NOT EXISTS `log_entries` (
 -- Table structure for table `projects`
 --
 
-CREATE TABLE IF NOT EXISTS `projects` (
+CREATE TABLE `projects` (
   `project_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `hidden` tinyint(1) NOT NULL DEFAULT '0',
   `course_pk` int(20) unsigned NOT NULL DEFAULT '0',
@@ -270,8 +299,8 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `project_number` varchar(30) NOT NULL DEFAULT '0',
   `ontime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `late` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `title` varchar(100) DEFAULT NULL,
-  `URL` varchar(100) DEFAULT NULL,
+  `title` text DEFAULT NULL,
+  `URL` text DEFAULT NULL,
   `description` text,
   `release_tokens` smallint(3) NOT NULL DEFAULT '0',
   `regeneration_time` int(3) NOT NULL DEFAULT '0',
@@ -300,7 +329,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
 -- Table structure for table `registration_requests`
 --
 
-CREATE TABLE IF NOT EXISTS `registration_requests` (
+CREATE TABLE `registration_requests` (
   `student_pk` int(11) NOT NULL,
   `course_pk` int(11) NOT NULL,
   `timestamp` bigint(20) NOT NULL,
@@ -317,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `registration_requests` (
 -- Table structure for table `rubrics`
 --
 
-CREATE TABLE IF NOT EXISTS `rubrics` (
+CREATE TABLE `rubrics` (
   `rubric_pk` int(11) NOT NULL AUTO_INCREMENT,
   `code_review_assignment_pk` int(11) NOT NULL,
   `name` varchar(80) COLLATE utf8_bin NOT NULL,
@@ -334,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
 -- Table structure for table `rubric_evaluations`
 --
 
-CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
+CREATE TABLE `rubric_evaluations` (
   `rubric_evaluation_pk` int(11) NOT NULL AUTO_INCREMENT,
   `rubric_pk` int(11) NOT NULL,
   `code_reviewer_pk` int(11) NOT NULL,
@@ -355,7 +384,7 @@ CREATE TABLE IF NOT EXISTS `rubric_evaluations` (
 -- Table structure for table `students`
 --
 
-CREATE TABLE IF NOT EXISTS `students` (
+CREATE TABLE `students` (
   `student_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `login_name` varchar(50) NOT NULL DEFAULT '',
   `campus_uid` varchar(80) NOT NULL DEFAULT '',
@@ -378,7 +407,7 @@ CREATE TABLE IF NOT EXISTS `students` (
 -- Table structure for table `student_pictures`
 --
 
-CREATE TABLE IF NOT EXISTS `student_pictures` (
+CREATE TABLE `student_pictures` (
   `student_pk` int(11) NOT NULL,
   `type` varchar(50) NOT NULL,
   `image` blob NOT NULL,
@@ -391,7 +420,7 @@ CREATE TABLE IF NOT EXISTS `student_pictures` (
 -- Table structure for table `student_registration`
 --
 
-CREATE TABLE IF NOT EXISTS `student_registration` (
+CREATE TABLE `student_registration` (
   `student_registration_pk` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `course_pk` int(5) unsigned NOT NULL DEFAULT '0',
   `student_pk` int(5) unsigned NOT NULL DEFAULT '0',
@@ -416,7 +445,7 @@ CREATE TABLE IF NOT EXISTS `student_registration` (
 -- Table structure for table `student_submit_status`
 --
 
-CREATE TABLE IF NOT EXISTS `student_submit_status` (
+CREATE TABLE `student_submit_status` (
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `student_registration_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `partner_sr_pk` int(11) DEFAULT NULL,
@@ -436,7 +465,7 @@ CREATE TABLE IF NOT EXISTS `student_submit_status` (
 -- Table structure for table `submissions`
 --
 
-CREATE TABLE IF NOT EXISTS `submissions` (
+CREATE TABLE `submissions` (
   `submission_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `student_registration_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
@@ -476,10 +505,10 @@ CREATE TABLE IF NOT EXISTS `submissions` (
 -- Table structure for table `submission_archives`
 --
 
-CREATE TABLE IF NOT EXISTS `submission_archives` (
+CREATE TABLE `submission_archives` (
   `archive_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `archive` mediumblob NOT NULL,
-  `checksum` varchar(32) NOT NULL,
+  `checksum` varchar(40) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -490,7 +519,7 @@ CREATE TABLE IF NOT EXISTS `submission_archives` (
 -- Table structure for table `test_outcomes`
 --
 
-CREATE TABLE IF NOT EXISTS `test_outcomes` (
+CREATE TABLE `test_outcomes` (
   `test_run_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `test_type` enum('build','public','release','secret','findbugs','pmd','student','uncovered_method') NOT NULL DEFAULT 'build',
   `test_number` int(20) unsigned NOT NULL DEFAULT '0',
@@ -517,7 +546,7 @@ CREATE TABLE IF NOT EXISTS `test_outcomes` (
 -- Table structure for table `test_runs`
 --
 
-CREATE TABLE IF NOT EXISTS `test_runs` (
+CREATE TABLE `test_runs` (
   `test_run_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `test_setup_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `submission_pk` int(20) unsigned NOT NULL DEFAULT '0',
@@ -529,8 +558,9 @@ CREATE TABLE IF NOT EXISTS `test_runs` (
   `num_release_tests_passed` smallint(3) NOT NULL DEFAULT '0',
   `num_secret_tests_passed` smallint(3) NOT NULL DEFAULT '0',
   `num_findbugs_warnings` smallint(3) NOT NULL DEFAULT '0',
-  `checksum_classfiles` varchar(32) DEFAULT NULL,
-  `checksum_sourcefiles` varchar(32) DEFAULT NULL,
+  `checksum_classfiles` varchar(40) DEFAULT NULL,
+  `checksum_sourcefiles` varchar(40) DEFAULT NULL,
+  `test_duration_millis` INT NOT NULL DEFAULT  '0' COMMENT  'Build and test time, in ms',
   PRIMARY KEY (`test_run_pk`),
   KEY `test_runs_ibfk_1` (`submission_pk`),
   KEY `checksum_classfiles` (`checksum_classfiles`(4))
@@ -542,7 +572,7 @@ CREATE TABLE IF NOT EXISTS `test_runs` (
 -- Table structure for table `test_setups`
 --
 
-CREATE TABLE IF NOT EXISTS `test_setups` (
+CREATE TABLE `test_setups` (
   `test_setup_pk` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `project_pk` int(20) unsigned NOT NULL DEFAULT '0',
   `jarfile_status` enum('new','pending','tested','active','inactive','failed','broken') NOT NULL DEFAULT 'new',
@@ -565,10 +595,10 @@ CREATE TABLE IF NOT EXISTS `test_setups` (
 -- Table structure for table `test_setup_archives`
 --
 
-CREATE TABLE IF NOT EXISTS `test_setup_archives` (
+CREATE TABLE `test_setup_archives` (
   `archive_pk` int(20) NOT NULL AUTO_INCREMENT,
   `archive` mediumblob NOT NULL,
-  `checksum` varchar(32) NOT NULL,
+  `checksum` varchar(40) NOT NULL,
   PRIMARY KEY (`archive_pk`),
   UNIQUE KEY `checksum` (`checksum`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

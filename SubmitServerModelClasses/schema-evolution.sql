@@ -36,3 +36,43 @@ ALTER TABLE  `code_reviewer` ADD  `rating_comment` TEXT CHARACTER SET utf8 COLLA
 
 ALTER TABLE  `code_review_assignment` ADD  `visible_to_students` TINYINT( 1 ) NOT NULL DEFAULT  '1'
 
+# change 4/30/2013
+
+ALTER TABLE  `courses` CHANGE  `url`  `url` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE  `projects` CHANGE  `URL`  `URL` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE  `projects` CHANGE  `title`  `title` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+# change 5/1/2013
+
+ALTER TABLE  `test_runs` ADD  `test_duration_millis` INT NOT NULL DEFAULT  '0' COMMENT  'Build and test time, in ms';
+
+
+# change 8/7/2013 - make checksums 40 characters, to handle SHA-1
+
+ALTER TABLE  `submission_archives` CHANGE  `checksum`  `checksum` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE  `test_setup_archives` CHANGE  `checksum`  `checksum` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE  `eclipse_launch_events` CHANGE  `checksum`  `checksum` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE  `code_metrics` CHANGE  `checksum_sourcefiles`  `checksum_sourcefiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE  `code_metrics` CHANGE  `checksum_classfiles`  `checksum_classfiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE  `test_runs` CHANGE  `checksum_sourcefiles`  `checksum_sourcefiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
+ALTER TABLE  `test_runs` CHANGE  `checksum_classfiles`  `checksum_classfiles` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
+
+# change 8/9/2013 - add tables for file contents
+
+CREATE TABLE `archive_contents` (
+  `archive_pk` int(11) NOT NULL,
+  `file_pk` int(11) NOT NULL,
+  KEY `submission_pk` (`archive_pk`,`file_pk`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE `file_contents` (
+  `file_pk` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text CHARACTER SET utf8 NOT NULL,
+  `text` tinyint(1) NOT NULL,
+  `size` int(11) NOT NULL,
+  `checksum` varchar(40) CHARACTER SET utf8 NOT NULL,
+  `contents` mediumblob NOT NULL,
+  PRIMARY KEY (`file_pk`),
+  UNIQUE KEY `checksum` (`checksum`),
+  KEY `text` (`text`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

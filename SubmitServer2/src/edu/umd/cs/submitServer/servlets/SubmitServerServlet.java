@@ -30,10 +30,16 @@ package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -45,9 +51,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVWriter;
-
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;
@@ -138,6 +144,7 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 		return submitServerDatabaseProperties;
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -231,25 +238,34 @@ public abstract class SubmitServerServlet extends HttpServlet implements
 			boolean transactionSuccess, HttpServletRequest req, Connection conn) {
 	    rollbackIfUnsuccessfulAndAlwaysReleaseConnection(transactionSuccess, req, conn, submitServerDatabaseProperties, getSubmitServerServletLog());
 	}
-	protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(
-            boolean transactionSuccess, HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
-        try {
-            if (!transactionSuccess && conn != null && conn.getAutoCommit()) {
-                String reqStr = req.getRequestURI();
-                if (req.getQueryString() != null) {
-                    reqStr += "?" + req.getQueryString();
-                }
-                log.warn(
-                        "Unable to rollback connection: " + reqStr);
-                conn.rollback();
-            }
-        } catch (SQLException ignore) {
-           log.warn("Unable to rollback connection",
-                    ignore);
-            // ignore
+
+	
+	protected static boolean isOpen(Connection conn) {
+	  try {
+	    return conn != null && !conn.isClosed();
+	  } catch(SQLException e) {
+	    return  false;
+	  }
+	}
+  protected static void rollbackIfUnsuccessfulAndAlwaysReleaseConnection(boolean transactionSuccess,
+      HttpServletRequest req, Connection conn, SubmitServerDatabaseProperties db, Logger log) {
+    if (!transactionSuccess && isOpen(conn) )
+      try {
+        if (conn.getAutoCommit()) {
+          String reqStr = req.getRequestURI();
+          if (req.getQueryString() != null) {
+            reqStr += "?" + req.getQueryString();
+          }
+          log.warn("Unable to rollback, already autocommitted: " + reqStr);
         }
-        releaseConnection(conn, db, log);
-    }
+        else 
+          conn.rollback();
+      } catch (SQLException ignore) {
+        log.warn("Unable to rollback connection", ignore);
+        // ignore
+      }
+    releaseConnection(conn, db, log);
+  }
 
 	private ILDAPAuthenticationService authenticationService;
 
@@ -348,7 +364,15 @@ public abstract class SubmitServerServlet extends HttpServlet implements
     return writer;
   }
 	
-	 protected static  void write(CSVWriter writer, Object... values) {
+	 public MessageDigest getSHA1() {
+    try {
+      return MessageDigest.getInstance("SHA-1");
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected static  void write(CSVWriter writer, Object... values) {
      String [] s = new String[values.length];
      for(int i = 0; i < values.length; i++) {
        if (values[i] == null)

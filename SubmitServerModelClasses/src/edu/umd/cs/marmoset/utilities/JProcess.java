@@ -143,7 +143,6 @@ final public class JProcess
             if (waitThread.isBusy())
                 waitThread.wait(waitTimeMillis);
             if (waitThread.isBusy()) {
-                if (false) System.out.println("calling process.destroy()");
                 destroyProcessGroup(process,log);
             }
             return waitThread.getReturnVal();

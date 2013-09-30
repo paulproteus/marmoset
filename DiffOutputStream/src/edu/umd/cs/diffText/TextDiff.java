@@ -17,6 +17,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
@@ -82,9 +84,9 @@ public class TextDiff extends StringsWriter {
     }
 
     public enum Option {
-        TRIM, IGNORE_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES, WAIT_FOR;
+        TRIM, IGNORE_CASE, IGNORE_WHITESPACE_CHANGE, IGNORE_BLANK_LINES, IGNORE_WHITESPACE, WAIT_FOR;
         public static Option valueOfAnyCase(String name) {
-            name = name.toUpperCase();
+            name = name.toUpperCase().replace(' ', '_');
             if (name.startsWith("IGNORES"))
                 name = "IGNORE" + name.substring(6);
             if (name.equals("WAITFOR") )
@@ -93,7 +95,9 @@ public class TextDiff extends StringsWriter {
                 return IGNORE_CASE;
             if (name.equals("IGNOREWHITESPACECHANGE"))
                 return IGNORE_WHITESPACE_CHANGE;
-            if (name.equals("IGNOREBLANKLINES"))
+            if (name.equals("IGNOREWHITESPACE"))
+                return IGNORE_WHITESPACE;
+             if (name.equals("IGNOREBLANKLINES"))
                 return IGNORE_BLANK_LINES;
             return valueOf(name);
         }
@@ -152,6 +156,10 @@ public class TextDiff extends StringsWriter {
 
         public Builder ignoreWhitespaceChange() {
             set(Option.IGNORE_WHITESPACE_CHANGE);
+            return this;
+        }
+        public Builder ignoreWhitespace() {
+            set(Option.IGNORE_WHITESPACE);
             return this;
         }
 
@@ -271,18 +279,24 @@ public class TextDiff extends StringsWriter {
     
     
 
-    
-    private String normalize(String s) {
-        if (options.containsKey(Option.TRIM))
-            s = s.trim();
-        if (options.containsKey(Option.IGNORE_CASE))
+     static String normalize( Set<Option> options, String s) {
+        if (options.contains(Option.IGNORE_CASE))
             s = s.toLowerCase();
-        if (options.containsKey(Option.IGNORE_WHITESPACE_CHANGE))
-            s = s.replaceAll("\\s+", " ");
+        if (options.contains(Option.IGNORE_WHITESPACE))
+            s = s.replaceAll("\\s+", "");
+        else if (options.contains(Option.IGNORE_WHITESPACE_CHANGE))
+            s = s.replaceAll("\\s+", " ").replaceAll(" $","");
+        else if (options.contains(Option.TRIM))
+            s = s.trim();
         return s;
     }
+    
+    private String normalize(String s) {
+        return normalize(options.keySet(), s);
+       
+    }
 
-    private Object getNextExpected() {
+    private   Object getNextExpected() {
         while (true) {
             Object o = getNextExpected0();
             if (o == null) return null;
@@ -325,6 +339,22 @@ public class TextDiff extends StringsWriter {
             throw new TestInfrastructureException(t);
         }
 
+        
+    }
+    
+  public static boolean differentBy(Option option, String normalizedExpected, String normalizedActual) {
+        
+      Set<Option> options = EnumSet.of(option);
+       return normalize(options,normalizedExpected).equals(normalize(options, normalizedActual));
+    }
+  
+    public Option diagnoseDifference(String normalizedExpected, String normalizedActual) {
+        
+        for(Option o : Option.values())
+            if (differentBy(o, normalizedExpected, normalizedActual))
+                return o;
+        return null;
+        
     }
 
     private String actual;
@@ -360,19 +390,40 @@ public class TextDiff extends StringsWriter {
         expected = o;
         if (o == null) {
             fail(String.format("On line %d, expected no more output but saw '%s'", line, txt));
-        } else if (o instanceof String) {
-            if (!normalize((String) o).equals(normalize(txt)))
-
-                fail(String.format("On line %d, expected '%s' but saw '%s'", line, o, txt));
-
-        } else if (o instanceof Pattern) {
-            Pattern p = (Pattern) o;
-            Matcher m = p.matcher(normalize(txt));
-            if (!m.matches())
-                fail(String.format("On line %d, /%s/ doesn't match '%s'", line, p, txt));
-
         } else {
-            fail("Got " + o.getClass());
+            String normalizedActual = normalize(txt);
+            if (o instanceof String) {
+                String normalizedExpected = normalize((String) o);
+                if (!normalizedExpected.equals(normalizedActual)) {
+                    Option diff = diagnoseDifference(normalizedExpected, normalizedActual);
+                    if (diff != null) switch(diff) {
+                    case TRIM: 
+                        fail(String.format("On line %d, incorrect leading or trailing whitespace: expected '%s' but saw '%s'", line, o, txt));
+                        break;
+                    case IGNORE_CASE: 
+                        fail(String.format("On line %d, incorrect case: expected '%s' but saw '%s'", line, o, txt));
+                        break;
+                    case IGNORE_WHITESPACE_CHANGE:
+                       fail(String.format("On line %d, whitespace doesn't match: expected '%s' but saw '%s'", line, o, txt));
+                        break;
+                    case IGNORE_WHITESPACE:
+                        fail(String.format("On line %d, missing or unexpected whitespace: expected '%s' but saw '%s'", line, o, txt));
+                         break;
+                    default:
+                        
+                    }
+                    fail(String.format("On line %d, expected '%s' but saw '%s'", line, o, txt)); 
+                }
+
+            } else if (o instanceof Pattern) {
+                Pattern p = (Pattern) o;
+                Matcher m = p.matcher(normalizedActual);
+                if (!m.matches())
+                    fail(String.format("On line %d, /%s/ doesn't match '%s'", line, p, txt));
+
+            } else {
+                fail("Got " + o.getClass());
+            }
         }
 
     }
@@ -382,7 +433,8 @@ public class TextDiff extends StringsWriter {
      * @return
      */
     public boolean isWhatWeAreWaitingFor(String txt) {
-        return normalize(txt).contains(options.get(Option.WAIT_FOR));
+        String waitWeAreWaitingFor = options.get(Option.WAIT_FOR);
+        return waitWeAreWaitingFor != null && normalize(txt).contains(waitWeAreWaitingFor);
     }
 
     @Override

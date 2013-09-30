@@ -34,10 +34,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Level;
+
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
+import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
+import edu.umd.cs.marmoset.modelClasses.ServerError.Kind;
 import edu.umd.cs.submitServer.BadPasswordException;
 import edu.umd.cs.submitServer.CanNotFindDirectoryIDException;
 import edu.umd.cs.submitServer.ClientRequestException;
@@ -64,99 +69,97 @@ import edu.umd.cs.submitServer.SubmitServerUtilities;
  */
 public class OneTimePasswordAuthenticationFilter extends SubmitServerFilter {
 
-	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) resp;
-		Connection conn = null;
-		String courseName = null;
-		String section = null;
-		String projectNumber = null;
-		String semester = null;
-		String classAccount = null;
-		String oneTimePassword = null;
-		String requestURL = SubmitServerUtilities.extractURL(request);
+  @Override
+  public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
+      ServletException {
+    HttpServletRequest request = (HttpServletRequest) req;
+    HttpServletResponse response = (HttpServletResponse) resp;
+    Connection conn = null;
+    String courseName = null;
+    String section = null;
+    String projectNumber = null;
+    String semester = null;
+    String classAccount = null;
+    String oneTimePassword = null;
+    String requestURL = SubmitServerUtilities.extractURL(request);
 
-		try {
-			conn = getConnection();
+    try {
+      conn = getConnection();
 
-			// set by filter
-			MultipartRequest multipartRequest = (MultipartRequest) request
-					.getAttribute(MULTIPART_REQUEST);
+      // set by filter
+      MultipartRequest multipartRequest = (MultipartRequest) request.getAttribute(MULTIPART_REQUEST);
 
-			courseName = multipartRequest.getCheckedParameter("courseName");
-			section = multipartRequest.getOptionalCheckedParameter("section");
-			projectNumber = multipartRequest
-					.getCheckedParameter("projectNumber");
-			semester = multipartRequest.getCheckedParameter("semester");
-			classAccount = multipartRequest.getOptionalCheckedParameter("classAccount");
-			if (classAccount == null)
-				classAccount = multipartRequest.getCheckedParameter("cvsAccount");
+      courseName = multipartRequest.getCheckedParameter("courseName");
+      section = multipartRequest.getOptionalCheckedParameter("section");
+      projectNumber = multipartRequest.getCheckedParameter("projectNumber");
+      semester = multipartRequest.getCheckedParameter("semester");
+      classAccount = multipartRequest.getOptionalCheckedParameter("classAccount");
+      if (classAccount == null)
+        classAccount = multipartRequest.getCheckedParameter("cvsAccount");
 
-				
-			oneTimePassword = multipartRequest
-					.getCheckedParameter("oneTimePassword");
+      oneTimePassword = multipartRequest.getCheckedParameter("oneTimePassword");
 
-			getAuthenticationLog().info(
-					"OneTimePasswordAuthentication attempt:\t" + classAccount
-							+ "\t" + oneTimePassword + "\t" + courseName + "\t"
-							+ semester + "\t" + projectNumber + "\t"
-							+ requestURL);
+      getAuthenticationLog().info(
+          "OneTimePasswordAuthentication attempt:\t" + classAccount + "\t" + oneTimePassword + "\t" + courseName + "\t"
+              + semester + "\t" + projectNumber + "\t" + requestURL);
 
-			Project project = Project.lookupByCourseProjectSemester(courseName,section,
-					projectNumber, semester, conn);
-			if (project == null)
-				throw new ServletException("Cannot find projectNumber "
-						+ projectNumber + " for course " + courseName
-						+ " in semester " + semester);
-			Course course = project.getCorrespondingCourse(conn);
+      Project project = Project.lookupByCourseProjectSemester(courseName, section, projectNumber, semester, conn);
+      if (project == null)
+        throw new ServletException("Cannot find projectNumber " + projectNumber + " for course " + courseName
+            + " in semester " + semester);
+      Course course = project.getCorrespondingCourse(conn);
 
-			StudentRegistration studentRegistration = StudentRegistration
-					.lookupByCvsAccountAndProjectPKAndOneTimePassword(
-							classAccount, oneTimePassword,
-							project.getProjectPK(), conn);
-			if (studentRegistration == null) {
-				studentRegistration = StudentRegistration
-						.lookupByCvsAccountAndCoursePK(classAccount,
-								course.getCoursePK(), conn);
-				if (studentRegistration != null)
-					throw new BadPasswordException(
-							HttpServletResponse.SC_UNAUTHORIZED,
-							"The one-time password stored in .submitUser is incorrect for " + classAccount + " in " + course.getCourseName() + ", project " + project.getProjectNumber());
-				else
-					throw new CanNotFindDirectoryIDException(
-							HttpServletResponse.SC_UNAUTHORIZED, classAccount
-									+ " is not registered for "
-									+ course.getCourseName() + " in "
-									+ course.getSemester());
-			}
+      StudentRegistration studentRegistration = StudentRegistration.lookupByCvsAccountAndProjectPKAndOneTimePassword(
+          classAccount, oneTimePassword, project.getProjectPK(), conn);
+      if (studentRegistration == null) {
+        studentRegistration = StudentRegistration.lookupByCvsAccountAndCoursePK(classAccount, course.getCoursePK(),
+            conn);
+        if (studentRegistration != null) {
+          StudentSubmitStatus status = StudentSubmitStatus.findOrCreate(project.getProjectPK(),
+              studentRegistration.getStudentRegistrationPK(), conn);
+          String msg = "Changing one-time password for " + classAccount + " for project " + project.getProjectNumber();
+          String remoteHost = SubmitServerFilter.getRemoteHost(request);
+          ServerError.insert(conn, Kind.BAD_AUTHENTICATION, studentRegistration.getStudentPK(),
+              studentRegistration.getStudentPK(), project.getCoursePK(), project.getProjectPK(),
+              /* submissionPK */null, /* code */"", msg,
+              /* type */"", OneTimePasswordAuthenticationFilter.class.getName(), request.getRequestURI(),
+              request.getQueryString(), remoteHost, /* refered */null, /* userAgent */"", /* exception */null);
 
-			Student student = studentRegistration.getCorrespondingStudent(conn);
+          getSubmitServerFilterLog().log(Level.WARN, msg);
+          if (true)
+            throw new BadPasswordException(HttpServletResponse.SC_UNAUTHORIZED,
+                "The one-time password stored in .submitUser is incorrect for " + classAccount + " in "
+                    + course.getCourseName() + ", project " + project.getProjectNumber());
 
-			getAuthenticationLog().info(
-					"OneTimePasswordAuthentication success:\t" + classAccount
-							+ "\t" + oneTimePassword + "\t" + courseName + "\t"
-							+ semester + "\t" + projectNumber + "\t"
-							+ requestURL);
+          status.setOneTimePasswordHack(oneTimePassword);
+          status.update(conn);
 
-			request.setAttribute("course", course);
-			request.setAttribute("studentRegistration", studentRegistration);
-			request.setAttribute("user", student);
-			request.setAttribute(PROJECT, project);
-		} catch (ClientRequestException e) {
-			getAuthenticationLog().warn(
-					"OneTimePasswordAuthentication failed:\t" + e.getMessage()
-							+ "\t" + classAccount + "\t" + oneTimePassword + "\t"
-							+ courseName + "\t" + semester + "\t"
-							+ projectNumber + "\t" + requestURL);
-			throw new ServletException(e);
-		} catch (SQLException e) {
-			throw new ServletException(e);
-		} finally {
-			releaseConnection(conn);
-		}
-		chain.doFilter(request, response);
-	}
+        } else
+          throw new CanNotFindDirectoryIDException(HttpServletResponse.SC_UNAUTHORIZED, classAccount
+              + " is not registered for " + course.getCourseName() + " in " + course.getSemester());
+      }
+
+      Student student = studentRegistration.getCorrespondingStudent(conn);
+
+      getAuthenticationLog().info(
+          "OneTimePasswordAuthentication success:\t" + classAccount + "\t" + oneTimePassword + "\t" + courseName + "\t"
+              + semester + "\t" + projectNumber + "\t" + requestURL);
+
+      request.setAttribute("course", course);
+      request.setAttribute("studentRegistration", studentRegistration);
+      request.setAttribute("user", student);
+      request.setAttribute(PROJECT, project);
+    } catch (ClientRequestException e) {
+      getAuthenticationLog().warn(
+          "OneTimePasswordAuthentication failed:\t" + e.getMessage() + "\t" + classAccount + "\t" + oneTimePassword
+              + "\t" + courseName + "\t" + semester + "\t" + projectNumber + "\t" + requestURL);
+      throw new ServletException(e);
+    } catch (SQLException e) {
+      throw new ServletException(e);
+    } finally {
+      releaseConnection(conn);
+    }
+    chain.doFilter(request, response);
+  }
 
 }

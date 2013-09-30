@@ -605,12 +605,16 @@ public abstract class BuildServer implements ConfigurationKeys {
 
             writeToCurrentFile("Testing completed ");
             // Send the test results back to the submit server
-            reportTestResults(projectSubmission);
-
             long total = System.currentTimeMillis() - start;
             log.info("submissionPK " + projectSubmission.getSubmissionPK()
                     + " took " + (total / 1000) + " seconds to process");
-            return result;
+            if (total > Integer.MAX_VALUE)
+                log.error("submissionPK %d took %d millisecons to process");
+            else
+                projectSubmission.setTestDurationMillis((int) total);
+            reportTestResults(projectSubmission);
+
+             return result;
 
         } catch (HttpException e) {
             log.error("Internal error: BuildServer got HttpException", e);

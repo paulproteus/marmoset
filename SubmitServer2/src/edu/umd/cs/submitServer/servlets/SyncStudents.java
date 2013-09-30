@@ -80,6 +80,7 @@ public class SyncStudents extends GradeServerInterfaceServlet {
 					
 				}
 			}
+			writer.println("Synchronization complete");
 
 		} catch (SQLException e) {
 			throw new ServletException(e);

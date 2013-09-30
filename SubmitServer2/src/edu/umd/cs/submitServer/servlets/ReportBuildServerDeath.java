@@ -55,8 +55,7 @@ public class ReportBuildServerDeath extends SubmitServerServlet {
 
 		Connection conn = null;
 		try {
-		    System.out.println(multipartRequest.getParameterNames());
-            
+		        
 			// Get submission pk and the submission
 			@Submission.PK
 			int submissionPK = Submission.asPK(multipartRequest.getIntParameter("submissionPK"));

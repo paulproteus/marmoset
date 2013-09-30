@@ -26,7 +26,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="ss" uri="http://www.cs.umd.edu/marmoset/ss"%>
-
+<c:url var="jsBase" value="/js" />
 <c:url var="viewSourceLink" value="../allSourceCode.jsp">
 	<c:param name="submissionPK" value="${submission.submissionPK}" />
 </c:url>
@@ -36,9 +36,21 @@
 
 <!DOCTYPE HTML>
 <html>
-<ss:head
+<head>
+<ss:headContent
 	title="Instructor view of submission ${submission.submissionPK}" />
-<body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/blitzer/jquery-ui.css"
+    type="text/css" />
+<script src="${jsBase}/jquery.easy-confirm-dialog.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".confirm").easyconfirm();
+  });
+    </script>
+</head><body>
+
+
 	<ss:header />
 	<ss:instructorBreadCrumb />
 
@@ -98,14 +110,15 @@
 			</c:when>
 			<c:otherwise>
 
+
 				<c:url var="reTestSubmissionLink"
-					value="/view/instructor/confirmChangeSubmissionBuildStatus.jsp">
+					value="/action/instructor/ChangeSubmissionBuildStatus">
 					<c:param name="submissionPK" value="${submission.submissionPK}" />
 					<c:param name="title"
 						value="Are you sure you want to mark submission ${submission.submissionPK} for retest?" />
 					<c:param name="buildStatus" value="retest" />
 				</c:url>
-				<a href="${reTestSubmissionLink}">Retest</a>
+				<a href="${reTestSubmissionLink}" class="confirm" title="Are you sure you want to retest this submission?">Retest</a>
 			</c:otherwise>
 		</c:choose>
 
@@ -113,7 +126,7 @@
 			<c:when test="${submission.buildStatus != 'BROKEN'}">
 	&nbsp;|&nbsp;
 	<c:url var="markBrokenLink"
-					value="/view/instructor/confirmChangeSubmissionBuildStatus.jsp">
+					value="/action/instructor/ChangeSubmissionBuildStatus">
 					<c:param name="submissionPK" value="${submission.submissionPK}" />
 					<c:param name="title"
 						value="Are you sure you want to mark submission ${submission.submissionPK} broken?" />
@@ -121,7 +134,7 @@
 						value="Broken submissions are not tested unless you specifically mark them for retest." />
 					<c:param name="buildStatus" value="broken" />
 				</c:url>
-				<a href="${markBrokenLink}">mark broken</a>
+				<a href="${markBrokenLink}"  class="confirm" title="Are you sure you want to mark this submission as broken?">mark broken</a>
 			</c:when>
 			<c:otherwise>
 				<p>

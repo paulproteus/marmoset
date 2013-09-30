@@ -59,6 +59,7 @@ import javax.annotation.meta.TypeQualifier;
 import org.apache.commons.io.CopyUtils;
 import org.apache.log4j.Logger;
 
+import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.EditDistance;
@@ -106,7 +107,7 @@ public class Project implements Serializable, Cloneable {
 	private String kindOfLatePenalty;
 	private double lateMultiplier;
 	private int lateConstant;
-	private int canonicalStudentRegistrationPK;
+	private @StudentRegistration.PK int canonicalStudentRegistrationPK;
     private String bestSubmissionPolicy;
     private String releasePolicy;
     private String stackTracePolicy;
@@ -116,7 +117,8 @@ public class Project implements Serializable, Cloneable {
     
 
     private transient byte[] cachedArchive;
-
+    private transient Map<String, byte[]>  cachedContents;
+    
     private static final long serialVersionUID = 1;
     private static final int serialMinorVersion = 1;
 
@@ -470,7 +472,7 @@ public class Project implements Serializable, Cloneable {
     /**
      * @return Returns the canonicalStudentRegistrationPK.
      */
-    public int getCanonicalStudentRegistrationPK()
+    public @StudentRegistration.PK int getCanonicalStudentRegistrationPK()
     {
         return canonicalStudentRegistrationPK;
     }
@@ -478,7 +480,7 @@ public class Project implements Serializable, Cloneable {
      * @param canonicalStudentRegistrationPK The canonicalStudentRegistrationPK to set.
      */
     public void setCanonicalStudentRegistrationPK(
-            int canonicalStudentRegistrationPK)
+            @StudentRegistration.PK int canonicalStudentRegistrationPK)
     {
         this.canonicalStudentRegistrationPK = canonicalStudentRegistrationPK;
     }
@@ -588,7 +590,7 @@ public class Project implements Serializable, Cloneable {
 		setKindOfLatePenalty(resultSet.getString(startingFrom++));
 		setLateMultiplier(resultSet.getDouble(startingFrom++));
 		setLateConstant(resultSet.getInt(startingFrom++));
-		setCanonicalStudentRegistrationPK(resultSet.getInt(startingFrom++));
+		setCanonicalStudentRegistrationPK(StudentRegistration.asPK(resultSet.getInt(startingFrom++)));
         setBestSubmissionPolicy(resultSet.getString(startingFrom++));
         setReleasePolicy(resultSet.getString(startingFrom++));
         setStackTracePolicy(resultSet.getString(startingFrom++));
@@ -857,7 +859,7 @@ public class Project implements Serializable, Cloneable {
 				Project project = new Project();
 				project.fetchValues(rs, 1);
 				if (rs.next())
-				    throw new SQLException("project not uniquely identified");
+				    throw new SQLException("project not uniquely identified by " + stmt);
 				return project;
 			}
 			return null;
@@ -947,7 +949,8 @@ public class Project implements Serializable, Cloneable {
     public Integer uploadCachedArchive(Connection conn)
     throws SQLException
     {
-        setArchivePK(Archive.uploadBytesToArchive(PROJECT_STARTER_FILE_ARCHIVES, cachedArchive, conn));
+        UploadResult uploadBytesToArchive = Archive.uploadBytesToArchive(PROJECT_STARTER_FILE_ARCHIVES, cachedArchive, conn);
+        setArchivePK(uploadBytesToArchive.archive_pk);
         return getArchivePK();
     }
 
@@ -982,7 +985,7 @@ public class Project implements Serializable, Cloneable {
      * @return an array of bytes of the cached archive
      * @throws SQLException
      */
-    public byte[] downloadArchive(Connection conn)
+    public byte[] getBaselineZip(Connection conn)
     throws SQLException
     {
     		if (cachedArchive == null)
@@ -990,13 +993,28 @@ public class Project implements Serializable, Cloneable {
     		return cachedArchive;
     }
 
-    public byte[] downloadArchive(int archivePK, Connection conn) throws SQLException {
+    public byte[] getBaselineZip(int archivePK, Connection conn) throws SQLException {
         Integer projectArchivePK = getArchivePK();
         if (projectArchivePK != null && archivePK == projectArchivePK)
-            return downloadArchive(conn);
+            return getBaselineZip(conn);
         return Archive.downloadBytesFromArchive(PROJECT_STARTER_FILE_ARCHIVES, archivePK, conn);
     }
 
+    public Map<String, byte[]> getBaselineContents(Connection conn)
+    throws SQLException, IOException
+    {
+            if (cachedContents == null)
+                cachedContents = Archive.getContents(PROJECT_STARTER_FILE_ARCHIVES, getArchivePK(), conn);
+            return cachedContents;
+    }
+
+    public Map<String, byte[]> getBaselineContents(int archivePK, Connection conn) throws SQLException, IOException {
+        Integer projectArchivePK = getArchivePK();
+        if (projectArchivePK != null && archivePK == projectArchivePK)
+            return getBaselineContents(conn);
+        return Archive.getContents(PROJECT_STARTER_FILE_ARCHIVES, archivePK, conn);
+    }
+    
 	@Override
 	protected Project clone() {
 		Project result;
@@ -1009,7 +1027,7 @@ public class Project implements Serializable, Cloneable {
 		return result;
 	}
 
-	public Project fork(Connection conn) throws SQLException {
+	public Project fork(Connection conn) throws SQLException, IOException {
 		Project fork = this.clone();
 		fork.setVisibleToStudents(false);
 		fork.setTitle("Fork of " + this.getTitle());
@@ -1075,7 +1093,7 @@ public class Project implements Serializable, Cloneable {
         // project starter files, if any
         if (getArchivePK() != null) {
             zipOutputStream.putNextEntry(new ZipEntry(getProjectNumber() +"-project-starter-files.zip"));
-            zipOutputStream.write(downloadArchive(conn));
+            zipOutputStream.write(getBaselineZip(conn));
         }
 
         zipOutputStream.close();
@@ -1107,7 +1125,7 @@ public class Project implements Serializable, Cloneable {
         if (baselinePK == null)
             return null;
         Map<String, List<String>> baselineText
-        = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
+        = TextUtilities.scanTextFiles(this.getBaselineContents(baselinePK, conn), fileProperties);
         return baselineText;
 
        
@@ -1134,7 +1152,7 @@ public class Project implements Serializable, Cloneable {
 	        
 	    if (baselinePK != 0 && baselinePK != submission.getArchivePK()) {
 	        if (baselineText == null)
-	            baselineText = TextUtilities.scanTextFilesInZip(this.downloadArchive(baselinePK, conn), fileProperties);
+	            baselineText = TextUtilities.scanTextFiles(this.getBaselineContents(baselinePK, conn), fileProperties);
 	        for(Entry<String, List<String>> e : current.entrySet()) {
 	            String file = e.getKey();
 	            if (!baselineText.containsKey(file))
@@ -1374,4 +1392,16 @@ public class Project implements Serializable, Cloneable {
 		return result;
 
 	}
+    /**
+     * @param project
+     * @param displayProperties
+     * @param conn
+     * @return
+     * @throws IOException
+     * @throws SQLException
+     */
+    public  Map<String, List<String>> getBaselineText(DisplayProperties displayProperties,
+        Connection conn) throws IOException, SQLException {
+      return TextUtilities.scanTextFiles(this.getBaselineContents(conn), displayProperties);
+    }
 }

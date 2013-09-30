@@ -70,18 +70,15 @@ public class AuthenticationFilter extends SubmitServerFilter {
 
 	}
 
-	private static void checkReferer(HttpServletRequest request)
+	public static void checkReferer(HttpServletRequest request)
 			throws ServletException {
-		String method = request.getMethod();
-        if (method.equals("GET"))
-			return;
-		if (method.equals("HEAD"))
-			return;
+	
 		String referer = request.getHeader("referer");
 		String requestURLString = request.getRequestURL().toString();
         
 		if (referer == null)
-			throw new ServletException("No referer for " + method + " of " + requestURLString);
+			throw new ServletException("No referer for " +   request.getMethod()
+		    + " of " + requestURLString);
 		try {
 			URL refererURL = new URL(referer);
 			 URL requestURL = new URL(requestURLString);
@@ -117,7 +114,10 @@ public class AuthenticationFilter extends SubmitServerFilter {
 		UserSession userSession = session == null ? null 
 				:  (UserSession) session.getAttribute(USER_SESSION);
 
-		checkReferer(request);
+	  String method = request.getMethod();
+    if (!method.equals("GET") && !method.equals("HEAD"))
+        checkReferer(request);
+    
 		if (session == null || session.isNew() || userSession == null) {
 			String login = String.format("%s/authenticate/%s/",
 			                             request.getContextPath(),

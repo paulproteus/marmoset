@@ -60,7 +60,7 @@ public class DownloadProjectStarterFiles extends SubmitServerServlet {
 		try {
 			conn = getConnection();
 
-			byte[] bytes = project.downloadArchive(conn);
+			byte[] bytes = project.getBaselineZip(conn);
 			ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
 			// Inform client of content type and length

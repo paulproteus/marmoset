@@ -551,17 +551,17 @@ public class DisplaySourceCodeAsHTML {
 				double intensity = Math.max(passedPct, failedPct);
 
 				double score = passedPct / (passedPct + failedPct);
-				// System.out.println(fileWithCoverage.getShortFileName() +
-				// ", lineNumber = "+lineNo+
-				// ", executable? "+isLineExecutable+
-				// ", countByOutcome = "+countByOutcome+
-				// ", totalPassed = "+totalPassed+
-				// ", totalFailed = "+totalFailed+
-				// ", passed = " +passed+
-				// ", failed = " +failed+
-				// ", passedPct = "+passedPct+
-				// ", failedPct = "+failedPct+
-				// ", score = "+score);
+				 if (false) System.out.println(fileWithCoverage.getShortFileName() +
+				 ", lineNumber = "+lineNo+
+				 ", executable? "+isLineExecutable+
+				 ", countByOutcome = "+countByOutcome+
+				 ", totalPassed = "+totalPassed+
+				 ", totalFailed = "+totalFailed+
+				 ", passed = " +passed+
+				 ", failed = " +failed+
+				 ", passedPct = "+passedPct+
+				 ", failedPct = "+failedPct+
+				 ", score = "+score);
 				style = " style=\"background-color:#"
 						+ scaleColor(score, intensity) + "\"";
 				out.print("<td bgcolor=\"#" + scaleColor(score, intensity)

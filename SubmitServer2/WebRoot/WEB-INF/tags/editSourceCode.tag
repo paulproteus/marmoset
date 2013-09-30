@@ -97,6 +97,8 @@ the changes from the submit server.
       </script>
       </div>
         </c:forEach>
+        <p>
+           <input type="submit" value="Submit as new submission">
     </form>
 
 <p align="right">javascript for code editing in browser provided by <a href="http://codemirror.net/">{} CodeMirror</a>

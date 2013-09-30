@@ -36,6 +36,8 @@ import edu.umd.cs.submitServer.policy.ChooseLastSubmissionPolicy;
 public interface SubmitServerConstants {
 	public static final String SNAPSHOT_PASSWORD = "snapshot.password";
 	public static final String AUTHENTICATION_LOG = "edu.umd.cs.submitServer.logging.authenticationLog";
+	
+	public static final String SUBMISSION_LOG = "edu.umd.cs.submitServer.logging.submissionLog";
 	public static final String AUTHENTICATION_LDAP_SERVICE = "authentication.ldap.service";
 
 	// SSL enviroment setup keys -- need to explicitly specify cacerts path
@@ -63,6 +65,8 @@ public interface SubmitServerConstants {
 	public static final String STUDENT_REGISTRATION_SET = "studentRegistrationSet";
 	public static final String STAFF_STUDENT_REGISTRATION_SET = "staffStudentRegistrationSet";
 	public static final String JUST_STUDENT_REGISTRATION_SET = "justStudentRegistrationSet";
+	public static final String INACTIVE_STUDENT_REGISTRATION_SET = "inactiveStudentRegistrationSet";
+  
 	public static final String SECTION_MAP = "sectionMap";
 	public static final String SECTIONS = "sections";
 	public static final String SECTION = "section";

@@ -33,6 +33,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import javax.annotation.Nonnull;
 
 /**
  * TextFileReader: Simple class for reading lines out of a text file using an iterator.
@@ -89,9 +92,11 @@ public class TextFileReader implements Iterable<String>
              * @see java.util.Iterator#next()
              */
             @Override
-			public String next()
+			public @Nonnull String next()
             {
-                return line;
+                if (line != null)
+                    return line;
+                throw new NoSuchElementException();
             }
 
             /* (non-Javadoc)

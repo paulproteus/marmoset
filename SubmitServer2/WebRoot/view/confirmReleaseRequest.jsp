@@ -44,13 +44,12 @@
 
 <h2>Are you sure you want to release test submission
  ${submission.submissionNumber} for project <c:out value="${project.projectNumber}"/>?</h2>
-
 <p>Submitted at <fmt:formatDate
     value="${submission.submissionTimestamp}"
     pattern="E',' dd MMM 'at' hh:mm a" />
 
 <c:if
-    test="${submission.currentTestRunPK != testRun.testRunPK}">
+    test="${project.testSetupPK != testRun.testSetupPK}">
     <p>Warning: we don't have results from the current version of the test setup.
     If you perform a release test, and upon testing with the current test setup
     the submission isn't eligible for release testing, you won't be able to see the results

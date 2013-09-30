@@ -114,7 +114,7 @@
         </ul>
     </c:if>
     <p>Server load: ${systemLoad}</p>
-    <h2>BuildServers</h2>
+    <h2>${fn:length(buildServers)} BuildServers</h2>
     <table>
         <tr>
             <th rowspan="2">Host</th>
@@ -158,15 +158,16 @@
     </table>
 
 
-  <h2><a href="javascript:toggle('upcomindCodeReviews')">Upcoming code review assignments</a></h2>
+<c:if test="${not empty upcomingCodeReviewAssignments }">
+  <h2><a href="javascript:toggle('upcomindCodeReviews')">${fn:length(upcomingCodeReviewAssignments)} Upcoming code review assignments</a></h2>
     <div id="upcomindCodeReviews" style="display: none">
     <table>
         <tr>
             <th >Course</th>
             <th >Project</th>
             <th >Deadline</th>
-             <th >Kind</th>
-               <th >Visible</th>
+            <th >Kind</th>
+            <th >Visible</th>
             <th >Description</th>
         </tr>
        
@@ -192,8 +193,9 @@
             </c:forEach>
     </table>
     </div>
+    </c:if>
 
-    <h2><a href="javascript:toggle('upcomingProjects')">Upcoming project deadlines</a></h2>
+    <h2><a href="javascript:toggle('upcomingProjects')">${fn:length(upcomingProjects)} Upcoming project deadlines</a></h2>
     <div id="upcomingProjects" style="display: none">
     <table>
         <tr>

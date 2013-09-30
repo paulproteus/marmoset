@@ -135,8 +135,6 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 			SqlUtilities.setInteger(stmt, 2, offset);
 			SqlUtilities.setInteger(stmt, 3, offset);
 
-			// System.out.println(stmt);
-
 			return getListFromPreparedStatement(stmt);
 		} finally {
 			Queries.closeStatement(stmt);
@@ -149,8 +147,6 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 		String query = " SELECT " + TestOutcome.ATTRIBUTES + " FROM "
 				+ TestOutcome.TABLE_NAME + " WHERE test_type = ? "
 				+ " AND test_name LIKE ? " + " LIMIT ?, ? ";
-
-		System.out.println(query);
 
 		PreparedStatement stmt = null;
 		try {
@@ -196,8 +192,6 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 				+ " AND test_name LIKE ? " + " AND exception_class_name = ? "
 				+ " LIMIT ?, ? ";
 
-		System.out.println(query);
-
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(query);
@@ -207,8 +201,6 @@ public class QueryTestOutcomesFilter extends SubmitServerFilter {
 
 			setStringOrWildcard(stmt, 2, testName);
 			stmt.setString(3, priority);
-
-			System.out.println(stmt);
 
 			return getListFromPreparedStatement(stmt);
 		} finally {

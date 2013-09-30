@@ -23,6 +23,7 @@
 
 package edu.umd.cs.marmoset.modelClasses;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.CheckForNull;
 import javax.annotation.meta.TypeQualifier;
 
+import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
 import edu.umd.cs.marmoset.utilities.DisplayProperties;
 import edu.umd.cs.marmoset.utilities.MarmosetUtilities;
 import edu.umd.cs.marmoset.utilities.Multiset;
@@ -604,13 +606,26 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	 * @return the archivePK of the newly uploaded archive
 	 * @throws SQLException
 	 */
-	public int uploadCachedArchive(Connection conn) throws SQLException {
+	public int uploadCachedArchive(Connection conn) throws SQLException, IOException {
 		return uploadSubmissionArchive(cachedArchive, conn);
 	}
 
 	public static int uploadSubmissionArchive(byte[] bytes, Connection conn)
-			throws SQLException {
-		return Archive.uploadBytesToArchive(SUBMISSION_ARCHIVES, bytes, conn);
+			throws SQLException, IOException {
+		UploadResult uploadResult = Archive.uploadBytesToArchive(SUBMISSION_ARCHIVES, bytes, conn);
+        int archive_pk  = uploadResult.archive_pk;
+        if (uploadResult.isNew){ 
+		TreeMap<String, byte[]> contents = Archive.unzip(new ByteArrayInputStream(bytes));
+		for(Map.Entry<String, byte[]> e : contents.entrySet()) {
+		    String path = e.getKey();
+		    String simpleName = TextUtilities.simpleName(path);
+		    boolean isText = TextUtilities.isText(simpleName);
+		    FileContents fc = FileContents.lookupOrInsert(conn, path, isText, e.getValue());
+		    ArchiveContents.add(archive_pk, fc.getFilePk(), conn);
+		}
+        }
+
+		return archive_pk;
 	}
 	public static void deleteAbortedSubmissionArchive(int pk, Connection conn)
 	throws SQLException {
@@ -619,7 +634,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 	@Deprecated
     public void updateCachedArchive(Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
 		if (archivePK != null && archivePK.intValue() != 0)
           Archive.updateBytesInArchive(SUBMISSION_ARCHIVES, archivePK, cachedArchive, conn);
@@ -655,10 +670,15 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	    return Archive.downloadBytesFromArchive(SUBMISSION_ARCHIVES, getArchivePK(), conn);
     }
 
+	   public Map<String, byte[]> getContents(Connection conn)
+	           throws IOException, SQLException
+	           {
+	               return Archive.getContents(SUBMISSION_ARCHIVES, getArchivePK(), conn);
+	           }
+	   
 	public Map<String,List<String>>
 		getText(Connection conn, @CheckForNull DisplayProperties fileProperties) throws SQLException, IOException {
-		  byte[] archive = downloadArchive(conn);
-		  return TextUtilities.scanTextFilesInZip(archive, fileProperties);
+		  return TextUtilities.scanTextFiles(getContents(conn), fileProperties);
 	}
 
     /**
@@ -832,13 +852,13 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	}
 
 	
-	public void insert(Connection conn, byte [] archive) throws SQLException {
+	public void insert(Connection conn, byte [] archive) throws SQLException, IOException {
 		 setArchiveForUpload(archive);
          insert(conn);
 	}
 
 	public void insert(Connection conn)
-	throws SQLException
+	throws SQLException, IOException
 	{
 	    String insert = Queries.makeInsertStatement(ATTRIBUTE_NAME_LIST.length, ATTRIBUTES, TABLE_NAME);
         if (!hasArchive() && !hasCachedArchive())
@@ -1009,6 +1029,36 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 		return getFromPreparedStatement(stmt);
 	}
+	   public static List<Integer> getAllArchivesForProject(
+	            @Project.PK Integer projectPK,
+	            Connection conn)
+	        throws SQLException
+	    {
+	        String query = " SELECT archive_pk "+
+	        " FROM "+
+	        " submissions " +
+	        " WHERE submissions.project_pk= ? ";
+	        
+
+	        PreparedStatement stmt = null;
+
+	        stmt = conn.prepareStatement(query);
+	        SqlUtilities.setInteger(stmt, 1, projectPK);
+	        List<Integer> result = new ArrayList<Integer>();
+	           
+	        try {
+	            ResultSet rs = stmt.executeQuery();
+
+	            while (rs.next())
+	            {
+	                result.add(rs.getInt(1));
+	            }
+	            return result;
+	        }
+	        finally {
+	            Queries.closeStatement(stmt);
+	        }
+	    }
 
 	/**
 	 * Retrieves a submission from a database by its submissionPK.
@@ -1281,6 +1331,35 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         	return submissions;
         } finally {
         	Queries.closeStatement(stmt);
+        }
+    }
+    
+    public static Submission lookupMostRecent(
+            @StudentRegistration.PK int studentRegistrationPK,
+            @Project.PK int projectPK,
+            Connection conn)
+    throws SQLException
+    {
+        String query = "SELECT " +ATTRIBUTES+ " "+
+        " FROM " +
+        " submissions " +
+        " WHERE submission_timestamp IS NOT NULL " +
+        " AND student_registration_pk = ?" +
+        " AND project_pk = ?" +
+        " AND most_recent = ?  LIMIT 1" ;
+
+        PreparedStatement stmt = Queries.setStatement(conn, query, studentRegistrationPK, projectPK, true);
+
+        try {
+            ResultSet rs = stmt.executeQuery();
+        
+            if (rs.next())
+            {
+                return new Submission(rs, 1);
+            }
+            return null;
+        } finally {
+            Queries.closeStatement(stmt);
         }
     }
     
@@ -1743,7 +1822,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String courseName,
         String semester,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         boolean transactionSuccess=false;
         try {
@@ -1784,7 +1863,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 
 //          find StudentSubmitStatus record
             StudentSubmitStatus studentSubmitStatus
-            = StudentSubmitStatus.createOrInsert(
+            = StudentSubmitStatus.findOrCreate(
                         project.getProjectPK(),
                         studentRegistration.getStudentRegistrationPK(),
                         conn);
@@ -1867,6 +1946,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
      * @param conn Connection to the database.
      * @return The submission object that's been uploaded into the database.
      * @throws SQLException If something goes wrong communicating with the database.
+     * @throws IOException 
      */
     public static Submission submit(
         byte[] bytesForUpload,
@@ -1877,7 +1957,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String submitClientVersion,
         Timestamp submissionTimestamp,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         Submission submission = prepareSubmission(studentRegistration, project,
 				cvstagTimestamp, submitClientTool, submitClientVersion,
@@ -1903,6 +1983,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
      * @param conn Connection to the database.
      * @return The submission object that's been uploaded into the database.
      * @throws SQLException If something goes wrong communicating with the database.
+     * @throws IOException 
      */
     public static Submission submit(
         int archivePK,
@@ -1913,7 +1994,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         String submitClientVersion,
         Timestamp submissionTimestamp,
         Connection conn)
-    throws SQLException
+    throws SQLException, IOException
     {
         Submission submission = prepareSubmission(studentRegistration, project,
 				cvstagTimestamp, submitClientTool, submitClientVersion,
@@ -1943,7 +2024,7 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 			Connection conn) throws SQLException {
 		// find StudentSubmitStatus record
         StudentSubmitStatus studentSubmitStatus
-        = StudentSubmitStatus.createOrInsert(
+        = StudentSubmitStatus.findOrCreate(
                     project.getProjectPK(),
                     studentRegistration.getStudentRegistrationPK(),
                     conn);
@@ -2003,13 +2084,11 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 	/** Returns the set of submission_pk's that have published reviews */
     public static Set<Integer> lookupSubmissionsWithReviews(Project project, Connection conn) throws SQLException {
         HashSet<Integer> result = new HashSet<Integer>();
-        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, code_review_comment "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
-                + " AND EXISTS (SELECT * FROM code_review_comment " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = code_review_comment.code_review_thread_pk " 
-                + "   and code_review_comment.draft = 0)";
+                + " AND code_review_thread.code_review_thread_pk = code_review_comment.code_review_thread_pk " 
+                + " AND code_review_comment.draft = 0";
         PreparedStatement stmt = Queries.setStatement(conn, query, project.getProjectPK());
         try {
             ResultSet rs = stmt.executeQuery();
@@ -2019,13 +2098,11 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         } finally {
             stmt.close();
         }
-        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, rubric_evaluations "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
-                + " AND EXISTS (SELECT * FROM rubric_evaluations " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = rubric_evaluations.code_review_thread_pk " 
-                + "   AND rubric_evaluations.status = 'LIVE')";
+                + " AND code_review_thread.code_review_thread_pk  = rubric_evaluations.code_review_thread_pk " 
+                + " AND rubric_evaluations.status = 'LIVE'";
         stmt = Queries.setStatement(conn, query, project.getProjectPK());
         try {
             ResultSet rs = stmt.executeQuery();
@@ -2046,14 +2123,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         if (studentRegistration == null)
             throw new NullPointerException("no studentRegistration");
         HashSet<Integer> result = new HashSet<Integer>();
-        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        String query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, code_review_comment "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
                 + " AND submissions.student_registration_pk  = ? "
-                + " AND EXISTS (SELECT * FROM code_review_comment " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = code_review_comment.code_review_thread_pk " 
-                + "   AND code_review_comment.draft = 0)";
+                + " AND code_review_thread.code_review_thread_pk  = code_review_comment.code_review_thread_pk " 
+                + " AND code_review_comment.draft = 0";
         PreparedStatement stmt = Queries.setStatement(conn, query, project.getProjectPK(), 
                     studentRegistration.getStudentRegistrationPK());
         try {
@@ -2063,14 +2138,12 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         } finally {
             stmt.close();
         }
-        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions "
+        query = "SELECT DISTINCT submissions.submission_pk FROM code_review_thread, submissions, rubric_evaluations "
                 + " WHERE submissions.submission_pk = code_review_thread.submission_pk " 
                 + " AND submissions.project_pk = ? "
                 + " AND submissions.student_registration_pk  = ? "
-                + " AND EXISTS (SELECT * FROM rubric_evaluations " 
-                + "   WHERE code_review_thread.code_review_thread_pk "
-                + "   = rubric_evaluations.code_review_thread_pk " 
-                + "   AND rubric_evaluations.status = 'LIVE')";
+                + " AND code_review_thread.code_review_thread_pk = rubric_evaluations.code_review_thread_pk " 
+                + " AND rubric_evaluations.status = 'LIVE'";
         stmt = Queries.setStatement(conn, query, project.getProjectPK(), 
                 studentRegistration.getStudentRegistrationPK());
         try {
