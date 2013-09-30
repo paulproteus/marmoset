@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import javax.annotation.CheckForNull;
@@ -45,7 +44,6 @@ import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
-import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.utilities.Objects;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
