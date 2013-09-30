@@ -137,14 +137,14 @@
                 <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
                 <td>
                 <c:url var="s" value="/view/instructor/project.jsp">
-                <c:param name="submissionPK" value="${buildServer.lastRequesProjectPK}" />
+                <c:param name="submissionPK" value="${buildServer.lastRequestProjectPK}" />
                 </c:url>
-                <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                <a href="${s}">${buildServer.lastRequestProjectPK}</a>
                 <td>
                 <c:url var="s" value="/view/instructor/course.jsp">
                 <c:param name="submissionPK" value="${buildServer.lastRequestCoursePK}" />
                 </c:url>
-                <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                <a href="${s}">${buildServer.lastRequestProjectPK}</a>
                 </c:when>
                 <c:otherwise>
                 </c:otherwise>

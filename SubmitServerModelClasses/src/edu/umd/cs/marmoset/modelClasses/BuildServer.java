@@ -19,14 +19,14 @@ public class BuildServer implements Comparable<BuildServer> {
 	String courses;
 	String remoteHost;
 	Timestamp lastRequest;
-	@Submission.PK int lastRequestSubmissionPK;
+	@Submission.PK final int lastRequestSubmissionPK;
 	@CheckForNull
 	Timestamp lastSuccess;
 	@CheckForNull
 	Timestamp lastJob;
 	String load;
-	@Project.PK int lastRequestProjectPK;
-	@Course.PK int lastRequestCoursePK;
+	@Project.PK final int lastRequestProjectPK;
+	@Course.PK final int lastRequestCoursePK;
 	public static final String TABLE_NAME = "buildservers";
 
 	static final String[] ATTRIBUTE_NAME_LIST = { "buildserver_pk", "name",
@@ -74,6 +74,14 @@ public class BuildServer implements Comparable<BuildServer> {
 	public @Submission.PK int getLastRequestSubmissionPK() {
         return lastRequestSubmissionPK;
     }
+	public @Project.PK int getLastRequestProjectPK() {
+		return lastRequestProjectPK;
+	}
+
+	public @Course.PK int getLastRequestCoursePK() {
+		return lastRequestCoursePK;
+	}
+
 	public Timestamp getLastJob() {
 		return lastJob;
 	}
