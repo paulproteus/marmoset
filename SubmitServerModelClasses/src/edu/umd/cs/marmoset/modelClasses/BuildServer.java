@@ -161,7 +161,7 @@ public class BuildServer implements Comparable<BuildServer> {
 
 	public static Collection<BuildServer> getAll(Connection conn)
 			throws SQLException {
-		String query = " SELECT " + ATTRIBUTES + ", submissions.project_pk, projects.project_pk FROM " + TABLE_NAME +"," + Submission.TABLE_NAME +"," + Project.TABLE_NAME
+		String query = " SELECT " + ATTRIBUTES + ", submissions.project_pk, projects.course_pk FROM " + TABLE_NAME +"," + Submission.TABLE_NAME +"," + Project.TABLE_NAME
 				+ " WHERE buildservers.last_request_submission_pk = submissions.submission_pk " 
 				+ " AND submissions.project_pk = projects.project_pk ";
 	    PreparedStatement stmt = conn.prepareStatement(query);
