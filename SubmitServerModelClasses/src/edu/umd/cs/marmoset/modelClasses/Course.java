@@ -44,7 +44,6 @@ import javax.annotation.meta.TypeQualifier;
 
 import com.google.common.base.Joiner;
 
-import edu.umd.cs.marmoset.modelClasses.Project.PK;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**

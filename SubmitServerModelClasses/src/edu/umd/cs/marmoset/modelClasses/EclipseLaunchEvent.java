@@ -59,7 +59,8 @@ public class EclipseLaunchEvent
                 total += t;
             this.total = total;
         }
-        public String toString() {
+        @Override
+		public String toString() {
             return String.valueOf(start) + ":" + counts;
         }
         public final Timestamp start;

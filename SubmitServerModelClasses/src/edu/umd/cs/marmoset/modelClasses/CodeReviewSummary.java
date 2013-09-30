@@ -21,8 +21,6 @@ import java.util.regex.Matcher;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import sun.nio.cs.ext.ISCII91;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 

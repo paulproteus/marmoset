@@ -57,7 +57,8 @@ public class MakeTestProperties extends ScriptTestProperties {
         return getOptionalStringProperty(STUDENT_MAKE_FILENAME);
     }
     
-    public boolean isSourceFile(String name) {
+    @Override
+	public boolean isSourceFile(String name) {
         String simpleName = FileNames.trimSourceFileName(name);
         if (name.equals(studentMakefileName) || name.equals(makefileName))
             return true;

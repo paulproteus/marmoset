@@ -52,6 +52,7 @@ public class EditDistanceTest extends TestCase {
 	}
 	EditDistance<Character> edit;
 
+	@Override
 	public void setUp() {
 		edit = new EditDistance<Character>(new CharacterDistance());
 

@@ -44,8 +44,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import edu.umd.cs.marmoset.utilities.SqlUtilities;
-
 
 /**
  * A CodeReviewer is a person in the role of commenting on a specific submission.

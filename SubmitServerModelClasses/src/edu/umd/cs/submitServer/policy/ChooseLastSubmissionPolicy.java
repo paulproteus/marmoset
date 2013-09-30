@@ -53,6 +53,7 @@ public class ChooseLastSubmissionPolicy extends ChosenSubmissionPolicy {
 
 	public static final ChooseLastSubmissionPolicy
 	INSTANCE = new ChooseLastSubmissionPolicy();
+	@Override
 	public  String getDescription() {
 		return "Grade the last submission";
 	}

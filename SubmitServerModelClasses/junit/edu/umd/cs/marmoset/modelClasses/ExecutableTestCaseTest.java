@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.InputKind;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.ExpectedKind;
+import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.InputKind;
 import edu.umd.cs.marmoset.modelClasses.ExecutableTestCase.Property;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome.TestType;
 

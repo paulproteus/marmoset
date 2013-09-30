@@ -40,7 +40,6 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 
 import edu.umd.cs.marmoset.modelClasses.Archive.UploadResult;
-import edu.umd.cs.marmoset.modelClasses.Queries.RetestPriority;
 import edu.umd.cs.marmoset.utilities.SqlUtilities;
 
 /**
