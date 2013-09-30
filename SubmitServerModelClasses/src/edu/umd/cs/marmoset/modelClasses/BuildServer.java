@@ -45,8 +45,9 @@ public class BuildServer implements Comparable<BuildServer> {
 		lastJob = rs.getTimestamp(startingFrom++);
 		lastSuccess = rs.getTimestamp(startingFrom++);
 		load = rs.getString(startingFrom++);
-		lastRequestProjectPK = Project.asPK(rs.getInt(startingFrom++));
-		lastRequestCoursePK = Course.asPK(rs.getInt(startingFrom++));
+		boolean hasLastRequest = lastRequestSubmissionPK != 0;
+		lastRequestProjectPK = hasLastRequest ? Project.asPK(rs.getInt(startingFrom++)) : 0;
+		lastRequestCoursePK = hasLastRequest ? Course.asPK(rs.getInt(startingFrom++)) : 0;
 	}
 
 	public boolean canBuild(Course course, @CheckForNull String universalBuilderserverKey) {
@@ -158,30 +159,51 @@ public class BuildServer implements Comparable<BuildServer> {
 	        }
 	   }
 	        
+    public static Collection<BuildServer> getAll(Connection conn)
+            throws SQLException {
+        String query = " SELECT "
+                + ATTRIBUTES
+                + ", submissions.project_pk, projects.course_pk FROM "
+                + TABLE_NAME
+                + ","
+                + Submission.TABLE_NAME
+                + ","
+                + Project.TABLE_NAME
+                + " WHERE buildservers.last_request_submission_pk = submissions.submission_pk "
+                + " AND submissions.project_pk = projects.project_pk ";
+        PreparedStatement stmt = conn.prepareStatement(query);
+        Collection<BuildServer> collection = new TreeSet<BuildServer>();
+        long recent = System.currentTimeMillis()
+                - TimeUnit.MILLISECONDS.convert(40, TimeUnit.MINUTES);
 
-	public static Collection<BuildServer> getAll(Connection conn)
-			throws SQLException {
-		String query = " SELECT " + ATTRIBUTES + ", submissions.project_pk, projects.course_pk FROM " + TABLE_NAME +"," + Submission.TABLE_NAME +"," + Project.TABLE_NAME
-				+ " WHERE buildservers.last_request_submission_pk = submissions.submission_pk " 
-				+ " AND submissions.project_pk = projects.project_pk ";
-	    PreparedStatement stmt = conn.prepareStatement(query);
-		Collection<BuildServer> collection = new TreeSet<BuildServer>();
-		ResultSet rs = stmt.executeQuery();
-		long recent = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(40, TimeUnit.MINUTES);
+        addRecentBuildServers(stmt, collection, recent);
+        query = " SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
+                + " WHERE buildservers.last_request_submission_pk = ? ";
+        stmt = conn.prepareStatement(query);
+        stmt.setInt(1, 0);
+        addRecentBuildServers(stmt, collection, recent);
 
+        return collection;
+    }
+
+
+    private static void addRecentBuildServers(PreparedStatement stmt,
+            Collection<BuildServer> collection, long recent)
+            throws SQLException {
+        ResultSet rs = stmt.executeQuery();
+		
 		while (rs.next()) {
-			BuildServer bs = new BuildServer(rs, 1);
+        	BuildServer bs = new BuildServer(rs, 1);
+        	rs.close();
+        	Timestamp lastRequest = bs.getLastRequest();
+        	Timestamp lastSuccess = bs.getLastSuccess();
+        	if (lastRequest.getTime() > recent || lastSuccess != null && lastSuccess.getTime() > recent)
+        	  collection.add(bs);
+        }
+		stmt.close();
+    }
 
-			Timestamp lastRequest = bs.getLastRequest();
-			Timestamp lastSuccess = bs.getLastSuccess();
-			if (lastRequest.getTime() > recent || lastSuccess != null && lastSuccess.getTime() > recent)
-			  collection.add(bs);
-		}
-		return collection;
-
-	}
-
-	public static Collection<BuildServer> getAll(Course course, String universalBuilderserverKey, Connection conn)
+    public static Collection<BuildServer> getAll(Course course, String universalBuilderserverKey, Connection conn)
 			throws SQLException {
 		Collection<BuildServer> collection = getAll(conn);
 		Collection<BuildServer> result = new TreeSet<BuildServer>();
