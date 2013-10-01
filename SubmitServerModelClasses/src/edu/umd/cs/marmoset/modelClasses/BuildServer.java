@@ -194,12 +194,12 @@ public class BuildServer implements Comparable<BuildServer> {
 		
 		while (rs.next()) {
         	BuildServer bs = new BuildServer(rs, 1);
-        	rs.close();
         	Timestamp lastRequest = bs.getLastRequest();
         	Timestamp lastSuccess = bs.getLastSuccess();
         	if (lastRequest.getTime() > recent || lastSuccess != null && lastSuccess.getTime() > recent)
         	  collection.add(bs);
         }
+        rs.close();
 		stmt.close();
     }
 
