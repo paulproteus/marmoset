@@ -79,3 +79,5 @@ CREATE TABLE `file_contents` (
 
 
 ALTER TABLE  `buildservers` ADD  `kind` VARCHAR( 40 ) NOT NULL DEFAULT  'UNKNOWN';
+
+ALTER TABLE  `student_submit_status` ADD  `last_build_request_timestamp` DATETIME NULL DEFAULT NULL;
