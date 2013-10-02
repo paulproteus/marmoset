@@ -186,7 +186,6 @@ public class BuildServer implements Comparable<BuildServer> {
         return collection;
     }
 
-
     private static void addRecentBuildServers(PreparedStatement stmt,
             Collection<BuildServer> collection, long recent)
             throws SQLException {
