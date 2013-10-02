@@ -53,6 +53,7 @@ import edu.umd.cs.marmoset.modelClasses.HttpHeaders;
 import edu.umd.cs.marmoset.modelClasses.IO;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Queries;
+import edu.umd.cs.marmoset.modelClasses.StudentSubmitStatus;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
 import edu.umd.cs.marmoset.modelClasses.TestRun.Kind;
@@ -351,9 +352,14 @@ public class RequestSubmission extends SubmitServerServlet {
                   + " pending build requests");
 
         submission.incrementNumPendingBuildRequests();
-        submission.setBuildRequestTimestamp(new Timestamp(System.currentTimeMillis()));
+        Timestamp buildRequestTimestamp = new Timestamp(System.currentTimeMillis());
+        submission.setBuildRequestTimestamp(buildRequestTimestamp);
 
         submission.update(conn);
+        if (!kind.isBackgroundRetest())
+          StudentSubmitStatus.updateLastBuildRequest(submission.getStudentRegistrationPK(), 
+            submission.getProjectPK(), 
+            buildRequestTimestamp, conn);
 
       } finally {
         if (locked)
