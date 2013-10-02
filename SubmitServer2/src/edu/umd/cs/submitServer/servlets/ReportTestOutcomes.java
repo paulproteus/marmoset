@@ -34,10 +34,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -58,13 +55,13 @@ import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.TestOutcome;
 import edu.umd.cs.marmoset.modelClasses.TestOutcomeCollection;
 import edu.umd.cs.marmoset.modelClasses.TestRun;
+import edu.umd.cs.marmoset.modelClasses.TestRun.Kind;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.marmoset.utilities.JavaMail;
 import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
 import edu.umd.cs.submitServer.filters.SubmitServerFilter;
-import edu.umd.cs.submitServer.servlets.RequestSubmission.Kind;
 
 /**
  * @author jspacco Called (usually by the Build Server) to report the outcomes

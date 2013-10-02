@@ -119,12 +119,12 @@
         <tr>
             <th rowspan="2">Host</th>
             <th rowspan="2">Last request</th>
-            <th colspan="3">now building</th>
+            <th colspan="4">now building</th>
             <th rowspan="2">Last job</th>
             <th rowspan="2">Last success</th>
             <th rowspan="2">Load</th>
         </tr>
-		<tr><th>submission<th>project<th>course
+		<tr><th>submission<th>kind<th>project<th>course
         <c:forEach var="buildServer" items="${buildServers}" varStatus="counter">
             <tr class="r${counter.index % 2}">
                 <td><c:out value="${buildServer.name}" /></td>
@@ -135,6 +135,7 @@
                 <c:param name="submissionPK" value="${buildServer.lastRequestSubmissionPK}" />
                 </c:url>
                 <a href="${s}">${buildServer.lastRequestSubmissionPK}</a>
+                <td><c:out value="${buildServer.kind}"/>
                 <td>
                 <c:url var="s" value="/view/instructor/project.jsp">
                 <c:param name="projectPK" value="${buildServer.lastRequestProjectPK}" />
@@ -147,7 +148,7 @@
                 <a href="${s}">${buildServer.lastRequestCoursePK}</a>
                 </c:when>
                 <c:otherwise>
-                <td colspan="3"></td>
+                <td colspan="4"/>
                 </c:otherwise>
                 </c:choose>
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>

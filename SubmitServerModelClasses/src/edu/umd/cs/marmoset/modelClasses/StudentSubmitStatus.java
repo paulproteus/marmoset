@@ -27,6 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -56,7 +57,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
      }
 
 	//private String pk;
-	private int projectPK; // non-NULL
+	private @Project.PK int projectPK; // non-NULL
 	private @StudentRegistration.PK  int studentRegistrationPK; // non-NULL
 	private @CheckForNull @StudentRegistration.PK  Integer partner_sr_pk;
 	private String oneTimePassword;
@@ -65,8 +66,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	private int numberCommits;
 	private int extension = 0;
 	private boolean canReleaseTest = true;
+	private Timestamp lastBuildRequestTimestamp;
 
-	// [NAT P002] removed random number generation
 
 	/**
 	 * List of all attributes of student_submit_status table.
@@ -80,7 +81,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 			"number_commits",
 			"number_runs",
 			"extension",
-			"can_release_test"
+			"can_release_test",
+			"last_build_request_timestamp"
 	};
 
 	public static final String TABLE_NAME = "student_submit_status";
@@ -126,13 +128,13 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	/**
 	 * @return Returns the projectPK.
 	 */
-	public int getProjectPK() {
+	public @Project.PK int getProjectPK() {
 		return projectPK;
 	}
 	/**
 	 * @param projectPK The projectPK to set.
 	 */
-	public void setProjectPK(int projectPK) {
+	public void setProjectPK(@Project.PK int projectPK) {
 		this.projectPK = projectPK;
 	}
 	/**
@@ -201,6 +203,13 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		this.canReleaseTest = canReleaseTest;
 	}
 
+	public Timestamp getLastBuildRequestTimestamp() {
+		return lastBuildRequestTimestamp;
+	}
+	
+	private void setLastBuildRequestTimestamp(Timestamp lastBuildRequestTimestamp) {
+		 this.lastBuildRequestTimestamp = lastBuildRequestTimestamp;
+	}
 	public void fetchValues(ResultSet resultSet, int startingFrom) throws SQLException
 	{
 		setProjectPK(resultSet.getInt(startingFrom++));
@@ -212,6 +221,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		setNumberRuns(resultSet.getInt(startingFrom++));
 		setExtension(resultSet.getInt(startingFrom++));
 		setCanReleaseTest(resultSet.getBoolean(startingFrom++));
+		setLastBuildRequestTimestamp(resultSet.getTimestamp(startingFrom++));
 	}
 
 	/**
@@ -321,8 +331,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	}
 
 	public static @CheckForNull StudentSubmitStatus lookupByStudentRegistrationPKAndProjectPK(
-			Integer studentRegistrationPK,
-			Integer projectPK,
+			@StudentRegistration.PK Integer studentRegistrationPK,
+			@Project.PK Integer projectPK,
 			 @Nonnull  Connection conn)
 			throws SQLException
 	{
@@ -339,12 +349,36 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
         StudentSubmitStatus result = getFromPreparedStatement(stmt);
 
         return result;
+	}
+	
+	public static void updateLastBuildRequest(
+			@StudentRegistration.PK Integer studentRegistrationPK,
+			@Project.PK Integer projectPK,
+			Timestamp lastBuildRequest,
+			 @Nonnull  Connection conn)
+			throws SQLException {
+		
+		String query =
+				 " UPDATE " + TABLE_NAME +
+			        " SET " +
+			        " last_build_request_timestamp = ? " +
+			" WHERE student_registration_pk = ? " +
+			" AND project_pk = ?";
+
+		PreparedStatement stmt = conn.prepareStatement(query);
+
+		stmt.setTimestamp(1, lastBuildRequest);
+		SqlUtilities.setInteger(stmt, 2, studentRegistrationPK);
+        SqlUtilities.setInteger(stmt, 3, projectPK);
+
+        stmt.executeUpdate();
 
 
 	}
 
+
     public static Map<Integer, StudentSubmitStatus> lookupAllByProjectPK(
-            Integer projectPK,
+            @Project.PK Integer projectPK,
             Connection conn)
     throws SQLException
     {
@@ -475,7 +509,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
  	 * @throws SQLException
  	 */
  	public static void banStudentFromExistingProjects(Connection conn,
- 			Integer coursePK, @StudentRegistration.PK Integer studentRegistrationPK, @Project.PK Integer projectPK)
+ 			@Course.PK Integer coursePK, @StudentRegistration.PK Integer studentRegistrationPK, @Project.PK Integer projectPK)
 	throws SQLException
 	{
  		List<Integer> studentRegistrationPKs = new ArrayList<Integer>();

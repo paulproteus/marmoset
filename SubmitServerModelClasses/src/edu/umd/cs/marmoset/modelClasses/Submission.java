@@ -1860,19 +1860,8 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
                         +studentRegistration.getStudentRegistrationPK()+
                         ", projectPK: " +project.getProjectPK());
             }
-
-//          find StudentSubmitStatus record
-            StudentSubmitStatus studentSubmitStatus
-            = StudentSubmitStatus.findOrCreate(
-                        project.getProjectPK(),
-                        studentRegistration.getStudentRegistrationPK(),
-                        conn);
-
-
-            int submitNumber = -1;
-            submitNumber = studentSubmitStatus.getNumberSubmissions() + 1;
-            studentSubmitStatus.setNumberSubmissions(submitNumber);
-            studentSubmitStatus.update(conn);
+            int submitNumber = getNewSubmissionNumber(conn, project,
+					studentRegistration);
 
             // prepare new snapshot record
             Submission submission=new Submission();
@@ -1903,6 +1892,28 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
             Queries.rollbackIfUnsuccessful(transactionSuccess, conn);
         }
     }
+	/**
+	 * @param conn
+	 * @param project
+	 * @param studentRegistration
+	 * @return
+	 * @throws SQLException
+	 */
+	private static int getNewSubmissionNumber(Connection conn, Project project,
+			StudentRegistration studentRegistration) throws SQLException {
+		
+//          find StudentSubmitStatus record
+		StudentSubmitStatus studentSubmitStatus
+		= StudentSubmitStatus.findOrCreate(
+		            project.getProjectPK(),
+		            studentRegistration.getStudentRegistrationPK(),
+		            conn);
+
+		int submitNumber = studentSubmitStatus.getNumberSubmissions() + 1;
+		studentSubmitStatus.setNumberSubmissions(submitNumber);
+		studentSubmitStatus.update(conn);
+		return submitNumber;
+	}
 
 
     private static Submission lookupByCvsTagTimestamp(String cvsTagTimestamp,
