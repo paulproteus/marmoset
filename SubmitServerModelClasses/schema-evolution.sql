@@ -76,3 +76,6 @@ CREATE TABLE `file_contents` (
   UNIQUE KEY `checksum` (`checksum`),
   KEY `text` (`text`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+ALTER TABLE  `buildservers` ADD  `kind` VARCHAR( 40 ) NOT NULL DEFAULT  'UNKNOWN';
