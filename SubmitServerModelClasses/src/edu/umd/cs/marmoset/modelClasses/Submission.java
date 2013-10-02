@@ -2034,21 +2034,14 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
 			String submitClientVersion, Timestamp submissionTimestamp,
 			Connection conn) throws SQLException {
 		// find StudentSubmitStatus record
-        StudentSubmitStatus studentSubmitStatus
-        = StudentSubmitStatus.findOrCreate(
-                    project.getProjectPK(),
-                    studentRegistration.getStudentRegistrationPK(),
-                    conn);
-
+       
 
         if (project.getCanonicalStudentRegistrationPK() ==
                 studentRegistration.getStudentRegistrationPK())
             TestSetup.resetAllFailedTestSetups(project.getProjectPK(),
                     conn);
-        int submissionNumber = studentSubmitStatus.getNumberSubmissions() + 1;
-        // figure out how many submissions have already been made
-        studentSubmitStatus.setNumberSubmissions(submissionNumber);
-        studentSubmitStatus.update(conn);
+        
+        int submissionNumber = getNewSubmissionNumber(conn, project, studentRegistration);
 
         // prepare new submission record
         Submission submission = new Submission();

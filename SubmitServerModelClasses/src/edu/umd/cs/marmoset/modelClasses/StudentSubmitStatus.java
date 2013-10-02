@@ -212,7 +212,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	}
 	public void fetchValues(ResultSet resultSet, int startingFrom) throws SQLException
 	{
-		setProjectPK(resultSet.getInt(startingFrom++));
+		setProjectPK(Project.asPK(resultSet.getInt(startingFrom++)));
 		setStudentRegistrationPK(StudentRegistration.asPK(resultSet.getInt(startingFrom++)));
 		setPartnerPK(StudentRegistration.asPK(resultSet.getInt(startingFrom++)));
 		setOneTimePassword(resultSet.getString(startingFrom++));
@@ -270,6 +270,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		stmt.setInt(index++, numberRuns);
 		stmt.setInt(index++, extension);
 		stmt.setBoolean(index++, canReleaseTest);
+		stmt.setTimestamp(index++, lastBuildRequestTimestamp);
 	}
 
 	public void update(Connection conn)
@@ -284,7 +285,8 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 	        " number_commits = ?, " +
 	        " number_runs = ?, " +
 	        " extension = ?, " +
-	        " can_release_test = ? " +
+	        " can_release_test = ?, " +
+	        " last_build_request_timestamp = ? " +
 	        " WHERE student_registration_pk = ? " +
 	        " AND project_pk = ? ";
 	    PreparedStatement stmt=null;
@@ -295,7 +297,9 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 			Queries.setStatement(stmt, getPartnerPK(), getOneTimePassword(),
 					getNumberSubmissions(), getNumberCommits(), getNumberRuns(),
 					getExtension(),
-					getCanReleaseTest(), getStudentRegistrationPK(),
+					getCanReleaseTest(),
+					getLastBuildRequestTimestamp(),
+					getStudentRegistrationPK(),
 					getProjectPK());
 			stmt.executeUpdate();
 	    } finally {
