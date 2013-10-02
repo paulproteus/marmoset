@@ -55,6 +55,7 @@ import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.Queries;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.marmoset.modelClasses.Submission.BuildStatus;
+import edu.umd.cs.marmoset.modelClasses.TestRun.Kind;
 import edu.umd.cs.marmoset.modelClasses.TestSetup;
 import edu.umd.cs.submitServer.MultipartRequest;
 import edu.umd.cs.submitServer.WebConfigProperties;
@@ -73,18 +74,6 @@ public class RequestSubmission extends SubmitServerServlet {
   private static final int MAX_BUILD_DURATION_MINUTES = 3;
 
   private static Lock lock = new java.util.concurrent.locks.ReentrantLock();
-
-  enum Kind {
-    UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP, BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST, PROJECT_RETEST;
-
-    public boolean isBackgroundRetest() {
-      return this == BACKGROUND_RETEST || this == PROJECT_RETEST;
-    }
-
-    public boolean isSpecificRequest() {
-      return this == SPECIFIC_REQUEST_NO_TESTSETUP || this == SPECIFIC_REQUEST_NEW_TESTUP || this == SPECIFIC_REQUEST;
-    }
-  }
 
   public static void timeDump(StringBuffer buf, Timestamp started, String f, Object... args) {
     long now = System.currentTimeMillis();
@@ -386,7 +375,7 @@ public class RequestSubmission extends SubmitServerServlet {
 
       OutputStream out = response.getOutputStream();
       IO.copyStream(bais, out);
-      BuildServer.submissionRequestedAndProvided(conn, hostname, remoteHost, courseKey, now, load, submission);
+      BuildServer.submissionRequestedAndProvided(conn, hostname, remoteHost, courseKey, now, load, submission, kind);
     } catch (SQLException e) {
       handleSQLException(e);
       throw new ServletException(e);

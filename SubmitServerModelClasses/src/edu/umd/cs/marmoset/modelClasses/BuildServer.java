@@ -25,12 +25,13 @@ public class BuildServer implements Comparable<BuildServer> {
 	@CheckForNull
 	Timestamp lastJob;
 	String load;
+	final TestRun.Kind kind;
 	@Project.PK final int lastRequestProjectPK;
 	@Course.PK final int lastRequestCoursePK;
 	public static final String TABLE_NAME = "buildservers";
 
 	static final String[] ATTRIBUTE_NAME_LIST = { "buildserver_pk", "name",
-			"remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "last_success", "system_load" };
+			"remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "last_success", "system_load", "kind" };
 
 	public static final String ATTRIBUTES = Queries.getAttributeList(
 			TABLE_NAME, ATTRIBUTE_NAME_LIST);
@@ -45,6 +46,7 @@ public class BuildServer implements Comparable<BuildServer> {
 		lastJob = rs.getTimestamp(startingFrom++);
 		lastSuccess = rs.getTimestamp(startingFrom++);
 		load = rs.getString(startingFrom++);
+		kind = TestRun.Kind.valueOfAnyCase(rs.getString(startingFrom++));
 		boolean hasLastRequest = lastRequestSubmissionPK != 0;
 		lastRequestProjectPK = hasLastRequest ? Project.asPK(rs.getInt(startingFrom++)) : 0;
 		lastRequestCoursePK = hasLastRequest ? Course.asPK(rs.getInt(startingFrom++)) : 0;
@@ -95,18 +97,22 @@ public class BuildServer implements Comparable<BuildServer> {
 	public String getLoad() {
 		return load;
 	}
+	
+	public TestRun.Kind getKind() {
+		return kind;
+	}
 
 	public static void submissionRequestedNoneAvailable(Connection conn, String name,
 			String remoteHost, @CheckForNull String courses,
 			Timestamp lastRequest, String load) throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(new String[] {
-				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "system_load" },
+				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "system_load", "kind"},
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
-			Queries.setStatement(stmt, name, remoteHost, courses, lastRequest,0,
-					load, remoteHost, courses, lastRequest,0,
-					load);
+			Queries.setStatement(stmt, name, remoteHost, courses, lastRequest, 0,
+					load, remoteHost, courses, lastRequest, 0,
+					load, TestRun.Kind.UNKNOWN);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);
@@ -114,14 +120,14 @@ public class BuildServer implements Comparable<BuildServer> {
 	}
 	public static void submissionRequestedAndProvided(Connection conn, String name,
 			String remoteHost, @CheckForNull String courses,
-			Timestamp now, String load, Submission submission) throws SQLException {
+			Timestamp now, String load, Submission submission, TestRun.Kind kind) throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(new String[] {
-				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "system_load" },
+				"name", "remote_host", "courses", "last_request", "last_request_submission_pk", "last_job", "system_load", "kind" },
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
 			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, 
-					remoteHost, courses, now, submission.getSubmissionPK(), now,load);
+					remoteHost, courses, now, submission.getSubmissionPK(), now,load, kind);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);
@@ -133,15 +139,15 @@ public class BuildServer implements Comparable<BuildServer> {
 			Timestamp now, String load, Submission submission)
 			throws SQLException {
 		String query = Queries.makeInsertOrUpdateStatement(
-				new String[] {"name", "remote_host","last_success" ,"last_built_submission_pk", "last_request_submission_pk", "system_load",  "courses", "last_request" }, 
-				new String[] {"remote_host", "last_success","last_built_submission_pk", "last_request_submission_pk", "system_load"}, 
+				new String[] {"name", "remote_host","last_success" ,"last_built_submission_pk", "last_request_submission_pk", "system_load", "kind", "courses", "last_request" }, 
+				new String[] {"remote_host", "last_success","last_built_submission_pk", "last_request_submission_pk", "system_load", "kind"}, 
 				TABLE_NAME);
 		@Submission.PK int submissionPK = submission.getSubmissionPK();
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
 			Queries.setStatement(stmt,
-					name, remoteHost, now, submissionPK, 0, load, "", now,
-					 remoteHost, now, submissionPK,0, load);
+					name, remoteHost, now, submissionPK, 0, load, TestRun.Kind.UNKNOWN, "", now,
+					 remoteHost, now, submissionPK,0, load, TestRun.Kind.UNKNOWN);
 			stmt.executeUpdate();
 		} finally {
 			Queries.closeStatement(stmt);

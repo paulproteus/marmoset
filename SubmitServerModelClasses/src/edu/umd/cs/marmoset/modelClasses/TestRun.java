@@ -514,5 +514,23 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
     }
 
 
+    public enum Kind {
+    	  UNKNOWN, SPECIFIC_REQUEST, SPECIFIC_REQUEST_NEW_TESTUP, SPECIFIC_REQUEST_NO_TESTSETUP, NEW_TEST_SETUP, BUILD_STATUS_NEW, EXPLICIT_RETESTS, OUT_OF_DATE_TEST_SETUPS, BACKGROUND_RETEST, PROJECT_RETEST;
+
+    	  public static Kind valueOfAnyCase(String name) {
+    	        return valueOf(name.toUpperCase());
+    	    }
+    	  
+    	  public boolean isBackgroundRetest() {
+    	    return this == BACKGROUND_RETEST || this == PROJECT_RETEST;
+    	  }
+
+    	  public boolean isSpecificRequest() {
+    	    return this == SPECIFIC_REQUEST_NO_TESTSETUP || this == SPECIFIC_REQUEST_NEW_TESTUP || this == SPECIFIC_REQUEST;
+    	  }
+    	}
+
 
 }
+
+ 
