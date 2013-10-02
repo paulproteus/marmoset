@@ -148,7 +148,7 @@
                 <a href="${s}">${buildServer.lastRequestCoursePK}</a>
                 </c:when>
                 <c:otherwise>
-                <td colspan="3"></td>
+                <td colspan="4"/>
                 </c:otherwise>
                 </c:choose>
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
