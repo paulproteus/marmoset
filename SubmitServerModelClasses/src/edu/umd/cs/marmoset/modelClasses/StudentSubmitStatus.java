@@ -270,6 +270,7 @@ import edu.umd.cs.marmoset.utilities.SqlUtilities;
 		stmt.setInt(index++, numberRuns);
 		stmt.setInt(index++, extension);
 		stmt.setBoolean(index++, canReleaseTest);
+		stmt.setTimestamp(index++, lastBuildRequestTimestamp);
 	}
 
 	public void update(Connection conn)

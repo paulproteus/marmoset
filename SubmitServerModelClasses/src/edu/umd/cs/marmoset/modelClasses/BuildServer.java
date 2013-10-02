@@ -111,7 +111,7 @@ public class BuildServer implements Comparable<BuildServer> {
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
 			Queries.setStatement(stmt, name, remoteHost, courses, lastRequest, 0,
-					load, remoteHost, courses, lastRequest, 0,
+					load, TestRun.Kind.UNKNOWN, remoteHost, courses, lastRequest, 0,
 					load, TestRun.Kind.UNKNOWN);
 			stmt.executeUpdate();
 		} finally {
@@ -126,7 +126,7 @@ public class BuildServer implements Comparable<BuildServer> {
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
-			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, 
+			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, kind,
 					remoteHost, courses, now, submission.getSubmissionPK(), now,load, kind);
 			stmt.executeUpdate();
 		} finally {
