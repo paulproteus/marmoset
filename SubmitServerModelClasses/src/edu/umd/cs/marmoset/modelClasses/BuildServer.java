@@ -126,7 +126,7 @@ public class BuildServer implements Comparable<BuildServer> {
 				TABLE_NAME);
 		PreparedStatement stmt = conn.prepareStatement(query);
 		try {
-			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, 
+			Queries.setStatement(stmt, name, remoteHost, courses, now,submission.getSubmissionPK(), now,load, kind,
 					remoteHost, courses, now, submission.getSubmissionPK(), now,load, kind);
 			stmt.executeUpdate();
 		} finally {
@@ -191,7 +191,6 @@ public class BuildServer implements Comparable<BuildServer> {
 
         return collection;
     }
-
 
     private static void addRecentBuildServers(PreparedStatement stmt,
             Collection<BuildServer> collection, long recent)
