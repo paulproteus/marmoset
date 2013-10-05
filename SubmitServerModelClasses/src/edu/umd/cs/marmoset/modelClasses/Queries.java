@@ -645,15 +645,15 @@ public final class Queries {
 
 	public static void setStatement(PreparedStatement p, Object... args)
 			throws SQLException {
-		ParameterMetaData meta = p.getParameterMetaData();
+//		ParameterMetaData meta = p.getParameterMetaData();
 		for (int i = 0; i < args.length; i++) {
 			Object o = args[i];
 			int col = i + 1;
-			String className = meta.getParameterClassName(col);
-			if (o != null && !o.getClass().getName().equals(className)) {
-				new SQLException(String.format("parameter %d of type %s doesn't match argument of class %s",
-						col, className, o.getClass().getName())).printStackTrace();
-			}
+//			String className = meta.getParameterClassName(col);
+//			if (o != null && !o.getClass().getName().equals(className)) {
+//				new SQLException(String.format("parameter %d of type %s doesn't match argument of class %s",
+//						col, className, o.getClass().getName())).printStackTrace();
+//			}
 				
 			if (o instanceof String)
 				p.setString(col, (String) o);
