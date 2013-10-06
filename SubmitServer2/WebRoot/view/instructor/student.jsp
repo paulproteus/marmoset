@@ -98,6 +98,7 @@
             </c:if>
             <p>
                 <ss:studentEmail />
+                <p>Login name: <c:out value="${student.loginName}"/>
                 <c:choose>
                     <c:when test="${studentRegistration.dropped}">
                         <p>Student has dropped course (as reported to grade server)
