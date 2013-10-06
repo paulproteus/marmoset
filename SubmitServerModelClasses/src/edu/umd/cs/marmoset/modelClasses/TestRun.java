@@ -528,6 +528,11 @@ public class TestRun implements ITestSummary<TestRun>, Cloneable
     	  public boolean isSpecificRequest() {
     	    return this == SPECIFIC_REQUEST_NO_TESTSETUP || this == SPECIFIC_REQUEST_NEW_TESTUP || this == SPECIFIC_REQUEST;
     	  }
+    	  
+    	  @Override
+    	  public String toString() {
+    	      return name().toLowerCase().replace('_', ' ');
+    	  }
     	}
 
 
