@@ -151,7 +151,7 @@
                 <td colspan="4"/>
                 </c:otherwise>
                 </c:choose>
-                <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
+                <td><fmt:formatDate value="${buildServer.lastJob}" pattern="dd MMM, hh:mm a" /></td>
 
                 <td><fmt:formatDate value="${buildServer.lastSuccess}" pattern="dd MMM, hh:mm a" /></td>
                 <td class="description"><c:out value="${buildServer.load}" /></td>
