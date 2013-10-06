@@ -110,7 +110,7 @@ public class CommandLineSubmit {
             addIgnoredPatternsFromFile(cvsIgnoreFile, ignorePatterns);
             addIgnoredPatternsFromFile(submitIgnoreFile, ignorePatterns);
 
-            FindAllFiles find = new FindAllFiles(submitFile, ignorePatterns.getPattern());
+            FindAllFiles find = new FindAllFiles(home, ignorePatterns.getPattern());
             Collection<File> files = find.getAllFiles();
 
             Properties userProps = new Properties();

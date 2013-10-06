@@ -47,9 +47,9 @@ public class FindAllFiles {
     int rootPathLength;
     Pattern p;
 
-    FindAllFiles(File f, Pattern filesToIgnore) throws IOException {
+    FindAllFiles(File root, Pattern filesToIgnore) throws IOException {
         p = filesToIgnore;
-        root = f.getCanonicalFile().getParentFile();
+        root = root.getCanonicalFile().getParentFile();
         rootPath = root.getCanonicalPath();
        // System.out.println("Root path: " + rootPath);
         rootPathLength = rootPath.length();
@@ -77,7 +77,7 @@ public class FindAllFiles {
 
     public static void main(String[] args) throws IOException {
         Pattern p = new FilesToIgnore().getPattern();
-        FindAllFiles allFiles = new FindAllFiles(new File(".project"), p);
+        FindAllFiles allFiles = new FindAllFiles(new File("."), p);
         System.out.println("---");
         for(File f : allFiles.s)
             if (!f.isDirectory())
