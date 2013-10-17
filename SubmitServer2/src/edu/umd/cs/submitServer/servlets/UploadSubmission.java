@@ -38,7 +38,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -59,7 +58,6 @@ import org.apache.log4j.Logger;
 import com.ice.tar.TarEntry;
 import com.ice.tar.TarInputStream;
 
-import edu.umd.cs.marmoset.modelClasses.Archive;
 import edu.umd.cs.marmoset.modelClasses.Project;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;

@@ -36,10 +36,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -53,7 +49,6 @@ import org.apache.log4j.Logger;
 import au.com.bytecode.opencsv.CSVWriter;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.utilities.SystemInfo;
 import edu.umd.cs.submitServer.GenericLDAPAuthenticationService;
 import edu.umd.cs.submitServer.ILDAPAuthenticationService;
 import edu.umd.cs.submitServer.SubmitServerConstants;

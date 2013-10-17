@@ -1,7 +1,5 @@
 package edu.umd.review.gwt;
 
-import java.util.Collection;
-
 import edu.umd.review.common.action.GetCodeReviewAction;
 import edu.umd.review.gwt.rpc.dto.CheckboxEvaluationDto;
 import edu.umd.review.gwt.rpc.dto.CheckboxRubricDto;

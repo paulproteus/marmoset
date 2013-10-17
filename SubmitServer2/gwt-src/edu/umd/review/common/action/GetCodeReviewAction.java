@@ -7,7 +7,6 @@ import java.util.Map;
 
 import net.customware.gwt.dispatch.shared.Action;
 import edu.umd.review.gwt.rpc.dto.FileDto;
-import edu.umd.review.server.dao.ReviewDao;
 
 public class GetCodeReviewAction implements Action<GetCodeReviewAction.Result> {
 

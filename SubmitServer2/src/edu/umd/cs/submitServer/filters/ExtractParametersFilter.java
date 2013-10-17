@@ -31,7 +31,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,9 +52,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Ordering;
-
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
@@ -76,7 +72,6 @@ import edu.umd.cs.submitServer.ReleaseInformation;
 import edu.umd.cs.submitServer.RequestParser;
 import edu.umd.cs.submitServer.SubmitServerConstants;
 import edu.umd.cs.submitServer.UserSession;
-import edu.umd.cs.submitServer.WebConfigProperties;
 
 /**
  * Requires a projectPK and optionally a studentRegistrationPK.

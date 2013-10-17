@@ -26,7 +26,6 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.zip.Checksum;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

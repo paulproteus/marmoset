@@ -8,7 +8,6 @@ import net.customware.gwt.dispatch.shared.DispatchException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import edu.umd.review.common.action.PublishAllAction;
 import edu.umd.review.common.action.RateReviewerAction;
 import edu.umd.review.common.action.VoidResult;
 

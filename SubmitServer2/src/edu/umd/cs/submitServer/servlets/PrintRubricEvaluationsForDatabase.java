@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.bytecode.opencsv.CSVWriter;
-
 import edu.umd.cs.marmoset.modelClasses.Rubric;
 import edu.umd.cs.marmoset.modelClasses.RubricEvaluation;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;

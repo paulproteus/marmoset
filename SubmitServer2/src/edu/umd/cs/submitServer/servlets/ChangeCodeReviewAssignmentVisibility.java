@@ -26,7 +26,6 @@ package edu.umd.cs.submitServer.servlets;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,10 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.Student;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
-import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.submitServer.InvalidRequiredParameterException;
 import edu.umd.cs.submitServer.RequestParser;
 
 public class ChangeCodeReviewAssignmentVisibility extends SubmitServerServlet {

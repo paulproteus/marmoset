@@ -3,7 +3,6 @@ package edu.umd.cs.submitServer.filters;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
