@@ -32,9 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment.Kind;
-import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
-import edu.umd.cs.marmoset.modelClasses.Submission;
 
 public class DeleteCodeReview extends SubmitServerServlet {
 

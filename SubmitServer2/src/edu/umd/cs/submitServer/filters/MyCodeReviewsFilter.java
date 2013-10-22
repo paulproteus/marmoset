@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import edu.umd.cs.marmoset.modelClasses.CodeReviewAssignment;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
@@ -127,7 +128,9 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 				if (author != null && userSession.getStudentPK() == author.getStudentPK())
 					reviewsOfMyCode.add(s);
 				else if (r.isAssignment()) {
-					if (r.getCodeReviewAssignment().isVisibleToStudents()
+					CodeReviewAssignment codeReviewAssignment = r.getCodeReviewAssignment();
+					assert codeReviewAssignment != null;
+          if (codeReviewAssignment.isVisibleToStudents()
 					    || !studentRegistration.isNormalStudent()) myAssignments.add(s);
 				} else
 					adHocReviews.add(s);

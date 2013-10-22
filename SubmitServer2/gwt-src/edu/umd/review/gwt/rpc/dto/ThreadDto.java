@@ -2,7 +2,6 @@ package edu.umd.review.gwt.rpc.dto;
 
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;

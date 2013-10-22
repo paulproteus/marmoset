@@ -35,9 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.cs.marmoset.modelClasses.Project;
-import edu.umd.cs.marmoset.modelClasses.Submission;
-import edu.umd.cs.submitServer.InvalidRequiredParameterException;
-import edu.umd.cs.submitServer.RequestParser;
 
 
 public class ForkProject extends SubmitServerServlet {

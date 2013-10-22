@@ -24,8 +24,6 @@
 package edu.umd.cs.submitServer.servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

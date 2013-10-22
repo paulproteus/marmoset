@@ -1137,7 +1137,8 @@ public class Project implements Serializable, Cloneable {
 			throws IOException, SQLException {
 		Map<String, BitSet> changed =  new HashMap<String,BitSet>();
         int baselinePK = 0;
-
+        Integer submissionArchivePK = submission.getArchivePK();
+		assert submissionArchivePK != null;
         Integer tmp = this.getArchivePK();
         if (tmp != null)
             baselinePK = tmp;
@@ -1146,11 +1147,13 @@ public class Project implements Serializable, Cloneable {
 	        ChooseLastSubmissionPolicy policy = new ChooseLastSubmissionPolicy();
 	        Submission compareTo = policy.lookupChosenOntimeOrLateSubmission(projectToDiffAgainst, submission.getStudentRegistrationPK() , conn);
 	        if (compareTo != null) {
-	            baselinePK = compareTo.getArchivePK();
+	            Integer compareToArchivePK = compareTo.getArchivePK();
+	            assert compareToArchivePK != null;
+				baselinePK = compareToArchivePK;
 	        }
 	    }
 	        
-	    if (baselinePK != 0 && baselinePK != submission.getArchivePK()) {
+	   if (baselinePK != 0 && baselinePK != submissionArchivePK) {
 	        if (baselineText == null)
 	            baselineText = TextUtilities.scanTextFiles(this.getBaselineContents(baselinePK, conn), fileProperties);
 	        for(Entry<String, List<String>> e : current.entrySet()) {

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.customware.gwt.dispatch.client.DispatchAsync;
@@ -23,9 +22,9 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.umd.review.common.action.GetCodeReviewAction;
 import edu.umd.review.common.action.GetUnscoredRubrics;
-import edu.umd.review.common.action.RateReviewerAction;
 import edu.umd.review.common.action.GetUnscoredRubrics.Result;
 import edu.umd.review.common.action.PublishAllAction;
+import edu.umd.review.common.action.RateReviewerAction;
 import edu.umd.review.common.action.VoidResult;
 import edu.umd.review.gwt.CodeReviewSummary;
 import edu.umd.review.gwt.GwtUtils;

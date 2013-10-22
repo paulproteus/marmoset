@@ -56,7 +56,6 @@ import edu.umd.cs.marmoset.parser.ReaderIterator;
 import edu.umd.cs.marmoset.parser.Token;
 import edu.umd.cs.marmoset.parser.TokenScanner;
 import edu.umd.cs.marmoset.parser.TokenType;
-import edu.umd.cs.marmoset.utilities.EditDistance;
 
 /**
  * Display source code as HTML.
