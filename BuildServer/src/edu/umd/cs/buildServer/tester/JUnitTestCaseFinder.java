@@ -125,12 +125,18 @@ public class JUnitTestCaseFinder implements Iterable<JUnitTestCase> {
 	 */
 	public void setInspectedClass(String className)
 			throws ClassNotFoundException {
+		className = className.trim();
+		if (className.isEmpty())
+			throw new IllegalArgumentException("Class name for test cannot be the empty string");
 		initRepository();
 		try {
 		this.inspectedClass = Repository.lookupClass(className);
 		} catch (org.apache.bcel.classfile.ClassFormatException e) {
 		    log.error("Error parsing class " + className , e);
 		    throw new ClassNotFoundException("BCEL is unable to parse class " + className, e);
+		} catch (RuntimeException e) {
+		    log.error("Error parsing class " + className , e);
+		    throw new ClassNotFoundException("Did not find class " + className, e);
 		}
 	}
 
