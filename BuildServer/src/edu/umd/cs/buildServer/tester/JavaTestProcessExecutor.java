@@ -374,7 +374,14 @@ public class JavaTestProcessExecutor implements ConfigurationKeys {
 						+ new File(outputFilename).length()
 						+ " bytes of output");
 
-		return readTestOutcomeFromFile();
+		TestOutcome testOutcome = readTestOutcomeFromFile();
+		if (testType == TestType.SECRET) {
+			String longTestResult = testOutcome.getLongTestResult();
+			String output = monitor.getCombinedOutput().trim();
+			if (output.length() > 0)
+				testOutcome.setLongTestResultCompressIfNeeded(longTestResult + "\nTest output:\n" + output);
+		}
+		return testOutcome;
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	        throw new RuntimeException("Unexpected IO Exception", e);

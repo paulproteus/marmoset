@@ -530,12 +530,8 @@ public class TestRunner extends BaseTestRunner {
 			ObjectOutputStream out = new ObjectOutputStream(
 					new BufferedOutputStream(new FileOutputStream(outputFile)));
 
-			System.out.println("Writing test outcomes");
 			Collection<TestOutcome> testOutcomes = r.getTestOutcomes();
-			for(TestOutcome t : testOutcomes) {
-			    System.out.println(t.getShortTestName() + " " + t.getOutcome());
-			    System.out.println(t.getCappedLongTestResult());
-			}
+			
             out.writeObject(testOutcomes);
 			out.close();
 
