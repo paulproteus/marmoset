@@ -208,7 +208,7 @@
                      <c:if test="${inconsistentResults > 0}">
             
 					<td><c:if
-						test="${submission.numFailedBackgroundRetests > 0 && (publicInconsistencies[submission.submissionPK] || releaseInconsistencies[submission.submissionPK]) && !secretInconsistencies[submission.submissionPK]}">
+						test="${submission.numFailedBackgroundRetests > 0 && (publicInconsistencies[submission.submissionPK] || releaseInconsistencies[submission.submissionPK])}">
 						<a href="${submissionAllTestsLink}">
 						${submission.numFailedBackgroundRetests} </a>
 					</c:if></td>
