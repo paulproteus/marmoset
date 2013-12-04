@@ -171,8 +171,9 @@ public class TestProperties {
                 MAX_DRAIN_OUTPUT_IN_BYTES, DEFAULT_MAX_DRAIN_OUTPUT_IN_BYTES));
         setAdditionalSourceFileExtensions(getOptionalStringProperty(ADDITIONAL_SOURCE_FILE_EXTENSIONS));
         setLdLibraryPath(getOptionalStringProperty(LD_LIBRARY_PATH));
-        setTestTimeoutInSeconds(getOptionalIntegerProperty(TEST_TIMEOUT,
-                DEFAULT_PROCESS_TIMEOUT));
+        int timeout = getOptionalIntegerProperty(TEST_TIMEOUT,
+                DEFAULT_PROCESS_TIMEOUT);
+        setTestTimeoutInSeconds(timeout);
         setRequiredFiles(getOptionalStringProperty(TestPropertyKeys.REQUIRED_FILES));
     }
 
@@ -429,7 +430,7 @@ public class TestProperties {
         for (int i = 0; i < propertyNameList.length; ++i) {
             String value = getOptionalStringProperty(propertyNameList[i]);
             if (value != null)
-                return value;
+                return value.trim();
         }
         return null;
     }
