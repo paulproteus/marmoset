@@ -57,6 +57,7 @@ public class StudentForUpload {
 	public final String firstname;
 	public final String lastname;
 	public final String classAccount;
+	public final String email;
 	public final @Nonnull String section;
 	public final boolean inactive;
 	public final boolean dropped;
@@ -73,10 +74,12 @@ public class StudentForUpload {
 	 * @param password
 	 */
 	public StudentForUpload(String loginName, String campusUID,
+	    String email,
 			String firstname, String lastname, String classAccount,
 			String section, boolean inactive, boolean dropped) {
 		this.loginName = loginName;
 		this.campusUID = campusUID;
+		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.classAccount = classAccount;
@@ -135,6 +138,7 @@ public class StudentForUpload {
 		if (classAccount.equals(""))
 		    classAccount = loginName;
 		this.classAccount  = classAccount;
+		this.email = null;
 		
 		inactive = false;
 		dropped = false;
@@ -144,6 +148,7 @@ public class StudentForUpload {
 		lastname = parser.getCheckedParameter("lastname");
 		firstname = parser.getCheckedParameter("firstname");
 		campusUID = parser.getCheckedParameter("campusUID");
+		email = parser.getOptionalCheckedParameter("email");
 		classAccount = parser.getOptionalCheckedParameter("classAccount");
 		loginName = parser.getCheckedParameter("loginName");
 		section = parser.getOptionalCheckedParameter("section","");
@@ -199,7 +204,7 @@ public class StudentForUpload {
 			throws SQLException {
 		StudentForUpload s = this;
 		Student student = Student.insertOrUpdateByLoginNameAndCampusUID(
-				s.campusUID, s.firstname, s.lastname, s.loginName, conn);
+				s.campusUID, s.firstname, s.lastname, s.loginName, s.email, conn);
 		return student;
 	}
 }
