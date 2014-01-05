@@ -418,6 +418,7 @@ public class Student  implements Comparable<Student> {
       String firstname,
       String lastname,
       String loginName,
+      String email,
       Connection conn) throws SQLException {
     if (FAKE_NAMES)
       throw new IllegalStateException();
@@ -428,6 +429,7 @@ public class Student  implements Comparable<Student> {
           student.setCampusUID(campusUID);
           student.setFirstname(firstname);
           student.setLastname(lastname);
+          student.setEmail(email);
           student.insert(conn);
     } else if (student.loginName.endsWith(ADMIN_SUFFIX)) {
       // do nothing
@@ -438,6 +440,7 @@ public class Student  implements Comparable<Student> {
       student.lastname = lastname;
       student.firstname = firstname;
       student.loginName = loginName;
+      student.email = email;
       student.update(conn);
     }
     return student;
