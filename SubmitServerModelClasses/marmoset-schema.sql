@@ -48,6 +48,7 @@ CREATE TABLE `buildservers` (
   `system_load` text COLLATE utf8_bin NOT NULL,
   `last_built_submission_pk` int(11) NOT NULL DEFAULT '0',
   `last_testrun_pk` int(11) NOT NULL DEFAULT '0',
+  `kind` VARCHAR( 40 ) NOT NULL DEFAULT  'UNKNOWN',
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -455,6 +456,7 @@ CREATE TABLE `student_submit_status` (
   `number_runs` int(11) NOT NULL DEFAULT '0',
   `extension` smallint(3) unsigned NOT NULL DEFAULT '0',
   `can_release_test` tinyint(1) NOT NULL DEFAULT '1',
+  `last_build_request_timestamp` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`project_pk`,`student_registration_pk`),
   KEY `partner_sr_pk` (`partner_sr_pk`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
