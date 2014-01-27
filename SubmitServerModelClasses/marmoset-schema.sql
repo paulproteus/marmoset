@@ -42,6 +42,7 @@ CREATE TABLE `buildservers` (
   `remote_host` text COLLATE utf8_bin NOT NULL,
   `courses` text COLLATE utf8_bin NOT NULL,
   `last_request` datetime NOT NULL,
+  `kind` VARCHAR( 40 ) NOT NULL DEFAULT  'UNKNOWN',
   `last_request_submission_pk` int(11) NOT NULL DEFAULT '0',
   `last_job` datetime DEFAULT NULL,
   `last_success` datetime DEFAULT NULL,
