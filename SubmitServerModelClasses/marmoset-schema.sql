@@ -49,7 +49,6 @@ CREATE TABLE `buildservers` (
   `system_load` text COLLATE utf8_bin NOT NULL,
   `last_built_submission_pk` int(11) NOT NULL DEFAULT '0',
   `last_testrun_pk` int(11) NOT NULL DEFAULT '0',
-  `kind` VARCHAR( 40 ) NOT NULL DEFAULT  'UNKNOWN',
   PRIMARY KEY (`buildserver_pk`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
