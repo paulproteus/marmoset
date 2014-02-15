@@ -75,6 +75,7 @@ public class TestProperties {
    
     // Shared
     private int testTimeoutInSeconds;
+    private int buildTimeoutInSeconds;
     protected Set<String> requiredFiles;
 
     private int maxDrainOutputInBytes;
@@ -173,7 +174,10 @@ public class TestProperties {
         setLdLibraryPath(getOptionalStringProperty(LD_LIBRARY_PATH));
         int timeout = getOptionalIntegerProperty(TEST_TIMEOUT,
                 DEFAULT_PROCESS_TIMEOUT);
+        int buildTimeout = getOptionalIntegerProperty(TestPropertyKeys.BUILD_TIMEOUT,
+                timeout);
         setTestTimeoutInSeconds(timeout);
+        setBuildTimeoutInSeconds(buildTimeout);
         setRequiredFiles(getOptionalStringProperty(TestPropertyKeys.REQUIRED_FILES));
     }
 
@@ -246,9 +250,14 @@ public class TestProperties {
         return testTimeoutInSeconds;
     }
 
+    public void setBuildTimeoutInSeconds(int buildTimeout) {
+        this.buildTimeoutInSeconds = buildTimeout;
+        setProperty(TEST_TIMEOUT[0],
+                Integer.toString(buildTimeout));
+    }
     public void setTestTimeoutInSeconds(int testTimeout) {
         this.testTimeoutInSeconds = testTimeout;
-        setProperty(TEST_TIMEOUT[0],
+        setProperty(TestPropertyKeys.BUILD_TIMEOUT[0],
                 Integer.toString(this.testTimeoutInSeconds));
     }
 
