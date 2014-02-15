@@ -181,7 +181,8 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
 	        
 			ProcessExitMonitor exitMonitor = new ProcessExitMonitor(process, getLog(), startTime);
            
-            long processTimeoutMillis = getTestProperties().getBuildTimeoutInSeconds()*1000L;
+            int buildTimeoutInSeconds = getTestProperties().getBuildTimeoutInSeconds();
+            long processTimeoutMillis = buildTimeoutInSeconds*1000L;
 
             boolean done = exitMonitor.waitForProcessToExit(processTimeoutMillis);
             copyMakeOutput.cancel(true);
@@ -200,8 +201,8 @@ public class CBuilder extends Builder<MakeTestProperties> implements TestPropert
                 // Wait for a while, to give files a chance to settle
                 pause(20);
             } else {
-                throw new CompileFailureException("make timed-out" + getProjectSubmission().getZipFile().getPath(),
-                		makeOutput.toString());
+                throw new CompileFailureException("exceeded build.timeout of " + buildTimeoutInSeconds +"s : " 
+                        + getProjectSubmission().getZipFile().getPath(), makeOutput.toString());
             }
 		} catch (IOException e) {
 			throw new BuilderException("Could not execute make", e);

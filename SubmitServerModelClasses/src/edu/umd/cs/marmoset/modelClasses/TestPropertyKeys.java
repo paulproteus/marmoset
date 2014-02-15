@@ -72,7 +72,7 @@ public interface TestPropertyKeys {
 			{"test.timeout.testCase", "test.timeout", "test.timeout.testProcess", "timeout"};
 
     public static final String[] BUILD_TIMEOUT =
-            {"build.timeout"};
+            {"build.timeout", "make.timeout", "compile.timeout"};
 
     
     public static final String  REQUIRED_FILES = "files.required";
