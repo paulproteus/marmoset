@@ -145,6 +145,7 @@
 
 	<target name="clean">
 		<delete file="buildserver.jar"/>
+		<delete dir="build/BuildServer"/>
 		<delete file="build/buildserver.zip"/>
 	        <delete file="lib/diffOutputStream.jar"/>
 	        <delete file="lib/modelClasses.jar"/>
