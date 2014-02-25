@@ -193,16 +193,16 @@
 				<td class="input"><input name="lastname" type="text" value="" required />
 				</td>
 			</tr>
+            <tr>
+                <td class="label">Email</td>
+                <td class="input"><input name="email" type="text" value="" autocorrect="off" autocapitalize="off" required/>
+                </td>
+            </tr>
 			<tr>
 				<td class="label">Login name</td>
 				<td class="input"><input name="loginName" type="text" value="" autocorrect="off" autocapitalize="off" required/>
 				</td>
 			</tr>
-			<tr>
-                <td class="label">Email</td>
-                <td class="input"><input name="email" type="text" value="" autocorrect="off" autocapitalize="off" required/>
-                </td>
-            </tr>
             <tr>
 				<td class="label">Campus uid</td>
 				<td class="input"><input name="campusUID" type="text" value="" autocorrect="off" autocapitalize="off" required/>

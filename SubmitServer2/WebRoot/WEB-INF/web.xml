@@ -381,6 +381,15 @@
         <filter-name>CodeReviewAssignmentFilter</filter-name>
         <url-pattern>/action/instructor/UnassignCodeReview</url-pattern>
     </filter-mapping>
+      <filter-mapping>
+        <filter-name>CodeReviewAssignmentFilter</filter-name>
+        <url-pattern>/data/instructor/PrintRubricEvaluationsForDatabase</url-pattern>
+   </filter-mapping>
+     <filter-mapping>
+        <filter-name>CodeReviewAssignmentFilter</filter-name>
+        <url-pattern>/data/instructor/PrintRubricsForDatabase</url-pattern>
+    </filter-mapping>
+    
 	
 	<filter>
 		<filter-name>InstructorFilter</filter-name>

@@ -49,9 +49,8 @@ public class FindAllFiles {
 
     FindAllFiles(File root, Pattern filesToIgnore) throws IOException {
         p = filesToIgnore;
-        root = root.getCanonicalFile().getParentFile();
+        root = root.getCanonicalFile();
         rootPath = root.getCanonicalPath();
-       // System.out.println("Root path: " + rootPath);
         rootPathLength = rootPath.length();
         s.add(root);
         searchFrom(root);

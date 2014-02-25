@@ -70,7 +70,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
  */
 public class CommandLineSubmit {
 
-    public static final String VERSION = "0.9.0";
+    public static final String VERSION = "0.9.1";
     public static final int HTTP_TIMEOUT = Integer.getInteger("HTTP_TIMEOUT", 30).intValue() * 1000;
 
     public static void main(String[] args) {
@@ -113,6 +113,7 @@ public class CommandLineSubmit {
             FindAllFiles find = new FindAllFiles(home, ignorePatterns.getPattern());
             Collection<File> files = find.getAllFiles();
 
+            boolean createdSubmitUser = false;
             Properties userProps = new Properties();
             if (submitUserFile.canRead()) {
                 userProps.load(new FileInputStream(submitUserFile));
@@ -123,133 +124,188 @@ public class CommandLineSubmit {
                 System.out
                         .println("We need to authenticate you and create a .submitUser file so you can submit your project");
 
-                PrintWriter newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
-                if (authenticationType.equals("openid")) {
-                    String[] result = getSubmitUserForOpenId(courseKey, projectNumber, baseURL);
-                    String classAccount = result[0];
-                    String onetimePassword = result[1];
-                    newUserProjectFile.println("classAccount=" + classAccount);
-                    newUserProjectFile.println("oneTimePassword=" + onetimePassword);
-                } else {
-                    String loginName, password;
-                    
-                    Console console = System.console();
-                    
-                    System.out.println("Please enter your LDAP username and password");
-                    System.out.print("LDAP username: ");
-                    loginName = console.readLine();
-                    System.out.println("Password: ");
-                    password = new String(console.readPassword());
-                    System.out.println("Thanks!");
-                    System.out.println("Preparing for submission. Please wait...");
-
-                    String url = baseURL + "/eclipse/NegotiateOneTimePassword";
-                    PostMethod post = new PostMethod(url);
-
-                    post.addParameter("loginName", loginName);
-                    post.addParameter("password", password);
-                    
-                    post.addParameter("courseKey", courseKey);
-                    post.addParameter("projectNumber", projectNumber);
-
-                    HttpClient client = new HttpClient();
-                    client.setConnectionTimeout(HTTP_TIMEOUT);
-
-                    // System.out.println("Preparing to execute method");
-                    int status = client.executeMethod(post);
-                    // System.out.println("Post finished with status: " +status);
-
-                    if (status != HttpStatus.SC_OK) {
-                        throw new HttpException("Unable to negotiate one-time password with the server: "
-                                + post.getResponseBodyAsString());
-                    }
-
-                    InputStream inputStream = post.getResponseBodyAsStream();
-                    BufferedReader userStream = new BufferedReader(new InputStreamReader(inputStream));
-                    while (true) {
-                        String line = userStream.readLine();
-                        if (line == null)
-                            break;
-                        // System.out.println(line);
-                        newUserProjectFile.println(line);
-                    }
-                    userStream.close(); 
-                }
-                newUserProjectFile.close();
-                if (!submitUserFile.canRead()) {
-                    System.out.println("Can't generate or access " + submitUserFile);
-                    System.exit(1);
-                }
+                createSubmitUser(submitUserFile, courseKey, projectNumber,
+                        authenticationType, baseURL);
+                createdSubmitUser = true;
                 userProps.load(new FileInputStream(submitUserFile));
             }
 
-            // ========================== assemble zip file in byte array
-            // ==============================
-            String loginName = userProps.getProperty("loginName");
-            String classAccount = userProps.getProperty("classAccount");
-            String from = classAccount;
-            if (loginName != null && !loginName.equals(classAccount))
-                from += "/" + loginName;
-            System.out.println(" submitted by " + from); 
-            System.out.println();
-            System.out.println("Submitting the following files");
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream(4096);
-            byte[] buf = new byte[4096];
-            ZipOutputStream zipfile = new ZipOutputStream(bytes);
-            zipfile.setComment("zipfile for CommandLineTurnin, version " + VERSION);
-            for (File resource : files) {
-                if (resource.isDirectory())
-                    continue;
-                String relativePath = resource.getCanonicalPath().substring(find.rootPathLength + 1);
-                System.out.println(relativePath);
-                ZipEntry entry = new ZipEntry(relativePath);
-                entry.setTime(resource.lastModified());
-
-                zipfile.putNextEntry(entry);
-                InputStream in = new FileInputStream(resource);
-                try {
-                    while (true) {
-                        int n = in.read(buf);
-                        if (n < 0)
-                            break;
-                        zipfile.write(buf, 0, n);
-                    }
-                } finally {
-                    in.close();
-                }
-                zipfile.closeEntry();
-
-            } // for each file
-            zipfile.close();
-
-            MultipartPostMethod filePost = new MultipartPostMethod(p.getProperty("submitURL"));
-
-            p.putAll(userProps);
-            // add properties
-            for (Map.Entry<?, ?> e : p.entrySet()) {
-                String key = (String) e.getKey();
-                String value = (String) e.getValue();
-                if (!key.equals("submitURL"))
-                    filePost.addParameter(key, value);
-            }
-            filePost.addParameter("submitClientTool", "CommandLineTool");
-            filePost.addParameter("submitClientVersion", VERSION);
-            byte[] allInput = bytes.toByteArray();
-            filePost.addPart(new FilePart("submittedFiles", new ByteArrayPartSource("submit.zip", allInput)));
-            // prepare httpclient
+            MultipartPostMethod filePost = createFilePost(p, find, files,
+                    userProps);
             HttpClient client = new HttpClient();
             client.setConnectionTimeout(HTTP_TIMEOUT);
             int status = client.executeMethod(filePost);
             System.out.println(filePost.getResponseBodyAsString());
-            if (status != HttpStatus.SC_OK)
+            if (status == 500 && !createdSubmitUser) {
+                System.out.println("Let's try reauthenticating you");
+                System.out.println();
+
+
+                createSubmitUser(submitUserFile, courseKey, projectNumber,
+                        authenticationType, baseURL);
+                userProps.load(new FileInputStream(submitUserFile));
+                filePost = createFilePost(p, find, files,
+                        userProps);
+                client = new HttpClient();
+                client.setConnectionTimeout(HTTP_TIMEOUT);
+                status = client.executeMethod(filePost);
+                System.out.println(filePost.getResponseBodyAsString());
+            }
+            if (status != HttpStatus.SC_OK) {
+                System.out.println("Status code: " + status);
                 System.exit(1);
+            }
+            System.out.println("Submission accepted");
         } catch (Exception e) {
             System.out.println();
             System.out.println("An Error has occured during submission!");
             System.out.println();
             System.out.println("[DETAILS]");
             System.out.println(e.getMessage());
+            e.printStackTrace(System.out);
             System.out.println();
+        }
+    }
+
+    /**
+     * @param p
+     * @param find
+     * @param files
+     * @param userProps
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    public static MultipartPostMethod createFilePost(Properties p,
+            FindAllFiles find, Collection<File> files, Properties userProps)
+            throws IOException, FileNotFoundException {
+        // ========================== assemble zip file in byte array
+        // ==============================
+        String loginName = userProps.getProperty("loginName");
+        String classAccount = userProps.getProperty("classAccount");
+        String from = classAccount;
+        if (loginName != null && !loginName.equals(classAccount))
+            from += "/" + loginName;
+        System.out.println(" submitted by " + from); 
+        System.out.println();
+        System.out.println("Submitting the following files");
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream(4096);
+        byte[] buf = new byte[4096];
+        ZipOutputStream zipfile = new ZipOutputStream(bytes);
+        zipfile.setComment("zipfile for CommandLineTurnin, version " + VERSION);
+        for (File resource : files) {
+            if (resource.isDirectory())
+                continue;
+            String relativePath = resource.getCanonicalPath().substring(find.rootPathLength + 1);
+            System.out.println(relativePath);
+            ZipEntry entry = new ZipEntry(relativePath);
+            entry.setTime(resource.lastModified());
+
+            zipfile.putNextEntry(entry);
+            InputStream in = new FileInputStream(resource);
+            try {
+                while (true) {
+                    int n = in.read(buf);
+                    if (n < 0)
+                        break;
+                    zipfile.write(buf, 0, n);
+                }
+            } finally {
+                in.close();
+            }
+            zipfile.closeEntry();
+
+        } // for each file
+        zipfile.close();
+
+        MultipartPostMethod filePost = new MultipartPostMethod(p.getProperty("submitURL"));
+
+        p.putAll(userProps);
+        // add properties
+        for (Map.Entry<?, ?> e : p.entrySet()) {
+            String key = (String) e.getKey();
+            String value = (String) e.getValue();
+            if (!key.equals("submitURL"))
+                filePost.addParameter(key, value);
+        }
+        filePost.addParameter("submitClientTool", "CommandLineTool");
+        filePost.addParameter("submitClientVersion", VERSION);
+        byte[] allInput = bytes.toByteArray();
+        filePost.addPart(new FilePart("submittedFiles", new ByteArrayPartSource("submit.zip", allInput)));
+        return filePost;
+    }
+
+    /**
+     * @param submitUserFile
+     * @param courseKey
+     * @param projectNumber
+     * @param authenticationType
+     * @param baseURL
+     * @throws IOException
+     * @throws UnsupportedEncodingException
+     * @throws URISyntaxException
+     * @throws HttpException
+     */
+    public static void createSubmitUser(File submitUserFile, String courseKey,
+            String projectNumber, String authenticationType, String baseURL)
+            throws IOException, UnsupportedEncodingException,
+            URISyntaxException, HttpException {
+        PrintWriter newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
+        if (authenticationType.equals("openid")) {
+            String[] result = getSubmitUserForOpenId(courseKey, projectNumber, baseURL);
+            String classAccount = result[0];
+            String onetimePassword = result[1];
+            newUserProjectFile.println("classAccount=" + classAccount);
+            newUserProjectFile.println("oneTimePassword=" + onetimePassword);
+        } else {
+            String loginName, password;
+            
+            Console console = System.console();
+            
+            System.out.println("Please enter your LDAP username and password");
+            System.out.print("LDAP username: ");
+            loginName = console.readLine();
+            System.out.println("Password: ");
+            password = new String(console.readPassword());
+            System.out.println("Thanks!");
+            System.out.println("Preparing for submission. Please wait...");
+
+            String url = baseURL + "/eclipse/NegotiateOneTimePassword";
+            PostMethod post = new PostMethod(url);
+
+            post.addParameter("loginName", loginName);
+            post.addParameter("password", password);
+            
+            post.addParameter("courseKey", courseKey);
+            post.addParameter("projectNumber", projectNumber);
+
+            HttpClient client = new HttpClient();
+            client.setConnectionTimeout(HTTP_TIMEOUT);
+
+            // System.out.println("Preparing to execute method");
+            int status = client.executeMethod(post);
+            // System.out.println("Post finished with status: " +status);
+
+            if (status != HttpStatus.SC_OK) {
+                throw new HttpException("Unable to negotiate one-time password with the server: "
+                        + post.getResponseBodyAsString());
+            }
+
+            InputStream inputStream = post.getResponseBodyAsStream();
+            BufferedReader userStream = new BufferedReader(new InputStreamReader(inputStream));
+            while (true) {
+                String line = userStream.readLine();
+                if (line == null)
+                    break;
+                // System.out.println(line);
+                newUserProjectFile.println(line);
+            }
+            userStream.close(); 
+        }
+        newUserProjectFile.close();
+        if (!submitUserFile.canRead()) {
+            System.out.println("Can't generate or access " + submitUserFile);
+            System.exit(1);
         }
     }
 
