@@ -198,6 +198,7 @@ public class UploadSubmission extends SubmitServerServlet {
                                 tins.copyEntryContents(zos);
                                 zos.closeEntry();
                             }
+                            tins.close();
                         } else {
                             // Non-archive file type
                             kind = Kind.SINGLE_FILE;

@@ -61,5 +61,7 @@ public class CheckUptime
             if (line==null) break;
             System.out.println(line);
         }
+        reader.close();
+        s.close();
     }
 }

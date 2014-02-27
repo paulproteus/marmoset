@@ -250,11 +250,12 @@ public class CommandLineSubmit {
             String projectNumber, String authenticationType, String baseURL)
             throws IOException, UnsupportedEncodingException,
             URISyntaxException, HttpException {
-        PrintWriter newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
+        PrintWriter newUserProjectFile;
         if (authenticationType.equals("openid")) {
             String[] result = getSubmitUserForOpenId(courseKey, projectNumber, baseURL);
             String classAccount = result[0];
             String onetimePassword = result[1];
+            newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
             newUserProjectFile.println("classAccount=" + classAccount);
             newUserProjectFile.println("oneTimePassword=" + onetimePassword);
         } else {
@@ -293,6 +294,7 @@ public class CommandLineSubmit {
 
             InputStream inputStream = post.getResponseBodyAsStream();
             BufferedReader userStream = new BufferedReader(new InputStreamReader(inputStream));
+            newUserProjectFile = new PrintWriter(new FileWriter(submitUserFile));
             while (true) {
                 String line = userStream.readLine();
                 if (line == null)
@@ -379,6 +381,7 @@ public class CommandLineSubmit {
                     break;
                 ignorePatterns.addPattern(ignoreMe);
             }
+            ignoreContents.close();
         }
     }
 }
