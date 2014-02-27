@@ -161,7 +161,7 @@
   </target>
 
   <target name="buildserver.zip">
-    <ant dir="../buildserver" target="dist"/>
+    <!-- <ant dir="../BuildServer" target="dist"/> -->
   </target>
 
   <!-- Create a war file-->
