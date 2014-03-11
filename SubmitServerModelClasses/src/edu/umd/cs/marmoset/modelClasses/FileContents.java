@@ -163,6 +163,9 @@ public class FileContents implements Comparable<FileContents> {
             result.insert(conn);
             return result;
         } catch (SQLException e) {
+            try {stmt.close(); } catch (Exception e2) {};
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, result.checksum);
             existing = getFromPreparedStatement(stmt);
             if (existing != null)
                 return existing;

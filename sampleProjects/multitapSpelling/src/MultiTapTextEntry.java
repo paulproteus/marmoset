@@ -73,6 +73,7 @@ public class MultiTapTextEntry {
             String txt = s.nextLine();
             System.out.printf("Case #%d: %s%n", i, getMultitapSpelling(txt));
         }
+        s.close();
     }
 
 }

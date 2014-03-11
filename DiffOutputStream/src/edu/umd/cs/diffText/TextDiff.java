@@ -108,11 +108,11 @@ public class TextDiff extends StringsWriter {
 
         final ArrayDeque<Object> expect = new ArrayDeque<Object>();
 
-        Builder() {
+        public Builder() {
             options = new EnumMap<Option, String>(Option.class);
         }
 
-        Builder(EnumMap<Option, String>options) {
+        public Builder(EnumMap<Option, String>options) {
             this.options = new EnumMap<Option,String>(options);
         }
 

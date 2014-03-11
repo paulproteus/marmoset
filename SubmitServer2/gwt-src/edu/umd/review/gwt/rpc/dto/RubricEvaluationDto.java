@@ -105,8 +105,11 @@ public abstract class RubricEvaluationDto implements IsSerializable, Comparable<
   }
 
   public void setDefaultValue() {
-    if (value == null)
-      setValue(rubric.getDefaultValue());
+    if (value != null && !value.isEmpty())
+      return;
+    
+    setValue(rubric.getDefaultValue());
+      
   }
   public void setValue(String value) {
     rubric.assertIsValidValue(value);
