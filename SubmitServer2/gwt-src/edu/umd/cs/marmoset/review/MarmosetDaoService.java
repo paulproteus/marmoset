@@ -647,7 +647,7 @@ public class MarmosetDaoService implements ReviewDao {
         RubricEvaluation.publish(RubricEvaluation.asPK(id), now, conn);
       }
 
-      reviewer.addComments(conn, commentIds.size(), now);
+      reviewer.addComments(conn, commentIds.size() + evaluationIds.size(), now);
       didPublish(conn);
 
     } catch (SQLException e) {
@@ -674,9 +674,8 @@ public class MarmosetDaoService implements ReviewDao {
     Timestamp now = now();
     try {
       conn = getConnection();
-      int count = CodeReviewComment.publishAll(reviewer, now, conn);
+      int count = CodeReviewComment.publishAll(reviewer, now, conn) + RubricEvaluation.publishAll(reviewer, now, conn);
       reviewer.addComments(conn, count, now);
-      RubricEvaluation.publishAll(reviewer, now, conn);
      didPublish(conn);
 
     } catch (SQLException e) {
