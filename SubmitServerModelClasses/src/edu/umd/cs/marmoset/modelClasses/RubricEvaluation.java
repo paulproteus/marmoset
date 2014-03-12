@@ -281,7 +281,7 @@ public void update(Connection conn) throws SQLException {
     }
   }
 
-  public static void publishAll(CodeReviewer reviewer, Timestamp now, Connection conn)
+  public static int publishAll(CodeReviewer reviewer, Timestamp now, Connection conn)
       throws SQLException {
     String query = "UPDATE " + TABLE_NAME + ", " + CodeReviewThread.TABLE_NAME
         + " SET " + TABLE_NAME + ".status = ?, " +TABLE_NAME+".modified=? "
@@ -294,7 +294,7 @@ public void update(Connection conn) throws SQLException {
 
     try {
       Queries.setStatement(stmt, "LIVE", now, reviewer.getCodeReviewerPK(), reviewer.getSubmissionPK());
-      stmt.execute();
+      return stmt.executeUpdate();
     } finally {
       stmt.close();
     }
