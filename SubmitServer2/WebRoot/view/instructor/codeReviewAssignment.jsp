@@ -47,8 +47,6 @@
 		<p>
 			<c:out value="${codeReviewAssignment.description}" />
         <p>
-            Visibility: <c:out value="${codeReviewAssignment.visibleToStudents}" />
-		<p>
 			Due
 			<fmt:formatDate value="${codeReviewAssignment.deadline}"
 				pattern="dd MMM, hh:mm a" />
