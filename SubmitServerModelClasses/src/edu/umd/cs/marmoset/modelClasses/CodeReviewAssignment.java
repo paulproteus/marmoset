@@ -146,7 +146,8 @@ public class CodeReviewAssignment {
         return kind.isByStudents();
     }
 	public boolean isVisibleToStudents() {
-		return visibleToStudents && !kind.isPrototype();
+	    boolean result = visibleToStudents && !kind.isPrototype();
+	    return result;
 	}
 	public void setVisibleToStudents(boolean visibleToStudents) {
 		this.visibleToStudents = visibleToStudents;

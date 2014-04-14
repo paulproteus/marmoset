@@ -589,17 +589,27 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 		this.rating = resultSet.getInt(startingFrom++);
 		this.ratingComment = resultSet.getString(startingFrom++);
 	}
-	public  CodeReviewer(ResultSet resultSet, int startingFrom, Connection conn)
+	public  CodeReviewer(@CheckForNull CodeReviewAssignment assignment, ResultSet resultSet, int startingFrom, Connection conn)
 	throws SQLException
 	{
 		this(resultSet, startingFrom);
-		if (codeReviewAssignmentPK != 0)
-			this.codeReviewAssignment = CodeReviewAssignment.lookupByPK(this.codeReviewAssignmentPK, conn);
+		this.codeReviewAssignment = assignment;
 		this.submission = Submission.lookupBySubmissionPK(this.submissionPK, conn);
 		this.student = Student.lookupByStudentPK(studentPK, conn);
 
 	}
 
+	   public  CodeReviewer(ResultSet resultSet, int startingFrom, Connection conn)
+	           throws SQLException
+	           {
+	               this(resultSet, startingFrom);
+	               if (codeReviewAssignmentPK != 0)
+	                   this.codeReviewAssignment = CodeReviewAssignment.lookupByPK(this.codeReviewAssignmentPK, conn);
+	               this.submission = Submission.lookupBySubmissionPK(this.submissionPK, conn);
+	               this.student = Student.lookupByStudentPK(studentPK, conn);
+
+	           }
+	   
 	public static CodeReviewer lookupByPK(int codeReviewerPK,
 			Connection conn) throws SQLException {
 		String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
@@ -635,7 +645,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			stmt.close();
 		}
 	}
-	public static @CheckForNull CodeReviewer lookupAuthorBySubmission(
+	public static @CheckForNull CodeReviewer lookupAuthorBySubmission(@CheckForNull CodeReviewAssignment assignment,
 			@Submission.PK int submissionPK, Connection conn) throws SQLException {
 		String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
 				+ " WHERE submission_pk = ? "
@@ -647,7 +657,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			stmt.setBoolean(2, true);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
-				return new CodeReviewer(rs, 1, conn);
+				return new CodeReviewer(assignment, rs, 1, conn);
 			return null;
 		} finally {
 			stmt.close();
@@ -678,6 +688,25 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			stmt.close();
 		}
 	}
+	   public static Collection<CodeReviewer> getReviewers(CodeReviewAssignment assignment,
+	            Connection conn) throws SQLException {
+	        String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
+	                + " WHERE code_review_assignment_pk = ? ";
+
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        try {
+	            stmt.setInt(1, assignment.getCodeReviewAssignmentPK());
+	            ResultSet rs = stmt.executeQuery();
+	            LinkedList<CodeReviewer> result = new LinkedList<CodeReviewer>();
+
+	            while (rs.next())
+	                result.add( new CodeReviewer(assignment, rs, 1, conn));
+	            return result;
+	        } finally {
+	            stmt.close();
+	        }
+	    }
+	   
 	public static Collection<CodeReviewer> lookupByCodeReviewAssignmentPK(int codeReviewAssignmentPK,
 			Connection conn) throws SQLException {
 		String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
@@ -712,7 +741,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
             stmt.close();
         }
     }
-	public static Collection<CodeReviewer> lookupBySubmissionPK( @Submission.PK int submissionPK,
+	public static Collection<CodeReviewer> lookupBySubmissionPK( @CheckForNull CodeReviewAssignment assignment,  @Submission.PK int submissionPK,
 			Connection conn) throws SQLException {
 		String query = "SELECT " + ATTRIBUTES + " FROM " + TABLE_NAME
 				+ " WHERE submission_pk = ? ";
@@ -724,7 +753,7 @@ public class CodeReviewer implements Comparable<CodeReviewer> {
 			LinkedList<CodeReviewer> result = new LinkedList<CodeReviewer>();
 
 			while (rs.next())
-				result.add( new CodeReviewer(rs, 1, conn));
+				result.add( new CodeReviewer(assignment, rs, 1, conn));
 			return result;
 		} finally {
 			stmt.close();
