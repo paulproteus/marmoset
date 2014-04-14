@@ -60,7 +60,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 			this.submission = submission;
 			this.project = Project.getByProjectPK(submission.getProjectPK(), conn);
 			this.course = Course.getByCoursePK(project.getCoursePK(), conn);
-			this.author = CodeReviewer.lookupAuthorBySubmission(
+			this.author = CodeReviewer.lookupAuthorBySubmission(assignment, 
 					submission.getSubmissionPK(), conn);
 
 			this.assignment = assignment;
@@ -70,7 +70,7 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				createFindbugsThreads(conn, submission);
 			}
 			
-			for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(submission.getSubmissionPK(), conn)) {
+			for(CodeReviewer r : CodeReviewer.lookupBySubmissionPK(assignment, submission.getSubmissionPK(), conn)) {
 				this.reviewers.put(r.getCodeReviewerPK(), r);
 			}
 		    this.allThreads = CodeReviewThread.lookupBySubmissionPK(submission.getSubmissionPK(), conn);

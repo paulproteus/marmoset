@@ -52,8 +52,8 @@ public class CodeReviewAssignmentFilter extends SubmitServerFilter {
         request.setAttribute("overallCodeReviewStatus", CodeReviewSummary.Status.NOT_STARTED);
         
       } else {
-        Collection<CodeReviewer> codeReviewersForAssignment = CodeReviewer.lookupByCodeReviewAssignmentPK(
-            codeReviewAssignmentPK, conn);
+        Collection<CodeReviewer> codeReviewersForAssignment = CodeReviewer.getReviewers(
+            codeReviewAssignment, conn);
 
         Map<Submission, CodeReviewSummary.Info> info = new HashMap<Submission, CodeReviewSummary.Info>();
         for (Submission s : submissionsUnderReview) {
