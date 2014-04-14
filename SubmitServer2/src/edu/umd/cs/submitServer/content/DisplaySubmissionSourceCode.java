@@ -205,14 +205,16 @@ public class DisplaySubmissionSourceCode {
       SQLException {
 
     int numChangedLines = submission.getNumChangedLines();
-    if (numChangedLines >= 0)
+    if (submission.isNumChangedLinesKnown())
       return numChangedLines;
+    int count = 0;
+    try {
     DisplayProperties fileProperties = new DisplayProperties();
     Map<String, List<String>> baseline = project.getBaselineText(conn, fileProperties);
 
     Map<String, List<String>> text = submission.getText(conn, fileProperties);
     Map<String, BitSet> changed = project.computeDiff(conn, submission, text, baseline, fileProperties);
-    int count = 0;
+
     for(Map.Entry<String, List<String>> e : text.entrySet()) {
       BitSet b = changed.get(e.getKey());
       if (b != null)
@@ -223,7 +225,11 @@ public class DisplaySubmissionSourceCode {
         count += value.size();
       }
     }
-
+    } catch (Throwable e) {
+      System.out.printf("Error getting num changed lines for submission %d: %s %s%n", submission.getSubmissionPK(),
+          e.getClass().getSimpleName(), e.getMessage());
+      count = -2;
+    }
     submission.setNumChangedLines(count);
     submission.update(conn);
     return count;

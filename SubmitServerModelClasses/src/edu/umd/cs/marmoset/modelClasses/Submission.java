@@ -312,6 +312,9 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
     public int getNumChangedLines() {
         return numChangedLines;
     }
+    public boolean isNumChangedLinesKnown() {
+        return numChangedLines != -1;
+    }
     public void setNumChangedLines(int numChangedLines) {
         this.numChangedLines = numChangedLines;
     }
