@@ -223,7 +223,7 @@
 									value="${codeReviewAssignment.codeReviewAssignmentPK}" />
 								Currently visible to students. <input type="hidden"
 									name="visibleToStudents" value="false" /> <input type="submit"
-									value="Make Visible" style="color: #003399" />
+									value="Make Invisible" style="color: #003399" />
 							</form>
 					</c:otherwise>
 				</c:choose>
