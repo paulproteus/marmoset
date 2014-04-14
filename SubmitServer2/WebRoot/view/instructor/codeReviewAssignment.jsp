@@ -46,6 +46,8 @@
 		</h2>
 		<p>
 			<c:out value="${codeReviewAssignment.description}" />
+        <p>
+            Visibility: <c:out value="${codeReviewAssignment.visibleToStudents}" />
 		<p>
 			Due
 			<fmt:formatDate value="${codeReviewAssignment.deadline}"
@@ -194,7 +196,7 @@
 								action="${changeCodeReviewAssignmentVisibilityLink}">
 								<input type="hidden" name="codeReviewAssignmentPK"
 									value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-								Currently invisible to students. <input type="hidden"
+								Currently invisible to students. <!- XXX1 -> <input type="hidden"
 									name="visibleToStudents" value="true" /> <input type="submit"
 									value="Make Visible" style="color: #003399" />
 							</form>
@@ -206,12 +208,12 @@
 			<h2>Code review started</h2>
 			<ul>
 				<c:choose>
-					<c:when test="${codeReviewAssignment.visibleToStudents}">
+					<c:when test="${!codeReviewAssignment.visibleToStudents}">
 						<li><form method="post"
 								action="${changeCodeReviewAssignmentVisibilityLink}">
 								<input type="hidden" name="codeReviewAssignmentPK"
 									value="${codeReviewAssignment.codeReviewAssignmentPK}" />
-								Currently invisible to students. <input type="hidden"
+								Currently invisible to students. <!-- XXX2 --> <input type="hidden"
 									name="visibleToStudents" value="true" /> <input type="submit"
 									value="Make Visible" style="color: #003399" />
 							</form>
