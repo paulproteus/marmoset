@@ -89,12 +89,16 @@ public class SystemInfo {
         
         List<MemoryPoolMXBean> mlist = ManagementFactory.getMemoryPoolMXBeans();
         for(MemoryPoolMXBean mb : mlist) {
+        	String name = mb.getName();
+			if (name.equals("Metaspace"))
+				continue;
             MemoryUsage usage = mb.getUsage();
             int current = mb(usage.getUsed());
             int max = mb(usage.getMax());
             
-            if (verbose || current > max/2+4)
-                out.printf("%s %d/%d, ", mb.getName(), current, max);
+            if (verbose || current > max/2+4) {
+				out.printf("%s %d/%d, ", name, current, max);
+			}
         }   
         
         getFreeDiskSpace(out, verbose);
