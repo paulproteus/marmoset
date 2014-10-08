@@ -50,6 +50,7 @@ import edu.umd.cs.marmoset.modelClasses.CodeReviewSummary;
 import edu.umd.cs.marmoset.modelClasses.CodeReviewer;
 import edu.umd.cs.marmoset.modelClasses.Course;
 import edu.umd.cs.marmoset.modelClasses.Project;
+import edu.umd.cs.marmoset.modelClasses.ServerError;
 import edu.umd.cs.marmoset.modelClasses.StudentRegistration;
 import edu.umd.cs.marmoset.modelClasses.Submission;
 import edu.umd.cs.submitServer.SubmitServerConstants;
@@ -109,7 +110,16 @@ public class MyCodeReviewsFilter extends SubmitServerFilter {
 			boolean allCodeReviews = request.getServletPath().endsWith("codeReviews.jsp");
 			boolean anyCodeReviews = false;
 			for(CodeReviewer r : myReviews) {
-				CodeReviewSummary s =  new CodeReviewSummary(conn, r);
+			  CodeReviewSummary s;
+			
+			  try {
+				 s =  new CodeReviewSummary(conn, r);
+			  } catch (Exception e) {
+			    ServletExceptionFilter.logError(conn, ServerError.Kind.EXCEPTION, request, 
+              "error in getting summary for code review " + r,
+               null, e);
+			    continue;
+			  }
 				if (project != null && !project.equals(s.getProject()))
 					continue;
 				if (myProjectPks != null && !myProjectPks.contains(s.getProject().getProjectPK()))
