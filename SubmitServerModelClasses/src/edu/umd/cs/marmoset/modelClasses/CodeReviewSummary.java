@@ -81,9 +81,11 @@ public class CodeReviewSummary  implements Comparable<CodeReviewSummary>{
 				    this.rubrics.put(r.getRubricPK(), r);
 			}
 		    for(RubricEvaluation eval : this.allRubricEvaluations) 
+		    	    if (eval != null)
 		    		if (!this.rubrics.containsKey(eval.getRubricPK())) {
 		    			Rubric r = Rubric.lookupByPK(eval.getRubricPK(), conn);
-		    			this.rubrics.put(r.getRubricPK(), r);
+		    			if (r != null)
+		    				this.rubrics.put(r.getRubricPK(), r);
 		    }
 
 
