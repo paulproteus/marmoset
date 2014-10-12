@@ -1225,6 +1225,32 @@ public class Submission implements ITestSummary<Submission>, Cloneable {
         return this.getSubmissionPK() - that.getSubmissionPK();
     }
 
+    
+    
+    
+    /**
+     * Get the total number of submissions with a particular status
+     */
+    
+    public static int numSubmissions(Connection conn, BuildStatus status)
+    throws SQLException
+    {
+        String queryString =
+            " SELECT " +ATTRIBUTES+
+            " FROM submissions " +
+            " WHERE submissions.current_test_run_pk = ? ";
+        PreparedStatement query = Queries.setStatement(conn, queryString, status);
+        try {
+            ResultSet rs = query.executeQuery();
+            if (rs.next())
+            return rs.getInt(1);
+            return 0;
+        } finally {
+            Queries.closeStatement(query);
+        }
+
+    }
+    
     /**
      * Looks up a submission whose currentTestRunPK is equal to the given testRunPK.
      * @param testRunPK the testRunPK
