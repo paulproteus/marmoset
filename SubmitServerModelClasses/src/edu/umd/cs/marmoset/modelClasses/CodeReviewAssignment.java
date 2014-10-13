@@ -253,9 +253,22 @@ public class CodeReviewAssignment {
 		if (activeReviewers > 0)
 			throw new IllegalStateException("Can't delete code review with active reviewers");
 		CodeReviewer.deleteInactiveReviewers(conn, this);
-		String cmd = "DELETE FROM " + Rubric.TABLE_NAME
-				+ " WHERE code_review_assignment_pk = ?";
+		String tables = Rubric.TABLE_NAME + "," + RubricEvaluation.TABLE_NAME;
 
+		executeDeeleteCodeReviewAssignment(conn, "DELETE " + tables + " FROM " + tables  
+				+ " WHERE code_review_assignment_pk = ? "
+				+ " AND " + Rubric.TABLE_NAME+"rubic_pk = "
+				+ RubricEvaluation.TABLE_NAME+"rubic_pk");	
+
+		executeDeeleteCodeReviewAssignment(conn, "DELETE FROM " + Rubric.TABLE_NAME
+				 + " WHERE code_review_assignment_pk = ?");
+
+		executeDeeleteCodeReviewAssignment(conn, "DELETE FROM " + CodeReviewAssignment.TABLE_NAME
+				+ " WHERE code_review_assignment_pk = ?");
+		
+	}
+	private void executeDeeleteCodeReviewAssignment(Connection conn, String cmd)
+			throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(cmd);
 		try {
 			Queries.setStatement(stmt, codeReviewAssignmentPK);
@@ -263,17 +276,6 @@ public class CodeReviewAssignment {
 		} finally {
 			stmt.close();
 		}
-		cmd = "DELETE FROM " + CodeReviewAssignment.TABLE_NAME
-				+ " WHERE code_review_assignment_pk = ?";
-
-		stmt = conn.prepareStatement(cmd);
-		try {
-			Queries.setStatement(stmt, codeReviewAssignmentPK);
-			stmt.execute();
-		} finally {
-			stmt.close();
-		}
-
 	}
     public void update(Connection conn) throws SQLException {
         String whereClause = " WHERE code_review_assignment_pk = ? ";
