@@ -330,8 +330,7 @@ public class RequestParser {
         project.setBrowserEditing(BrowserEditing.valueOfAnyCase(
                 getCheckedParameter("browserEditing")));
 
-		if (hasParameter("pair"))
-            project.setPair(getCheckbox("pair"));
+		project.setPair(getCheckbox("pair"));
 
 		boolean isTested = getCheckbox("tested");
 		project.setIsTested(isTested);
