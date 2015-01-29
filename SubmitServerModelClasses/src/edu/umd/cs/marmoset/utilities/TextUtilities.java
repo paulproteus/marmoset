@@ -307,10 +307,7 @@ public class TextUtilities {
 						.asList(String
 								.format("File contains  %,d lines; not included in source listing",
 										result.size()));
-			if (s.length() > 500)
-				result.add(s.substring(500) + "... (elided)");
-			else
-				result.add(s);
+			result.add(s);
 		}
 		return result;
 	}
